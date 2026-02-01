@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment — FWF Membership</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/images/logo.png">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+  <link rel="shortcut icon" href="assets/images/logo.png">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  
+  <style>
+    :root{
+      --ink:#1e293b; --muted:#64748b; --soft:#f1f5f9;
+      --success:#22c55e; --error:#ef4444;
+      --card:#ffffff; --brd:#e2e8f0;
+    }
+    body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#f8fafc;color:var(--ink);padding:20px 0}
+    *{box-sizing:border-box}
+    
+    .container{max-width:720px;margin:40px auto;padding:0 16px}
+    .card{background:#fff;border:1px solid var(--brd);border-radius:26px;box-shadow:0 18px 50px rgba(2,6,23,.12);padding:40px 32px}
+    .card h2{margin:0 0 8px;font-size:2rem;font-weight:900;color:var(--ink)}
+    .card .subtitle{margin:0 0 24px;color:var(--muted);font-weight:600}
+    
+    .summary-box{background:linear-gradient(135deg,#fef3c7,#fef08a);border:2px solid #fbbf24;border-radius:16px;padding:24px;margin-bottom:24px}
+    .summary-box h3{margin:0 0 16px;color:#92400e;font-size:1.2rem}
+    .summary-item{display:flex;justify-content:space-between;margin:10px 0;padding:8px 0;border-bottom:1px solid #fcd34d}
+    .summary-item:last-child{border:0;font-weight:800;font-size:1.3rem;color:#92400e}
+    .summary-label{color:#78350f}
+    .summary-value{font-weight:700;color:#92400e}
+    
+    .payment-methods{margin:24px 0}
+    .payment-option{border:2px solid var(--brd);border-radius:16px;padding:20px;margin-bottom:14px;cursor:pointer;transition:all .2s}
+    .payment-option:hover{border-color:#6153ff;background:#f5f3ff}
+    .payment-option.selected{border-color:#6153ff;background:#f5f3ff;box-shadow:0 0 0 3px rgba(97,83,255,.1)}
+    .payment-option input[type="radio"]{margin-right:12px;width:20px;height:20px}
+    .payment-label{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.1rem}
+    .payment-icon{font-size:1.5rem}
+    
+    .upi-details{margin-top:16px;padding:20px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;display:none}
+    .upi-details.show{display:block}
+    .upi-id{font-size:1.2rem;font-weight:800;color:#166534;padding:12px;background:#fff;border-radius:8px;text-align:center;margin:12px 0;border:2px dashed#22c55e}
+    .qr-placeholder{width:200px;height:200px;margin:16px auto;background:#fff;border:2px solid #86efac;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#22c55e;font-weight:700}
+    
+    .form-field{margin-bottom:20px}
+    .form-input{width:100%;padding:14px 16px;border:2px solid var(--brd);border-radius:12px;font-size:1rem;font-family:inherit;font-weight:600}
+    .form-input:focus{outline:0;border-color:#6153ff;box-shadow:0 0 0 3px rgba(97,83,255,.1)}
+    .form-label{display:block;margin-bottom:8px;font-weight:700;color:var(--ink)}
+    
+    .btn-submit{width:100%;padding:18px 0;background:#22c55e;color:#fff;font-weight:900;border:none;border-radius:16px;font-size:1.1rem;cursor:pointer;box-shadow:0 10px 26px rgba(34,197,94,.25);transition:all .2s;font-family:inherit}
+    .btn-submit:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px)}
+    .btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+    
+    .message{padding:14px 18px;border-radius:12px;margin-bottom:20px;font-weight:600;display:none}
+    .message.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;display:block}
+    .message.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;display:block}
+    
+    .back-link{display:inline-flex;align-items:center;gap:8px;color:#6153ff;text-decoration:none;font-weight:700;margin-bottom:20px}
+    .back-link:hover{text-decoration:underline}
+    
+    .success-modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:1000}
+    .success-modal.show{display:flex}
+    .success-content{background:#fff;border-radius:24px;padding:40px;max-width:500px;text-align:center}
+    .success-icon{font-size:4rem;color:#22c55e;margin-bottom:20px}
+    .success-content h2{margin:0 0 12px;color:#22c55e}
+    .success-content p{margin:12px 0;color:var(--muted)}
+    .credentials{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px;margin:20px 0}
+    .credentials div{margin:10px 0}
+    .credentials strong{color:#166534}
+    .btn-primary{display:inline-block;margin-top:20px;padding:14px 32px;background:#6153ff;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/join" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Form
+    </a>
+    
+    <div class="card">
+      <h2>Complete Payment</h2>
+      <p class="subtitle">Secure your FWF membership</p>
+      
+      <div class="summary-box">
+        <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+        <div class="summary-item">
+          <span class="summary-label">Membership Plan:</span>
+          <span class="summary-value">Monthly</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Registration Fee:</span>
+          <span class="summary-value">₹200</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Amount:</span>
+          <span class="summary-value">₹200</span>
+        </div>
+      </div>
+      
+      <div id="message" class="message"></div>
+      
+      <div class="payment-methods">
+        <h3 style="margin-bottom:16px">Select Payment Method</h3>
+        
+        <label class="payment-option" id="upiOption">
+          <div class="payment-label">
+            <input type="radio" name="payment" value="upi" checked>
+            <span class="payment-icon" style="color:#22c55e">💳</span>
+            <span>UPI Payment</span>
+          </div>
+          <div class="upi-details show" id="upiDetails">
+            <p style="margin:0 0 12px;font-weight:600;color:#166534">Scan QR or Pay to UPI ID:</p>
+            <div class="upi-id">fwf@paytm</div>
+            <div class="qr-placeholder">
+              <div>
+                <i class="fas fa-qrcode" style="font-size:3rem"></i>
+                <p style="margin:8px 0 0;font-size:0.9rem">QR Code</p>
+              </div>
+            </div>
+            <p style="margin:12px 0 0;font-size:0.9rem;color:#166534">After payment, enter Transaction ID below</p>
+          </div>
+        </label>
+        
+        <label class="payment-option" id="bankOption">
+          <div class="payment-label">
+            <input type="radio" name="payment" value="bank">
+            <span class="payment-icon" style="color:#3b82f6">🏦</span>
+            <span>Bank Transfer / NEFT</span>
+          </div>
+        </label>
+      </div>
+      
+      <form id="paymentForm">
+        <div class="form-field">
+          <label class="form-label">Transaction ID / Reference Number</label>
+          <input class="form-input" name="paymentRef" type="text" placeholder="Enter your payment reference" required>
+        </div>
+        
+        <button class="btn-submit" type="submit" id="submitBtn">
+          <i class="fas fa-check-circle"></i> Complete Membership
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="success-modal" id="successModal">
+    <div class="success-content">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2>Welcome to FWF!</h2>
+      <p>Your membership has been successfully registered</p>
+      <div class="credentials" id="credentials">
+        <div><strong>Member ID:</strong> <span id="displayMemberId">Loading...</span></div>
+        <div><strong>Password:</strong> <span id="displayPassword">Loading...</span></div>
+      </div>
+      <p style="font-size:0.9rem;color:var(--error)">
+        <i class="fas fa-exclamation-triangle"></i> Please save these credentials securely
+      </p>
+      <a href="/member-login" class="btn-primary">Login to Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    // Load saved data
+    const savedData = JSON.parse(sessionStorage.getItem('fwfJoinData') || '{}');
+    if (!savedData.fullName) {
+      alert('Session expired. Please fill the form again.');
+      window.location.href = '/join';
+    }
+    
+    // Payment method toggle
+    const paymentOptions = document.querySelectorAll('.payment-option');
+    const upiDetails = document.getElementById('upiDetails');
+    
+    paymentOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const radio = option.querySelector('input[type="radio"]');
+        radio.checked = true;
+        paymentOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        
+        if (radio.value === 'upi') {
+          upiDetails.classList.add('show');
+        } else {
+          upiDetails.classList.remove('show');
+        }
+      });
+    });
+    
+    // Initialize first option as selected
+    document.getElementById('upiOption').classList.add('selected');
+    
+    // Form submission
+    const form = document.getElementById('paymentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const message = document.getElementById('message');
+    const successModal = document.getElementById('successModal');
+    
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = 'message ' + type;
+      message.style.display = 'block';
+      setTimeout(() => {
+        message.style.display = 'none';
+      }, 5000);
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const paymentRef = form.paymentRef.value.trim();
+      if (!paymentRef) {
+        showMessage('Please enter transaction reference', 'error');
+        return;
+      }
+      
+      // Disable button and show loading
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      
+      try {
+        // Prepare final data
+        const finalData = {
+          ...savedData,
+          paymentRef: paymentRef
+        };
+        
+        // Submit to API
+        const response = await fetch('/api/join', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(finalData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+          // Show success modal with credentials
+          document.getElementById('displayMemberId').textContent = result.memberId || 'Check your email';
+          document.getElementById('displayPassword').textContent = result.password || 'Check your email';
+          successModal.classList.add('show');
+          
+          // Clear session storage
+          sessionStorage.removeItem('fwfJoinData');
+        } else {
+          showMessage(result.error || 'Registration failed. Please try again.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showMessage('Network error. Please check your connection and try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+  </script>
+</body>
+</html>

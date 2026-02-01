@@ -1,92 +1,213 @@
-<!-- JOIN MEMBERSHIP — STEP 1 (put inside join.html) -->
-<section id="join-membership" style="max-width:720px;margin:20px auto;padding:0 16px">
-  <div style="background:#fff;border:1px solid #e7e9f6;border-radius:26px;box-shadow:0 18px 50px rgba(2,6,23,.12);padding:28px 22px">
-    <h2 style="margin:0 0 6px;font-size:1.8rem;font-weight:900;color:#0f172a">Join Membership</h2>
-    <p style="margin:0 0 18px;color:#64748b;font-weight:700">₹200/month – training, projects, mentoring & job-connect</p>
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Join FWF — Membership</title>
 
-    <style>
-      .jm-fl{position:relative;margin-bottom:14px}
-      .jm-inp{
-        width:100%;border-radius:16px;border:2px solid #e7e9f6;background:#fff;
-        padding:22px 16px 12px 54px;font-weight:800;color:#0f172a;outline:0;
-        transition:border-color .18s,box-shadow .18s
-      }
-      .jm-inp:focus{border-color:#6153ff;box-shadow:0 0 0 3px rgba(97,83,255,.15)}
-      .jm-lbl{
-        position:absolute;left:50px;top:14px;font-weight:900;font-size:1rem;color:#6153ff;
-        padding:0 6px;background:transparent;pointer-events:none;transition:.18s;border-radius:6px
-      }
-      .jm-inp::placeholder{color:transparent}
-      .jm-inp:focus + .jm-lbl, .jm-inp:not(:placeholder-shown) + .jm-lbl{
-        top:-8px;left:44px;font-size:.86rem;background:#fff;box-shadow:0 0 0 6px #fff inset
-      }
-      .jm-ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:1.1rem}
-      .jm-btn{
-        width:100%;padding:16px 0;background:#6153ff;color:#fff;font-weight:900;border:none;
-        border-radius:16px;font-size:1.06rem;cursor:pointer;box-shadow:0 10px 26px rgba(97,83,255,.25)
-      }
-      .jm-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
-      /* FontAwesome optional icons */
-      @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css");
-    </style>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/images/logo.png">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+  <link rel="shortcut icon" href="assets/images/logo.png">
 
-    <form id="memberForm" autocomplete="off" novalidate>
-      <div class="jm-fl">
-        <i class="jm-ico fa-regular fa-user"></i>
-        <input class="jm-inp" name="name" placeholder=" " required>
-        <label class="jm-lbl">Full Name</label>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  
+  <style>
+    :root{
+      --ink:#1e293b; --muted:#64748b; --soft:#f1f5f9;
+      --gA:#60a5fa; --gB:#a78bfa; --gC:#22c55e; --gD:#22d3ee;
+      --card:#ffffff; --brd:#e2e8f0;
+    }
+    body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#f8fafc;color:var(--ink);padding:20px 0}
+    *{box-sizing:border-box}
+    
+    .container{max-width:720px;margin:40px auto;padding:0 16px}
+    .card{background:#fff;border:1px solid var(--brd);border-radius:26px;box-shadow:0 18px 50px rgba(2,6,23,.12);padding:40px 32px}
+    .card h2{margin:0 0 8px;font-size:2rem;font-weight:900;color:var(--ink)}
+    .card .subtitle{margin:0 0 24px;color:var(--muted);font-weight:700;font-size:1.1rem}
+    
+    .form-field{position:relative;margin-bottom:20px}
+    .form-input{
+      width:100%;border-radius:16px;border:2px solid var(--brd);background:#fff;
+      padding:22px 16px 12px 54px;font-weight:700;color:var(--ink);outline:0;font-size:1rem;
+      transition:border-color .18s,box-shadow .18s;font-family:inherit;
+    }
+    .form-input:focus{border-color:#6153ff;box-shadow:0 0 0 3px rgba(97,83,255,.15)}
+    .form-label{
+      position:absolute;left:50px;top:14px;font-weight:900;font-size:1rem;color:#6153ff;
+      padding:0 6px;background:transparent;pointer-events:none;transition:.18s;border-radius:6px;
+    }
+    .form-input::placeholder{color:transparent}
+    .form-input:focus + .form-label, 
+    .form-input:not(:placeholder-shown) + .form-label{
+      top:-10px;left:44px;font-size:.86rem;background:#fff;box-shadow:0 0 0 6px #fff inset;
+    }
+    .form-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:1.1rem}
+    
+    select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+    
+    .btn-submit{
+      width:100%;padding:18px 0;background:#6153ff;color:#fff;font-weight:900;border:none;
+      border-radius:16px;font-size:1.1rem;cursor:pointer;box-shadow:0 10px 26px rgba(97,83,255,.25);
+      transition:all .2s;font-family:inherit;
+    }
+    .btn-submit:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px)}
+    .btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+    
+    .message{padding:14px 18px;border-radius:12px;margin-bottom:20px;font-weight:600;display:none}
+    .message.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;display:block}
+    .message.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;display:block}
+    
+    .info-box{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd;border-radius:16px;padding:20px;margin-bottom:24px}
+    .info-box h3{margin:0 0 10px;color:#1e40af;font-size:1.1rem}
+    .info-box ul{margin:8px 0;padding-left:20px;color:#1e3a8a}
+    .info-box li{margin:6px 0}
+    
+    .back-link{display:inline-flex;align-items:center;gap:8px;color:#6153ff;text-decoration:none;font-weight:700;margin-bottom:20px}
+    .back-link:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+    
+    <div class="card">
+      <h2>Join FWF Membership</h2>
+      <p class="subtitle">₹200/month – Training, Projects, Mentoring & Job-Connect</p>
+      
+      <div class="info-box">
+        <h3><i class="fas fa-gift" style="color:#f59e0b"></i> Membership Benefits</h3>
+        <ul>
+          <li>Priority access to skill training programs</li>
+          <li>Direct project assignments and earning opportunities</li>
+          <li>One-on-one mentoring and business support</li>
+          <li>Job placement assistance and networking</li>
+        </ul>
       </div>
+      
+      <div id="message" class="message"></div>
+      
+      <form id="memberForm" autocomplete="off" novalidate>
+        <div class="form-field">
+          <i class="form-icon fa-regular fa-user"></i>
+          <input class="form-input" name="fullName" type="text" placeholder=" " required>
+          <label class="form-label">Full Name</label>
+        </div>
 
-      <div class="jm-fl">
-        <i class="jm-ico fa-solid fa-mobile-screen-button"></i>
-        <input class="jm-inp" name="mobile" placeholder=" " inputmode="numeric" maxlength="10" pattern="[0-9]{10}" required>
-        <label class="jm-lbl">Phone</label>
-      </div>
+        <div class="form-field">
+          <i class="form-icon fa-solid fa-mobile-screen-button"></i>
+          <input class="form-input" name="mobile" type="tel" placeholder=" " inputmode="numeric" maxlength="10" pattern="[0-9]{10}" required>
+          <label class="form-label">Mobile Number</label>
+        </div>
 
-      <div class="jm-fl">
-        <i class="jm-ico fa-regular fa-envelope"></i>
-        <input class="jm-inp" type="email" name="email" placeholder=" " required>
-        <label class="jm-lbl">Email</label>
-      </div>
+        <div class="form-field">
+          <i class="form-icon fa-regular fa-envelope"></i>
+          <input class="form-input" type="email" name="email" placeholder=" " required>
+          <label class="form-label">Email Address</label>
+        </div>
 
-      <div class="jm-fl">
-        <i class="jm-ico fa-solid fa-diagram-project"></i>
-        <select class="jm-inp" name="project" required style="appearance:none">
-          <option value="" hidden selected></option>
-          <option>Suraksha</option>
-          <option>Swachh Bharat</option>
-          <option>Happy Meal</option>
-          <option>Green Energy</option>
-          <option>DIY Crafts</option>
-          <option>Swachh Jal</option>
-          <option>Samman</option>
-          <option>Sweet Home</option>
-          <option>Hariyali</option>
-          <option>Worship</option>
-          <option>Shiksha</option>
-        </select>
-        <label class="jm-lbl">Select Project</label>
-      </div>
+        <div class="form-field">
+          <i class="form-icon fa-solid fa-id-card"></i>
+          <input class="form-input" name="aadhar" type="text" placeholder=" " maxlength="12" pattern="[0-9]{12}">
+          <label class="form-label">Aadhar Number (Optional)</label>
+        </div>
 
-      <button class="jm-btn" type="submit">Proceed to Payment</button>
-    </form>
+        <div class="form-field">
+          <i class="form-icon fa-solid fa-credit-card"></i>
+          <input class="form-input" name="pan" type="text" placeholder=" " maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" style="text-transform:uppercase">
+          <label class="form-label">PAN Number (Optional)</label>
+        </div>
+
+        <div class="form-field">
+          <i class="form-icon fa-solid fa-diagram-project"></i>
+          <select class="form-input" name="project" required>
+            <option value="" hidden selected></option>
+            <option value="Suraksha">Suraksha (Safety Equipment)</option>
+            <option value="Swachh Bharat">Swachh Bharat (Cleanliness)</option>
+            <option value="Happy Meal">Happy Meal (Food Services)</option>
+            <option value="Green Energy">Green Energy (Solar/Renewable)</option>
+            <option value="DIY Crafts">DIY Crafts (Handicrafts)</option>
+            <option value="Swachh Jal">Swachh Jal (Water Purification)</option>
+            <option value="Samman">Samman (Elder Care)</option>
+            <option value="Sweet Home">Sweet Home (Home Services)</option>
+            <option value="Hariyali">Hariyali (Plantation)</option>
+            <option value="Worship">Worship (Religious Items)</option>
+            <option value="Shiksha">Shiksha (Education)</option>
+          </select>
+          <label class="form-label">Select Your Project</label>
+        </div>
+
+        <button class="btn-submit" type="submit" id="submitBtn">
+          <i class="fas fa-arrow-right"></i> Proceed to Payment
+        </button>
+      </form>
+      
+      <p style="text-align:center;margin-top:20px;color:var(--muted);font-size:0.9rem">
+        Already a member? <a href="/member-login" style="color:#6153ff;font-weight:700">Login here</a>
+      </p>
+    </div>
   </div>
-</section>
 
-<script>
-  // On submit, save details and go to step-2 page
-  document.getElementById('memberForm').addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const f = e.target;
-    if(!f.checkValidity()){ f.reportValidity(); return; }
-    const data = {
-      name:   f.name.value.trim(),
-      mobile: f.mobile.value.trim(),
-      email:  f.email.value.trim(),
-      project:f.project.value
-    };
-    sessionStorage.setItem('fwfJoinData', JSON.stringify(data));
-    // change filename if your payment page is different
-    window.location.href = 'join-payment.html';
-  });
-</script>
+  <script>
+    const form = document.getElementById('memberForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const message = document.getElementById('message');
+    
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = 'message ' + type;
+      message.style.display = 'block';
+      setTimeout(() => {
+        message.style.display = 'none';
+      }, 5000);
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      
+      const formData = {
+        fullName: form.fullName.value.trim(),
+        mobile: form.mobile.value.trim(),
+        email: form.email.value.trim(),
+        aadhar: form.aadhar.value.trim(),
+        pan: form.pan.value.trim().toUpperCase(),
+        project: form.project.value
+      };
+      
+      // Save to sessionStorage for payment page
+      sessionStorage.setItem('fwfJoinData', JSON.stringify(formData));
+      
+      // Disable button and show loading
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      
+      try {
+        // For now, just redirect to payment page
+        // In production, you might want to validate/pre-register first
+        window.location.href = '/join-payment.html';
+      } catch (error) {
+        console.error('Error:', error);
+        showMessage('Something went wrong. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+    
+    // Auto-format PAN to uppercase
+    form.pan.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toUpperCase();
+    });
+  </script>
+</body>
+</html>

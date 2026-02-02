@@ -2,6 +2,14 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/privacy", "destination": "/privacy.html" }
-  ]
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/join", "destination": "/join.html" },
+    { "source": "/projects", "destination": "/projects.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/csr", "destination": "/csr.html" },
+    { "source": "/donation", "destination": "/donation.html" }
+  ],
+  "github": {
+    "silent": true
+  }
 }

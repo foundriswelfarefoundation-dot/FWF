@@ -6,7 +6,8 @@ const MemberSchema = new mongoose.Schema({
   aadhar:   { type: String, trim: true },
   pan:      { type: String, trim: true },
   project:  { type: String, trim: true },
-  paymentRef: { type: String, trim: true }
+  paymentRef: { type: String, trim: true },
+  paymentProof: { type: String } // Base64 image/PDF
 }, { timestamps: true });
 
 export default mongoose.models.Member || mongoose.model("Member", MemberSchema);

@@ -395,10 +395,10 @@
       <h2 class="payTitle">Complete Payment</h2>
       <div class="qrBox"><img id="memberQR" src="/assets/images/QRimg.jpg" alt="FWF UPI QR"></div>
       <div class="bankList"><div><b>UPI ID:</b> fwf10@kotak</div><div><b>Account number:</b> 9580118412</div><div><b>IFSC:</b> KKBK0005355</div></div>
-      <p class="note">Pay ₹200 and click below.</p>
+      <p class="note">Pay ₹500 and click below.</p>
       <button id="memberPaid" class="btn-solid"><i class="fa-solid fa-check"></i> I have paid</button>
       <div class="done-wrap" id="memberDone" style="display:none;">
-        <div class="done-grid"><input type="text" id="memberTxn" placeholder="Transaction / UTR Number" /><input type="file" id="memberShot" accept="image/*" /></div>
+        <div class="done-grid"><input type="text" id="memberTxn" placeholder="Transaction / UTR Number" /><input type="file" id="memberShot" accept="image/*,application/pdf" placeholder="Upload payment proof" /></div>
         <button id="memberFinish" class="btn-done">Submit & Get Member ID</button>
       </div>
     </div>
@@ -510,7 +510,58 @@
   memberForm.addEventListener('submit', (e)=>{ e.preventDefault(); if(!memberForm.checkValidity()){ memberForm.reportValidity(); return; } memberStep1.style.display='none'; memberStep2.style.display='block'; });
   document.getElementById('memberQR').addEventListener('click', e=> e.target.classList.toggle('zoomed'));
   document.getElementById('memberPaid').addEventListener('click', ()=>{ const box=document.getElementById('memberDone'); box.style.display = (box.style.display==='block') ? 'none':'block'; });
-  document.getElementById('memberFinish').addEventListener('click', ()=>{ const txn=document.getElementById('memberTxn').value.trim(); if(!txn){ alert('Please enter the Transaction / UTR Number.'); return; } const mid='FWF'+Math.floor(100000+Math.random()*900000); const pwd=Math.random().toString(36).slice(-8); alert(`Payment received!\nMember ID: ${mid}\nTemp Password: ${pwd}\n\n(Email with credentials has been sent.)`); closeModal(memberModal); });
+  
+  document.getElementById('memberFinish').addEventListener('click', async ()=>{ 
+    const txn=document.getElementById('memberTxn').value.trim(); 
+    const fileInput=document.getElementById('memberShot');
+    
+    if(!txn){ alert('Please enter the Transaction / UTR Number.'); return; }
+    if(!fileInput.files[0]){ alert('Please upload payment screenshot/PDF.'); return; }
+    
+    const file = fileInput.files[0];
+    if(file.size > 5*1024*1024){ alert('File size should be less than 5MB.'); return; }
+    
+    const btn = document.getElementById('memberFinish');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading...';
+    
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const formData = {
+          fullName: memberForm.querySelector('[name="name"]').value,
+          mobile: memberForm.querySelector('[name="phone"]').value,
+          email: memberForm.querySelector('[name="email"]').value,
+          project: memberForm.querySelector('[name="project"]').value,
+          paymentRef: txn,
+          paymentProof: reader.result // base64 string
+        };
+        
+        const res = await fetch('/api/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await res.json();
+        
+        if(data.ok){
+          alert(`Payment received!\nMember ID: ${data.memberId}\nPassword: ${data.password}\n\n(Credentials sent to your email)`);
+          closeModal(memberModal);
+          memberForm.reset();
+        } else {
+          alert(data.error || 'Registration failed. Please try again.');
+        }
+      } catch(e) {
+        alert('Error: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Submit & Get Member ID';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 
   /* VOLUNTEER */
   const volModal=document.getElementById('volModal');

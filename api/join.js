@@ -6,12 +6,12 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ ok:false, error:"Method not allowed" });
   try {
     await connectDB();
-    const { fullName, name, mobile, email, aadhar = "", pan = "", project = "", paymentRef = "" } = req.body || {};
+    const { fullName, name, mobile, email, aadhar = "", pan = "", project = "", paymentRef = "", paymentProof = "" } = req.body || {};
     const finalName = fullName || name;
     if (!finalName || !mobile || !email) return res.status(400).json({ ok:false, error:"Missing required fields" });
 
-    // Save to MongoDB for records
-    const saved = await Member.create({ fullName: finalName, mobile, email, aadhar, pan, project, paymentRef });
+    // Save to MongoDB for records (including base64 payment proof)
+    const saved = await Member.create({ fullName: finalName, mobile, email, aadhar, pan, project, paymentRef, paymentProof });
 
     // Also register in backend SQLite for authentication
     let memberId = "";

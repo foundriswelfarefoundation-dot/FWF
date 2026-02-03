@@ -359,10 +359,10 @@
     <div id="memberStep1">
       <h2 style="margin:0 0 8px">Join Membership</h2>
       <p class="subtle">₹500/month – training, projects, mentoring & job-connect</p>
-      <form id="memberForm" autocomplete="off" novalidate>
-        <div class="fl-group"><i class="fl-icon fa-regular fa-user"></i><input class="fl-input" name="name" placeholder=" " required><label class="fl-label">Full Name</label></div>
-        <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" required><label class="fl-label">Phone</label></div>
-        <div class="fl-group"><i class="fl-icon fa-regular fa-envelope"></i><input class="fl-input" type="email" name="email" placeholder=" " required><label class="fl-label">Email</label></div>
+      <form id="memberForm" autocomplete="on" novalidate>
+        <div class="fl-group"><i class="fl-icon fa-regular fa-user"></i><input id="memberName" class="fl-input" name="name" placeholder=" " autocomplete="name" required><label class="fl-label" for="memberName">Full Name</label></div>
+        <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input id="memberMobile" class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" autocomplete="tel" required><label class="fl-label" for="memberMobile">Phone</label></div>
+        <div class="fl-group"><i class="fl-icon fa-regular fa-envelope"></i><input id="memberEmail" class="fl-input" type="email" name="email" placeholder=" " autocomplete="email" required><label class="fl-label" for="memberEmail">Email</label></div>
         <!-- Project dropdown -> as per screenshot -->
         <div class="fl-group">
           <i class="fl-icon fa-solid fa-diagram-project"></i>
@@ -530,9 +530,9 @@
     reader.onload = async () => {
       try {
         const formData = {
-          fullName: memberForm.querySelector('[name="name"]').value,
-          mobile: memberForm.querySelector('[name="phone"]').value,
-          email: memberForm.querySelector('[name="email"]').value,
+          fullName: memberForm.querySelector('[name="name"]').value.trim(),
+          mobile: memberForm.querySelector('[name="mobile"]').value.trim(),
+          email: memberForm.querySelector('[name="email"]').value.trim(),
           project: memberForm.querySelector('[name="project"]').value,
           paymentRef: txn,
           paymentProof: reader.result // base64 string

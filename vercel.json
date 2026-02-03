@@ -7,7 +7,11 @@
     { "source": "/projects", "destination": "/projects.html" },
     { "source": "/about", "destination": "/about.html" },
     { "source": "/csr", "destination": "/csr.html" },
-    { "source": "/donation", "destination": "/donation.html" }
+    { "source": "/donation", "destination": "/donation.html" },
+    { "source": "/member-login", "destination": "/member-login.html" },
+    { "source": "/admin-login", "destination": "/admin-login.html" },
+    { "source": "/member-dashboard", "destination": "/member-dashboard.html" },
+    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" }
   ],
   "github": {
     "silent": true

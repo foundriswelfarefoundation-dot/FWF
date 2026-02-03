@@ -519,7 +519,7 @@
     if(!fileInput.files[0]){ alert('Please upload payment screenshot/PDF.'); return; }
     
     const file = fileInput.files[0];
-    if(file.size > 5*1024*1024){ alert('File size should be less than 5MB.'); return; }
+    if(file.size > 30*1024*1024){ alert('File size should be less than 30MB.'); return; }
     
     const btn = document.getElementById('memberFinish');
     btn.disabled = true;

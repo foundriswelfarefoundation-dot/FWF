@@ -38,8 +38,9 @@
 <script src="auth.js"></script>
 <script>
 async function load(){
+  const BACKEND_URL = 'https://fwf-production.up.railway.app';
   try{
-    const data = await AUTH.api('/api/member/me');
+    const data = await AUTH.api(`${BACKEND_URL}/api/member/me`);
     document.getElementById('name').textContent = data.user.name || 'Member';
     document.getElementById('memberId').textContent = data.user.member_id;
     document.getElementById('wbal').textContent = (data.wallet.balance_inr||0).toFixed(0);
@@ -54,7 +55,8 @@ document.getElementById('applyBtn').onclick = async ()=>{
   const amt = prompt('Enter wallet amount to apply:');
   if(!amt) return;
   try{
-    await AUTH.api('/api/member/apply-wallet',{method:'POST', body:{amount:Number(amt)}});
+    const BACKEND_URL = 'https://fwf-production.up.railway.app';
+    await AUTH.api(`${BACKEND_URL}/api/member/apply-wallet`,{method:'POST', body:{amount:Number(amt)}});
     alert('Applied!');
     load();
   }catch(e){ alert(e.message); }

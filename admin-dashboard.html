@@ -36,8 +36,9 @@
 <script src="auth.js"></script>
 <script>
 async function load(){
+  const BACKEND_URL = 'https://fwf-production.up.railway.app';
   try{
-    const data = await AUTH.api('/api/admin/overview');
+    const data = await AUTH.api(`${BACKEND_URL}/api/admin/overview`);
     document.getElementById('mcount').textContent = data.totals.members;
     document.getElementById('acount').textContent = data.totals.active_members;
     const tbody = document.querySelector('#tbl tbody');

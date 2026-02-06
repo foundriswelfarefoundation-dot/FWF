@@ -29,7 +29,8 @@
 <script>
 document.getElementById('loginBtn').onclick = async ()=>{
   try{
-    await AUTH.api('/api/admin/login',{method:'POST', body:{username:document.getElementById('user').value.trim(), password:document.getElementById('pwd').value.trim()}});
+    const BACKEND_URL = 'https://fwf-production.up.railway.app';
+    await AUTH.api(`${BACKEND_URL}/api/admin/login`,{method:'POST', body:{username:document.getElementById('user').value.trim(), password:document.getElementById('pwd').value.trim()}});
     location.href = 'admin-dashboard.html';
   }catch(e){ alert(e.message); }
 };

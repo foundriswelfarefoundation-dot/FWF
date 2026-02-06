@@ -8,12 +8,18 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
+import { initSentry, setUserContext, captureError, addBreadcrumb } from './lib/sentry.js';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Initialize Sentry BEFORE any other middleware
+const { requestHandler, errorHandler } = initSentry(app);
+app.use(requestHandler);
+
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'change_me_secret';
 const ORG_PREFIX = process.env.ORG_PREFIX || 'FWF';
@@ -41,44 +47,20 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(siteRoot));
 
-// --- DB setup ---
+// --- DB setup with migrations ---
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-const db = new Database(path.join(dataDir, 'fwf.db'));
+const dbPath = path.join(dataDir, 'fwf.db');
+const db = new Database(dbPath);
 
-db.exec(`
-CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  member_id TEXT UNIQUE,
-  name TEXT,
-  mobile TEXT UNIQUE,
-  email TEXT UNIQUE,
-  password_hash TEXT,
-  role TEXT CHECK(role IN ('member','admin')) NOT NULL DEFAULT 'member',
-  membership_active INTEGER DEFAULT 0,
-  created_at TEXT DEFAULT (datetime('now'))
-);
-CREATE TABLE IF NOT EXISTS wallets (
-  user_id INTEGER UNIQUE,
-  balance_inr REAL DEFAULT 0,
-  lifetime_earned_inr REAL DEFAULT 0,
-  lifetime_applied_inr REAL DEFAULT 0,
-  updated_at TEXT DEFAULT (datetime('now')),
-  FOREIGN KEY(user_id) REFERENCES users(id)
-);
-CREATE TABLE IF NOT EXISTS member_projects (
-  user_id INTEGER UNIQUE,
-  project_id INTEGER,
-  project_name TEXT,
-  project_cost REAL,
-  target60_inr REAL,
-  cash_credited_inr REAL DEFAULT 0,
-  wallet_applied_inr REAL DEFAULT 0,
-  eligible_flag INTEGER DEFAULT 0,
-  eligible_on TEXT,
-  FOREIGN KEY(user_id) REFERENCES users(id)
-);
-`);
+// Run migrations on startup
+import { runMigrations } from './migrations/migrate.js';
+try {
+  runMigrations(dbPath);
+} catch (err) {
+  console.error('❌ Migration failed:', err.message);
+  process.exit(1);
+}
 
 function nextMemberId(){
   const row = db.prepare(`SELECT member_id FROM users WHERE role='member' ORDER BY id DESC LIMIT 1`).get();
@@ -197,6 +179,20 @@ app.get('/api/admin/overview', auth('admin'), (req,res)=>{
   };
   const latest = db.prepare(`SELECT member_id,name,mobile,created_at FROM users WHERE role='member' ORDER BY id DESC LIMIT 10`).all();
   res.json({ totals, latest });
+});
+
+// Sentry error handler MUST be before other error handlers and after all routes
+app.use(errorHandler);
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  captureError(err, {
+    url: req.url,
+    method: req.method,
+    user: req.user,
+  });
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(PORT, ()=>{

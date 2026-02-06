@@ -25,14 +25,15 @@
   <input id="pwd" class="input" type="password" placeholder="••••••••"/><br>
   <button class="btn" id="loginBtn">Login</button>
 </div>
+<script src="assets/js/fwf.js"></script>
 <script src="auth.js"></script>
 <script>
 document.getElementById('loginBtn').onclick = async ()=>{
   try{
-    const BACKEND_URL = 'https://fwf-production.up.railway.app';
+    const BACKEND_URL = 'http://localhost:3000';
     await AUTH.api(`${BACKEND_URL}/api/admin/login`,{method:'POST', body:{username:document.getElementById('user').value.trim(), password:document.getElementById('pwd').value.trim()}});
     location.href = 'admin-dashboard.html';
-  }catch(e){ alert(e.message); }
+  }catch(e){ FWF_Notify.toast(e.message || 'Login failed', 'error'); }
 };
 </script>
 </body></html>

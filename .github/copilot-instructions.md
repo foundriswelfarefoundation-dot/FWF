@@ -37,6 +37,13 @@ When a member joins via `/api/join.js`:
 
 **Why?** MongoDB handles form data + file uploads; SQLite handles auth + wallet operations. This separation allows frontend (Vercel) and backend (Express) to be deployed independently.
 
+### Serverless Performance Pattern: Global Caching
+Both MongoDB and nodemailer use **global caching** to survive across serverless function invocations:
+- `global._mongoose` caches MongoDB connection (see [lib/db.js](lib/db.js#L9-L10))
+- `global._mailer` caches nodemailer transporter (see [lib/mailer.js](lib/mailer.js#L3-L4))
+- Pattern: Check `cached.conn/transporter` before creating new instance
+- **Critical**: Always use `connectDB()` and `getTransporter()` - never create directly
+
 ### Authentication Flow
 - **JWT tokens** stored in httpOnly cookies for security (XSS protection)
 - **Login endpoints**:
@@ -102,11 +109,80 @@ npm start  # → http://localhost:3000
 
 ### Deployment
 - **Vercel** (frontend + serverless): Auto-deploys from Git
-  - Root `package.json` dependencies: mongoose, nodemailer
+  - Root `package.json` dependencies: mongoose, nodemailer, @sentry/browser, @sentry/node
   - `vercel.json` handles clean URLs: `/join` → `/join.html`
 - **Backend Express**: Deploy separately (Railway, Render, VPS)
   - Update `BACKEND_URL` in root `.env` to production backend URL
 - **Why separate?** Vercel serverless has 10s timeout; long-running auth/wallet ops need dedicated server
+
+### Database Migrations (Production)
+SQLite schema changes use **migration files** instead of delete/recreate:
+
+```bash
+# Create migration file
+cd backend/migrations
+# Create XXX_description.sql (e.g., 002_add_kyc_fields.sql)
+
+# Test locally (ALWAYS backup first!)
+cp data/fwf.db data/fwf.db.backup
+node migrations/migrate.js        # Run pending migrations
+node migrations/migrate.js --status  # Check status
+
+# Production deployment
+# 1. Backup database on server
+cp data/fwf.db data/fwf.db.$(date +%Y%m%d_%H%M%S)
+# 2. Pull latest code (contains migration file)
+git pull
+# 3. Run migrations
+node migrations/migrate.js
+# 4. Restart server
+pm2 restart fwf-backend
+```
+
+**Migration tracking**: `_migrations` table stores applied migrations. Never modify existing .sql files after deployment.  
+**Docs**: [backend/migrations/README.md](backend/migrations/README.md)
+
+### Error Monitoring (Sentry)
+FWF uses Sentry for production error tracking across all platforms:
+
+**Setup**:
+1. Create account at [sentry.io](https://sentry.io) (free tier: 5k errors/month)
+2. Create projects: Node.js (backend), JavaScript (frontend), Node.js (serverless)
+3. Add DSNs to `.env`:
+   ```bash
+   # backend/.env
+   SENTRY_DSN=https://abc@o123.ingest.sentry.io/456
+   
+   # root .env (serverless)
+   SENTRY_DSN=https://xyz@o123.ingest.sentry.io/789
+   
+   # assets/js/sentry.js (frontend - edit file directly)
+   const SENTRY_DSN = 'https://def@o123.ingest.sentry.io/123';
+   ```
+
+**Integration**:
+- **Backend**: Auto-enabled via middleware in `server.js`
+- **Frontend**: Include `<script src="/assets/js/sentry.js"></script>` in HTML
+- **Serverless**: Wrap handlers with `withSentry()`:
+  ```javascript
+  import { withSentry } from "../lib/sentry.js";
+  export default withSentry(async function handler(req, res) { ... });
+  ```
+
+**Manual error capture**:
+```javascript
+// Backend
+import { captureError, addBreadcrumb } from './lib/sentry.js';
+captureError(err, { context: 'payment-processing' });
+addBreadcrumb('database', 'User registered', { memberId });
+
+// Frontend
+window.FWF_Error.capture(err, { form: 'join-form' });
+window.FWF_Error.addBreadcrumb('Form submitted', { formId: 'contact' });
+```
+
+**Privacy**: Passwords, tokens, cookies, payment proofs, and KYC docs are auto-filtered.  
+**Docs**: [docs/ERROR_MONITORING.md](docs/ERROR_MONITORING.md)
 
 ### Git Workflows
 Convenience scripts:
@@ -227,14 +303,19 @@ BACKEND_URL=http://localhost:3000            # Express server URL (production in
 1. Create `/api/new-function.js` with: `export default async function handler(req, res) {}`
 2. Import utilities: `import { connectDB } from "../lib/db.js";`
 3. Add Mongoose model in `/models/` if storing data
-4. Handle errors: `try/catch` → `res.status(500).json({ok:false, error: String(err)})`
+4. Wrap with Sentry: `import { withSentry } from "../lib/sentry.js"; export default withSentry(async function...)`
 5. Commit/push → Vercel auto-deploys
 
-### Modify SQLite Schema
-1. Edit `db.exec()` section in `backend/server.js` (lines ~33-62)
-2. Delete `backend/data/fwf.db` locally to reset
-3. Restart server → schema recreates on startup
-4. **Production**: Backup DB, apply migration via SQL script
+### Modify SQLite Schema (Production-Safe)
+1. Create migration file: `backend/migrations/00X_description.sql`
+2. Write SQL (use `ALTER TABLE`, `CREATE INDEX`, etc.)
+3. Test locally:
+   ```bash
+   cp backend/data/fwf.db backend/data/fwf.db.backup
+   node backend/migrations/migrate.js
+   ```
+4. Production: Backup DB, pull code, run `node migrations/migrate.js`, restart server
+5. **Never** modify existing migration files after deployment
 
 ### Add Bilingual Content
 1. Add `data-i18n="key.name"` attribute to HTML element
@@ -242,3 +323,8 @@ BACKEND_URL=http://localhost:3000            # Express server URL (production in
 3. For HTML content: use `data-i18n-html="key.name"`
 4. For placeholders: use `data-i18n-placeholder="key.name"`
 5. `setI18n(lang)` function handles replacement on language switch
+
+### Debug Deployment Issues
+- Use [debug.html](debug.html) to verify file paths and clean URLs work correctly
+- Check that Vercel rewrites in `vercel.json` are applied
+- Test direct `.html` links vs clean URLs (`/privacy` vs `/privacy.html`)

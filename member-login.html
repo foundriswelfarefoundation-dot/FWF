@@ -206,6 +206,7 @@ body::before{
   </div>
 </div>
 
+<script src="assets/js/fwf.js"></script>
 <script src="auth.js"></script>
 <script>
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -219,14 +220,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
   
   try{
-    const BACKEND_URL = 'https://fwf-production.up.railway.app';
+    const BACKEND_URL = 'http://localhost:3000';
     const res = await AUTH.api(`${BACKEND_URL}/api/auth/login`, {method:'POST', body:{memberId,password}});
     btnText.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
     setTimeout(() => {
       if(res.role==='member') location.href = '/member-dashboard';
     }, 500);
   }catch(e){ 
-    btnText.innerHTML = '<i class="fa-solid fa-xmark"></i> ' + e.message;
+    btnText.innerHTML = '<i class="fa-solid fa-xmark"></i> Login Failed';
+    FWF_Notify.toast(e.message || 'Invalid credentials', 'error');
     setTimeout(() => {
       btnText.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Dashboard';
       btn.disabled = false;

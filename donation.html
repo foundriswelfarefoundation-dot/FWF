@@ -16,6 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;800&family=Mukta:wght@400;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
+  <script src="assets/js/fwf.js"></script>
+
   <style>
     :root{
       --primary:#6153ff; --accent:#22c55e; --deep:#0f172a; --brd:#e3e8f5;
@@ -495,7 +497,7 @@
   donateForm.addEventListener('submit', (e)=>{ e.preventDefault(); if(!donateForm.checkValidity()){ donateForm.reportValidity(); return; } donateStep1.style.display='none'; donateStep2.style.display='block'; });
   document.getElementById('qrToggle').addEventListener('click', e=> e.target.classList.toggle('zoomed'));
   document.getElementById('toggleDone').addEventListener('click', ()=>{ const dw=document.getElementById('doneWrap'); dw.style.display = (dw.style.display==='block') ? 'none':'block'; });
-  document.getElementById('submitDone').addEventListener('click', ()=>{ const txn=document.getElementById('txnId').value.trim(); if(!txn){ alert('Please enter the Transaction / UTR Number.'); return; } alert('Thanks! Your payment details were submitted. We will verify and email the 80G receipt.'); closeModal(donateModal); resetDonate(); });
+  document.getElementById('submitDone').addEventListener('click', ()=>{ const txn=document.getElementById('txnId').value.trim(); if(!txn){ FWF_Notify.toast('Please enter the Transaction / UTR Number.', 'warning'); return; } FWF_Notify.toast('Thanks! Your payment details were submitted. We will verify and email the 80G receipt.', 'success', 6000); closeModal(donateModal); resetDonate(); });
 
   /* MEMBERSHIP (2-step) */
   const memberModal=document.getElementById('memberModal');
@@ -547,14 +549,21 @@
         const data = await res.json();
         
         if(data.ok){
-          alert(`Payment received!\nMember ID: ${data.memberId}\nPassword: ${data.password}\n\n(Credentials sent to your email)`);
-          closeModal(memberModal);
-          memberForm.reset();
+          FWF_Notify.modal({
+            title: '🎉 Payment Received!',
+            message: `<strong>Member ID:</strong> ${data.memberId}<br><strong>Password:</strong> <code style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;color:#f5576c">${data.password}</code><br><br><small style="color:#64748b">Credentials have been sent to your email</small>`,
+            type: 'success',
+            confirmText: 'OK, Got it!',
+            onConfirm: () => {
+              closeModal(memberModal);
+              memberForm.reset();
+            }
+          });
         } else {
-          alert(data.error || 'Registration failed. Please try again.');
+          FWF_Notify.toast(data.error || 'Registration failed. Please try again.', 'error', 5000);
         }
       } catch(e) {
-        alert('Error: ' + e.message);
+        FWF_Notify.toast('Error: ' + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = 'Submit & Get Member ID';
@@ -568,14 +577,14 @@
   document.getElementById('openVolunteer2').addEventListener('click', ()=>{ resetForm(document.getElementById('volForm')); openModal(volModal); });
   document.getElementById('closeVol').addEventListener('click', ()=> closeModal(volModal));
   volModal.addEventListener('click', (e)=>{ if(e.target===volModal) closeModal(volModal); });
-  document.getElementById('volForm').addEventListener('submit', (e)=>{ e.preventDefault(); const f=e.target; if(!f.checkValidity()){ f.reportValidity(); return; } alert('Thanks! Your volunteer request has been sent to our support team and a thank-you email is on its way to you.'); closeModal(volModal); });
+  document.getElementById('volForm').addEventListener('submit', (e)=>{ e.preventDefault(); const f=e.target; if(!f.checkValidity()){ f.reportValidity(); return; } FWF_Notify.toast('Thanks! Your volunteer request has been sent to our support team and a thank-you email is on its way to you.', 'success', 6000); closeModal(volModal); });
 
   /* PARTNER */
   const partnerModal=document.getElementById('partnerModal');
   document.getElementById('openPartner2').addEventListener('click', ()=>{ resetForm(document.getElementById('partnerForm')); openModal(partnerModal); });
   document.getElementById('closePartner').addEventListener('click', ()=> closeModal(partnerModal));
   partnerModal.addEventListener('click', (e)=>{ if(e.target===partnerModal) closeModal(partnerModal); });
-  document.getElementById('partnerForm').addEventListener('submit', (e)=>{ e.preventDefault(); if(!e.target.checkValidity()){ e.target.reportValidity(); return;} alert('Thanks! CSR partnership request received. Our team will contact you.'); closeModal(partnerModal); });
+  document.getElementById('partnerForm').addEventListener('submit', (e)=>{ e.preventDefault(); if(!e.target.checkValidity()){ e.target.reportValidity(); return;} FWF_Notify.toast('Thanks! CSR partnership request received. Our team will contact you.', 'success', 5000); closeModal(partnerModal); });
 </script>
 </body>
 </html>

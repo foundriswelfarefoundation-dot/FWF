@@ -1,58 +1,302 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Admin Dashboard — FWF</title>
-
-<!-- Favicon -->
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/images/logo.png">
-<link rel="apple-touch-icon" href="assets/images/logo.png">
-<link rel="shortcut icon" href="assets/images/logo.png">
-
-<link rel="stylesheet" href="style.css"/>
-<style>
-.wrap{max-width:1100px;margin:24px auto;padding:0 16px}
-.card{background:linear-gradient(180deg,#101623,#0d1320);border:1px solid #1f2937;border-radius:16px;padding:20px}
-.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.kpi{display:flex;flex-direction:column;gap:6px;background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:14px}
-.kpi .val{font-size:22px;font-weight:800;color:#fff}
-.kpi .lab{color:#94a3b8}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{border-bottom:1px solid #1f2937;padding:10px 8px;color:#cbd5e1;text-align:left}
-</style>
-</head><body>
-<div class="wrap">
-  <div class="card">
-    <h2 style="color:#fff;margin:0 0 10px">Admin Overview</h2>
-    <div class="row">
-      <div class="kpi"><span class="lab">Total Members</span><span class="val" id="mcount">0</span></div>
-      <div class="kpi"><span class="lab">Active Members</span><span class="val" id="acount">0</span></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin Dashboard — FWF</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .admin-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-left: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #f093fb, #f5576c);
+    }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); }
+    .stat-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .icon-members { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .icon-active { background: linear-gradient(135deg, #22c55e, #059669); }
+    .stat-label { color: #64748b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-value {
+      font-size: 42px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .table-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    .table-section h2 {
+      margin: 0 0 24px;
+      color: #1e293b;
+      font-size: 24px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    .table thead {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+    .table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 700;
+      color: #475569;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .table td {
+      padding: 16px 20px;
+      color: #1e293b;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+    .table tbody tr {
+      transition: all 0.2s;
+    }
+    .table tbody tr:hover {
+      background: linear-gradient(90deg, #fef3f2, #fff);
+    }
+    .member-id {
+      font-weight: 700;
+      color: #f5576c;
+    }
+    .date-cell {
+      color: #64748b;
+      font-size: 13px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      color: #475569;
+      border: 2px solid #e2e8f0;
+    }
+    .btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    
+    @media (max-width: 768px) {
+      .header { padding: 20px; }
+      .header h1 { font-size: 24px; }
+      .admin-badge { display: block; margin: 8px 0 0 0; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-value { font-size: 36px; }
+      .table-section { padding: 20px; }
+      .table th, .table td { padding: 12px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>🛡️ Admin Dashboard<span class="admin-badge">Administrator</span></h1>
+      </div>
+      <div>
+        <button class="btn" id="logoutBtn">🚪 Logout</button>
+      </div>
     </div>
-    <br>
-    <h3 style="color:#cbd5e1">Latest Members</h3>
-    <table class="table" id="tbl"><thead><tr><th>Member ID</th><th>Name</th><th>Mobile</th><th>Joined</th></tr></thead><tbody></tbody></table>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon icon-members">👥</div>
+        <div class="stat-label">Total Members</div>
+        <div class="stat-value" id="mcount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon icon-active">✓</div>
+        <div class="stat-label">Active Members</div>
+        <div class="stat-value" id="acount">0</div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <h2>📋 Latest Members</h2>
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Member ID</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Joined Date</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="empty-state-icon">⏳</div>
+                  <div>Loading members...</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-</div>
-<script src="auth.js"></script>
-<script>
-async function load(){
-  const BACKEND_URL = 'https://fwf-production.up.railway.app';
-  try{
-    const data = await AUTH.api(`${BACKEND_URL}/api/admin/overview`);
-    document.getElementById('mcount').textContent = data.totals.members;
-    document.getElementById('acount').textContent = data.totals.active_members;
-    const tbody = document.querySelector('#tbl tbody');
-    tbody.innerHTML = '';
-    data.latest.forEach(r=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${r.member_id}</td><td>${r.name||''}</td><td>${r.mobile||''}</td><td>${r.created_at}</td>`;
-      tbody.appendChild(tr);
-    });
-  }catch(e){
-    alert('Session expired or unauthorized');
-    location.href='admin-login.html';
-  }
-}
-load();
-</script>
-</body></html>
+
+  <script src="assets/js/fwf.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    const BACKEND_URL = 'http://localhost:3000';
+
+    async function load() {
+      try {
+        const data = await AUTH.api(`${BACKEND_URL}/api/admin/overview`);
+        
+        document.getElementById('mcount').textContent = data.totals.members;
+        document.getElementById('acount').textContent = data.totals.active_members;
+        
+        const tbody = document.getElementById('tbody');
+        tbody.innerHTML = '';
+        
+        if (data.latest && data.latest.length > 0) {
+          data.latest.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><span class="member-id">${r.member_id || '-'}</span></td>
+              <td>${r.name || '-'}</td>
+              <td>${r.mobile || '-'}</td>
+              <td><span class="date-cell">${new Date(r.created_at).toLocaleDateString('en-IN')}</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>No members found</div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+      } catch (e) {
+        FWF_Notify.toast('Session expired or unauthorized. Redirecting...', 'error');
+        setTimeout(() => location.href = 'admin-login.html', 2000);
+      }
+    }
+
+    document.getElementById('logoutBtn').onclick = () => {
+      FWF_Notify.confirm('Are you sure you want to logout?', async () => {
+        await AUTH.api('/api/auth/logout', {method: 'POST'});
+        FWF_Notify.toast('Logged out successfully', 'success');
+        setTimeout(() => location.href = 'admin-login.html', 1000);
+      });
+    };
+
+    load();
+  </script>
+</body>
+</html>

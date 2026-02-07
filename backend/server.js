@@ -89,7 +89,23 @@ if(!findAdmin){
   const memberId = `${ORG_PREFIX}-ADMIN-001`;
   db.prepare(`INSERT INTO users(member_id,name,email,password_hash,role,membership_active) VALUES(?,?,?,?,?,1)`)
     .run(memberId, 'FWF Admin', process.env.ADMIN_USER || 'admin@fwf', hash, 'admin');
-  console.log(`Admin created -> user: ${process.env.ADMIN_USER || 'admin@fwf'} | pass: ${process.env.ADMIN_PASS || 'Admin@12345'}`);
+  console.log(`✅ Admin created -> user: ${process.env.ADMIN_USER || 'admin@fwf'} | pass: ${process.env.ADMIN_PASS || 'Admin@12345'}`);
+}
+
+// Seed test member if not exists (for dashboard testing)
+const findTestMember = db.prepare(`SELECT * FROM users WHERE member_id=?`).get(`${ORG_PREFIX}-TEST-001`);
+if(!findTestMember){
+  const testPassword = 'Test@12345';
+  const hash = bcrypt.hashSync(testPassword, 10);
+  const memberId = `${ORG_PREFIX}-TEST-001`;
+  const testInfo = db.prepare(`INSERT INTO users(member_id,name,mobile,email,password_hash,role,membership_active) VALUES(?,?,?,?,?,'member',1)`)
+    .run(memberId, 'Test Member', '9999999999', 'test@fwf.org', hash);
+  
+  // Create wallet for test member
+  db.prepare(`INSERT OR IGNORE INTO wallets(user_id, balance_inr, lifetime_earned_inr) VALUES(?,?,?)`)
+    .run(testInfo.lastInsertRowid, 5000, 5000);
+  
+  console.log(`✅ Test member created -> ID: ${memberId} | pass: ${testPassword}`);
 }
 
 // --- Auth middleware ---

@@ -109,6 +109,24 @@ function auth(requiredRole){
 }
 
 // --- Routes ---
+
+// Health check / Status endpoint
+app.get('/', (req,res)=>{
+  res.json({
+    ok: true,
+    service: 'FWF Backend API',
+    status: 'online',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
+      member: ['/api/member/me', '/api/member/apply-wallet'],
+      admin: ['/api/admin/overview'],
+      payment: ['/api/pay/simulate-join']
+    }
+  });
+});
+
 // simulate join payment (replace with gateway webhook later)
 app.post('/api/pay/simulate-join', (req,res)=>{
   const { name, mobile, email } = req.body;

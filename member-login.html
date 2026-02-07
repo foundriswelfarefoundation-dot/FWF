@@ -220,7 +220,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
   
   try{
-    const BACKEND_URL = 'http://localhost:3000';
+    const BACKEND_URL = 'https://fwf-production.up.railway.app';
     const res = await AUTH.api(`${BACKEND_URL}/api/auth/login`, {method:'POST', body:{memberId,password}});
     btnText.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
     setTimeout(() => {

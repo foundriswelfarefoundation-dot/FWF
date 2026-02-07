@@ -138,9 +138,26 @@ app.get('/', (req,res)=>{
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet'],
       admin: ['/api/admin/overview'],
-      payment: ['/api/pay/simulate-join']
+      payment: ['/api/pay/simulate-join'],
+      debug: ['/api/debug/users (development only)']
     }
   });
+});
+
+// Debug endpoint - check if test member exists (remove in production)
+app.get('/api/debug/users', (req,res)=>{
+  try {
+    const users = db.prepare(`SELECT member_id, name, email, mobile, role, membership_active, created_at FROM users ORDER BY id DESC LIMIT 10`).all();
+    const testMember = db.prepare(`SELECT u.member_id, u.name, u.email, u.role, w.balance_inr FROM users u LEFT JOIN wallets w ON u.id = w.user_id WHERE u.member_id=?`).get(`${ORG_PREFIX}-TEST-001`);
+    res.json({ 
+      ok: true, 
+      totalUsers: users.length,
+      users,
+      testMember: testMember || 'Not found - seeding may have failed'
+    });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // simulate join payment (replace with gateway webhook later)

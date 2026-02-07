@@ -151,7 +151,7 @@ app.post('/api/auth/login', (req,res)=>{
   if(!u) return res.status(400).json({error:'Invalid credentials'});
   if(!bcrypt.compareSync(password, u.password_hash)) return res.status(400).json({error:'Invalid credentials'});
   const token = signToken({ uid: u.id, role: u.role, memberId: u.member_id, name: u.name });
-  res.cookie('token', token, { httpOnly:true, sameSite:'lax' });
+  res.cookie('token', token, { httpOnly:true, sameSite:'none', secure: true });
   res.json({ ok:true, role: u.role });
 });
 
@@ -161,12 +161,12 @@ app.post('/api/admin/login', (req,res)=>{
   if(!u) return res.status(400).json({error:'Invalid credentials'});
   if(!bcrypt.compareSync(password, u.password_hash)) return res.status(400).json({error:'Invalid credentials'});
   const token = signToken({ uid: u.id, role: u.role, memberId: u.member_id, name: u.name });
-  res.cookie('token', token, { httpOnly:true, sameSite:'lax' });
+  res.cookie('token', token, { httpOnly:true, sameSite:'none', secure: true });
   res.json({ ok:true });
 });
 
 app.post('/api/auth/logout', (req,res)=>{
-  res.clearCookie('token');
+  res.clearCookie('token', { httpOnly:true, sameSite:'none', secure: true });
   res.json({ ok:true });
 });
 

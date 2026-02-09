@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Project Booklet — FWF</title>
+  <link rel="icon" href="assets/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Booklet Container */
+    .booklet {
+      width: 100%;
+      max-width: 900px;
+      min-height: 600px;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      perspective: 2000px;
+    }
+
+    /* Page Container (for flipping) */
+    .page-container {
+      width: 100%;
+      height: 100%;
+      min-height: 600px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .page {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      padding: 60px;
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Page turn animation */
+    .turning-left {
+      animation: pageFlipLeft 0.8s ease;
+    }
+
+    .turning-right {
+      animation: pageFlipRight 0.8s ease;
+    }
+
+    @keyframes pageFlipLeft {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(-180deg); opacity: 0; }
+    }
+
+    @keyframes pageFlipRight {
+      0% { transform: rotateY(-180deg); opacity: 0; }
+      100% { transform: rotateY(0deg); }
+    }
+
+    /* Cover Page */
+    .cover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1), transparent 50%);
+      animation: shimmer 15s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .cover-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 56px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover-subtitle {
+      font-size: 20px;
+      opacity: 0.95;
+      max-width: 500px;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover-touch {
+      position: absolute;
+      bottom: 40px;
+      font-size: 14px;
+      opacity: 0.8;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Summary Page */
+    .summary .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      color: #667eea;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .summary-section {
+      margin-bottom: 32px;
+    }
+
+    .summary-section h3 {
+      font-size: 20px;
+      color: #1f2937;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .summary-section h3 i {
+      color: #667eea;
+      font-size: 18px;
+    }
+
+    .summary-section p {
+      color: #4b5563;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .impact-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .impact-badge {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Index Page */
+    .index .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      color: #667eea;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .index-list {
+      display: grid;
+      gap: 12px;
+      max-height: 450px;
+      overflow-y: auto;
+      padding-right: 16px;
+    }
+
+    .index-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .index-list::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 10px;
+    }
+
+    .index-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .index-item:hover {
+      background: linear-gradient(135deg, #e0e7ff, #ddd6fe);
+      border-left-color: #667eea;
+      transform: translateX(8px);
+    }
+
+    .index-item-name {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 15px;
+    }
+
+    .index-item-page {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    /* Unit Detail Page */
+    .unit-detail .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .unit-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .unit-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    .unit-meta-item i {
+      color: #667eea;
+    }
+
+    .unit-section {
+      margin-bottom: 28px;
+    }
+
+    .unit-section h3 {
+      font-size: 18px;
+      color: #1f2937;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unit-section h3 i {
+      color: #764ba2;
+      font-size: 16px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .product-card {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #166534;
+      border: 2px solid #86efac;
+    }
+
+    .finance-box {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .finance-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .finance-row:last-child {
+      border-bottom: none;
+    }
+
+    .finance-label {
+      font-size: 14px;
+      color: #92400e;
+      font-weight: 500;
+    }
+
+    .finance-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #78350f;
+    }
+
+    /* Navigation */
+    .nav-controls {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .page-counter {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.25);
+      transform: rotate(90deg);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .booklet {
+        max-width: 100%;
+        min-height: 500px;
+      }
+
+      .page {
+        padding: 40px 24px;
+      }
+
+      .cover-title {
+        font-size: 40px;
+      }
+
+      .cover-icon {
+        font-size: 60px;
+      }
+
+      .page-title {
+        font-size: 28px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="booklet" id="booklet">
+    <button class="close-btn" onclick="window.history.back()">×</button>
+    
+    <!-- Cover Page -->
+    <div class="page cover active" data-page="0">
+      <div class="cover-icon" id="coverIcon">
+        <i class="fa-solid fa-shield-heart"></i>
+      </div>
+      <h1 class="cover-title" id="coverTitle">Suraksha</h1>
+      <p class="cover-subtitle" id="coverSubtitle">Health & hygiene products for safer communities.</p>
+      <div class="cover-touch">
+        <i class="fa-solid fa-hand-pointer"></i> Click next to explore
+      </div>
+    </div>
+
+    <!-- Summary Page -->
+    <div class="page summary" data-page="1">
+      <h2 class="page-title">परिचय / Introduction</h2>
+      
+      <div class="summary-section">
+        <h3><i class="fa-solid fa-info-circle"></i> About This Project</h3>
+        <p id="summaryDescription">This project focuses on creating sustainable livelihoods through health and hygiene product manufacturing.</p>
+      </div>
+
+      <div class="summary-section">
+        <h3><i class="fa-solid fa-bullseye"></i> Impact Areas</h3>
+        <div class="impact-badges" id="impactBadges">
+          <span class="impact-badge">
+            <i class="fa-solid fa-circle-check"></i>
+            Employment
+          </span>
+        </div>
+      </div>
+
+      <div class="summary-section">
+        <h3><i class="fa-solid fa-chart-simple"></i> Key Statistics</h3>
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-box">
+            <div class="stat-value">8</div>
+            <div class="stat-label">Total Units</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">₹1.5L</div>
+            <div class="stat-label">Setup Cost</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">₹40k</div>
+            <div class="stat-label">Working Capital</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Index Page -->
+    <div class="page index" data-page="2">
+      <h2 class="page-title">अनुक्रमणिका / Index</h2>
+      <div class="index-list" id="indexList">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- Unit Detail Pages (dynamically created) -->
+
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+      <button class="nav-btn" id="prevBtn" onclick="prevPage()">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="nav-btn" id="nextBtn" onclick="nextPage()">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="page-counter" id="pageCounter">Page 1 / 10</div>
+  </div>
+
+  <script>
+    let currentPage = 0;
+    let totalPages = 3; // Cover + Summary + Index (units added dynamically)
+    let projectData = null;
+    let allPages = [];
+
+    // Sample data (will be replaced with URL params or API)
+    const SAMPLE_PROJECT = {
+      key: "suraksha",
+      name: "Suraksha",
+      subtitle: "Health & hygiene products for safer communities.",
+      icon: "fa-shield-heart",
+      impacts: ["Employment", "Women Empowerment", "Health"],
+      description: "Suraksha empowers communities by creating dignified livelihoods through the production of essential health and hygiene products. Each unit is designed to be profitable while addressing critical public health needs.",
+      units: [
+        {
+          name: "MediSan Liquids Unit",
+          space: "~260 sqft",
+          workers: "4 workers",
+          profit: "₹60k–90k/m",
+          setup: "₹1,50,000",
+          working: "₹40,000",
+          upfront: "₹17,500",
+          products: [{name: "Handwash (gel/foam)"}, {name: "Antiseptic liquid"}, {name: "Hand rub (70% IPA)"}, {name: "Disinfectant surface spray"}],
+          description: "Complete liquid hygiene product manufacturing unit focusing on handwashes, sanitizers, and disinfectants.",
+          machines: ["Mixing tanks", "Filling machines", "Labeling equipment", "Storage tanks"],
+          requirements: ["Clean water supply", "Ventilation", "Storage racks", "Quality testing kit"]
+        },
+        {
+          name: "FreshWipe Converting Unit",
+          space: "~240 sqft",
+          workers: "4 workers",
+          profit: "₹50k–75k/m",
+          setup: "₹1,20,000",
+          working: "₹30,000",
+          upfront: "₹15,000",
+          products: [{name: "Wet wipes (single/multi)"}, {name: "Floor/Surface wipes"}, {name: "Tissue folding"}],
+          description: "Wipes and tissue product manufacturing and packaging unit.",
+          machines: ["Wipe cutting machine", "Folding machine", "Packaging unit"],
+          requirements: ["Climate control", "Clean room area", "Raw material storage"]
+        }
+      ],
+      costs: {
+        setup: "₹1.2–1.8L",
+        working: "₹0.30–0.50L",
+        upfront: "₹10k–25k"
+      }
+    };
+
+    function init() {
+      // Get project data from URL params or use sample
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectKey = urlParams.get('project');
+      
+      // TODO: Fetch actual project data
+      projectData = SAMPLE_PROJECT;
+
+      // Populate cover
+      document.getElementById('coverIcon').innerHTML = `<i class="fa-solid ${projectData.icon}"></i>`;
+      document.getElementById('coverTitle').textContent = projectData.name;
+      document.getElementById('coverSubtitle').textContent = projectData.subtitle;
+
+      // Populate summary
+      document.getElementById('summaryDescription').textContent = projectData.description;
+      
+      const impactBadges = projectData.impacts.map(impact => 
+        `<span class="impact-badge"><i class="fa-solid fa-circle-check"></i>${impact}</span>`
+      ).join('');
+      document.getElementById('impactBadges').innerHTML = impactBadges;
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-box">
+          <div class="stat-value">${projectData.units.length}</div>
+          <div class="stat-label">Total Units</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${projectData.costs.setup}</div>
+          <div class="stat-label">Setup Cost</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${projectData.costs.working}</div>
+          <div class="stat-label">Working Capital</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${projectData.costs.upfront}</div>
+          <div class="stat-label">Upfront Payment</div>
+        </div>
+      `;
+
+      // Populate index
+      const indexList = document.getElementById('indexList');
+      projectData.units.forEach((unit, index) => {
+        const pageNum = index + 3; // Cover=0, Summary=1, Index=2, Units start at 3
+        const item = document.createElement('div');
+        item.className = 'index-item';
+        item.innerHTML = `
+          <span class="index-item-name">${unit.name}</span>
+          <span class="index-item-page">Page ${pageNum + 1}</span>
+        `;
+        item.onclick = () => goToPage(pageNum);
+        indexList.appendChild(item);
+
+        // Create unit detail page
+        createUnitPage(unit, pageNum);
+      });
+
+      // Update total pages
+      totalPages = 3 + projectData.units.length;
+      allPages = document.querySelectorAll('.page');
+      updateUI();
+    }
+
+    function createUnitPage(unit, pageNum) {
+      const page = document.createElement('div');
+      page.className = 'page unit-detail';
+      page.setAttribute('data-page', pageNum);
+
+      const productsHTML = unit.products.map(p => 
+        `<div class="product-card">${p.name}</div>`
+      ).join('');
+
+      const machinesHTML = unit.machines ? 
+        `<div class="unit-section">
+          <h3><i class="fa-solid fa-cog"></i> Machines & Equipment</h3>
+          <ul style="margin-left: 20px; color: #4b5563; line-height: 1.8;">
+            ${unit.machines.map(m => `<li>${m}</li>`).join('')}
+          </ul>
+        </div>` : '';
+
+      const requirementsHTML = unit.requirements ? 
+        `<div class="unit-section">
+          <h3><i class="fa-solid fa-list-check"></i> Requirements</h3>
+          <ul style="margin-left: 20px; color: #4b5563; line-height: 1.8;">
+            ${unit.requirements.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+        </div>` : '';
+
+      page.innerHTML = `
+        <h2 class="page-title">${unit.name}</h2>
+        
+        <div class="unit-meta">
+          <div class="unit-meta-item">
+            <i class="fa-solid fa-ruler-combined"></i>
+            <span>${unit.space}</span>
+          </div>
+          <div class="unit-meta-item">
+            <i class="fa-solid fa-users"></i>
+            <span>${unit.workers}</span>
+          </div>
+          <div class="unit-meta-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Profit: ${unit.profit}</span>
+          </div>
+        </div>
+
+        <div class="unit-section">
+          <h3><i class="fa-solid fa-align-left"></i> Description</h3>
+          <p style="color: #4b5563; line-height: 1.8;">${unit.description}</p>
+        </div>
+
+        <div class="unit-section">
+          <h3><i class="fa-solid fa-box"></i> Products</h3>
+          <div class="products-grid">
+            ${productsHTML}
+          </div>
+        </div>
+
+        ${machinesHTML}
+        ${requirementsHTML}
+
+        <div class="unit-section">
+          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Details</h3>
+          <div class="finance-box">
+            <div class="finance-row">
+              <span class="finance-label">Project Start Cost</span>
+              <span class="finance-value">${unit.setup}</span>
+            </div>
+            <div class="finance-row">
+              <span class="finance-label">Working Capital</span>
+              <span class="finance-value">${unit.working}</span>
+            </div>
+            <div class="finance-row">
+              <span class="finance-label">Beneficiary Upfront</span>
+              <span class="finance-value">${unit.upfront}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('booklet').appendChild(page);
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages - 1) {
+        goToPage(currentPage + 1);
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        goToPage(currentPage - 1);
+      }
+    }
+
+    function goToPage(pageNum) {
+      if (pageNum < 0 || pageNum >= totalPages || pageNum === currentPage) return;
+
+      const currentPageEl = allPages[currentPage];
+      const nextPageEl = allPages[pageNum];
+
+      // Add flip animation
+      if (pageNum > currentPage) {
+        currentPageEl.classList.add('turning-left');
+      } else {
+        nextPageEl.classList.add('turning-right');
+      }
+
+      setTimeout(() => {
+        currentPageEl.classList.remove('active', 'turning-left');
+        nextPageEl.classList.add('active');
+        currentPageEl.classList.remove('turning-right');
+        currentPage = pageNum;
+        updateUI();
+      }, 400);
+    }
+
+    function updateUI() {
+      document.getElementById('prevBtn').disabled = currentPage === 0;
+      document.getElementById('nextBtn').disabled = currentPage === totalPages - 1;
+      document.getElementById('pageCounter').textContent = `Page ${currentPage + 1} / ${totalPages}`;
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

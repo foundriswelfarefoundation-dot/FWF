@@ -161,372 +161,385 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .btn-primary.accent-outline:hover{box-shadow:0 0 0 1px #fff inset,0 8px 22px rgba(0,0,0,.22)}
 
 /* Modal - BOOKLET STYLE */
-.modal-backdrop{position:fixed;inset:0;place-items:center;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);padding:20px;z-index:50;perspective:2500px;opacity:0;transition:opacity .3s ease}
-.modal-backdrop.open{opacity:1}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-backdrop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,6,.82);backdrop-filter:blur(12px);padding:20px;z-index:50;opacity:0;transition:opacity .35s ease;pointer-events:none}
+.modal-backdrop.open{opacity:1;pointer-events:auto}
 
-/* Booklet Container - Real Book Effect */
+/* Booklet Wrapper */
 .booklet-wrapper{
-  width:100%;max-width:min(96vw,1200px);height:min(90vh,700px);
-  position:relative;perspective:2500px;
-  filter:drop-shadow(0 50px 100px rgba(0,0,0,0.5));
+  width:min(96vw,1100px);height:min(92vh,720px);
+  position:relative;
   display:flex;
-}
-.booklet-container{
-  width:50%;height:100%;
-  background:#f5f1e8;
-  border-radius:8px 0 0 8px;
-  box-shadow:
-    -8px 0 20px rgba(0,0,0,0.3),
-    0 5px 40px rgba(0,0,0,0.4),
-    inset 3px 0 8px rgba(255,255,255,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.5);
-  position:relative;
-  transform-style:preserve-3d;
-  transform:rotateY(-3deg) translateZ(0);
-  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin:right center;
-}
-.booklet-container.flipping{transform:rotateY(-8deg) translateZ(0)}
-
-/* Right page container */
-.booklet-container-right{
-  width:50%;height:100%;
-  background:#f5f1e8;
-  border-radius:0 16px 16px 0;
-  box-shadow:
-    8px 0 20px rgba(0,0,0,0.3),
-    0 5px 40px rgba(0,0,0,0.4),
-    inset -3px 0 8px rgba(255,255,255,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.5);
-  position:relative;
-  transform-style:preserve-3d;
-  transform:rotateY(3deg) translateZ(0);
-  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin:left center;
-}
-.booklet-container-right.flipping{transform:rotateY(8deg) translateZ(0)}
-.booklet-container-right .booklet-page{left:0;right:0}
-.booklet-container-right .booklet-pages-edge{display:none}
-
-/* Book spine with binding details */
-.booklet-container::before{
-  content:"";position:absolute;left:-12px;top:0;bottom:0;width:44px;
-  background:
-    linear-gradient(90deg,#8b7355 0%,#a68968 20%,#c8b699 40%,#d4c5ab 50%,#c8b699 60%,#a68968 80%,#8b7355 100%);
-  box-shadow:
-    inset 4px 0 12px rgba(0,0,0,0.4),
-    inset -2px 0 8px rgba(255,255,255,0.2),
-    -4px 0 20px rgba(0,0,0,0.6);
-  border-right:2px solid rgba(93,78,55,0.4);
-  z-index:10;
-  border-radius:8px 0 0 8px;
-  transform:translateZ(-5px);
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,0.6)) drop-shadow(0 10px 20px rgba(0,0,0,0.3));
 }
 
-/* Book spine stitching effect */
-.booklet-container::after{
-  content:"";position:absolute;left:-7px;top:10%;bottom:10%;width:2px;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,transparent 12px,
-    rgba(93,78,55,0.4) 12px,rgba(93,78,55,0.4) 15px
+/* Close Button - ON WRAPPER (outside 3D transforms) */
+.booklet-close{
+  position:absolute;top:-14px;right:-14px;z-index:100;
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,#dc2626,#ef4444);
+  border:2px solid #fff;color:#fff;
+  cursor:pointer;font-size:18px;
+  display:grid;place-items:center;
+  transition:all .2s ease;
+  box-shadow:0 4px 14px rgba(220,38,38,0.4),0 2px 4px rgba(0,0,0,0.2);
+  pointer-events:auto;
+}
+.booklet-close:hover{transform:scale(1.15) rotate(90deg);box-shadow:0 6px 20px rgba(220,38,38,0.5)}
+
+/* Navigation - ON WRAPPER (outside 3D transforms) */
+.booklet-nav{
+  position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#1e1b18,#2a2520);
+  padding:8px 14px;border-radius:999px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.1);
+  pointer-events:auto;
+}
+.booklet-nav button{
+  background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;
+  width:34px;height:34px;border-radius:50%;cursor:pointer;
+  display:grid;place-items:center;font-size:14px;
+  transition:all .2s ease;
+  box-shadow:0 3px 8px rgba(249,115,22,0.35);
+  pointer-events:auto;
+}
+.booklet-nav button:hover:not(:disabled){transform:scale(1.12);box-shadow:0 4px 14px rgba(249,115,22,0.5)}
+.booklet-nav button:disabled{background:linear-gradient(135deg,#3d352c,#322c26);color:#6b5b4a;cursor:not-allowed;box-shadow:none}
+.booklet-nav .page-indicator{font:700 13px "Georgia",serif;color:#d4c5ab;padding:0 10px;letter-spacing:0.5px}
+
+/* Book Spine (center divider) */
+.book-spine{
+  width:30px;min-width:30px;align-self:stretch;
+  background:linear-gradient(90deg,
+    #6b5744 0%,#8b7355 15%,#a68968 35%,#c8b699 50%,#a68968 65%,#8b7355 85%,#6b5744 100%);
+  box-shadow:
+    inset 0 0 15px rgba(0,0,0,0.4),
+    0 0 20px rgba(0,0,0,0.5),
+    4px 0 8px rgba(0,0,0,0.2),
+    -4px 0 8px rgba(0,0,0,0.2);
+  position:relative;z-index:5;
+  border-radius:2px;
+}
+/* Spine stitching */
+.book-spine::before{
+  content:"";position:absolute;left:50%;top:5%;bottom:5%;width:2px;transform:translateX(-50%);
+  background:repeating-linear-gradient(0deg,
+    transparent,transparent 10px,
+    rgba(93,78,55,0.5) 10px,rgba(93,78,55,0.5) 14px
   );
-  z-index:11;
-  box-shadow:1px 0 2px rgba(0,0,0,0.3);
+}
+/* Spine gold bands */
+.book-spine::after{
+  content:"";position:absolute;left:3px;right:3px;top:0;bottom:0;
+  background:
+    linear-gradient(0deg,
+      transparent 0%,rgba(218,173,82,0.3) 2%,transparent 4%,
+      transparent 96%,rgba(218,173,82,0.3) 98%,transparent 100%
+    );
 }
 
-/* Right book page */
-.booklet-container-right{
-  width:50%;height:100%;
-  background:#f5f1e8;
-  border-radius:0 16px 16px 0;
+/* Left Page */
+.book-page-left{
+  flex:1;height:100%;position:relative;overflow:hidden;
+  background:#faf7f0;
+  border-radius:6px 0 0 6px;
   box-shadow:
-    8px 0 20px rgba(0,0,0,0.3),
-    0 5px 40px rgba(0,0,0,0.4),
-    inset -3px 0 8px rgba(255,255,255,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.5);
-  position:relative;
-  transform-style:preserve-3d;
-  transform:rotateY(3deg) translateZ(0);
-  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin:left center;
+    -6px 0 18px rgba(0,0,0,0.15),
+    inset -8px 0 25px rgba(0,0,0,0.06),
+    inset 0 2px 0 rgba(255,255,255,0.6);
+}
+/* Left page inner shadow (gutter) */
+.book-page-left::after{
+  content:"";position:absolute;right:0;top:0;bottom:0;width:40px;
+  background:linear-gradient(90deg,transparent,rgba(0,0,0,0.06));
+  pointer-events:none;z-index:6;
 }
 
-/* Page edges visible on right side */
-.booklet-pages-edge{
-  position:absolute;right:-8px;top:8px;bottom:8px;width:12px;
+/* Right Page */
+.book-page-right{
+  flex:1;height:100%;position:relative;overflow:hidden;
+  background:#faf7f0;
+  border-radius:0 6px 6px 0;
+  box-shadow:
+    6px 0 18px rgba(0,0,0,0.15),
+    inset 8px 0 25px rgba(0,0,0,0.06),
+    inset 0 2px 0 rgba(255,255,255,0.6);
+}
+/* Right page inner shadow (gutter) */
+.book-page-right::after{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:40px;
+  background:linear-gradient(270deg,transparent,rgba(0,0,0,0.06));
+  pointer-events:none;z-index:6;
+}
+
+/* Page edge stacking effect (right side) */
+.book-page-right::before{
+  content:"";position:absolute;right:-6px;top:4px;bottom:4px;width:8px;
   background:linear-gradient(180deg,
-    #fefdfb 0%,#faf8f3 20%,#f5f1e8 40%,#efe9dc 50%,
-    #f5f1e8 60%,#faf8f3 80%,#fefdfb 100%);
-  border-radius:0 8px 8px 0;
-  box-shadow:
-    inset -3px 0 6px rgba(0,0,0,0.15),
-    3px 0 10px rgba(0,0,0,0.3);
-  z-index:8;
-  overflow:hidden;
+    #fefdfb 0%,#f5f0e5 25%,#ede7d9 50%,#f5f0e5 75%,#fefdfb 100%);
+  border-radius:0 4px 4px 0;
+  box-shadow:2px 0 6px rgba(0,0,0,0.12);z-index:-1;
 }
 
-/* Individual page layers effect */
-.booklet-pages-edge::before{
-  content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,transparent 3px,
-    rgba(0,0,0,0.02) 3px,rgba(0,0,0,0.02) 4px
-  );
+/* Page edge stacking effect (left side) */
+.book-page-left::before{
+  content:"";position:absolute;left:-6px;top:4px;bottom:4px;width:8px;
+  background:linear-gradient(180deg,
+    #fefdfb 0%,#f5f0e5 25%,#ede7d9 50%,#f5f0e5 75%,#fefdfb 100%);
+  border-radius:4px 0 0 4px;
+  box-shadow:-2px 0 6px rgba(0,0,0,0.12);z-index:-1;
 }
 
-/* Booklet pages with paper texture */
+/* Page Content Area */
 .booklet-page{
-  position:absolute;left:32px;right:0;top:0;bottom:0;
-  background:#fefdfb;
-  padding:40px;
-  overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;
-  transition:opacity 0.4s ease;
+  position:absolute;inset:0;
+  background:transparent;
+  padding:36px 32px 50px;
+  overflow-y:auto;overflow-x:hidden;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
   display:flex;flex-direction:column;
-  box-shadow:inset 0 0 100px rgba(93,78,55,0.02);
   scrollbar-width:thin;
-  scrollbar-color:rgba(93,78,55,0.3) rgba(212,197,171,0.2);
+  scrollbar-color:rgba(139,115,85,0.25) transparent;
 }
-.booklet-page::-webkit-scrollbar{width:6px}
-.booklet-page::-webkit-scrollbar-track{background:rgba(212,197,171,0.2);border-radius:4px}
-.booklet-page::-webkit-scrollbar-thumb{background:rgba(93,78,55,0.3);border-radius:4px}
-.booklet-page::-webkit-scrollbar-thumb:hover{background:rgba(93,78,55,0.5)}
-.booklet-page::before{
-  content:"";position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.8),transparent 40%),
-    radial-gradient(ellipse at 90% 90%,rgba(139,115,85,0.03),transparent 50%);
-  pointer-events:none;opacity:0.6;
-}
+.booklet-page::-webkit-scrollbar{width:5px}
+.booklet-page::-webkit-scrollbar-track{background:transparent}
+.booklet-page::-webkit-scrollbar-thumb{background:rgba(139,115,85,0.25);border-radius:4px}
+.booklet-page::-webkit-scrollbar-thumb:hover{background:rgba(139,115,85,0.4)}
 .booklet-page.active{opacity:1;pointer-events:auto;z-index:5}
-.booklet-page::-webkit-scrollbar{width:8px}
-.booklet-page::-webkit-scrollbar-track{background:rgba(212,197,171,0.2);border-radius:4px}
-.booklet-page::-webkit-scrollbar-thumb{background:rgba(93,78,55,0.3);border-radius:4px}
-.booklet-page::-webkit-scrollbar-thumb:hover{background:rgba(93,78,55,0.5)}
 
-/* Cover Page with embossed effect */
-.booklet-cover{
-  background:linear-gradient(135deg,#faf8f3 0%,#f5f1e8 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;position:relative;overflow:hidden;
-}
-.booklet-cover::after{
-  content:"";position:absolute;inset:0;
+/* Paper texture overlay */
+.book-page-left .page-texture,
+.book-page-right .page-texture{
+  position:absolute;inset:0;
   background:
-    radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.08),transparent 60%),
-    radial-gradient(circle at 70% 80%,rgba(139,115,85,0.05),transparent 50%);
+    radial-gradient(ellipse at 20% 20%,rgba(255,255,255,0.4),transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(139,115,85,0.03),transparent 40%);
+  pointer-events:none;z-index:1;
+}
+
+/* Page number footer */
+.page-number{
+  position:absolute;bottom:14px;z-index:10;
+  font:600 11px "Georgia",serif;color:#a09080;letter-spacing:1px;
   pointer-events:none;
 }
+.book-page-left .page-number{left:32px}
+.book-page-right .page-number{right:32px}
+
+/* ===== Cover Page ===== */
+.booklet-cover{
+  background:linear-gradient(145deg,#f8f4eb 0%,#f0eadb 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;position:relative;
+}
+/* Decorative corner flourishes */
+.booklet-cover::before{
+  content:"❧";position:absolute;top:24px;left:28px;
+  font-size:28px;color:rgba(139,115,85,0.2);
+}
+.booklet-cover::after{
+  content:"❧";position:absolute;bottom:24px;right:28px;
+  font-size:28px;color:rgba(139,115,85,0.2);transform:rotate(180deg);
+}
 .booklet-cover-icon{
-  width:120px;height:120px;
-  background:linear-gradient(135deg,#fff7ed,#fed7aa);
-  border-radius:24px;display:grid;place-items:center;
-  font-size:56px;color:#f97316;margin-bottom:24px;
+  width:100px;height:100px;
+  background:linear-gradient(145deg,#fff7ed,#fed7aa);
+  border-radius:50%;display:grid;place-items:center;
+  font-size:44px;color:#f97316;margin-bottom:20px;
   box-shadow:
-    0 10px 30px rgba(249,115,22,0.2),
-    inset 0 2px 4px rgba(255,255,255,0.8),
-    inset 0 -2px 4px rgba(249,115,22,0.2);
-  position:relative;z-index:1;
+    0 8px 24px rgba(249,115,22,0.2),
+    inset 0 2px 0 rgba(255,255,255,0.8),
+    0 0 0 4px rgba(249,115,22,0.1);
 }
 .booklet-cover-title{
-  font:900 48px/1.1 "Georgia",serif;color:#5d4e37;margin-bottom:12px;
-  text-shadow:0 2px 4px rgba(0,0,0,0.08),1px 1px 0 rgba(255,255,255,0.5);
-  position:relative;z-index:1;
+  font:900 38px/1.1 "Georgia","Times New Roman",serif;
+  color:#3d2e1a;margin-bottom:10px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.6);
+  letter-spacing:-0.5px;
 }
 .booklet-cover-subtitle{
-  font:400 18px/1.4 "Inter",sans-serif;color:#8b7355;max-width:400px;
-  position:relative;z-index:1;
-  text-shadow:0 1px 2px rgba(255,255,255,0.8);
+  font:400 15px/1.6 "Georgia",serif;color:#7a6b55;
+  max-width:340px;font-style:italic;
+}
+/* Decorative line under title */
+.booklet-cover-line{
+  width:60px;height:2px;margin:14px auto;
+  background:linear-gradient(90deg,transparent,#c8a96e,transparent);
 }
 
-/* Summary Page */
-.booklet-summary h2{font:900 32px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #d4c5ab}
-.booklet-summary-content{font:400 16px/1.7 "Georgia",serif;color:#2d2416;margin-bottom:24px}
-.booklet-impacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.booklet-impact{background:#fff;border:2px solid #d4c5ab;color:#5d4e37;font:600 14px "Inter",sans-serif;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
+/* ===== Summary Page ===== */
+.booklet-summary h2{font:900 26px/1.2 "Georgia",serif;color:#3d2e1a;margin-bottom:14px;padding-bottom:10px;border-bottom:1.5px solid #d4c5ab}
+.booklet-summary-content{font:400 14.5px/1.75 "Georgia",serif;color:#3a2f20;margin-bottom:20px;text-indent:2em}
+.booklet-impacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.booklet-impact{background:#f8f4eb;border:1.5px solid #d4c5ab;color:#5d4e37;font:600 12.5px "Inter",sans-serif;padding:6px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+.booklet-impact i{color:#22c55e;font-size:11px}
 
-/* Index Page */
-.booklet-index h2{font:900 32px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #d4c5ab}
+/* ===== Index Page ===== */
+.booklet-index h2{font:900 26px/1.2 "Georgia",serif;color:#3d2e1a;margin-bottom:20px;padding-bottom:10px;border-bottom:1.5px solid #d4c5ab}
 .index-list{list-style:none;margin:0;padding:0}
-.index-item{background:#fff;border:1px solid #d4c5ab;border-radius:12px;margin-bottom:12px;padding:16px 20px;cursor:pointer;transition:all 0.2s ease;display:flex;justify-content:space-between;align-items:center}
-.index-item:hover{background:linear-gradient(135deg,#faf8f3,#fff);transform:translateX(4px);box-shadow:0 4px 12px rgba(93,78,55,0.12)}
-.index-item-name{font:700 16px "Inter",sans-serif;color:#2d2416}
-.index-item-meta{font:400 13px "Inter",sans-serif;color:#8b7355;margin-top:4px}
-.index-item-page{font:800 18px "Georgia",serif;color:#f97316;min-width:40px;text-align:right}
+.index-item{
+  background:transparent;border-bottom:1px dotted #c8b699;
+  margin-bottom:0;padding:10px 4px;cursor:pointer;
+  transition:all 0.15s ease;display:flex;justify-content:space-between;align-items:center;
+}
+.index-item:last-child{border-bottom:none}
+.index-item:hover{background:rgba(249,115,22,0.05);padding-left:8px}
+.index-item-name{font:600 14px "Georgia",serif;color:#3a2f20}
+.index-item-meta{font:400 11.5px "Inter",sans-serif;color:#8b7355;margin-top:2px}
+.index-item-page{font:700 15px "Georgia",serif;color:#c8a96e;min-width:30px;text-align:right}
 
-/* Unit Detail Page */
-.unit-detail-page h2{font:900 28px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:8px}
-.unit-detail-page .unit-subtitle{font:400 15px "Inter",sans-serif;color:#8b7355;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e8dcc8}
-.detail-section{margin-bottom:24px}
-.detail-section h3{font:800 20px "Georgia",serif;color:#5d4e37;margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.detail-section h3 i{color:#f97316;font-size:18px}
-.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.detail-card{background:#fff;border:1px solid #e8dcc8;border-radius:10px;padding:12px 16px}
-.detail-card-label{font:600 12px "Inter",sans-serif;color:#8b7355;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-.detail-card-value{font:700 16px "Inter",sans-serif;color:#2d2416}
+/* ===== Unit Detail Page ===== */
+.unit-detail-page h2{font:900 24px/1.2 "Georgia",serif;color:#3d2e1a;margin-bottom:6px}
+.unit-detail-page .unit-subtitle{font:italic 400 13px "Georgia",serif;color:#8b7355;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e8dcc8}
+.detail-section{margin-bottom:20px}
+.detail-section h3{font:700 16px "Georgia",serif;color:#5d4e37;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.detail-section h3 i{color:#c8a96e;font-size:15px}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.detail-card{background:rgba(248,244,235,0.7);border:1px solid #e8dcc8;border-radius:8px;padding:10px 12px}
+.detail-card-label{font:600 10px "Inter",sans-serif;color:#8b7355;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
+.detail-card-value{font:700 14px "Inter",sans-serif;color:#3a2f20}
 .product-list{list-style:none;margin:0;padding:0}
-.product-list li{background:#fff;border-left:3px solid #f97316;padding:10px 16px;margin-bottom:8px;border-radius:6px;font:400 15px "Inter",sans-serif;color:#2d2416}
-.product-list li::before{content:"✓";color:#22c55e;font-weight:800;margin-right:10px}
+.product-list li{background:transparent;border-left:2px solid #c8a96e;padding:6px 12px;margin-bottom:4px;border-radius:0;font:400 13px "Inter",sans-serif;color:#3a2f20}
+.product-list li::before{content:"✦";color:#c8a96e;font-size:10px;margin-right:8px}
 
-/* Navigation Controls */
-.booklet-nav{position:absolute;bottom:16px;right:16px;display:flex;gap:8px;z-index:15;background:rgba(255,255,255,0.9);padding:6px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,0.12);border:1px solid #d4c5ab;pointer-events:auto}
-.booklet-nav button{background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:14px;transition:all 0.2s ease;box-shadow:0 2px 6px rgba(249,115,22,0.25);pointer-events:auto}
-.booklet-nav button:hover:not(:disabled){transform:scale(1.08);box-shadow:0 3px 10px rgba(249,115,22,0.4)}
-.booklet-nav button:disabled{background:#e8dcc8;color:#8b7355;cursor:not-allowed;box-shadow:none}
-.booklet-nav .page-indicator{font:600 12px "Inter",sans-serif;color:#5d4e37;display:flex;align-items:center;padding:0 8px}
-.booklet-close{position:absolute;top:16px;right:16px;z-index:20;background:linear-gradient(135deg,#8b7355,#a68968);border:1px solid #6b5744;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:grid;place-items:center;transition:all 0.2s ease;box-shadow:0 3px 10px rgba(0,0,0,0.18);pointer-events:auto}
-.booklet-close:hover{background:linear-gradient(135deg,#7a6451,#8b7355);transform:scale(1.1)}
-
-/* Evening theme adjustments */
-.theme-evening .booklet-container{
-  background:#2a2520;
-  box-shadow:
-    -8px 0 20px rgba(0,0,0,0.6),
-    0 5px 40px rgba(0,0,0,0.7),
-    inset 3px 0 8px rgba(255,255,255,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.15);
+/* ===========================
+   EVENING THEME
+   =========================== */
+.theme-evening .book-page-left,
+.theme-evening .book-page-right{background:#1c1915}
+.theme-evening .book-page-left::after{background:linear-gradient(90deg,transparent,rgba(0,0,0,0.12))}
+.theme-evening .book-page-right::after{background:linear-gradient(270deg,transparent,rgba(0,0,0,0.12))}
+.theme-evening .book-page-left::before,
+.theme-evening .book-page-right::before{
+  background:linear-gradient(180deg,#1a1612 0%,#15120f 25%,#100e0c 50%,#15120f 75%,#1a1612 100%);
 }
-.theme-evening .booklet-container-right{
-  background:#2a2520;
-  box-shadow:
-    8px 0 20px rgba(0,0,0,0.6),
-    0 5px 40px rgba(0,0,0,0.7),
-    inset -3px 0 8px rgba(255,255,255,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.15);
+.theme-evening .book-spine{
+  background:linear-gradient(90deg,#1a1612 0%,#241e18 15%,#322c26 35%,#3d352c 50%,#322c26 65%,#241e18 85%,#1a1612 100%);
 }
-.theme-evening .booklet-container::before{
-  background:linear-gradient(90deg,#1a1612 0%,#241e18 20%,#322c26 40%,#3d352c 50%,#322c26 60%,#241e18 80%,#1a1612 100%);
-  border-right-color:rgba(255,255,255,0.1);
-  box-shadow:
-    inset 4px 0 12px rgba(0,0,0,0.6),
-    inset -2px 0 8px rgba(255,255,255,0.08),
-    -4px 0 20px rgba(0,0,0,0.8);
+.theme-evening .book-spine::after{
+  background:linear-gradient(0deg,transparent 0%,rgba(200,169,110,0.2) 2%,transparent 4%,transparent 96%,rgba(200,169,110,0.2) 98%,transparent 100%);
 }
-.theme-evening .booklet-pages-edge{
-  background:linear-gradient(180deg,
-    #1f1b17 0%,#2a2520 20%,#322c26 40%,#3d352c 50%,
-    #322c26 60%,#2a2520 80%,#1f1b17 100%);
+.theme-evening .booklet-page{color:#d4c5ab}
+.theme-evening .page-texture{
+  background:radial-gradient(ellipse at 20% 20%,rgba(255,255,255,0.03),transparent 50%),
+             radial-gradient(ellipse at 80% 80%,rgba(200,169,110,0.02),transparent 40%) !important;
 }
-.theme-evening .booklet-page{background:#1f1b17;color:#e8dcc8}
-.theme-evening .booklet-page::before{
-  background:
-    radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.05),transparent 40%),
-    radial-gradient(ellipse at 90% 90%,rgba(212,197,171,0.03),transparent 50%);
-}
-.theme-evening .booklet-cover{background:linear-gradient(135deg,#322c26 0%,#2a2520 100%)}
-.theme-evening .booklet-cover::after{
-  background:
-    radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.15),transparent 60%),
-    radial-gradient(circle at 70% 80%,rgba(212,197,171,0.08),transparent 50%);
-}
-.theme-evening .booklet-cover-icon{background:linear-gradient(135deg,#3d352c,#322c26);border-color:#4a4035;box-shadow:0 10px 30px rgba(0,0,0,0.4),inset 0 2px 4px rgba(255,255,255,0.1)}
-.theme-evening .booklet-cover-title{color:#d4c5ab;text-shadow:0 2px 4px rgba(0,0,0,0.4),1px 1px 0 rgba(255,255,255,0.1)}
-.theme-evening .booklet-cover-subtitle{color:#a68968;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+.theme-evening .page-number{color:#5a5045}
+.theme-evening .booklet-cover{background:linear-gradient(145deg,#231f1a 0%,#1c1915 100%)}
+.theme-evening .booklet-cover::before,.theme-evening .booklet-cover::after{color:rgba(200,169,110,0.15)}
+.theme-evening .booklet-cover-icon{background:linear-gradient(145deg,#322c26,#2a2520);color:#f97316;box-shadow:0 8px 24px rgba(0,0,0,0.4),inset 0 2px 0 rgba(255,255,255,0.05),0 0 0 4px rgba(249,115,22,0.15)}
+.theme-evening .booklet-cover-title{color:#d4c5ab;text-shadow:0 1px 0 rgba(0,0,0,0.4)}
+.theme-evening .booklet-cover-subtitle{color:#8b7a64}
+.theme-evening .booklet-cover-line{background:linear-gradient(90deg,transparent,#6b5744,transparent)}
 .theme-evening .booklet-summary h2,.theme-evening .booklet-index h2,.theme-evening .unit-detail-page h2{color:#d4c5ab;border-color:#3d352c}
-.theme-evening .booklet-summary-content,.theme-evening .unit-subtitle{color:#c8b699;border-color:#3d352c}
-.theme-evening .booklet-impact{background:#322c26;border-color:#3d352c;color:#d4c5ab}
-.theme-evening .index-item,.theme-evening .detail-card{background:#2a2520;border-color:#3d352c;color:#e8dcc8}
-.theme-evening .index-item-name,.theme-evening .detail-card-value{color:#e8dcc8}
-.theme-evening .index-item-meta,.theme-evening .detail-card-label{color:#a68968}
-.theme-evening .index-item-page{color:#f97316}
-.theme-evening .index-item:hover{background:linear-gradient(135deg,#322c26,#2a2520);border-color:#f97316}
-.theme-evening .product-list li{background:#322c26;border-color:#3d352c;color:#c8b699}
-.theme-evening .booklet-page::-webkit-scrollbar-thumb{background:rgba(212,197,171,0.4)}
-.theme-evening .booklet-page::-webkit-scrollbar-track{background:rgba(29,25,21,0.3)}
-.theme-evening .booklet-nav{background:rgba(42,37,32,0.95);border-color:#3d352c}
-.theme-evening .booklet-nav .page-indicator{color:#d4c5ab}
-.theme-evening .booklet-close{background:linear-gradient(135deg,#3d352c,#322c26);border-color:#4a4035}
+.theme-evening .booklet-summary-content{color:#b8a890}
+.theme-evening .unit-subtitle{color:#7a6b55;border-color:#3d352c}
+.theme-evening .booklet-impact{background:#2a2520;border-color:#3d352c;color:#c8b699}
+.theme-evening .index-item{border-color:#3d352c}
+.theme-evening .index-item:hover{background:rgba(249,115,22,0.08)}
+.theme-evening .index-item-name{color:#d4c5ab}
+.theme-evening .index-item-meta{color:#7a6b55}
+.theme-evening .detail-card{background:rgba(42,37,32,0.6);border-color:#3d352c}
+.theme-evening .detail-card-value{color:#d4c5ab}
+.theme-evening .detail-card-label{color:#7a6b55}
+.theme-evening .detail-section h3{color:#c8b699}
+.theme-evening .detail-section h3 i{color:#c8a96e}
+.theme-evening .product-list li{color:#b8a890;border-color:#6b5744}
 
-/* Morning theme adjustments - Cool blue tones */
-.theme-morning .booklet-container{
-  background:#f8fbff;
-  box-shadow:
-    -8px 0 20px rgba(99,102,241,0.12),
-    0 5px 40px rgba(59,130,246,0.15),
-    inset 3px 0 8px rgba(255,255,255,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+/* ===========================
+   MORNING THEME
+   =========================== */
+.theme-morning .book-page-left,
+.theme-morning .book-page-right{background:#f8fbff}
+.theme-morning .book-spine{
+  background:linear-gradient(90deg,#4a6fa5 0%,#6689b8 15%,#82a3cc 35%,#9ab8db 50%,#82a3cc 65%,#6689b8 85%,#4a6fa5 100%);
 }
-.theme-morning .booklet-container-right{
-  background:#f8fbff;
-  box-shadow:
-    8px 0 20px rgba(99,102,241,0.12),
-    0 5px 40px rgba(59,130,246,0.15),
-    inset -3px 0 8px rgba(255,255,255,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+.theme-morning .book-spine::after{
+  background:linear-gradient(0deg,transparent 0%,rgba(147,197,253,0.4) 2%,transparent 4%,transparent 96%,rgba(147,197,253,0.4) 98%,transparent 100%);
 }
-.theme-morning .booklet-container::before{
-  background:linear-gradient(90deg,#5b7bb4 0%,#6e8fc4 20%,#8aa5d4 40%,#9fb8e0 50%,#8aa5d4 60%,#6e8fc4 80%,#5b7bb4 100%);
-  border-right-color:rgba(99,102,241,0.25);
+.theme-morning .book-page-left::before,
+.theme-morning .book-page-right::before{
+  background:linear-gradient(180deg,#fff 0%,#f0f7ff 25%,#e8f2ff 50%,#f0f7ff 75%,#fff 100%);
 }
-.theme-morning .booklet-pages-edge{
-  background:linear-gradient(180deg,
-    #ffffff 0%,#f8fbff 20%,#f0f7ff 40%,#e8f2ff 50%,
-    #f0f7ff 60%,#f8fbff 80%,#ffffff 100%);
-}
-.theme-morning .booklet-page{background:#ffffff;color:#1e293b}
-.theme-morning .booklet-cover{background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%)}
-.theme-morning .booklet-cover-icon{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#3b82f6}
+.theme-morning .booklet-cover{background:linear-gradient(145deg,#e8f2ff 0%,#dbeafe 100%)}
+.theme-morning .booklet-cover::before,.theme-morning .booklet-cover::after{color:rgba(59,130,246,0.15)}
+.theme-morning .booklet-cover-icon{background:linear-gradient(145deg,#dbeafe,#bfdbfe);color:#3b82f6;box-shadow:0 8px 24px rgba(59,130,246,0.2),inset 0 2px 0 rgba(255,255,255,0.8),0 0 0 4px rgba(59,130,246,0.1)}
 .theme-morning .booklet-cover-title{color:#1e3a8a}
 .theme-morning .booklet-cover-subtitle{color:#3b82f6}
+.theme-morning .booklet-cover-line{background:linear-gradient(90deg,transparent,#93c5fd,transparent)}
+.theme-morning .booklet-summary h2,.theme-morning .booklet-index h2,.theme-morning .unit-detail-page h2{color:#1e3a8a;border-color:#bfdbfe}
+.theme-morning .booklet-summary-content{color:#1e293b}
 .theme-morning .booklet-impact{background:#f0f9ff;border-color:#bfdbfe;color:#1e40af}
-.theme-morning .index-item,.theme-morning .detail-card{background:#f8fbff;border-color:#dbeafe}
-.theme-morning .index-item:hover{background:linear-gradient(135deg,#f0f9ff,#dbeafe);border-color:#3b82f6}
-.theme-morning .product-list li{background:#f8fbff;border-color:#dbeafe}
+.theme-morning .index-item{border-color:#bfdbfe}
+.theme-morning .index-item:hover{background:rgba(59,130,246,0.06)}
+.theme-morning .index-item-name{color:#1e293b}
+.theme-morning .index-item-page{color:#3b82f6}
+.theme-morning .detail-card{background:rgba(240,249,255,0.7);border-color:#bfdbfe}
+.theme-morning .detail-card-value{color:#1e293b}
+.theme-morning .detail-section h3 i{color:#3b82f6}
+.theme-morning .product-list li{border-color:#3b82f6;color:#1e293b}
+.theme-morning .product-list li::before{color:#3b82f6}
+.theme-morning .page-number{color:#93c5fd}
 
-/* Afternoon theme adjustments - Warm golden tones */
-.theme-afternoon .booklet-container{
-  background:#fffbf5;
-  box-shadow:
-    -8px 0 20px rgba(251,146,60,0.12),
-    0 5px 40px rgba(249,115,22,0.15),
-    inset 3px 0 8px rgba(255,255,255,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+/* ===========================
+   AFTERNOON THEME
+   =========================== */
+.theme-afternoon .book-page-left,
+.theme-afternoon .book-page-right{background:#fffcf5}
+.theme-afternoon .book-spine{
+  background:linear-gradient(90deg,#a67c52 0%,#bf9268 15%,#d4a87e 35%,#e0bb92 50%,#d4a87e 65%,#bf9268 85%,#a67c52 100%);
 }
-.theme-afternoon .booklet-container-right{
-  background:#fffbf5;
-  box-shadow:
-    8px 0 20px rgba(251,146,60,0.12),
-    0 5px 40px rgba(249,115,22,0.15),
-    inset -3px 0 8px rgba(255,255,255,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+.theme-afternoon .book-spine::after{
+  background:linear-gradient(0deg,transparent 0%,rgba(253,186,116,0.4) 2%,transparent 4%,transparent 96%,rgba(253,186,116,0.4) 98%,transparent 100%);
 }
-.theme-afternoon .booklet-container::before{
-  background:linear-gradient(90deg,#b8865f 0%,#c99970 20%,#daad82 40%,#e5bc92 50%,#daad82 60%,#c99970 80%,#b8865f 100%);
-  border-right-color:rgba(251,146,60,0.25);
+.theme-afternoon .book-page-left::before,
+.theme-afternoon .book-page-right::before{
+  background:linear-gradient(180deg,#fff 0%,#fffbf5 25%,#fff7ed 50%,#fffbf5 75%,#fff 100%);
 }
-.theme-afternoon .booklet-pages-edge{
-  background:linear-gradient(180deg,
-    #ffffff 0%,#fffbf5 20%,#fff8ed 40%,#fff4e0 50%,
-    #fff8ed 60%,#fffbf5 80%,#ffffff 100%);
-}
-.theme-afternoon .booklet-page{background:#ffffff;color:#1e293b}
-.theme-afternoon .booklet-cover{background:linear-gradient(135deg,#fed7aa 0%,#fdba74 100%)}
-.theme-afternoon .booklet-cover-icon{background:linear-gradient(135deg,#fed7aa,#fdba74);color:#ea580c}
+.theme-afternoon .booklet-cover{background:linear-gradient(145deg,#fff7ed 0%,#fed7aa 100%)}
+.theme-afternoon .booklet-cover::before,.theme-afternoon .booklet-cover::after{color:rgba(234,88,12,0.15)}
+.theme-afternoon .booklet-cover-icon{background:linear-gradient(145deg,#fed7aa,#fdba74);color:#ea580c;box-shadow:0 8px 24px rgba(234,88,12,0.2),inset 0 2px 0 rgba(255,255,255,0.8),0 0 0 4px rgba(234,88,12,0.1)}
 .theme-afternoon .booklet-cover-title{color:#7c2d12}
 .theme-afternoon .booklet-cover-subtitle{color:#c2410c}
+.theme-afternoon .booklet-cover-line{background:linear-gradient(90deg,transparent,#f97316,transparent)}
+.theme-afternoon .booklet-summary h2,.theme-afternoon .booklet-index h2,.theme-afternoon .unit-detail-page h2{color:#7c2d12;border-color:#fed7aa}
+.theme-afternoon .booklet-summary-content{color:#1e293b}
 .theme-afternoon .booklet-impact{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
-.theme-afternoon .index-item,.theme-afternoon .detail-card{background:#fffbf5;border-color:#fed7aa}
-.theme-afternoon .index-item:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#f97316}
-.theme-afternoon .product-list li{background:#fffbf5;border-color:#fed7aa}
+.theme-afternoon .index-item{border-color:#fed7aa}
+.theme-afternoon .index-item:hover{background:rgba(249,115,22,0.06)}
+.theme-afternoon .index-item-name{color:#1e293b}
+.theme-afternoon .index-item-page{color:#ea580c}
+.theme-afternoon .detail-card{background:rgba(255,247,237,0.7);border-color:#fed7aa}
+.theme-afternoon .detail-card-value{color:#1e293b}
+.theme-afternoon .detail-section h3 i{color:#ea580c}
+.theme-afternoon .product-list li{border-color:#ea580c;color:#1e293b}
+.theme-afternoon .product-list li::before{color:#ea580c}
+.theme-afternoon .page-number{color:#fdba74}
 
-/* Responsive */
+/* ===========================
+   RESPONSIVE
+   =========================== */
 @media (max-width:780px){
-.booklet-wrapper{height:min(95vh,800px);filter:drop-shadow(0 30px 60px rgba(0,0,0,0.5));flex-direction:column}
-.booklet-container{width:100%;transform:rotateY(0deg) translateZ(0);border-radius:8px 8px 0 0}
-.booklet-container-right{display:none}
-.booklet-container::before{left:-8px;width:36px}
-.booklet-pages-edge{right:-6px;width:10px}
-.booklet-page{padding:24px 20px 60px;left:28px}
-.booklet-cover-title{font-size:36px}
-.booklet-cover-icon{width:90px;height:90px;font-size:42px}
-.unit-detail-page h2{font-size:24px}
-.detail-grid{grid-template-columns:1fr}
-.booklet-nav{bottom:12px;right:12px;padding:5px 8px}
-.booklet-nav button{width:28px;height:28px;font-size:12px}
+.booklet-wrapper{width:96vw;height:min(94vh,700px);flex-direction:column}
+.book-spine{width:100%;min-width:unset;height:8px;
+  background:linear-gradient(180deg,#6b5744 0%,#8b7355 30%,#c8b699 50%,#8b7355 70%,#6b5744 100%);
+}
+.book-spine::before{display:none}
+.book-spine::after{display:none}
+.book-page-left{border-radius:6px 6px 0 0;flex:1}
+.book-page-right{display:none}
+.book-page-left::after{display:none}
+.book-page-left::before{display:none}
+.booklet-page{padding:24px 20px 50px}
+.booklet-cover-title{font-size:30px}
+.booklet-cover-icon{width:80px;height:80px;font-size:36px}
+.booklet-close{top:-12px;right:-6px;width:36px;height:36px;font-size:16px}
+.booklet-nav{bottom:-16px;padding:6px 10px}
+.booklet-nav button{width:30px;height:30px;font-size:12px}
 .booklet-nav .page-indicator{font-size:11px;padding:0 6px}
-.booklet-close{width:32px;height:32px;font-size:16px;top:12px;right:12px}
+.detail-grid{grid-template-columns:1fr}
 }
 
 /* JOIN US etc. (unchanged) */
@@ -858,36 +871,39 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
   <!-- BOOKLET MODAL -->
   <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
     <div class="booklet-wrapper">
+      <!-- Close button (on wrapper, outside book) -->
+      <button class="booklet-close" aria-label="Close" onclick="closeModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
       <!-- Left page -->
-      <div class="booklet-container">
-        <!-- Page edges visible on right -->
-        <div class="booklet-pages-edge"></div>
-        
-        <button class="booklet-close" aria-label="Close" onclick="closeModal()">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-        
-        <!-- Pages will be dynamically injected here -->
+      <div class="book-page-left">
+        <div class="page-texture"></div>
         <div id="bookletPages"></div>
-        
-        <!-- Navigation -->
-        <div class="booklet-nav">
-          <button id="prevPage" aria-label="Previous page" disabled>
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <div class="page-indicator">
-            <span id="currentPageNum">1</span> / <span id="totalPages">1</span>
-          </div>
-          <button id="nextPage" aria-label="Next page">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
+        <div class="page-number" id="leftPageNum"></div>
       </div>
-      
+
+      <!-- Spine -->
+      <div class="book-spine"></div>
+
       <!-- Right page -->
-      <div class="booklet-container-right">
-        <!-- Pages will be dynamically injected here -->
+      <div class="book-page-right">
+        <div class="page-texture"></div>
         <div id="bookletPagesRight"></div>
+        <div class="page-number" id="rightPageNum"></div>
+      </div>
+
+      <!-- Navigation (on wrapper, outside book) -->
+      <div class="booklet-nav">
+        <button id="prevPage" aria-label="Previous page" disabled>
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="page-indicator">
+          <span id="currentPageNum">1</span> / <span id="totalPages">1</span>
+        </div>
+        <button id="nextPage" aria-label="Next page">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -1216,81 +1232,71 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
   /* ===== Booklet Modal System ===== */
   const modal=document.getElementById('modal'),
         bookletPages=document.getElementById('bookletPages'),
+        bookletPagesRight=document.getElementById('bookletPagesRight'),
         currentPageNum=document.getElementById('currentPageNum'),
         totalPagesEl=document.getElementById('totalPages'),
+        leftPageNum=document.getElementById('leftPageNum'),
+        rightPageNum=document.getElementById('rightPageNum'),
         prevBtn=document.getElementById('prevPage'),
         nextBtn=document.getElementById('nextPage');
 
-  let currentProject=null, currentPage=0, pages=[];
+  let currentProject=null, currentSpread=0, pages=[], totalSpreads=0;
 
-  function openModal(){ modal.style.display='grid'; setTimeout(()=>modal.classList.add('open'),10); document.body.style.overflow='hidden'; }
-  function closeModal(){ modal.classList.remove('open'); setTimeout(()=>modal.style.display='none',300); document.body.style.overflow=''; currentPage=0; }
+  function openModal(){ modal.style.display='flex'; setTimeout(()=>modal.classList.add('open'),10); document.body.style.overflow='hidden'; }
+  function closeModal(){ modal.classList.remove('open'); setTimeout(()=>modal.style.display='none',350); document.body.style.overflow=''; currentSpread=0; }
   window.closeModal=closeModal;
-  modal.addEventListener('click',e=>{ if(e.target===modal && !e.target.closest('.booklet-container')) closeModal(); });
-  document.addEventListener('keydown',e=>{ 
-    if(!modal.classList.contains('open')) return;
-    if(e.key==='Escape') closeModal();
-    if(e.key==='ArrowLeft' && currentPage > 0) goToPage(currentPage - 1);
-    if(e.key==='ArrowRight' && currentPage < pages.length - 1) goToPage(currentPage + 1);
+
+  // Close on backdrop click (not on book itself)
+  modal.addEventListener('click',e=>{
+    if(e.target===modal) closeModal();
   });
 
-  function goToPage(pageNum){
-    if(pageNum < 0 || pageNum >= pages.length) return;
-    
-    currentPage = pageNum;
-    
-    // Calculate which spread (pair of pages) to show
-    // Page 0-1 = spread 0, Page 2-3 = spread 1, etc.
-    const spreadIndex = Math.floor(pageNum / 2);
-    
-    // Left container has even pages (0,2,4...) at indices 0,1,2...
-    // Right container has odd pages (1,3,5...) at indices 0,1,2...
-    // Both should show the same spreadIndex
-    
-    const leftPages = document.querySelectorAll('#bookletPages .booklet-page');
-    const rightPages = document.querySelectorAll('#bookletPagesRight .booklet-page');
-    
-    leftPages.forEach((p, i) => {
-      p.classList.toggle('active', i === spreadIndex);
-    });
-    
-    rightPages.forEach((p, i) => {
-      p.classList.toggle('active', i === spreadIndex);
-    });
-    
-    // Update UI
-    currentPageNum.textContent = pageNum + 1;
-    prevBtn.disabled = pageNum === 0;
-    nextBtn.disabled = pageNum === pages.length - 1;
-    
-    // Add flip animation
-    const container = document.querySelector('.booklet-container');
-    const containerRight = document.querySelector('.booklet-container-right');
-    if (container && containerRight) {
-      container.classList.add('flipping');
-      containerRight.classList.add('flipping');
-      setTimeout(() => {
-        container.classList.remove('flipping');
-        containerRight.classList.remove('flipping');
-      }, 600);
-    }
+  document.addEventListener('keydown',e=>{
+    if(!modal.classList.contains('open')) return;
+    if(e.key==='Escape') closeModal();
+    if(e.key==='ArrowLeft') goToSpread(currentSpread - 1);
+    if(e.key==='ArrowRight') goToSpread(currentSpread + 1);
+  });
+
+  function goToSpread(spreadNum){
+    if(spreadNum < 0 || spreadNum >= totalSpreads) return;
+    currentSpread = spreadNum;
+
+    // Each spread shows 2 pages: left = spreadNum*2, right = spreadNum*2 + 1
+    const leftIdx = spreadNum * 2;
+    const rightIdx = spreadNum * 2 + 1;
+
+    // Show correct left page
+    const leftPages = bookletPages.querySelectorAll('.booklet-page');
+    leftPages.forEach((p,i)=> p.classList.toggle('active', i === spreadNum));
+
+    // Show correct right page
+    const rightPages = bookletPagesRight.querySelectorAll('.booklet-page');
+    rightPages.forEach((p,i)=> p.classList.toggle('active', i === spreadNum));
+
+    // Page numbers
+    leftPageNum.textContent = leftIdx < pages.length ? (leftIdx + 1) : '';
+    rightPageNum.textContent = rightIdx < pages.length ? (rightIdx + 1) : '';
+
+    // Update nav
+    currentPageNum.textContent = `${leftIdx + 1}–${Math.min(rightIdx + 1, pages.length)}`;
+    totalPagesEl.textContent = pages.length;
+    prevBtn.disabled = spreadNum === 0;
+    nextBtn.disabled = spreadNum >= totalSpreads - 1;
   }
 
-  prevBtn.addEventListener('click', ()=> goToPage(currentPage - 1));
-  nextBtn.addEventListener('click', ()=> goToPage(currentPage + 1));
+  prevBtn.addEventListener('click', ()=> goToSpread(currentSpread - 1));
+  nextBtn.addEventListener('click', ()=> goToSpread(currentSpread + 1));
 
   function showProject(project){
     currentProject = project;
-    currentPage = 0;
+    currentSpread = 0;
     pages = [];
     bookletPages.innerHTML = '';
-    const bookletPagesRight = document.getElementById('bookletPagesRight');
     bookletPagesRight.innerHTML = '';
 
-    // Create a helper function to add pages
     const allPageElements = [];
 
-    // Project descriptions (can be customized per project)
     const descriptions = {
       "suraksha": "Comprehensive health and hygiene products that empower women and protect communities. Our range includes mosquito repellents, sanitary solutions, and protective items designed for safety and dignity.",
       "swachh-bharat": "Comprehensive home and surface care solutions making cleanliness accessible and affordable for every household. From floor cleaners to tissue products, we bring professional-grade hygiene to local communities.",
@@ -1307,16 +1313,17 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
     // Page 1: Cover
     const coverPage = document.createElement('div');
-    coverPage.className = 'booklet-page booklet-cover active';
+    coverPage.className = 'booklet-page booklet-cover';
     coverPage.innerHTML = `
       <div class="booklet-cover-icon">
         <i class="fa-solid ${project.icon}"></i>
       </div>
       <h1 class="booklet-cover-title">${project.name}</h1>
+      <div class="booklet-cover-line"></div>
       <p class="booklet-cover-subtitle">${project.subtitle}</p>
     `;
     allPageElements.push(coverPage);
-    pages.push({type: 'cover', title: 'Cover'});
+    pages.push({type:'cover',title:'Cover'});
 
     // Page 2: Summary
     const summaryPage = document.createElement('div');
@@ -1326,7 +1333,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       <div class="booklet-summary-content">
         ${descriptions[project.key] || project.subtitle}
       </div>
-      <h3 style="font: 700 18px 'Inter', sans-serif; color: #5d4e37; margin-bottom: 12px;">Impact Areas</h3>
+      <h3 style="font:700 16px 'Georgia',serif;color:inherit;margin:16px 0 10px;opacity:0.8">Impact Areas</h3>
       <div class="booklet-impacts">
         ${project.impacts.map(imp => `
           <span class="booklet-impact">
@@ -1334,15 +1341,9 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
           </span>
         `).join('')}
       </div>
-      <div style="margin-top: 24px; padding: 16px; background: rgba(249, 115, 22, 0.08); border-left: 4px solid #f97316; border-radius: 8px;">
-        <p style="font: 400 15px 'Inter', sans-serif; color: #2d2416; margin: 0;">
-          <strong>💡 Did you know?</strong> This project includes ${project.units.length} different production units, 
-          each designed to create sustainable livelihoods and economic independence.
-        </p>
-      </div>
     `;
     allPageElements.push(summaryPage);
-    pages.push({type: 'summary', title: 'Summary'});
+    pages.push({type:'summary',title:'Summary'});
 
     // Page 3: Index
     const indexPage = document.createElement('div');
@@ -1353,9 +1354,9 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
         ${project.units.map((unit, idx) => `
           <li class="index-item" data-page="${3 + idx}">
             <div>
-              <div class="index-item-name">${unit.name}</div>
+              <div class="index-item-name">${idx+1}. ${unit.name}</div>
               <div class="index-item-meta">
-                ${unit.space} • ${unit.workers} workers • ${(unit.products || []).length} products
+                ${unit.space} &middot; ${unit.workers} workers &middot; ${(unit.products || []).length} products
               </div>
             </div>
             <div class="index-item-page">${4 + idx}</div>
@@ -1364,115 +1365,81 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       </ul>
     `;
     allPageElements.push(indexPage);
-    pages.push({type: 'index', title: 'Index'});
+    pages.push({type:'index',title:'Index'});
 
     // Pages 4+: Unit Details
     project.units.forEach((unit, idx) => {
       const unitPage = document.createElement('div');
       unitPage.className = 'booklet-page unit-detail-page';
-      
-      const costs = COSTS[project.key] || {setup:"—",working:"—",upfront:"—"};
-      
+      const costs = COSTS[project.key] || {setup:"\u2014",working:"\u2014",upfront:"\u2014"};
       unitPage.innerHTML = `
         <h2>${unit.name}</h2>
-        <p class="unit-subtitle">${project.name} • Unit ${idx + 1} of ${project.units.length}</p>
-        
+        <p class="unit-subtitle">${project.name} &middot; Unit ${idx+1} of ${project.units.length}</p>
         <div class="detail-section">
           <h3><i class="fa-solid fa-chart-line"></i> Quick Overview</h3>
           <div class="detail-grid">
-            <div class="detail-card">
-              <div class="detail-card-label">Space Required</div>
-              <div class="detail-card-value">${unit.space || '—'}</div>
-            </div>
-            <div class="detail-card">
-              <div class="detail-card-label">Workforce</div>
-              <div class="detail-card-value">${unit.workers || '—'} workers</div>
-            </div>
-            <div class="detail-card">
-              <div class="detail-card-label">Monthly Profit Potential</div>
-              <div class="detail-card-value">${unit.profit || '—'}</div>
-            </div>
-            <div class="detail-card">
-              <div class="detail-card-label">Products</div>
-              <div class="detail-card-value">${(unit.products || []).length} items</div>
-            </div>
+            <div class="detail-card"><div class="detail-card-label">Space Required</div><div class="detail-card-value">${unit.space||'\u2014'}</div></div>
+            <div class="detail-card"><div class="detail-card-label">Workforce</div><div class="detail-card-value">${unit.workers||'\u2014'} workers</div></div>
+            <div class="detail-card"><div class="detail-card-label">Monthly Profit</div><div class="detail-card-value">${unit.profit||'\u2014'}</div></div>
+            <div class="detail-card"><div class="detail-card-label">Products</div><div class="detail-card-value">${(unit.products||[]).length} items</div></div>
           </div>
         </div>
-
         <div class="detail-section">
           <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Requirements</h3>
           <div class="detail-grid">
-            <div class="detail-card">
-              <div class="detail-card-label">Project Start Cost</div>
-              <div class="detail-card-value">${costs.setup}</div>
-            </div>
-            <div class="detail-card">
-              <div class="detail-card-label">Working Capital</div>
-              <div class="detail-card-value">${costs.working}</div>
-            </div>
-            <div class="detail-card">
-              <div class="detail-card-label">Beneficiary Upfront</div>
-              <div class="detail-card-value">${costs.upfront}</div>
-            </div>
+            <div class="detail-card"><div class="detail-card-label">Project Start Cost</div><div class="detail-card-value">${costs.setup}</div></div>
+            <div class="detail-card"><div class="detail-card-label">Working Capital</div><div class="detail-card-value">${costs.working}</div></div>
+            <div class="detail-card"><div class="detail-card-label">Beneficiary Upfront</div><div class="detail-card-value">${costs.upfront}</div></div>
           </div>
         </div>
-
         <div class="detail-section">
           <h3><i class="fa-solid fa-box"></i> Product Portfolio</h3>
           <ul class="product-list">
-            ${(unit.products || []).map(p => `<li>${p.name}</li>`).join('')}
+            ${(unit.products||[]).map(p => `<li>${p.name}</li>`).join('')}
           </ul>
         </div>
-
-        <div class="detail-section">
-          <h3><i class="fa-solid fa-circle-info"></i> Terms & Conditions</h3>
-          <div style="background: #fff; border: 1px solid #e8dcc8; border-radius: 10px; padding: 16px; font: 400 14px 'Inter', sans-serif; color: #2d2416;">
-            <ol style="margin: 0; padding-left: 20px;">
-              <li style="margin-bottom: 8px;">Beneficiary membership must be active</li>
-              <li style="margin-bottom: 8px;">Eligible for project funding after 12 months</li>
-              <li>Must participate in NGO welfare projects</li>
-            </ol>
-          </div>
-        </div>
-
-        <div style="margin-top: auto; padding-top: 16px; text-align: center;">
-          <button class="btn btn-primary" onclick="window.location.href='/join'" style="padding: 12px 24px; border-radius: 12px; background: #f97316; color: #fff; border: none; cursor: pointer; font-weight: 700; font-size: 15px;">
-            Register for this Unit <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i>
+        <div style="margin-top:auto;padding-top:14px;text-align:center">
+          <button class="btn btn-primary" onclick="window.location.href='/join'" style="padding:10px 22px;border-radius:10px;background:#f97316;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:14px">
+            Register for this Unit <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i>
           </button>
         </div>
       `;
-      
       allPageElements.push(unitPage);
-      pages.push({type: 'unit', title: unit.name, unitIndex: idx});
+      pages.push({type:'unit',title:unit.name,unitIndex:idx});
     });
 
-    // Distribute pages to left and right containers
+    // If odd number of pages, add a blank page at end
+    if(allPageElements.length % 2 !== 0){
+      const blankPage = document.createElement('div');
+      blankPage.className = 'booklet-page';
+      blankPage.style.cssText = 'display:flex;align-items:center;justify-content:center;opacity:0;';
+      allPageElements.push(blankPage);
+      pages.push({type:'blank',title:'Blank'});
+    }
+
+    // Distribute: even indices (0,2,4...) -> left, odd indices (1,3,5...) -> right
     allPageElements.forEach((pageEl, index) => {
-      if (index % 2 === 0) {
-        // Even pages go to left (0, 2, 4...)
-        bookletPages.appendChild(pageEl.cloneNode(true));
+      if(index % 2 === 0){
+        bookletPages.appendChild(pageEl);
       } else {
-        // Odd pages go to right (1, 3, 5...)
-        bookletPagesRight.appendChild(pageEl.cloneNode(true));
+        bookletPagesRight.appendChild(pageEl);
       }
     });
 
-    // Re-attach event listeners to cloned index items
+    // Attach index item click handlers
     document.querySelectorAll('.index-item').forEach(item => {
       item.addEventListener('click', () => {
         const pageNum = parseInt(item.dataset.page);
-        goToPage(pageNum);
+        // Convert page number to spread index
+        goToSpread(Math.floor(pageNum / 2));
       });
     });
 
-    // Update total pages
-    totalPagesEl.textContent = pages.length;
-    currentPageNum.textContent = '1';
-    prevBtn.disabled = true;
-    nextBtn.disabled = pages.length <= 1;
-    
-    // Trigger initial page display
-    goToPage(0);
+    // Calculate total spreads
+    totalSpreads = Math.ceil(pages.length / 2);
+
+    // Show first spread
+    goToSpread(0);
   }
 
   cardsEl.addEventListener('click',e=>{

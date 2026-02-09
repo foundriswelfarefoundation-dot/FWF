@@ -161,32 +161,140 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .btn-primary.accent-outline:hover{box-shadow:0 0 0 1px #fff inset,0 8px 22px rgba(0,0,0,.22)}
 
 /* Modal - BOOKLET STYLE */
-.modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);padding:20px;z-index:50;perspective:1800px}
+.modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);padding:20px;z-index:50;perspective:2500px}
 .modal-backdrop.open{display:grid;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* Booklet Container */
-.booklet-wrapper{width:100%;max-width:min(96vw,1000px);height:min(90vh,700px);position:relative;perspective:2000px}
-.booklet-container{width:100%;height:100%;background:#f5f1e8;border-radius:16px;box-shadow:0 40px 90px rgba(0,0,0,.35),0 0 1px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4);position:relative;transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)}
-.booklet-container.flipping{transform:rotateY(-5deg)}
+/* Booklet Container - Real Book Effect */
+.booklet-wrapper{
+  width:100%;max-width:min(96vw,1000px);height:min(90vh,700px);
+  position:relative;perspective:2500px;
+  filter:drop-shadow(0 50px 100px rgba(0,0,0,0.5));
+}
+.booklet-container{
+  width:100%;height:100%;
+  background:#f5f1e8;
+  border-radius:8px 16px 16px 8px;
+  box-shadow:
+    -8px 0 20px rgba(0,0,0,0.3),
+    0 5px 40px rgba(0,0,0,0.4),
+    inset 3px 0 8px rgba(255,255,255,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  position:relative;
+  transform-style:preserve-3d;
+  transform:rotateY(-2deg) translateZ(0);
+  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.booklet-container.flipping{transform:rotateY(-8deg) translateZ(0)}
 
-/* Book spine */
-.booklet-container::before{content:"";position:absolute;left:0;top:0;bottom:0;width:32px;background:linear-gradient(90deg,#c8b699 0%,#d4c5ab 50%,#c8b699 100%);box-shadow:2px 0 8px rgba(0,0,0,.15) inset;border-right:1px solid rgba(0,0,0,.08);z-index:10;border-radius:16px 0 0 16px}
+/* Book spine with binding details */
+.booklet-container::before{
+  content:"";position:absolute;left:-12px;top:0;bottom:0;width:44px;
+  background:
+    linear-gradient(90deg,#8b7355 0%,#a68968 20%,#c8b699 40%,#d4c5ab 50%,#c8b699 60%,#a68968 80%,#8b7355 100%);
+  box-shadow:
+    inset 4px 0 12px rgba(0,0,0,0.4),
+    inset -2px 0 8px rgba(255,255,255,0.2),
+    -4px 0 20px rgba(0,0,0,0.6);
+  border-right:2px solid rgba(93,78,55,0.4);
+  z-index:10;
+  border-radius:8px 0 0 8px;
+  transform:translateZ(-5px);
+}
 
-/* Booklet pages */
-.booklet-page{position:absolute;left:32px;right:0;top:0;bottom:0;background:#fefdfb;padding:40px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 0.4s ease;display:flex;flex-direction:column}
+/* Book spine stitching effect */
+.booklet-container::after{
+  content:"";position:absolute;left:-7px;top:10%;bottom:10%;width:2px;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 12px,
+    rgba(93,78,55,0.4) 12px,rgba(93,78,55,0.4) 15px
+  );
+  z-index:11;
+  box-shadow:1px 0 2px rgba(0,0,0,0.3);
+}
+
+/* Page edges visible on right side */
+.booklet-pages-edge{
+  position:absolute;right:-8px;top:8px;bottom:8px;width:12px;
+  background:linear-gradient(180deg,
+    #fefdfb 0%,#faf8f3 20%,#f5f1e8 40%,#efe9dc 50%,
+    #f5f1e8 60%,#faf8f3 80%,#fefdfb 100%);
+  border-radius:0 8px 8px 0;
+  box-shadow:
+    inset -3px 0 6px rgba(0,0,0,0.15),
+    3px 0 10px rgba(0,0,0,0.3);
+  z-index:8;
+  overflow:hidden;
+}
+
+/* Individual page layers effect */
+.booklet-pages-edge::before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 3px,
+    rgba(0,0,0,0.02) 3px,rgba(0,0,0,0.02) 4px
+  );
+}
+
+/* Booklet pages with paper texture */
+.booklet-page{
+  position:absolute;left:32px;right:0;top:0;bottom:0;
+  background:#fefdfb;
+  padding:40px;
+  overflow-y:auto;opacity:0;pointer-events:none;
+  transition:opacity 0.4s ease;
+  display:flex;flex-direction:column;
+  box-shadow:inset 0 0 100px rgba(93,78,55,0.02);
+}
+.booklet-page::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.8),transparent 40%),
+    radial-gradient(ellipse at 90% 90%,rgba(139,115,85,0.03),transparent 50%);
+  pointer-events:none;opacity:0.6;
+}
 .booklet-page.active{opacity:1;pointer-events:auto;z-index:5}
 .booklet-page::-webkit-scrollbar{width:8px}
 .booklet-page::-webkit-scrollbar-track{background:rgba(212,197,171,0.2);border-radius:4px}
 .booklet-page::-webkit-scrollbar-thumb{background:rgba(93,78,55,0.3);border-radius:4px}
 .booklet-page::-webkit-scrollbar-thumb:hover{background:rgba(93,78,55,0.5)}
 
-/* Cover Page */
-.booklet-cover{background:linear-gradient(135deg,#faf8f3 0%,#f5f1e8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
-.booklet-cover::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.08),transparent 60%);pointer-events:none}
-.booklet-cover-icon{width:120px;height:120px;background:linear-gradient(135deg,#fff7ed,#fed7aa);border-radius:24px;display:grid;place-items:center;font-size:56px;color:#f97316;margin-bottom:24px;box-shadow:0 10px 30px rgba(249,115,22,0.2);position:relative;z-index:1}
-.booklet-cover-title{font:900 48px/1.1 "Georgia",serif;color:#5d4e37;margin-bottom:12px;text-shadow:0 2px 4px rgba(0,0,0,0.08);position:relative;z-index:1}
-.booklet-cover-subtitle{font:400 18px/1.4 "Inter",sans-serif;color:#8b7355;max-width:400px;position:relative;z-index:1}
+/* Cover Page with embossed effect */
+.booklet-cover{
+  background:linear-gradient(135deg,#faf8f3 0%,#f5f1e8 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;position:relative;overflow:hidden;
+}
+.booklet-cover::after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.08),transparent 60%),
+    radial-gradient(circle at 70% 80%,rgba(139,115,85,0.05),transparent 50%);
+  pointer-events:none;
+}
+.booklet-cover-icon{
+  width:120px;height:120px;
+  background:linear-gradient(135deg,#fff7ed,#fed7aa);
+  border-radius:24px;display:grid;place-items:center;
+  font-size:56px;color:#f97316;margin-bottom:24px;
+  box-shadow:
+    0 10px 30px rgba(249,115,22,0.2),
+    inset 0 2px 4px rgba(255,255,255,0.8),
+    inset 0 -2px 4px rgba(249,115,22,0.2);
+  position:relative;z-index:1;
+}
+.booklet-cover-title{
+  font:900 48px/1.1 "Georgia",serif;color:#5d4e37;margin-bottom:12px;
+  text-shadow:0 2px 4px rgba(0,0,0,0.08),1px 1px 0 rgba(255,255,255,0.5);
+  position:relative;z-index:1;
+}
+.booklet-cover-subtitle{
+  font:400 18px/1.4 "Inter",sans-serif;color:#8b7355;max-width:400px;
+  position:relative;z-index:1;
+  text-shadow:0 1px 2px rgba(255,255,255,0.8);
+}
 
 /* Summary Page */
 .booklet-summary h2{font:900 32px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #d4c5ab}
@@ -227,12 +335,41 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .booklet-close:hover{background:linear-gradient(135deg,#7a6451,#8b7355);transform:scale(1.1)}
 
 /* Evening theme adjustments */
-.theme-evening .booklet-container{background:#2a2520;color:#e8dcc8}
-.theme-evening .booklet-container::before{background:linear-gradient(90deg,#1a1612 0%,#241e18 50%,#1a1612 100%);border-right-color:rgba(255,255,255,0.06)}
+.theme-evening .booklet-container{
+  background:#2a2520;color:#e8dcc8;
+  box-shadow:
+    -8px 0 20px rgba(0,0,0,0.6),
+    0 5px 40px rgba(0,0,0,0.7),
+    inset 3px 0 8px rgba(255,255,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.theme-evening .booklet-container::before{
+  background:linear-gradient(90deg,#1a1612 0%,#241e18 20%,#322c26 40%,#3d352c 50%,#322c26 60%,#241e18 80%,#1a1612 100%);
+  border-right-color:rgba(255,255,255,0.1);
+  box-shadow:
+    inset 4px 0 12px rgba(0,0,0,0.6),
+    inset -2px 0 8px rgba(255,255,255,0.08),
+    -4px 0 20px rgba(0,0,0,0.8);
+}
+.theme-evening .booklet-pages-edge{
+  background:linear-gradient(180deg,
+    #1f1b17 0%,#2a2520 20%,#322c26 40%,#3d352c 50%,
+    #322c26 60%,#2a2520 80%,#1f1b17 100%);
+}
 .theme-evening .booklet-page{background:#1f1b17;color:#e8dcc8}
+.theme-evening .booklet-page::before{
+  background:
+    radial-gradient(ellipse at 10% 10%,rgba(255,255,255,0.05),transparent 40%),
+    radial-gradient(ellipse at 90% 90%,rgba(212,197,171,0.03),transparent 50%);
+}
 .theme-evening .booklet-cover{background:linear-gradient(135deg,#322c26 0%,#2a2520 100%)}
-.theme-evening .booklet-cover-title{color:#d4c5ab;text-shadow:0 2px 4px rgba(0,0,0,0.4)}
-.theme-evening .booklet-cover-subtitle{color:#a68968}
+.theme-evening .booklet-cover::after{
+  background:
+    radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.15),transparent 60%),
+    radial-gradient(circle at 70% 80%,rgba(212,197,171,0.08),transparent 50%);
+}
+.theme-evening .booklet-cover-title{color:#d4c5ab;text-shadow:0 2px 4px rgba(0,0,0,0.4),1px 1px 0 rgba(255,255,255,0.1)}
+.theme-evening .booklet-cover-subtitle{color:#a68968;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
 .theme-evening .booklet-summary h2,.theme-evening .booklet-index h2,.theme-evening .unit-detail-page h2{color:#d4c5ab}
 .theme-evening .index-item,.theme-evening .detail-card,.theme-evening .product-list li{background:#2a2520;border-color:#3d352c}
 .theme-evening .index-item:hover{background:linear-gradient(135deg,#322c26,#2a2520)}
@@ -241,8 +378,11 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 
 /* Responsive */
 @media (max-width:780px){
-.booklet-wrapper{height:min(95vh,800px)}
-.booklet-page{padding:24px 20px 60px}
+.booklet-wrapper{height:min(95vh,800px);filter:drop-shadow(0 30px 60px rgba(0,0,0,0.5))}
+.booklet-container{transform:rotateY(0deg) translateZ(0)}
+.booklet-container::before{left:-8px;width:36px}
+.booklet-pages-edge{right:-6px;width:10px}
+.booklet-page{padding:24px 20px 60px;left:28px}
 .booklet-cover-title{font-size:36px}
 .booklet-cover-icon{width:90px;height:90px;font-size:42px}
 .unit-detail-page h2{font-size:24px}
@@ -579,6 +719,9 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
   <div id="modal" class="modal-backdrop" aria-hidden="true" role="dialog">
     <div class="booklet-wrapper">
       <div class="booklet-container">
+        <!-- Page edges visible on right -->
+        <div class="booklet-pages-edge"></div>
+        
         <button class="booklet-close" aria-label="Close" onclick="closeModal()">
           <i class="fa-solid fa-xmark"></i>
         </button>

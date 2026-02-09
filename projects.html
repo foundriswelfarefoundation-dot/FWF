@@ -167,14 +167,15 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 
 /* Booklet Container - Real Book Effect */
 .booklet-wrapper{
-  width:100%;max-width:min(96vw,1000px);height:min(90vh,700px);
+  width:100%;max-width:min(96vw,1200px);height:min(90vh,700px);
   position:relative;perspective:2500px;
   filter:drop-shadow(0 50px 100px rgba(0,0,0,0.5));
+  display:flex;
 }
 .booklet-container{
-  width:100%;height:100%;
+  width:50%;height:100%;
   background:#f5f1e8;
-  border-radius:8px 16px 16px 8px;
+  border-radius:8px 0 0 8px;
   box-shadow:
     -8px 0 20px rgba(0,0,0,0.3),
     0 5px 40px rgba(0,0,0,0.4),
@@ -182,10 +183,31 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
     inset 0 1px 0 rgba(255,255,255,0.5);
   position:relative;
   transform-style:preserve-3d;
-  transform:rotateY(-2deg) translateZ(0);
+  transform:rotateY(-3deg) translateZ(0);
   transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin:right center;
 }
 .booklet-container.flipping{transform:rotateY(-8deg) translateZ(0)}
+
+/* Right page container */
+.booklet-container-right{
+  width:50%;height:100%;
+  background:#f5f1e8;
+  border-radius:0 16px 16px 0;
+  box-shadow:
+    8px 0 20px rgba(0,0,0,0.3),
+    0 5px 40px rgba(0,0,0,0.4),
+    inset -3px 0 8px rgba(255,255,255,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  position:relative;
+  transform-style:preserve-3d;
+  transform:rotateY(3deg) translateZ(0);
+  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin:left center;
+}
+.booklet-container-right.flipping{transform:rotateY(8deg) translateZ(0)}
+.booklet-container-right .booklet-page{left:0;right:0}
+.booklet-container-right .booklet-pages-edge{display:none}
 
 /* Book spine with binding details */
 .booklet-container::before{
@@ -212,6 +234,23 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
   );
   z-index:11;
   box-shadow:1px 0 2px rgba(0,0,0,0.3);
+}
+
+/* Right book page */
+.booklet-container-right{
+  width:50%;height:100%;
+  background:#f5f1e8;
+  border-radius:0 16px 16px 0;
+  box-shadow:
+    8px 0 20px rgba(0,0,0,0.3),
+    0 5px 40px rgba(0,0,0,0.4),
+    inset -3px 0 8px rgba(255,255,255,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  position:relative;
+  transform-style:preserve-3d;
+  transform:rotateY(3deg) translateZ(0);
+  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin:left center;
 }
 
 /* Page edges visible on right side */
@@ -243,11 +282,17 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
   position:absolute;left:32px;right:0;top:0;bottom:0;
   background:#fefdfb;
   padding:40px;
-  overflow-y:auto;opacity:0;pointer-events:none;
+  overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;
   transition:opacity 0.4s ease;
   display:flex;flex-direction:column;
   box-shadow:inset 0 0 100px rgba(93,78,55,0.02);
+  scrollbar-width:thin;
+  scrollbar-color:rgba(93,78,55,0.3) rgba(212,197,171,0.2);
 }
+.booklet-page::-webkit-scrollbar{width:6px}
+.booklet-page::-webkit-scrollbar-track{background:rgba(212,197,171,0.2);border-radius:4px}
+.booklet-page::-webkit-scrollbar-thumb{background:rgba(93,78,55,0.3);border-radius:4px}
+.booklet-page::-webkit-scrollbar-thumb:hover{background:rgba(93,78,55,0.5)}
 .booklet-page::before{
   content:"";position:absolute;inset:0;
   background:
@@ -326,12 +371,12 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .product-list li::before{content:"✓";color:#22c55e;font-weight:800;margin-right:10px}
 
 /* Navigation Controls */
-.booklet-nav{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:15;background:rgba(255,255,255,0.95);padding:10px 16px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,0.15);border:1px solid #d4c5ab}
-.booklet-nav button{background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:18px;transition:all 0.2s ease;box-shadow:0 2px 8px rgba(249,115,22,0.3)}
-.booklet-nav button:hover:not(:disabled){transform:scale(1.1);box-shadow:0 4px 12px rgba(249,115,22,0.5)}
+.booklet-nav{position:absolute;bottom:16px;right:16px;display:flex;gap:8px;z-index:15;background:rgba(255,255,255,0.9);padding:6px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,0.12);border:1px solid #d4c5ab}
+.booklet-nav button{background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:14px;transition:all 0.2s ease;box-shadow:0 2px 6px rgba(249,115,22,0.25)}
+.booklet-nav button:hover:not(:disabled){transform:scale(1.08);box-shadow:0 3px 10px rgba(249,115,22,0.4)}
 .booklet-nav button:disabled{background:#e8dcc8;color:#8b7355;cursor:not-allowed;box-shadow:none}
-.booklet-nav .page-indicator{font:700 14px "Inter",sans-serif;color:#5d4e37;display:flex;align-items:center;padding:0 12px}
-.booklet-close{position:absolute;top:20px;right:20px;z-index:20;background:linear-gradient(135deg,#8b7355,#a68968);border:1px solid #6b5744;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:24px;display:grid;place-items:center;transition:all 0.2s ease;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.booklet-nav .page-indicator{font:600 12px "Inter",sans-serif;color:#5d4e37;display:flex;align-items:center;padding:0 8px}
+.booklet-close{position:absolute;top:16px;right:16px;z-index:20;background:linear-gradient(135deg,#8b7355,#a68968);border:1px solid #6b5744;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:grid;place-items:center;transition:all 0.2s ease;box-shadow:0 3px 10px rgba(0,0,0,0.18)}
 .booklet-close:hover{background:linear-gradient(135deg,#7a6451,#8b7355);transform:scale(1.1)}
 
 /* Evening theme adjustments */
@@ -718,6 +763,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
   <!-- BOOKLET MODAL -->
   <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
     <div class="booklet-wrapper">
+      <!-- Left page -->
       <div class="booklet-container">
         <!-- Page edges visible on right -->
         <div class="booklet-pages-edge"></div>
@@ -741,6 +787,12 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
             <i class="fa-solid fa-chevron-right"></i>
           </button>
         </div>
+      </div>
+      
+      <!-- Right page -->
+      <div class="booklet-container-right">
+        <!-- Pages will be dynamically injected here -->
+        <div id="bookletPagesRight"></div>
       </div>
     </div>
   </div>
@@ -1089,16 +1141,36 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
   function goToPage(pageNum){
     if(pageNum < 0 || pageNum >= pages.length) return;
+    
+    // Calculate left and right page indices
+    const leftPageIdx = Math.floor(pageNum / 2) * 2;
+    const rightPageIdx = leftPageIdx + 1;
+    
     currentPage = pageNum;
-    document.querySelectorAll('.booklet-page').forEach((p,i)=> p.classList.toggle('active', i===pageNum));
+    
+    // Update left pages
+    document.querySelectorAll('#bookletPages .booklet-page').forEach((p,i)=> {
+      p.classList.toggle('active', i === leftPageIdx);
+    });
+    
+    // Update right pages
+    document.querySelectorAll('#bookletPagesRight .booklet-page').forEach((p,i)=> {
+      p.classList.toggle('active', i === rightPageIdx);
+    });
+    
     currentPageNum.textContent = pageNum + 1;
     prevBtn.disabled = pageNum === 0;
     nextBtn.disabled = pageNum === pages.length - 1;
     
     // Add flip animation
     const container = document.querySelector('.booklet-container');
+    const containerRight = document.querySelector('.booklet-container-right');
     container.classList.add('flipping');
-    setTimeout(()=> container.classList.remove('flipping'), 600);
+    containerRight.classList.add('flipping');
+    setTimeout(()=> {
+      container.classList.remove('flipping');
+      containerRight.classList.remove('flipping');
+    }, 600);
   }
 
   prevBtn.addEventListener('click', ()=> goToPage(currentPage - 1));
@@ -1109,6 +1181,11 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     currentPage = 0;
     pages = [];
     bookletPages.innerHTML = '';
+    const bookletPagesRight = document.getElementById('bookletPagesRight');
+    bookletPagesRight.innerHTML = '';
+
+    // Create a helper function to add pages
+    const allPageElements = [];
 
     // Project descriptions (can be customized per project)
     const descriptions = {
@@ -1135,7 +1212,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       <h1 class="booklet-cover-title">${project.name}</h1>
       <p class="booklet-cover-subtitle">${project.subtitle}</p>
     `;
-    bookletPages.appendChild(coverPage);
+    allPageElements.push(coverPage);
     pages.push({type: 'cover', title: 'Cover'});
 
     // Page 2: Summary
@@ -1161,7 +1238,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
         </p>
       </div>
     `;
-    bookletPages.appendChild(summaryPage);
+    allPageElements.push(summaryPage);
     pages.push({type: 'summary', title: 'Summary'});
 
     // Page 3: Index
@@ -1183,16 +1260,8 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
         `).join('')}
       </ul>
     `;
-    bookletPages.appendChild(indexPage);
+    allPageElements.push(indexPage);
     pages.push({type: 'index', title: 'Index'});
-
-    // Add click handlers to index items
-    indexPage.querySelectorAll('.index-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const pageNum = parseInt(item.dataset.page);
-        goToPage(pageNum);
-      });
-    });
 
     // Pages 4+: Unit Details
     project.units.forEach((unit, idx) => {
@@ -1270,8 +1339,27 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
         </div>
       `;
       
-      bookletPages.appendChild(unitPage);
+      allPageElements.push(unitPage);
       pages.push({type: 'unit', title: unit.name, unitIndex: idx});
+    });
+
+    // Distribute pages to left and right containers
+    allPageElements.forEach((pageEl, index) => {
+      if (index % 2 === 0) {
+        // Even pages go to left (0, 2, 4...)
+        bookletPages.appendChild(pageEl.cloneNode(true));
+      } else {
+        // Odd pages go to right (1, 3, 5...)
+        bookletPagesRight.appendChild(pageEl.cloneNode(true));
+      }
+    });
+
+    // Re-attach event listeners to cloned index items
+    document.querySelectorAll('.index-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const pageNum = parseInt(item.dataset.page);
+        goToPage(pageNum);
+      });
     });
 
     // Update total pages
@@ -1279,6 +1367,9 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     currentPageNum.textContent = '1';
     prevBtn.disabled = true;
     nextBtn.disabled = pages.length <= 1;
+    
+    // Trigger initial page display
+    goToPage(0);
   }
 
   cardsEl.addEventListener('click',e=>{

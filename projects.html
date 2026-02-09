@@ -160,282 +160,94 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .btn-primary.accent-outline{border:1px solid #fff !important;box-shadow:0 0 0 1px #fff inset !important}
 .btn-primary.accent-outline:hover{box-shadow:0 0 0 1px #fff inset,0 8px 22px rgba(0,0,0,.22)}
 
-/* Modal - BOOK STYLE */
+/* Modal - BOOKLET STYLE */
 .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);padding:20px;z-index:50;perspective:1800px}
 .modal-backdrop.open{display:grid;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-.modalCard{
-  max-width:min(96vw,1100px);width:100%;
-  background:#f5f1e8;color:#2d2416;
-  border-radius:16px;
-  box-shadow:
-    0 40px 90px rgba(0,0,0,.35),
-    0 0 1px rgba(0,0,0,.15),
-    inset 0 1px 0 rgba(255,255,255,.4);
-  overflow:hidden;
-  position:relative;
-  transform-style:preserve-3d;
-  animation:bookOpen .5s cubic-bezier(.34,1.56,.64,1) forwards;
-}
-@keyframes bookOpen{
-  from{transform:rotateY(-15deg) scale(.92);opacity:.5}
-  to{transform:rotateY(0) scale(1);opacity:1}
-}
+/* Booklet Container */
+.booklet-wrapper{width:100%;max-width:min(96vw,1000px);height:min(90vh,700px);position:relative;perspective:2000px}
+.booklet-container{width:100%;height:100%;background:#f5f1e8;border-radius:16px;box-shadow:0 40px 90px rgba(0,0,0,.35),0 0 1px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4);position:relative;transform-style:preserve-3d;transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)}
+.booklet-container.flipping{transform:rotateY(-5deg)}
 
-/* Book spine effect */
-.modalCard::before{
-  content:"";position:absolute;left:0;top:0;bottom:0;width:32px;
-  background:linear-gradient(90deg,#c8b699 0%,#d4c5ab 50%,#c8b699 100%);
-  box-shadow:2px 0 8px rgba(0,0,0,.15) inset;
-  border-right:1px solid rgba(0,0,0,.08);
-}
+/* Book spine */
+.booklet-container::before{content:"";position:absolute;left:0;top:0;bottom:0;width:32px;background:linear-gradient(90deg,#c8b699 0%,#d4c5ab 50%,#c8b699 100%);box-shadow:2px 0 8px rgba(0,0,0,.15) inset;border-right:1px solid rgba(0,0,0,.08);z-index:10;border-radius:16px 0 0 16px}
 
-.modalHead{
-  padding:18px 24px 16px 56px;display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(135deg,#faf8f3 0%,#f5f1e8 100%);
-  border-bottom:2px solid #d4c5ab;
-  position:relative;
-}
-.modalHead::after{
-  content:"";position:absolute;top:0;left:32px;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
-}
-.modalHead h3{margin:0;font:900 22px/1.2 "Georgia",serif;color:#5d4e37;text-shadow:0 1px 0 rgba(255,255,255,.5);letter-spacing:.3px}
+/* Booklet pages */
+.booklet-page{position:absolute;left:32px;right:0;top:0;bottom:0;background:#fefdfb;padding:40px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 0.4s ease;display:flex;flex-direction:column}
+.booklet-page.active{opacity:1;pointer-events:auto;z-index:5}
+.booklet-page::-webkit-scrollbar{width:8px}
+.booklet-page::-webkit-scrollbar-track{background:rgba(212,197,171,0.2);border-radius:4px}
+.booklet-page::-webkit-scrollbar-thumb{background:rgba(93,78,55,0.3);border-radius:4px}
+.booklet-page::-webkit-scrollbar-thumb:hover{background:rgba(93,78,55,0.5)}
 
-/* Close button - vintage bookmark style */
-.closeX{
-  background:linear-gradient(135deg,#8b7355,#a68968);
-  border:1px solid #6b5744;
-  color:#fff;
-  width:40px;
-  height:40px;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:20px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  transition:all .2s ease;
-  box-shadow:0 2px 8px rgba(0,0,0,.15);
-  position:relative;
-}
-.closeX:hover{
-  background:linear-gradient(135deg,#7a6451,#8b7355);
-  transform:scale(1.08);
-  box-shadow:0 4px 12px rgba(0,0,0,.25);
-}
-.closeX:active{transform:scale(.95)}
-.theme-evening .closeX{background:linear-gradient(135deg,#5d4e37,#7a6451);border-color:#4a3a28}
-.theme-evening .closeX:hover{background:linear-gradient(135deg,#4a3a28,#5d4e37)}
+/* Cover Page */
+.booklet-cover{background:linear-gradient(135deg,#faf8f3 0%,#f5f1e8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.booklet-cover::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.08),transparent 60%);pointer-events:none}
+.booklet-cover-icon{width:120px;height:120px;background:linear-gradient(135deg,#fff7ed,#fed7aa);border-radius:24px;display:grid;place-items:center;font-size:56px;color:#f97316;margin-bottom:24px;box-shadow:0 10px 30px rgba(249,115,22,0.2);position:relative;z-index:1}
+.booklet-cover-title{font:900 48px/1.1 "Georgia",serif;color:#5d4e37;margin-bottom:12px;text-shadow:0 2px 4px rgba(0,0,0,0.08);position:relative;z-index:1}
+.booklet-cover-subtitle{font:400 18px/1.4 "Inter",sans-serif;color:#8b7355;max-width:400px;position:relative;z-index:1}
 
-.theme-evening .modalCard{background:#2a2520;color:#e8dcc8;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 1px rgba(255,255,255,.1),inset 0 1px 0 rgba(255,255,255,.08)}
-.theme-evening .modalCard::before{background:linear-gradient(90deg,#1a1612 0%,#241e18 50%,#1a1612 100%);border-right-color:rgba(255,255,255,.06)}
-.theme-evening .modalHead{background:linear-gradient(135deg,#322c26 0%,#2a2520 100%);border-bottom-color:#3d352c}
-.theme-evening .modalHead h3{color:#d4c5ab;text-shadow:0 1px 2px rgba(0,0,0,.4)}
-.modalBody{padding:0;background:#fefdfb}
-.theme-evening .modalBody{background:#1f1b17}
+/* Summary Page */
+.booklet-summary h2{font:900 32px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #d4c5ab}
+.booklet-summary-content{font:400 16px/1.7 "Georgia",serif;color:#2d2416;margin-bottom:24px}
+.booklet-impacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.booklet-impact{background:#fff;border:2px solid #d4c5ab;color:#5d4e37;font:600 14px "Inter",sans-serif;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
 
-/* Book pages layout */
-.unitLayout{
-  display:grid;
-  grid-template-columns:minmax(280px,36vw) 1fr;
-  min-height:540px;
-  gap:0;
-  margin-left:32px; /* offset for spine */
-}
-@media (max-width:880px){.unitLayout{grid-template-columns:1fr}}
+/* Index Page */
+.booklet-index h2{font:900 32px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #d4c5ab}
+.index-list{list-style:none;margin:0;padding:0}
+.index-item{background:#fff;border:1px solid #d4c5ab;border-radius:12px;margin-bottom:12px;padding:16px 20px;cursor:pointer;transition:all 0.2s ease;display:flex;justify-content:space-between;align-items:center}
+.index-item:hover{background:linear-gradient(135deg,#faf8f3,#fff);transform:translateX(4px);box-shadow:0 4px 12px rgba(93,78,55,0.12)}
+.index-item-name{font:700 16px "Inter",sans-serif;color:#2d2416}
+.index-item-meta{font:400 13px "Inter",sans-serif;color:#8b7355;margin-top:4px}
+.index-item-page{font:800 18px "Georgia",serif;color:#f97316;min-width:40px;text-align:right}
 
-/* Left page (index) & Right page (content) */
-.unitNav,.unitDetail{position:relative;overflow:auto}
-.unitNav{
-  background:#fefdfb;
-  padding:20px 16px 20px 24px;
-  display:block;
-  border-right:2px solid #d4c5ab;
-  position:relative;
-  box-shadow:4px 0 12px rgba(0,0,0,.08) inset;
-}
-.unitNav::before{
-  content:"";position:absolute;top:0;bottom:0;right:0;width:8px;
-  background:linear-gradient(90deg,transparent,rgba(212,197,171,.3));
-  pointer-events:none;
-}
-.theme-evening .unitNav{background:#241e18;border-right-color:#3d352c;box-shadow:4px 0 12px rgba(0,0,0,.25) inset}
-.theme-evening .unitNav::before{background:linear-gradient(90deg,transparent,rgba(61,53,44,.4))}
+/* Unit Detail Page */
+.unit-detail-page h2{font:900 28px/1.2 "Georgia",serif;color:#5d4e37;margin-bottom:8px}
+.unit-detail-page .unit-subtitle{font:400 15px "Inter",sans-serif;color:#8b7355;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e8dcc8}
+.detail-section{margin-bottom:24px}
+.detail-section h3{font:800 20px "Georgia",serif;color:#5d4e37;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.detail-section h3 i{color:#f97316;font-size:18px}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.detail-card{background:#fff;border:1px solid #e8dcc8;border-radius:10px;padding:12px 16px}
+.detail-card-label{font:600 12px "Inter",sans-serif;color:#8b7355;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.detail-card-value{font:700 16px "Inter",sans-serif;color:#2d2416}
+.product-list{list-style:none;margin:0;padding:0}
+.product-list li{background:#fff;border-left:3px solid #f97316;padding:10px 16px;margin-bottom:8px;border-radius:6px;font:400 15px "Inter",sans-serif;color:#2d2416}
+.product-list li::before{content:"✓";color:#22c55e;font-weight:800;margin-right:10px}
 
-.unitDetail{
-  padding:24px 28px 24px 24px;
-  background:#fefdfb;
-  font-family:"Georgia",serif;
-}
-.theme-evening .unitDetail{background:#1f1b17;color:#e8dcc8}
+/* Navigation Controls */
+.booklet-nav{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:15;background:rgba(255,255,255,0.95);padding:10px 16px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,0.15);border:1px solid #d4c5ab}
+.booklet-nav button{background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:18px;transition:all 0.2s ease;box-shadow:0 2px 8px rgba(249,115,22,0.3)}
+.booklet-nav button:hover:not(:disabled){transform:scale(1.1);box-shadow:0 4px 12px rgba(249,115,22,0.5)}
+.booklet-nav button:disabled{background:#e8dcc8;color:#8b7355;cursor:not-allowed;box-shadow:none}
+.booklet-nav .page-indicator{font:700 14px "Inter",sans-serif;color:#5d4e37;display:flex;align-items:center;padding:0 12px}
+.booklet-close{position:absolute;top:20px;right:20px;z-index:20;background:linear-gradient(135deg,#8b7355,#a68968);border:1px solid #6b5744;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:24px;display:grid;place-items:center;transition:all 0.2s ease;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.booklet-close:hover{background:linear-gradient(135deg,#7a6451,#8b7355);transform:scale(1.1)}
 
-/* Left page: Unit blocks (chapters) */
-.unitBlock{
-  border:1px solid #d4c5ab;
-  border-radius:8px;
-  background:#fff;
-  margin-bottom:12px;
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(93,78,55,.08);
-  transition:all .2s ease;
-}
-.unitBlock:hover{box-shadow:0 4px 16px rgba(93,78,55,.15);transform:translateX(2px)}
-.theme-evening .unitBlock{background:#2a2520;border-color:#3d352c;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.theme-evening .unitBlock:hover{box-shadow:0 4px 16px rgba(0,0,0,.35)}
+/* Evening theme adjustments */
+.theme-evening .booklet-container{background:#2a2520;color:#e8dcc8}
+.theme-evening .booklet-container::before{background:linear-gradient(90deg,#1a1612 0%,#241e18 50%,#1a1612 100%);border-right-color:rgba(255,255,255,0.06)}
+.theme-evening .booklet-page{background:#1f1b17;color:#e8dcc8}
+.theme-evening .booklet-cover{background:linear-gradient(135deg,#322c26 0%,#2a2520 100%)}
+.theme-evening .booklet-cover-title{color:#d4c5ab;text-shadow:0 2px 4px rgba(0,0,0,0.4)}
+.theme-evening .booklet-cover-subtitle{color:#a68968}
+.theme-evening .booklet-summary h2,.theme-evening .booklet-index h2,.theme-evening .unit-detail-page h2{color:#d4c5ab}
+.theme-evening .index-item,.theme-evening .detail-card,.theme-evening .product-list li{background:#2a2520;border-color:#3d352c}
+.theme-evening .index-item:hover{background:linear-gradient(135deg,#322c26,#2a2520)}
+.theme-evening .booklet-page::-webkit-scrollbar-thumb{background:rgba(212,197,171,0.3)}
+.theme-evening .booklet-nav{background:rgba(42,37,32,0.95);border-color:#3d352c}
 
-.unitHdr{
-  display:flex;align-items:center;gap:12px;width:100%;
-  background:linear-gradient(180deg,#faf8f3,#f5f1e8);
-  border:none;padding:12px 14px;cursor:pointer;color:#5d4e37;text-align:left;
-  border-bottom:1px solid transparent;
-  transition:all .2s ease;
+/* Responsive */
+@media (max-width:780px){
+.booklet-wrapper{height:min(95vh,800px)}
+.booklet-page{padding:24px 20px 60px}
+.booklet-cover-title{font-size:36px}
+.booklet-cover-icon{width:90px;height:90px;font-size:42px}
+.unit-detail-page h2{font-size:24px}
+.detail-grid{grid-template-columns:1fr}
 }
-.unitHdr:hover{border-bottom-color:#d4c5ab}
-.theme-evening .unitHdr{background:linear-gradient(180deg,#322c26,#2a2520);color:#d4c5ab}
-.theme-evening .unitHdr:hover{border-bottom-color:#3d352c}
-
-.unitHdr .unitIcon{
-  width:40px;height:40px;display:grid;place-items:center;border-radius:10px;
-  background:linear-gradient(135deg,#8b7355,#a68968);
-  color:#fff;border:1px solid #6b5744;
-  box-shadow:0 2px 6px rgba(0,0,0,.15);
-}
-.theme-evening .unitHdr .unitIcon{background:linear-gradient(135deg,#5d4e37,#7a6451);border-color:#4a3a28}
-.uName{font-weight:900;font-family:"Plus Jakarta Sans",sans-serif;font-size:14px}
-.uMeta{font-size:11px;opacity:.75;font-style:italic;color:#8b7355}
-.theme-evening .uMeta{color:#a68968}
-.caret{margin-left:auto;color:#8b7355;transition:transform .2s ease}
-.theme-evening .caret{color:#a68968}
-.unitBlock.open .caret{transform:rotate(180deg)}
-.unitHdr.selected{box-shadow:0 0 0 2px rgba(139,115,85,.3) inset;background:#faf8f3}
-.theme-evening .unitHdr.selected{box-shadow:0 0 0 2px rgba(166,137,104,.3) inset;background:#322c26}
-
-.prodList{
-  list-style:none;margin:0;padding:10px 14px 14px 56px;display:none;
-  background:linear-gradient(180deg,#fefdfb,#f5f1e8);
-  border-top:1px solid #d4c5ab;
-}
-.theme-evening .prodList{background:linear-gradient(180deg,#241e18,#1f1b17);border-top-color:#3d352c}
-.unitBlock.open .prodList{display:block}
-.prodList li{margin:7px 0}
-.prodItem{
-  width:100%;text-align:left;padding:9px 12px;
-  border:1px solid #d4c5ab;
-  border-radius:6px;
-  background:#fefdfb;
-  cursor:pointer;
-  font-weight:600;
-  font-size:13px;
-  color:#5d4e37;
-  font-family:"Georgia",serif;
-  transition:all .2s ease;
-  position:relative;
-  overflow:hidden;
-}
-.prodItem::before{
-  content:"";position:absolute;left:-100%;top:0;bottom:0;width:100%;
-  background:linear-gradient(90deg,transparent,rgba(212,197,171,.3),transparent);
-  transition:left .4s ease;
-}
-.prodItem:hover::before{left:100%}
-.prodItem:hover{background:#f5f1e8;border-color:#8b7355;transform:translateX(3px)}
-.prodItem.active{border-color:#8b7355;background:#f5f1e8;box-shadow:0 2px 8px rgba(93,78,55,.15);font-weight:700}
-.theme-evening .prodItem{background:#2a2520;color:#d4c5ab;border-color:#3d352c}
-.theme-evening .prodItem:hover{background:#322c26;border-color:#7a6451}
-.theme-evening .prodItem.active{background:#322c26;border-color:#7a6451;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-
-/* Right page: Content details */
-.detailTitle{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  padding-bottom:12px;margin-bottom:16px;
-  border-bottom:2px solid #d4c5ab;
-}
-.detailTitle h4{
-  margin:0;
-  font:900 24px/1.3 "Georgia",serif;
-  color:#5d4e37;
-  letter-spacing:.3px;
-}
-.theme-evening .detailTitle{border-bottom-color:#3d352c}
-.theme-evening .detailTitle h4{color:#d4c5ab}
-
-.detailBadge{
-  background:linear-gradient(135deg,#8b7355,#a68968);
-  color:#fff;
-  border:1px solid #6b5744;
-  padding:6px 14px;
-  border-radius:20px;
-  font-weight:700;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  box-shadow:0 2px 6px rgba(0,0,0,.15);
-}
-.theme-evening .detailBadge{background:linear-gradient(135deg,#5d4e37,#7a6451);border-color:#4a3a28}
-
-.detailMeta{
-  display:flex;flex-wrap:wrap;gap:12px;margin:16px 0 20px;
-}
-.detailMeta span{
-  display:inline-flex;gap:8px;align-items:center;
-  background:#f5f1e8;
-  border:1px solid #d4c5ab;
-  padding:8px 14px;
-  border-radius:8px;
-  font-size:13px;
-  font-weight:600;
-  color:#5d4e37;
-  font-family:"Georgia",serif;
-}
-.theme-evening .detailMeta span{background:#2a2520;border-color:#3d352c;color:#d4c5ab}
-
-.detailBlock{
-  background:linear-gradient(135deg,#fefdfb,#faf8f3);
-  border:1px solid #d4c5ab;
-  border-radius:12px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 2px 8px rgba(93,78,55,.08);
-}
-.detailBlock h5{
-  margin:0 0 12px;
-  font:800 16px/1.2 "Georgia",serif;
-  color:#5d4e37;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  border-bottom:1px solid #d4c5ab;
-  padding-bottom:8px;
-}
-.theme-evening .detailBlock{background:linear-gradient(135deg,#2a2520,#241e18);border-color:#3d352c;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.theme-evening .detailBlock h5{color:#d4c5ab;border-bottom-color:#3d352c}
-
-.kv{display:grid;gap:10px}
-.kv .row{
-  display:flex;justify-content:space-between;gap:14px;
-  background:#fefdfb;
-  border:1px solid #d4c5ab;
-  padding:10px 14px;
-  border-radius:8px;
-  font-size:14px;
-  font-family:"Georgia",serif;
-}
-.kv .key{color:#8b7355;font-weight:600;font-style:italic}
-.kv .val{color:#5d4e37;font-weight:700}
-.theme-evening .kv .row{background:#1f1b17;border-color:#3d352c}
-.theme-evening .kv .key{color:#a68968}
-.theme-evening .kv .val{color:#e8dcc8}
-
-.tc{font-size:13px;color:#5d4e37;line-height:1.6;font-family:"Georgia",serif}
-.tc li{margin-left:20px;margin-bottom:6px}
-.theme-evening .tc{color:#d4c5ab}
-
-/* 2) Vertical slider styles - HIDDEN */
-.panelSlider{display:none !important}
-.hasSlider{padding-right:36px}
-/* vscroll HIDDEN */
-.vscroll{ display:none !important; }
 
 /* JOIN US etc. (unchanged) */
 .registration-section{margin:56px 0;background:var(--panel);border-radius:14px;padding:24px;border:1px solid var(--border)}
@@ -462,64 +274,6 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 
 @media (max-width:1024px){.join-grid{grid-template-columns:1fr}.hero-content{padding:28px}}
 @media (max-width:700px){.nav-menu{display:none}.hero-title{font-size:34px}.container{padding:0 12px}}
-
-/* ===== Compact modal size & layout ===== */
-.modal-backdrop .modalCard{
-  width: min(92vw, 920px) !important;   /* narrower */
-  max-width: 920px !important;
-  max-height: 78vh !important;          /* not full screen */
-  border-radius: 18px;
-}
-.modal-backdrop .modalHead{
-  padding: 10px 14px !important;
-}
-.modal-backdrop .modalBody{
-  padding: 0 !important;
-  max-height: calc(78vh - 48px);        /* keep header */
-  overflow: auto;                        /* scroll inside card */
-}
-
-/* Less tall master–detail area */
-.unitLayout{
-  grid-template-columns: 260px 1fr !important;
-  min-height: 420px !important;
-}
-@media (max-width: 880px){
-  .modal-backdrop .modalCard{
-    width: min(94vw, 720px) !important;
-    max-height: 82vh !important;
-  }
-  .unitLayout{ min-height: 380px !important; }
-}
-
-/* ===== Compact left pane ===== */
-.unitNav{ padding: 8px !important; }
-.unitBlock{ margin-bottom: 8px !important; border-radius: 12px !important; }
-.unitHdr{ padding: 8px 10px !important; }
-.unitHdr .unitIcon{ width:32px;height:32px; border-radius:8px; }
-.uName{ font-weight:800; font-size:14px; }
-.uMeta{ font-size:11px; }
-.prodList{ padding: 6px 8px 10px 44px !important; }
-.prodItem{ padding: 7px 9px !important; font-size:12px; }
-
-/* ===== Compact right pane ===== */
-.unitDetail{ padding: 14px !important; }
-.detailTitle h4{ font-size:18px !important; }
-.detailBadge{ padding:5px 8px !important; font-size:11px !important; }
-.btn.btn-primary.btn-register{ padding:10px 14px !important; font-size:14px !important; }
-
-.detailMeta{ gap:8px !important; margin:10px 0 12px !important; }
-.detailMeta span{ padding:6px 8px !important; font-size:12px !important; }
-
-.detailBlock{ padding:10px !important; margin-bottom:10px !important; border-radius:12px !important; }
-.detailBlock h5{ font-size:13px !important; margin-bottom:6px !important; }
-.kv .row{ padding:7px 9px !important; font-size:13px !important; }
-.kv .key{ font-weight:700 !important; }
-.kv .val{ font-weight:800 !important; }
-
-/* Vertical slider tighter - HIDDEN */
-.panelSlider{ display: none !important; }
-.vscroll{ display: none !important; }
 
 /* FOOTER */
 footer{position:relative;z-index:1;margin:28px 0 18px}
@@ -821,17 +575,28 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     </footer>
   </div>
 
-  <!-- MODAL -->
-  <div id="modal" class="modal-backdrop" aria-hidden="true" aria-labelledby="modalTitle" role="dialog">
-    <div class="modalCard">
-      <div class="modalHead">
-        <h3 id="modalTitle">Project Details</h3>
-        <button class="closeX" aria-label="Close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="modalBody">
-        <div class="unitLayout">
-          <aside id="unitNav" class="unitNav" aria-label="Unit list"></aside>
-          <section id="unitDetail" class="unitDetail" aria-live="polite"></section>
+  <!-- BOOKLET MODAL -->
+  <div id="modal" class="modal-backdrop" aria-hidden="true" role="dialog">
+    <div class="booklet-wrapper">
+      <div class="booklet-container">
+        <button class="booklet-close" aria-label="Close" onclick="closeModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <!-- Pages will be dynamically injected here -->
+        <div id="bookletPages"></div>
+        
+        <!-- Navigation -->
+        <div class="booklet-nav">
+          <button id="prevPage" aria-label="Previous page" disabled>
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="page-indicator">
+            <span id="currentPageNum">1</span> / <span id="totalPages">1</span>
+          </div>
+          <button id="nextPage" aria-label="Next page">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -1158,179 +923,219 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     const opt=document.createElement('option'); opt.value=p.key; opt.textContent=p.name; projectSelect.appendChild(opt);
   });
 
-  /* ===== Modal (master–detail with accordion left) ===== */
+  /* ===== Booklet Modal System ===== */
   const modal=document.getElementById('modal'),
-        unitNav=document.getElementById('unitNav'),
-        unitDetail=document.getElementById('unitDetail'),
-        modalTitle=document.getElementById('modalTitle');
+        bookletPages=document.getElementById('bookletPages'),
+        currentPageNum=document.getElementById('currentPageNum'),
+        totalPagesEl=document.getElementById('totalPages'),
+        prevBtn=document.getElementById('prevPage'),
+        nextBtn=document.getElementById('nextPage');
 
-  let currentProject=null, currentUnitIndex=0, currentProductName=null;
+  let currentProject=null, currentPage=0, pages=[];
 
   function openModal(){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-  function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; currentPage=0; }
   window.closeModal=closeModal;
-  modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); });
+  modal.addEventListener('click',e=>{ if(e.target===modal && !e.target.closest('.booklet-container')) closeModal(); });
+  document.addEventListener('keydown',e=>{ 
+    if(!modal.classList.contains('open')) return;
+    if(e.key==='Escape') closeModal();
+    if(e.key==='ArrowLeft' && currentPage > 0) goToPage(currentPage - 1);
+    if(e.key==='ArrowRight' && currentPage < pages.length - 1) goToPage(currentPage + 1);
+  });
 
-  // Scroll slider attach
-  function attachScrollSlider(panel){
-    panel.querySelector('.panelSlider')?.remove();
-    panel.classList.add('hasSlider');
-    const holder=document.createElement('div'); holder.className='panelSlider';
-    holder.innerHTML='<input type="range" class="vscroll" orient="vertical" min="0" max="1000" value="0" aria-label="Scroll">';
-    panel.appendChild(holder);
-    const slider=holder.querySelector('.vscroll');
-
-    const syncFromPanel=()=>{
-      const max=Math.max(1,panel.scrollHeight - panel.clientHeight);
-      slider.value=Math.round(panel.scrollTop/max*1000);
-    };
-    const syncFromSlider=()=>{
-      const max=Math.max(1,panel.scrollHeight - panel.clientHeight);
-      panel.scrollTop=(slider.value/1000)*max;
-    };
-    panel.addEventListener('scroll',syncFromPanel);
-    slider.addEventListener('input',syncFromSlider);
-    new ResizeObserver(syncFromPanel).observe(panel);
-    setTimeout(syncFromPanel,50);
+  function goToPage(pageNum){
+    if(pageNum < 0 || pageNum >= pages.length) return;
+    currentPage = pageNum;
+    document.querySelectorAll('.booklet-page').forEach((p,i)=> p.classList.toggle('active', i===pageNum));
+    currentPageNum.textContent = pageNum + 1;
+    prevBtn.disabled = pageNum === 0;
+    nextBtn.disabled = pageNum === pages.length - 1;
+    
+    // Add flip animation
+    const container = document.querySelector('.booklet-container');
+    container.classList.add('flipping');
+    setTimeout(()=> container.classList.remove('flipping'), 600);
   }
+
+  prevBtn.addEventListener('click', ()=> goToPage(currentPage - 1));
+  nextBtn.addEventListener('click', ()=> goToPage(currentPage + 1));
 
   function showProject(project){
-    currentProject=project; currentUnitIndex=0; currentProductName=null;
-    modalTitle.textContent = project.name + ' — ' + L10N[curLang].unitsLabel;
-    unitNav.innerHTML=''; unitDetail.innerHTML='';
+    currentProject = project;
+    currentPage = 0;
+    pages = [];
+    bookletPages.innerHTML = '';
 
-    project.units.forEach((u,idx)=>{
-      const block=document.createElement('div');
-      block.className='unitBlock'+(idx===0?' open':'');
-      block.dataset.index=idx;
+    // Project descriptions (can be customized per project)
+    const descriptions = {
+      "suraksha": "Comprehensive health and hygiene products that empower women and protect communities. Our range includes mosquito repellents, sanitary solutions, and protective items designed for safety and dignity.",বাসস্থল योशикਾ स्वास্থ্যবর्धक hygienic products that क्रیप্टোग्राफी empower women and protect communities. Our comprehensive range includes MosQuit repellents, sanitary solutions, and protective items designed for safety and dignity.",
+      "swachh-bharat": "Comprehensive home and surface care solutions making cleanliness accessible and affordable for every household. From floor cleaners to tissue products, we bring professional-grade hygiene to local communities.",
+      "happy-meal": "Nutritious, locally-made food products that support health and livelihoods. We process spices, ready-to-cook mixes, traditional snacks, and essential staples with quality and affordability at the core.",
+      "green-energy": "Affordable clean technology products and services that bring sustainable energy to homes and communities. From LED lights to solar solutions, we make green energy accessible to all.",
+      "diy-crafts": "Creative handicrafts and custom products with strong profit margins. Empowering artisans through jute bags, jewelry, paper crafts, and personalized creations that celebrate skill and tradition.",
+      "swachh-jal": "Water purification systems and services ensuring safe drinking water for all. From gravity filters to RO systems, we provide complete water treatment solutions with installation and maintenance support.",
+      "samman": "Apparel manufacturing creating steady livelihoods through clothing production. From basics to workwear, we offer dignified employment in the garment sector with fair wages and growth opportunities.",
+      "sweet-home": "Home utility products including linens, curtains, and organizing solutions. Making homes comfortable through quality textile products manufactured locally with care.",
+      "hariyali": "Green livelihoods through composting, nursery supplies, and garden tools. Supporting urban agriculture and environmental sustainability with practical solutions for home and community gardens.",
+      "worship": "Traditional puja essentials and incense products with local branding. Preserving cultural heritage while creating sustainable livelihoods through quality worship items.",
+      "shiksha": "Affordable stationery and learning essentials supporting education. From notebooks to art supplies, we make quality educational materials accessible to all students."
+    };
 
-      const hdr=document.createElement('button');
-      hdr.className='unitHdr'+(idx===0?' selected':''); hdr.type='button';
-      hdr.innerHTML=`<div class="unitIcon"><i class="fa-solid fa-industry"></i></div>
-        <div><div class="uName">${u.name}</div><div class="uMeta">${u.space} • ${u.workers} ${L10N[curLang].workersLabel}</div></div>
-        <i class="fa-solid fa-chevron-down caret"></i>`;
-      block.appendChild(hdr);
+    // Page 1: Cover
+    const coverPage = document.createElement('div');
+    coverPage.className = 'booklet-page booklet-cover active';
+    coverPage.innerHTML = `
+      <div class="booklet-cover-icon">
+        <i class="fa-solid ${project.icon}"></i>
+      </div>
+      <h1 class="booklet-cover-title">${project.name}</h1>
+      <p class="booklet-cover-subtitle">${project.subtitle}</p>
+    `;
+    bookletPages.appendChild(coverPage);
+    pages.push({type: 'cover', title: 'Cover'});
 
-      const ul=document.createElement('ul'); ul.className='prodList';
-      (u.products||[]).forEach(p=>{
-        const li=document.createElement('li');
-        li.innerHTML=`<button class="prodItem" type="button" data-index="${idx}" data-prod="${p.name}">${p.name}</button>`;
-        ul.appendChild(li);
+    // Page 2: Summary
+    const summaryPage = document.createElement('div');
+    summaryPage.className = 'booklet-page booklet-summary';
+    summaryPage.innerHTML = `
+      <h2>About This Project</h2>
+      <div class="booklet-summary-content">
+        ${descriptions[project.key] || project.subtitle}
+      </div>
+      <h3 style="font: 700 18px 'Inter', sans-serif; color: #5d4e37; margin-bottom: 12px;">Impact Areas</h3>
+      <div class="booklet-impacts">
+        ${project.impacts.map(imp => `
+          <span class="booklet-impact">
+            <i class="fa-solid fa-circle-check"></i> ${imp}
+          </span>
+        `).join('')}
+      </div>
+      <div style="margin-top: 24px; padding: 16px; background: rgba(249, 115, 22, 0.08); border-left: 4px solid #f97316; border-radius: 8px;">
+        <p style="font: 400 15px 'Inter', sans-serif; color: #2d2416; margin: 0;">
+          <strong>💡 Did you know?</strong> This project includes ${project.units.length} different production units, 
+          each designed to create sustainable livelihoods and economic independence.
+        </p>
+      </div>
+    `;
+    bookletPages.appendChild(summaryPage);
+    pages.push({type: 'summary', title: 'Summary'});
+
+    // Page 3: Index
+    const indexPage = document.createElement('div');
+    indexPage.className = 'booklet-page booklet-index';
+    indexPage.innerHTML = `
+      <h2>Production Units (${project.units.length})</h2>
+      <ul class="index-list">
+        ${project.units.map((unit, idx) => `
+          <li class="index-item" data-page="${3 + idx}">
+            <div>
+              <div class="index-item-name">${unit.name}</div>
+              <div class="index-item-meta">
+                ${unit.space} • ${unit.workers} workers • ${(unit.products || []).length} products
+              </div>
+            </div>
+            <div class="index-item-page">${4 + idx}</div>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+    bookletPages.appendChild(indexPage);
+    pages.push({type: 'index', title: 'Index'});
+
+    // Add click handlers to index items
+    indexPage.querySelectorAll('.index-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const pageNum = parseInt(item.dataset.page);
+        goToPage(pageNum);
       });
-      block.appendChild(ul);
-      unitNav.appendChild(block);
     });
 
-    // events
-    unitNav.addEventListener('click',onLeftClick);
-    attachScrollSlider(unitNav);
-    renderDetail('unit',0); // default: first unit cumulative
-  }
-
-  function onLeftClick(e){
-    const prodBtn=e.target.closest('.prodItem');
-    if(prodBtn){
-      const idx=parseInt(prodBtn.dataset.index,10);
-      const pname=prodBtn.dataset.prod;
-      unitNav.querySelectorAll('.prodItem').forEach(b=>b.classList.remove('active'));
-      prodBtn.classList.add('active');
-      unitNav.querySelectorAll('.unitHdr').forEach(h=>h.classList.remove('selected'));
-      unitNav.querySelector(`.unitBlock[data-index="${idx}"] .unitHdr`)?.classList.add('selected');
-      renderDetail('product',idx,pname);
-      return;
-    }
-    const hdr=e.target.closest('.unitHdr');
-    if(hdr){
-      const block=hdr.parentElement;
-      const idx=parseInt(block.dataset.index,10);
-      block.classList.toggle('open');
-      unitNav.querySelectorAll('.unitHdr').forEach(h=>h.classList.remove('selected'));
-      hdr.classList.add('selected');
-      unitNav.querySelectorAll('.prodItem').forEach(b=>b.classList.remove('active'));
-      renderDetail('unit',idx);
-    }
-  }
-
-  function computeCosts(mode, unit, projectKey, productCount){
-    const base=COSTS[projectKey]||{};
-    const totalSetup = avgFromRange(base.setup);
-    const totalWork  = avgFromRange(base.working);
-    const totalUp    = avgFromRange(base.upfront);
-
-    // If product object has explicit cost, use it (setup/working/upfront numbers)
-    if(mode==='product' && typeof unit._selectedProduct==='object' && unit._selectedProduct.cost){
-      const c=unit._selectedProduct.cost;
-      return {
-        setup: c.setup ?? Math.round(totalSetup/(productCount||1)),
-        working: c.working ?? Math.round(totalWork/(productCount||1)),
-        upfront: c.upfront ?? Math.round(totalUp/(productCount||1))
-      };
-    }
-
-    if(mode==='product'){
-      const n=Math.max(1, productCount||1);
-      return { setup: Math.round(totalSetup/n), working: Math.round(totalWork/n), upfront: Math.round(totalUp/n) };
-    }
-    // mode==='unit' cumulative (all products)
-    return { setup: totalSetup, working: totalWork, upfront: totalUp };
-  }
-
-  function renderDetail(mode, idx, prodName=null){
-    currentUnitIndex=idx; currentProductName = (mode==='product')?prodName:null;
-    const t=L10N[curLang], u=currentProject.units[idx];
-    const prodCount=(u.products||[]).length;
-
-    // store selected product ref (for explicit cost, if provided later)
-    if(mode==='product'){
-      u._selectedProduct = (u.products||[]).find(p=>p.name===prodName) || {name:prodName};
-    }else{
-      u._selectedProduct = null;
-    }
-
-    const cost = computeCosts(mode, u, currentProject.key, prodCount);
-
-    unitDetail.innerHTML=`
-      <div class="detailTitle">
-        <h4>${u.name}${mode==='product' && prodName?` — ${prodName}`:''}</h4>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span class="detailBadge"><i class="fa-solid fa-circle-check"></i>&nbsp; ${mode==='product' ? (t.profitable) : (t.profitable+' • All Products')}</span>
-          <button class="btn btn-primary btn-register" type="button">${t.registerNow}</button>
+    // Pages 4+: Unit Details
+    project.units.forEach((unit, idx) => {
+      const unitPage = document.createElement('div');
+      unitPage.className = 'booklet-page unit-detail-page';
+      
+      const costs = COSTS[project.key] || {setup:"—",working:"—",upfront:"—"};
+      
+      unitPage.innerHTML = `
+        <h2>${unit.name}</h2>
+        <p class="unit-subtitle">${project.name} • Unit ${idx + 1} of ${project.units.length}</p>
+        
+        <div class="detail-section">
+          <h3><i class="fa-solid fa-chart-line"></i> Quick Overview</h3>
+          <div class="detail-grid">
+            <div class="detail-card">
+              <div class="detail-card-label">Space Required</div>
+              <div class="detail-card-value">${unit.space || '—'}</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Workforce</div>
+              <div class="detail-card-value">${unit.workers || '—'} workers</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Monthly Profit Potential</div>
+              <div class="detail-card-value">${unit.profit || '—'}</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Products</div>
+              <div class="detail-card-value">${(unit.products || []).length} items</div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="detailMeta">
-        <span><i class="fa-solid fa-vector-square"></i> ${u.space}</span>
-        <span><i class="fa-solid fa-user-group"></i> ${u.workers} ${t.workersLabel}</span>
-        <span><i class="fa-solid fa-layer-group"></i> ${mode==='product'?'1 of '+prodCount: (prodCount||1)+' products'}</span>
-        ${u.profit?`<span><i class="fa-solid fa-indian-rupee-sign"></i> ${u.profit}</span>`:''}
-      </div>
-
-      <div class="detailBlock">
-        <h5>${t.setupFinance} ${mode==='product' ? '(Selected Product)' : '(Cumulative Unit)'}</h5>
-        <div class="kv">
-          <div class="row"><span class="key">${t.startCost}</span><span class="val">${inr(cost.setup)}</span></div>
-          <div class="row"><span class="key">${t.workingCapital}</span><span class="val">${inr(cost.working)}</span></div>
-          <div class="row"><span class="key">${t.upfront}</span><span class="val">${inr(cost.upfront)}</span></div>
+        <div class="detail-section">
+          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Requirements</h3>
+          <div class="detail-grid">
+            <div class="detail-card">
+              <div class="detail-card-label">Project Start Cost</div>
+              <div class="detail-card-value">${costs.setup}</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Working Capital</div>
+              <div class="detail-card-value">${costs.working}</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Beneficiary Upfront</div>
+              <div class="detail-card-value">${costs.upfront}</div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="detailBlock">
-        <h5>${t.productList}</h5>
-        <ul>${(u.products||[]).map(p=>`<li>${p.name}</li>`).join('')}</ul>
-      </div>
+        <div class="detail-section">
+          <h3><i class="fa-solid fa-box"></i> Product Portfolio</h3>
+          <ul class="product-list">
+            ${(unit.products || []).map(p => `<li>${p.name}</li>`).join('')}
+          </ul>
+        </div>
 
-      <div class="detailBlock">
-        <h5>${t.tc}</h5>
-        <div class="tc"><ol><li>${t.tc1}</li><li>${t.tc2}</li><li>${t.tc3}</li></ol></div>
-      </div>`;
+        <div class="detail-section">
+          <h3><i class="fa-solid fa-circle-info"></i> Terms & Conditions</h3>
+          <div style="background: #fff; border: 1px solid #e8dcc8; border-radius: 10px; padding: 16px; font: 400 14px 'Inter', sans-serif; color: #2d2416;">
+            <ol style="margin: 0; padding-left: 20px;">
+              <li style="margin-bottom: 8px;">Beneficiary membership must be active</li>
+              <li style="margin-bottom: 8px;">Eligible for project funding after 12 months</li>
+              <li>Must participate in NGO welfare projects</li>
+            </ol>
+          </div>
+        </div>
 
-    unitDetail.querySelector('.btn-register')?.addEventListener('click',()=>{
-      const selected = (mode==='product' && prodName) ? `${u.name} → ${prodName}` : `${u.name} (All products)`;
-      openQuickRegister(currentProject, u, selected);
+        <div style="margin-top: auto; padding-top: 16px; text-align: center;">
+          <button class="btn btn-primary" onclick="window.location.href='/join'" style="padding: 12px 24px; border-radius: 12px; background: #f97316; color: #fff; border: none; cursor: pointer; font-weight: 700; font-size: 15px;">
+            Register for this Unit <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i>
+          </button>
+        </div>
+      `;
+      
+      bookletPages.appendChild(unitPage);
+      pages.push({type: 'unit', title: unit.name, unitIndex: idx});
     });
 
-    attachScrollSlider(unitDetail);
+    // Update total pages
+    totalPagesEl.textContent = pages.length;
+    currentPageNum.textContent = '1';
+    prevBtn.disabled = true;
+    nextBtn.disabled = pages.length <= 1;
   }
 
   cardsEl.addEventListener('click',e=>{

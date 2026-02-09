@@ -381,11 +381,19 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 
 /* Evening theme adjustments */
 .theme-evening .booklet-container{
-  background:#2a2520;color:#e8dcc8;
+  background:#2a2520;
   box-shadow:
     -8px 0 20px rgba(0,0,0,0.6),
     0 5px 40px rgba(0,0,0,0.7),
     inset 3px 0 8px rgba(255,255,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.theme-evening .booklet-container-right{
+  background:#2a2520;
+  box-shadow:
+    8px 0 20px rgba(0,0,0,0.6),
+    0 5px 40px rgba(0,0,0,0.7),
+    inset -3px 0 8px rgba(255,255,255,0.08),
     inset 0 1px 0 rgba(255,255,255,0.15);
 }
 .theme-evening .booklet-container::before{
@@ -413,13 +421,95 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
     radial-gradient(ellipse at 30% 30%,rgba(249,115,22,0.15),transparent 60%),
     radial-gradient(circle at 70% 80%,rgba(212,197,171,0.08),transparent 50%);
 }
+.theme-evening .booklet-cover-icon{background:linear-gradient(135deg,#3d352c,#322c26);border-color:#4a4035;box-shadow:0 10px 30px rgba(0,0,0,0.4),inset 0 2px 4px rgba(255,255,255,0.1)}
 .theme-evening .booklet-cover-title{color:#d4c5ab;text-shadow:0 2px 4px rgba(0,0,0,0.4),1px 1px 0 rgba(255,255,255,0.1)}
 .theme-evening .booklet-cover-subtitle{color:#a68968;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
-.theme-evening .booklet-summary h2,.theme-evening .booklet-index h2,.theme-evening .unit-detail-page h2{color:#d4c5ab}
-.theme-evening .index-item,.theme-evening .detail-card,.theme-evening .product-list li{background:#2a2520;border-color:#3d352c}
-.theme-evening .index-item:hover{background:linear-gradient(135deg,#322c26,#2a2520)}
-.theme-evening .booklet-page::-webkit-scrollbar-thumb{background:rgba(212,197,171,0.3)}
+.theme-evening .booklet-summary h2,.theme-evening .booklet-index h2,.theme-evening .unit-detail-page h2{color:#d4c5ab;border-color:#3d352c}
+.theme-evening .booklet-summary-content,.theme-evening .unit-subtitle{color:#c8b699;border-color:#3d352c}
+.theme-evening .booklet-impact{background:#322c26;border-color:#3d352c;color:#d4c5ab}
+.theme-evening .index-item,.theme-evening .detail-card{background:#2a2520;border-color:#3d352c;color:#e8dcc8}
+.theme-evening .index-item-name,.theme-evening .detail-card-value{color:#e8dcc8}
+.theme-evening .index-item-meta,.theme-evening .detail-card-label{color:#a68968}
+.theme-evening .index-item-page{color:#f97316}
+.theme-evening .index-item:hover{background:linear-gradient(135deg,#322c26,#2a2520);border-color:#f97316}
+.theme-evening .product-list li{background:#322c26;border-color:#3d352c;color:#c8b699}
+.theme-evening .booklet-page::-webkit-scrollbar-thumb{background:rgba(212,197,171,0.4)}
+.theme-evening .booklet-page::-webkit-scrollbar-track{background:rgba(29,25,21,0.3)}
 .theme-evening .booklet-nav{background:rgba(42,37,32,0.95);border-color:#3d352c}
+.theme-evening .booklet-nav .page-indicator{color:#d4c5ab}
+.theme-evening .booklet-close{background:linear-gradient(135deg,#3d352c,#322c26);border-color:#4a4035}
+
+/* Morning theme adjustments - Cool blue tones */
+.theme-morning .booklet-container{
+  background:#f8fbff;
+  box-shadow:
+    -8px 0 20px rgba(99,102,241,0.12),
+    0 5px 40px rgba(59,130,246,0.15),
+    inset 3px 0 8px rgba(255,255,255,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.theme-morning .booklet-container-right{
+  background:#f8fbff;
+  box-shadow:
+    8px 0 20px rgba(99,102,241,0.12),
+    0 5px 40px rgba(59,130,246,0.15),
+    inset -3px 0 8px rgba(255,255,255,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.theme-morning .booklet-container::before{
+  background:linear-gradient(90deg,#5b7bb4 0%,#6e8fc4 20%,#8aa5d4 40%,#9fb8e0 50%,#8aa5d4 60%,#6e8fc4 80%,#5b7bb4 100%);
+  border-right-color:rgba(99,102,241,0.25);
+}
+.theme-morning .booklet-pages-edge{
+  background:linear-gradient(180deg,
+    #ffffff 0%,#f8fbff 20%,#f0f7ff 40%,#e8f2ff 50%,
+    #f0f7ff 60%,#f8fbff 80%,#ffffff 100%);
+}
+.theme-morning .booklet-page{background:#ffffff;color:#1e293b}
+.theme-morning .booklet-cover{background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%)}
+.theme-morning .booklet-cover-icon{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#3b82f6}
+.theme-morning .booklet-cover-title{color:#1e3a8a}
+.theme-morning .booklet-cover-subtitle{color:#3b82f6}
+.theme-morning .booklet-impact{background:#f0f9ff;border-color:#bfdbfe;color:#1e40af}
+.theme-morning .index-item,.theme-morning .detail-card{background:#f8fbff;border-color:#dbeafe}
+.theme-morning .index-item:hover{background:linear-gradient(135deg,#f0f9ff,#dbeafe);border-color:#3b82f6}
+.theme-morning .product-list li{background:#f8fbff;border-color:#dbeafe}
+
+/* Afternoon theme adjustments - Warm golden tones */
+.theme-afternoon .booklet-container{
+  background:#fffbf5;
+  box-shadow:
+    -8px 0 20px rgba(251,146,60,0.12),
+    0 5px 40px rgba(249,115,22,0.15),
+    inset 3px 0 8px rgba(255,255,255,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.theme-afternoon .booklet-container-right{
+  background:#fffbf5;
+  box-shadow:
+    8px 0 20px rgba(251,146,60,0.12),
+    0 5px 40px rgba(249,115,22,0.15),
+    inset -3px 0 8px rgba(255,255,255,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.theme-afternoon .booklet-container::before{
+  background:linear-gradient(90deg,#b8865f 0%,#c99970 20%,#daad82 40%,#e5bc92 50%,#daad82 60%,#c99970 80%,#b8865f 100%);
+  border-right-color:rgba(251,146,60,0.25);
+}
+.theme-afternoon .booklet-pages-edge{
+  background:linear-gradient(180deg,
+    #ffffff 0%,#fffbf5 20%,#fff8ed 40%,#fff4e0 50%,
+    #fff8ed 60%,#fffbf5 80%,#ffffff 100%);
+}
+.theme-afternoon .booklet-page{background:#ffffff;color:#1e293b}
+.theme-afternoon .booklet-cover{background:linear-gradient(135deg,#fed7aa 0%,#fdba74 100%)}
+.theme-afternoon .booklet-cover-icon{background:linear-gradient(135deg,#fed7aa,#fdba74);color:#ea580c}
+.theme-afternoon .booklet-cover-title{color:#7c2d12}
+.theme-afternoon .booklet-cover-subtitle{color:#c2410c}
+.theme-afternoon .booklet-impact{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.theme-afternoon .index-item,.theme-afternoon .detail-card{background:#fffbf5;border-color:#fed7aa}
+.theme-afternoon .index-item:hover{background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#f97316}
+.theme-afternoon .product-list li{background:#fffbf5;border-color:#fed7aa}
 
 /* Responsive */
 @media (max-width:780px){

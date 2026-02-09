@@ -423,8 +423,9 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 
 /* Responsive */
 @media (max-width:780px){
-.booklet-wrapper{height:min(95vh,800px);filter:drop-shadow(0 30px 60px rgba(0,0,0,0.5))}
-.booklet-container{transform:rotateY(0deg) translateZ(0)}
+.booklet-wrapper{height:min(95vh,800px);filter:drop-shadow(0 30px 60px rgba(0,0,0,0.5));flex-direction:column}
+.booklet-container{width:100%;transform:rotateY(0deg) translateZ(0);border-radius:8px 8px 0 0}
+.booklet-container-right{display:none}
 .booklet-container::before{left:-8px;width:36px}
 .booklet-pages-edge{right:-6px;width:10px}
 .booklet-page{padding:24px 20px 60px;left:28px}
@@ -432,6 +433,10 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .booklet-cover-icon{width:90px;height:90px;font-size:42px}
 .unit-detail-page h2{font-size:24px}
 .detail-grid{grid-template-columns:1fr}
+.booklet-nav{bottom:12px;right:12px;padding:5px 8px}
+.booklet-nav button{width:28px;height:28px;font-size:12px}
+.booklet-nav .page-indicator{font-size:11px;padding:0 6px}
+.booklet-close{width:32px;height:32px;font-size:16px;top:12px;right:12px}
 }
 
 /* JOIN US etc. (unchanged) */

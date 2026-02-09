@@ -161,8 +161,8 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .btn-primary.accent-outline:hover{box-shadow:0 0 0 1px #fff inset,0 8px 22px rgba(0,0,0,.22)}
 
 /* Modal - BOOKLET STYLE */
-.modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);padding:20px;z-index:50;perspective:2500px}
-.modal-backdrop.open{display:grid;animation:fadeIn .3s ease}
+.modal-backdrop{position:fixed;inset:0;place-items:center;background:rgba(15,23,42,.75);backdrop-filter:blur(8px);padding:20px;z-index:50;perspective:2500px;opacity:0;transition:opacity .3s ease}
+.modal-backdrop.open{opacity:1}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* Booklet Container - Real Book Effect */
@@ -716,7 +716,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
   </div>
 
   <!-- BOOKLET MODAL -->
-  <div id="modal" class="modal-backdrop" aria-hidden="true" role="dialog">
+  <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
     <div class="booklet-wrapper">
       <div class="booklet-container">
         <!-- Page edges visible on right -->
@@ -1076,8 +1076,8 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
   let currentProject=null, currentPage=0, pages=[];
 
-  function openModal(){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-  function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; currentPage=0; }
+  function openModal(){ modal.style.display='grid'; setTimeout(()=>modal.classList.add('open'),10); document.body.style.overflow='hidden'; }
+  function closeModal(){ modal.classList.remove('open'); setTimeout(()=>modal.style.display='none',300); document.body.style.overflow=''; currentPage=0; }
   window.closeModal=closeModal;
   modal.addEventListener('click',e=>{ if(e.target===modal && !e.target.closest('.booklet-container')) closeModal(); });
   document.addEventListener('keydown',e=>{ 

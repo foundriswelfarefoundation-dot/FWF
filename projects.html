@@ -170,15 +170,38 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
   position:relative;
   display:flex;
   filter:drop-shadow(0 40px 80px rgba(0,0,0,0.6)) drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+  transition:all .5s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* Close Button - ON WRAPPER (outside 3D transforms) */
+/* Closed Book State - Front Cover Only */
+.booklet-wrapper.closed{
+  perspective:2000px;
+}
+.booklet-wrapper.closed .book-page-left{
+  width:100%;
+  border-radius:8px;
+  transform:rotateY(0deg);
+  box-shadow:
+    8px 0 30px rgba(0,0,0,0.4),
+    -2px 0 20px rgba(0,0,0,0.2),
+    inset -8px 0 20px rgba(0,0,0,0.1);
+}
+.booklet-wrapper.closed .book-page-right,
+.booklet-wrapper.closed .book-spine{
+  display:none;
+}
+.booklet-wrapper.closed .page-fold-left,
+.booklet-wrapper.closed .page-fold-right{
+  display:none;
+}
+
+/* Close Button - Smaller & Cleaner */
 .booklet-close{
-  position:absolute;top:-14px;right:-14px;z-index:100;
-  width:40px;height:40px;border-radius:50%;
+  position:absolute;top:-12px;right:-12px;z-index:100;
+  width:32px;height:32px;border-radius:50%;
   background:linear-gradient(135deg,#dc2626,#ef4444);
   border:2px solid #fff;color:#fff;
-  cursor:pointer;font-size:18px;
+  cursor:pointer;font-size:15px;
   display:grid;place-items:center;
   transition:all .2s ease;
   box-shadow:0 4px 14px rgba(220,38,38,0.4),0 2px 4px rgba(0,0,0,0.2);
@@ -186,27 +209,98 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 }
 .booklet-close:hover{transform:scale(1.15) rotate(90deg);box-shadow:0 6px 20px rgba(220,38,38,0.5)}
 
-/* Navigation - ON WRAPPER (outside 3D transforms) */
-.booklet-nav{
-  position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);z-index:100;
-  display:flex;align-items:center;gap:6px;
+/* Page Fold Click Areas - Replace Navigation Buttons */
+.page-fold-left,
+.page-fold-right{
+  position:absolute;
+  top:0;bottom:0;width:80px;
+  z-index:90;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity .3s ease;
+  pointer-events:auto;
+}
+.page-fold-left{left:0}
+.page-fold-right{right:0}
+
+/* Fold hover effect */
+.page-fold-left::before,
+.page-fold-right::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,
+    rgba(0,0,0,0.08) 0%,
+    rgba(0,0,0,0.02) 30%,
+    transparent 70%);
+  opacity:0;
+  transition:opacity .25s ease;
+}
+.page-fold-right::before{
+  background:linear-gradient(270deg,
+    rgba(0,0,0,0.08) 0%,
+    rgba(0,0,0,0.02) 30%,
+    transparent 70%);
+}
+.page-fold-left:hover::before,
+.page-fold-right:hover::before{
+  opacity:1;
+}
+
+/* Fold indicator arrows */
+.page-fold-left::after,
+.page-fold-right::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:0;height:0;
+  border-style:solid;
+  opacity:0;
+  transition:opacity .3s ease,transform .3s ease;
+}
+.page-fold-left::after{
+  left:18px;
+  border-width:12px 16px 12px 0;
+  border-color:transparent rgba(249,115,22,0.9) transparent transparent;
+}
+.page-fold-right::after{
+  right:18px;
+  border-width:12px 0 12px 16px;
+  border-color:transparent transparent transparent rgba(249,115,22,0.9);
+}
+.page-fold-left:hover::after,
+.page-fold-right:hover::after{
+  opacity:1;
+}
+.page-fold-left:hover::after{transform:translateY(-50%) translateX(4px)}
+.page-fold-right:hover::after{transform:translateY(-50%) translateX(-4px)}
+
+/* Disabled state */
+.page-fold-left.disabled,
+.page-fold-right.disabled{
+  cursor:not-allowed;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Page indicator at bottom center */
+.page-indicator{
+  position:absolute;
+  bottom:-24px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:100;
+  font:700 13px "Georgia",serif;
+  color:#d4c5ab;
   background:linear-gradient(135deg,#1e1b18,#2a2520);
-  padding:8px 14px;border-radius:999px;
+  padding:8px 16px;
+  border-radius:999px;
   box-shadow:0 4px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);
   border:1px solid rgba(255,255,255,0.1);
-  pointer-events:auto;
+  pointer-events:none;
+  letter-spacing:0.5px;
 }
-.booklet-nav button{
-  background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;
-  width:34px;height:34px;border-radius:50%;cursor:pointer;
-  display:grid;place-items:center;font-size:14px;
-  transition:all .2s ease;
-  box-shadow:0 3px 8px rgba(249,115,22,0.35);
-  pointer-events:auto;
-}
-.booklet-nav button:hover:not(:disabled){transform:scale(1.12);box-shadow:0 4px 14px rgba(249,115,22,0.5)}
-.booklet-nav button:disabled{background:linear-gradient(135deg,#3d352c,#322c26);color:#6b5b4a;cursor:not-allowed;box-shadow:none}
-.booklet-nav .page-indicator{font:700 13px "Georgia",serif;color:#d4c5ab;padding:0 10px;letter-spacing:0.5px}
 
 /* Book Spine (center divider) */
 .book-spine{
@@ -523,6 +617,7 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
    =========================== */
 @media (max-width:780px){
 .booklet-wrapper{width:96vw;height:min(94vh,700px);flex-direction:column}
+.booklet-wrapper.closed .book-page-left{border-radius:8px}
 .book-spine{width:100%;min-width:unset;height:8px;
   background:linear-gradient(180deg,#6b5744 0%,#8b7355 30%,#c8b699 50%,#8b7355 70%,#6b5744 100%);
 }
@@ -535,10 +630,9 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .booklet-page{padding:24px 20px 50px}
 .booklet-cover-title{font-size:30px}
 .booklet-cover-icon{width:80px;height:80px;font-size:36px}
-.booklet-close{top:-12px;right:-6px;width:36px;height:36px;font-size:16px}
-.booklet-nav{bottom:-16px;padding:6px 10px}
-.booklet-nav button{width:30px;height:30px;font-size:12px}
-.booklet-nav .page-indicator{font-size:11px;padding:0 6px}
+.booklet-close{top:-10px;right:-6px;width:28px;height:28px;font-size:14px}
+.page-indicator{bottom:-20px;padding:6px 12px;font-size:11px}
+.page-fold-left,.page-fold-right{width:60px}
 .detail-grid{grid-template-columns:1fr}
 }
 
@@ -870,7 +964,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
   <!-- BOOKLET MODAL -->
   <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
-    <div class="booklet-wrapper">
+    <div class="booklet-wrapper closed">
       <!-- Close button (on wrapper, outside book) -->
       <button class="booklet-close" aria-label="Close" onclick="closeModal()">
         <i class="fa-solid fa-xmark"></i>
@@ -893,17 +987,13 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
         <div class="page-number" id="rightPageNum"></div>
       </div>
 
-      <!-- Navigation (on wrapper, outside book) -->
-      <div class="booklet-nav">
-        <button id="prevPage" aria-label="Previous page" disabled>
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <div class="page-indicator">
-          <span id="currentPageNum">1</span> / <span id="totalPages">1</span>
-        </div>
-        <button id="nextPage" aria-label="Next page">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
+      <!-- Page fold click areas (replace nav buttons) -->
+      <div class="page-fold-left" id="pageFoldLeft" aria-label="Previous page"></div>
+      <div class="page-fold-right" id="pageFoldRight" aria-label="Next page"></div>
+
+      <!-- Page indicator -->
+      <div class="page-indicator">
+        <span id="currentPageNum">1</span> / <span id="totalPages">1</span>
       </div>
     </div>
   </div>
@@ -1231,19 +1321,42 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
   /* ===== Booklet Modal System ===== */
   const modal=document.getElementById('modal'),
+        bookletWrapper=document.querySelector('.booklet-wrapper'),
         bookletPages=document.getElementById('bookletPages'),
         bookletPagesRight=document.getElementById('bookletPagesRight'),
         currentPageNum=document.getElementById('currentPageNum'),
         totalPagesEl=document.getElementById('totalPages'),
         leftPageNum=document.getElementById('leftPageNum'),
         rightPageNum=document.getElementById('rightPageNum'),
-        prevBtn=document.getElementById('prevPage'),
-        nextBtn=document.getElementById('nextPage');
+        pageFoldLeft=document.getElementById('pageFoldLeft'),
+        pageFoldRight=document.getElementById('pageFoldRight');
 
-  let currentProject=null, currentSpread=0, pages=[], totalSpreads=0;
+  let currentProject=null, currentSpread=0, pages=[], totalSpreads=0, isBookOpen=false;
 
-  function openModal(){ modal.style.display='flex'; setTimeout(()=>modal.classList.add('open'),10); document.body.style.overflow='hidden'; }
-  function closeModal(){ modal.classList.remove('open'); setTimeout(()=>modal.style.display='none',350); document.body.style.overflow=''; currentSpread=0; }
+  function openModal(){ 
+    modal.style.display='flex'; 
+    setTimeout(()=>{
+      modal.classList.add('open');
+      // Open book after modal appears
+      setTimeout(()=>{
+        bookletWrapper.classList.remove('closed');
+        isBookOpen=true;
+      },350);
+    },10); 
+    document.body.style.overflow='hidden'; 
+  }
+  
+  function closeModal(){ 
+    // Close book first
+    bookletWrapper.classList.add('closed');
+    isBookOpen=false;
+    setTimeout(()=>{
+      modal.classList.remove('open'); 
+      setTimeout(()=>modal.style.display='none',350); 
+    },500);
+    document.body.style.overflow=''; 
+    currentSpread=0; 
+  }
   window.closeModal=closeModal;
 
   // Close on backdrop click (not on book itself)
@@ -1251,14 +1364,26 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     if(e.target===modal) closeModal();
   });
 
+  // Click on book cover to open it
+  bookletWrapper.addEventListener('click',e=>{
+    if(!isBookOpen && bookletWrapper.classList.contains('closed')){
+      e.stopPropagation();
+      bookletWrapper.classList.remove('closed');
+      isBookOpen=true;
+    }
+  });
+
   document.addEventListener('keydown',e=>{
     if(!modal.classList.contains('open')) return;
     if(e.key==='Escape') closeModal();
-    if(e.key==='ArrowLeft') goToSpread(currentSpread - 1);
-    if(e.key==='ArrowRight') goToSpread(currentSpread + 1);
+    if(isBookOpen){
+      if(e.key==='ArrowLeft') goToSpread(currentSpread - 1);
+      if(e.key==='ArrowRight') goToSpread(currentSpread + 1);
+    }
   });
 
   function goToSpread(spreadNum){
+    if(!isBookOpen) return;
     if(spreadNum < 0 || spreadNum >= totalSpreads) return;
     currentSpread = spreadNum;
 
@@ -1278,15 +1403,26 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     leftPageNum.textContent = leftIdx < pages.length ? (leftIdx + 1) : '';
     rightPageNum.textContent = rightIdx < pages.length ? (rightIdx + 1) : '';
 
-    // Update nav
+    // Update page indicator
     currentPageNum.textContent = `${leftIdx + 1}–${Math.min(rightIdx + 1, pages.length)}`;
     totalPagesEl.textContent = pages.length;
-    prevBtn.disabled = spreadNum === 0;
-    nextBtn.disabled = spreadNum >= totalSpreads - 1;
+    
+    // Update fold areas
+    if(spreadNum === 0){
+      pageFoldLeft.classList.add('disabled');
+    } else {
+      pageFoldLeft.classList.remove('disabled');
+    }
+    if(spreadNum >= totalSpreads - 1){
+      pageFoldRight.classList.add('disabled');
+    } else {
+      pageFoldRight.classList.remove('disabled');
+    }
   }
 
-  prevBtn.addEventListener('click', ()=> goToSpread(currentSpread - 1));
-  nextBtn.addEventListener('click', ()=> goToSpread(currentSpread + 1));
+  // Page fold click handlers
+  pageFoldLeft.addEventListener('click', ()=> goToSpread(currentSpread - 1));
+  pageFoldRight.addEventListener('click', ()=> goToSpread(currentSpread + 1));
 
   function showProject(project){
     currentProject = project;

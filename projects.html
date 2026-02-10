@@ -194,6 +194,12 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .booklet-wrapper.closed .page-fold-right{
   display:none;
 }
+.booklet-wrapper.closed .page-indicator{
+  display:none;
+}
+.booklet-wrapper.closed .booklet-close{
+  top:12px;right:12px;
+}
 
 /* Close Button - Smaller & Cleaner */
 .booklet-close{
@@ -1335,14 +1341,10 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
   function openModal(){ 
     modal.style.display='flex'; 
+    bookletWrapper.classList.add('closed');
+    isBookOpen=false;
     setTimeout(()=>{
       modal.classList.add('open');
-      // Open book after modal appears
-      setTimeout(()=>{
-        bookletWrapper.classList.remove('closed');
-        isBookOpen=true;
-        goToSpread(0); // Show first spread when book opens
-      },350);
     },10); 
     document.body.style.overflow='hidden'; 
   }

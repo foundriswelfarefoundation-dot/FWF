@@ -1341,6 +1341,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       setTimeout(()=>{
         bookletWrapper.classList.remove('closed');
         isBookOpen=true;
+        goToSpread(0); // Show first spread when book opens
       },350);
     },10); 
     document.body.style.overflow='hidden'; 
@@ -1350,6 +1351,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     // Close book first
     bookletWrapper.classList.add('closed');
     isBookOpen=false;
+    showClosedCover(); // Reset to closed cover view
     setTimeout(()=>{
       modal.classList.remove('open'); 
       setTimeout(()=>modal.style.display='none',350); 
@@ -1370,6 +1372,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       e.stopPropagation();
       bookletWrapper.classList.remove('closed');
       isBookOpen=true;
+      goToSpread(0); // Show first spread when book opens
     }
   });
 
@@ -1381,6 +1384,19 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       if(e.key==='ArrowRight') goToSpread(currentSpread + 1);
     }
   });
+
+  // Setup closed book state (show only cover on left page)
+  function showClosedCover(){
+    const leftPages = bookletPages.querySelectorAll('.booklet-page');
+    leftPages.forEach((p,i)=> p.classList.toggle('active', i === 0)); // Only first page (cover)
+    
+    const rightPages = bookletPagesRight.querySelectorAll('.booklet-page');
+    rightPages.forEach(p=> p.classList.remove('active')); // No right page in closed state
+    
+    // Hide page numbers and indicator in closed state
+    leftPageNum.textContent = '';
+    rightPageNum.textContent = '';
+  }
 
   function goToSpread(spreadNum){
     if(!isBookOpen) return;
@@ -1574,8 +1590,8 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     // Calculate total spreads
     totalSpreads = Math.ceil(pages.length / 2);
 
-    // Show first spread
-    goToSpread(0);
+    // Show closed cover (will open with animation in openModal)
+    showClosedCover();
   }
 
   cardsEl.addEventListener('click',e=>{

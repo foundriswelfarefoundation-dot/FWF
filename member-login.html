@@ -220,7 +220,14 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
   
   try{
-    const res = await AUTH.api('/api/auth/login', {method:'POST', body:{memberId,password}});
+    let res;
+    // Detect admin-style login (email with @) vs member ID (FWF-XXXXXX)
+    if(memberId.includes('@')){
+      res = await AUTH.api('/api/admin/login', {method:'POST', body:{username:memberId, password}});
+      res.role = 'admin';
+    } else {
+      res = await AUTH.api('/api/auth/login', {method:'POST', body:{memberId, password}});
+    }
     btnText.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
     setTimeout(() => {
       if(res.role==='admin') location.href = '/admin-dashboard';

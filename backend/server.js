@@ -64,6 +64,13 @@ try {
   process.exit(1);
 }
 
+// Point value: 1 point = ₹10
+const POINT_VALUE = 10;
+const DONATION_POINTS_PERCENT = 10;   // 10% of donation as points
+const REFERRAL_POINTS_PERCENT = 50;   // 50% of referral payment as points
+const QUIZ_TICKET_POINTS_PERCENT = 10; // 10% of ticket price as points
+const QUIZ_TICKET_PRICE = 100;
+
 function nextMemberId(){
   const row = db.prepare(`SELECT member_id FROM users WHERE role='member' ORDER BY id DESC LIMIT 1`).get();
   let n = 0;
@@ -83,6 +90,12 @@ function randPass(len=10){
 function signToken(payload){
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 }
+function generateReferralCode(memberId){
+  return memberId.replace(/-/g,'') + Math.random().toString(36).substring(2,6).toUpperCase();
+}
+function amountToPoints(amountInr){
+  return amountInr / POINT_VALUE;
+}
 
 // Seed admin if not exists
 const findAdmin = db.prepare(`SELECT * FROM users WHERE role='admin' LIMIT 1`).get();
@@ -100,15 +113,26 @@ if(!findTestMember){
   const testPassword = 'Test@12345';
   const hash = bcrypt.hashSync(testPassword, 10);
   const memberId = `${ORG_PREFIX}-TEST-001`;
-  const testInfo = db.prepare(`INSERT INTO users(member_id,name,mobile,email,password_hash,role,membership_active) VALUES(?,?,?,?,?,'member',1)`)
-    .run(memberId, 'Test Member', '9999999999', 'test@fwf.org', hash);
+  const refCode = generateReferralCode(memberId);
+  const testInfo = db.prepare(`INSERT INTO users(member_id,name,mobile,email,password_hash,role,membership_active,referral_code) VALUES(?,?,?,?,?,'member',1,?)`)
+    .run(memberId, 'Test Member', '9999999999', 'test@fwf.org', hash, refCode);
   
-  // Create wallet for test member
-  db.prepare(`INSERT OR IGNORE INTO wallets(user_id, balance_inr, lifetime_earned_inr) VALUES(?,?,?)`)
-    .run(testInfo.lastInsertRowid, 5000, 5000);
+  // Create wallet for test member with points
+  db.prepare(`INSERT OR IGNORE INTO wallets(user_id, balance_inr, lifetime_earned_inr, points_balance, total_points_earned) VALUES(?,?,?,?,?)`)
+    .run(testInfo.lastInsertRowid, 5000, 5000, 50, 50);
   
-  console.log(`✅ Test member created -> ID: ${memberId} | pass: ${testPassword}`);
+  console.log(`✅ Test member created -> ID: ${memberId} | pass: ${testPassword} | ref: ${refCode}`);
 }
+
+// Ensure existing members have referral codes
+try {
+  const membersWithoutRef = db.prepare(`SELECT id, member_id FROM users WHERE role='member' AND (referral_code IS NULL OR referral_code='')`).all();
+  for (const m of membersWithoutRef) {
+    const refCode = generateReferralCode(m.member_id);
+    db.prepare(`UPDATE users SET referral_code=? WHERE id=?`).run(refCode, m.id);
+  }
+  if(membersWithoutRef.length > 0) console.log(`✅ Generated referral codes for ${membersWithoutRef.length} member(s)`);
+} catch(e) { /* columns may not exist yet before migration */ }
 
 // --- Auth middleware ---
 function auth(requiredRole){
@@ -225,10 +249,140 @@ app.post('/api/auth/logout', (req,res)=>{
 });
 
 app.get('/api/member/me', auth('member'), (req,res)=>{
-  const u = db.prepare(`SELECT id, member_id, name, mobile, email, created_at FROM users WHERE id=?`).get(req.user.uid);
-  const w = db.prepare(`SELECT balance_inr, lifetime_earned_inr, lifetime_applied_inr FROM wallets WHERE user_id=?`).get(req.user.uid) || {balance_inr:0,lifetime_earned_inr:0,lifetime_applied_inr:0};
+  const u = db.prepare(`SELECT id, member_id, name, mobile, email, created_at, first_login_done, referral_code, avatar_url, bio FROM users WHERE id=?`).get(req.user.uid);
+  const w = db.prepare(`SELECT balance_inr, lifetime_earned_inr, lifetime_applied_inr, points_balance, points_from_donations, points_from_referrals, points_from_quiz, total_points_earned FROM wallets WHERE user_id=?`).get(req.user.uid) 
+    || {balance_inr:0,lifetime_earned_inr:0,lifetime_applied_inr:0,points_balance:0,points_from_donations:0,points_from_referrals:0,points_from_quiz:0,total_points_earned:0};
   const p = db.prepare(`SELECT project_name, project_cost, target60_inr, cash_credited_inr, wallet_applied_inr, eligible_flag FROM member_projects WHERE user_id=?`).get(req.user.uid) || null;
-  res.json({ user:u, wallet:w, project:p });
+  
+  // Referral stats
+  const referralStats = db.prepare(`SELECT COUNT(*) as total, SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active, SUM(referral_points) as totalPoints FROM referrals WHERE referrer_id=?`).get(req.user.uid) || {total:0,active:0,totalPoints:0};
+  
+  // Recent donations collected
+  const recentDonations = db.prepare(`SELECT amount, points_earned, donor_name, created_at FROM donations WHERE member_id=? ORDER BY id DESC LIMIT 5`).all(req.user.uid);
+  
+  // Quiz ticket stats
+  const quizStats = db.prepare(`SELECT COUNT(*) as sold, SUM(points_earned) as totalPoints FROM quiz_tickets WHERE seller_id=?`).get(req.user.uid) || {sold:0,totalPoints:0};
+  
+  // Recent points transactions
+  const recentPoints = db.prepare(`SELECT points, type, description, created_at FROM points_ledger WHERE user_id=? ORDER BY id DESC LIMIT 10`).all(req.user.uid);
+  
+  // Point value info
+  const pointInfo = { pointValue: POINT_VALUE, donationPercent: DONATION_POINTS_PERCENT, referralPercent: REFERRAL_POINTS_PERCENT, quizPercent: QUIZ_TICKET_POINTS_PERCENT, ticketPrice: QUIZ_TICKET_PRICE };
+
+  res.json({ user:u, wallet:w, project:p, referralStats, recentDonations, quizStats, recentPoints, pointInfo });
+});
+
+// Mark first login as done (dismiss welcome letter)
+app.post('/api/member/welcome-done', auth('member'), (req,res)=>{
+  db.prepare(`UPDATE users SET first_login_done=1 WHERE id=?`).run(req.user.uid);
+  res.json({ ok:true });
+});
+
+// Update profile
+app.post('/api/member/update-profile', auth('member'), (req,res)=>{
+  const { name, bio, avatar_url } = req.body;
+  const sets = [];
+  const vals = [];
+  if(name) { sets.push('name=?'); vals.push(name); }
+  if(bio !== undefined) { sets.push('bio=?'); vals.push(bio); }
+  if(avatar_url !== undefined) { sets.push('avatar_url=?'); vals.push(avatar_url); }
+  if(sets.length === 0) return res.status(400).json({error:'Nothing to update'});
+  vals.push(req.user.uid);
+  db.prepare(`UPDATE users SET ${sets.join(',')} WHERE id=?`).run(...vals);
+  res.json({ ok:true });
+});
+
+// Record a donation collected by member → 10% as points
+app.post('/api/member/record-donation', auth('member'), (req,res)=>{
+  const { amount, donorName, donorContact } = req.body;
+  const amt = parseFloat(amount);
+  if(!amt || amt <= 0) return res.status(400).json({error:'Valid amount required'});
+  
+  const pointsRupees = amt * (DONATION_POINTS_PERCENT / 100);
+  const points = amountToPoints(pointsRupees);
+  
+  db.transaction(()=>{
+    db.prepare(`INSERT INTO donations(member_id, amount, points_earned, donor_name, donor_contact) VALUES(?,?,?,?,?)`)
+      .run(req.user.uid, amt, points, donorName||null, donorContact||null);
+    db.prepare(`UPDATE wallets SET points_balance = points_balance + ?, points_from_donations = points_from_donations + ?, total_points_earned = total_points_earned + ?, updated_at = datetime('now') WHERE user_id=?`)
+      .run(points, points, points, req.user.uid);
+    db.prepare(`INSERT INTO points_ledger(user_id, points, type, description) VALUES(?,?,'donation',?)`)
+      .run(req.user.uid, points, `₹${amt} donation collected from ${donorName||'anonymous'} → ${points} points`);
+  })();
+  
+  res.json({ ok:true, points, message:`₹${amt} donation recorded. You earned ${points} points!` });
+});
+
+// Sell quiz ticket → 10% as points
+app.post('/api/member/sell-ticket', auth('member'), (req,res)=>{
+  const { buyerName, buyerContact, ticketPrice } = req.body;
+  const price = parseFloat(ticketPrice) || QUIZ_TICKET_PRICE;
+  
+  const pointsRupees = price * (QUIZ_TICKET_POINTS_PERCENT / 100);
+  const points = amountToPoints(pointsRupees);
+  
+  db.transaction(()=>{
+    db.prepare(`INSERT INTO quiz_tickets(seller_id, buyer_name, buyer_contact, ticket_price, points_earned) VALUES(?,?,?,?,?)`)
+      .run(req.user.uid, buyerName||null, buyerContact||null, price, points);
+    db.prepare(`UPDATE wallets SET points_balance = points_balance + ?, points_from_quiz = points_from_quiz + ?, total_points_earned = total_points_earned + ?, updated_at = datetime('now') WHERE user_id=?`)
+      .run(points, points, points, req.user.uid);
+    db.prepare(`INSERT INTO points_ledger(user_id, points, type, description) VALUES(?,?,'quiz',?)`)
+      .run(req.user.uid, points, `Quiz ticket sold to ${buyerName||'buyer'} (₹${price}) → ${points} points`);
+  })();
+  
+  res.json({ ok:true, points, message:`Ticket sold! You earned ${points} points.` });
+});
+
+// Get referral info
+app.get('/api/member/referrals', auth('member'), (req,res)=>{
+  const u = db.prepare(`SELECT referral_code FROM users WHERE id=?`).get(req.user.uid);
+  const referrals = db.prepare(`SELECT r.*, u.name as referred_name, u.member_id as referred_member_id FROM referrals r JOIN users u ON r.referred_user_id = u.id WHERE r.referrer_id=? ORDER BY r.id DESC`).all(req.user.uid);
+  res.json({ ok:true, referralCode: u.referral_code, referrals });
+});
+
+// Register via referral (used by join flow)
+app.post('/api/member/register-referral', (req,res)=>{
+  const { referralCode, newUserId } = req.body;
+  if(!referralCode || !newUserId) return res.status(400).json({error:'referralCode & newUserId required'});
+  
+  const referrer = db.prepare(`SELECT id FROM users WHERE referral_code=?`).get(referralCode);
+  if(!referrer) return res.status(404).json({error:'Invalid referral code'});
+  
+  // Create pending referral
+  db.prepare(`INSERT INTO referrals(referrer_id, referred_user_id, status) VALUES(?,?,'pending')`)
+    .run(referrer.id, newUserId);
+  db.prepare(`UPDATE users SET referred_by=? WHERE id=?`).run(referrer.id, newUserId);
+  
+  res.json({ ok:true });
+});
+
+// Activate referral (called when referred member's payment is confirmed)
+app.post('/api/member/activate-referral', auth('admin'), (req,res)=>{
+  const { referredMemberId, paymentAmount } = req.body;
+  const referred = db.prepare(`SELECT id, referred_by FROM users WHERE member_id=?`).get(referredMemberId);
+  if(!referred || !referred.referred_by) return res.status(400).json({error:'No referral found'});
+  
+  const amt = parseFloat(paymentAmount) || 500;
+  const pointsRupees = amt * (REFERRAL_POINTS_PERCENT / 100);
+  const points = amountToPoints(pointsRupees);
+  
+  db.transaction(()=>{
+    db.prepare(`UPDATE referrals SET status='active', payment_amount=?, referral_points=?, activated_at=datetime('now') WHERE referrer_id=? AND referred_user_id=? AND status='pending'`)
+      .run(amt, points, referred.referred_by, referred.id);
+    db.prepare(`UPDATE wallets SET points_balance = points_balance + ?, points_from_referrals = points_from_referrals + ?, total_points_earned = total_points_earned + ?, updated_at = datetime('now') WHERE user_id=?`)
+      .run(points, points, points, referred.referred_by);
+    db.prepare(`INSERT INTO points_ledger(user_id, points, type, description) VALUES(?,?,'referral',?)`)
+      .run(referred.referred_by, points, `Referral activated: ${referredMemberId} paid ₹${amt} → ${points} points`);
+    db.prepare(`UPDATE users SET membership_active=1 WHERE id=?`).run(referred.id);
+  })();
+  
+  res.json({ ok:true, points });
+});
+
+// Points ledger history
+app.get('/api/member/points-history', auth('member'), (req,res)=>{
+  const ledger = db.prepare(`SELECT points, type, description, created_at FROM points_ledger WHERE user_id=? ORDER BY id DESC LIMIT 50`).all(req.user.uid);
+  res.json({ ok:true, ledger });
 });
 
 app.post('/api/member/apply-wallet', auth('member'), (req,res)=>{

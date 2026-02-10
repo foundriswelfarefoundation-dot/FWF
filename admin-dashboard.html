@@ -1320,11 +1320,11 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
     FWF_Notify.confirm('Logout from admin panel?', async ()=>{
       await AUTH.api('/api/auth/logout',{method:'POST'});
       notify('Logged out','success');
-      setTimeout(()=> location.href = '/admin-login', 1000);
+      setTimeout(()=> location.href = '/', 1000);
     });
   } else {
     if(confirm('Logout?')){
-      AUTH.api('/api/auth/logout',{method:'POST'}).finally(()=> location.href = '/admin-login');
+      AUTH.api('/api/auth/logout',{method:'POST'}).finally(()=> location.href = '/');
     }
   }
 });

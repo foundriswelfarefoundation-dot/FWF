@@ -1054,11 +1054,11 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
     FWF_Notify.confirm('Are you sure you want to logout?', async ()=>{
       await AUTH.api('/api/auth/logout',{method:'POST'});
       notify('Logged out','success');
-      setTimeout(()=> location.href = '/member-login', 1000);
+      setTimeout(()=> location.href = '/', 1000);
     });
   } else {
     if(confirm('Logout?')){
-      AUTH.api('/api/auth/logout',{method:'POST'}).finally(()=> location.href = '/member-login');
+      AUTH.api('/api/auth/logout',{method:'POST'}).finally(()=> location.href = '/');
     }
   }
 });

@@ -180,13 +180,32 @@ app.post('/api/pay/simulate-join', (req,res)=>{
   res.json({ ok:true, memberId, password: plain });
 });
 
+// Admin: reset a member's password (protected, admin only)
+app.post('/api/admin/reset-password', auth('admin'), (req,res)=>{
+  const { memberId, newPassword } = req.body;
+  if(!memberId || !newPassword) return res.status(400).json({error:'memberId & newPassword required'});
+  const u = db.prepare(`SELECT id FROM users WHERE member_id=?`).get(memberId);
+  if(!u) return res.status(404).json({error:'Member not found'});
+  const hash = bcrypt.hashSync(newPassword, 10);
+  db.prepare(`UPDATE users SET password_hash=? WHERE id=?`).run(hash, u.id);
+  res.json({ ok:true, message:`Password reset for ${memberId}` });
+});
+
 app.post('/api/auth/login', (req,res)=>{
   const { memberId, password } = req.body;
+  if(!memberId || !password) return res.status(400).json({error:'Member ID and password are required'});
   const u = db.prepare(`SELECT * FROM users WHERE member_id=?`).get(memberId);
-  if(!u) return res.status(400).json({error:'Invalid credentials'});
-  if(!bcrypt.compareSync(password, u.password_hash)) return res.status(400).json({error:'Invalid credentials'});
+  if(!u){
+    console.log(`Login failed: member_id "${memberId}" not found`);
+    return res.status(400).json({error:'Invalid Member ID or password'});
+  }
+  if(!bcrypt.compareSync(password, u.password_hash)){
+    console.log(`Login failed: wrong password for "${memberId}"`);
+    return res.status(400).json({error:'Invalid Member ID or password'});
+  }
   const token = signToken({ uid: u.id, role: u.role, memberId: u.member_id, name: u.name });
   res.cookie('token', token, { httpOnly:true, sameSite:'none', secure: true });
+  addBreadcrumb('auth', 'Member logged in', { memberId: u.member_id });
   res.json({ ok:true, role: u.role });
 });
 

@@ -223,7 +223,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const res = await AUTH.api('/api/auth/login', {method:'POST', body:{memberId,password}});
     btnText.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
     setTimeout(() => {
-      if(res.role==='member') location.href = '/member-dashboard';
+      if(res.role==='admin') location.href = '/admin-dashboard';
+      else location.href = '/member-dashboard';
     }, 500);
   }catch(e){ 
     btnText.innerHTML = '<i class="fa-solid fa-xmark"></i> Login Failed';

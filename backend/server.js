@@ -218,9 +218,11 @@ app.post('/api/admin/reset-password', auth('admin'), (req,res)=>{
 app.post('/api/auth/login', (req,res)=>{
   const { memberId, password } = req.body;
   if(!memberId || !password) return res.status(400).json({error:'Member ID and password are required'});
-  const u = db.prepare(`SELECT * FROM users WHERE member_id=?`).get(memberId);
+  // Try member_id first, then fallback to email (supports admin login from member page)
+  let u = db.prepare(`SELECT * FROM users WHERE member_id=?`).get(memberId);
+  if(!u) u = db.prepare(`SELECT * FROM users WHERE email=?`).get(memberId);
   if(!u){
-    console.log(`Login failed: member_id "${memberId}" not found`);
+    console.log(`Login failed: member_id/email "${memberId}" not found`);
     return res.status(400).json({error:'Invalid Member ID or password'});
   }
   if(!bcrypt.compareSync(password, u.password_hash)){

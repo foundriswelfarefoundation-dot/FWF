@@ -5,296 +5,1334 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Admin Dashboard — FWF</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container { max-width: 1400px; margin: 0 auto; }
-    .header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 28px 32px;
-      margin-bottom: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .header h1 {
-      font-size: 32px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #f093fb, #f5576c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .admin-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #f093fb, #f5576c);
-      color: white;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-left: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-    .stat-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 32px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #f093fb, #f5576c);
-    }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); }
-    .stat-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      margin-bottom: 16px;
-    }
-    .icon-members { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .icon-active { background: linear-gradient(135deg, #22c55e, #059669); }
-    .stat-label { color: #64748b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .stat-value {
-      font-size: 42px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #f093fb, #f5576c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .table-section {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 32px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-    .table-section h2 {
-      margin: 0 0 24px;
-      color: #1e293b;
-      font-size: 24px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .table-wrapper {
-      overflow-x: auto;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-    }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-    }
-    .table thead {
-      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    }
-    .table th {
-      padding: 16px 20px;
-      text-align: left;
-      font-weight: 700;
-      color: #475569;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid #e2e8f0;
-    }
-    .table td {
-      padding: 16px 20px;
-      color: #1e293b;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 14px;
-    }
-    .table tbody tr {
-      transition: all 0.2s;
-    }
-    .table tbody tr:hover {
-      background: linear-gradient(90deg, #fef3f2, #fff);
-    }
-    .member-id {
-      font-weight: 700;
-      color: #f5576c;
-    }
-    .date-cell {
-      color: #64748b;
-      font-size: 13px;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #94a3b8;
-    }
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: white;
-      color: #475569;
-      border: 2px solid #e2e8f0;
-    }
-    .btn:hover {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-    }
-    
-    @media (max-width: 768px) {
-      .header { padding: 20px; }
-      .header h1 { font-size: 24px; }
-      .admin-badge { display: block; margin: 8px 0 0 0; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .stat-value { font-size: 36px; }
-      .table-section { padding: 20px; }
-      .table th, .table td { padding: 12px; font-size: 12px; }
-    }
+/* ==============================
+   CSS VARIABLES
+   ============================== */
+:root {
+  --bg-1:#f0f2f8; --bg-2:#e8ecf4;
+  --accent:#6366f1; --accent2:#ec4899; --accent-soft:rgba(99,102,241,.1);
+  --sidebar-bg:linear-gradient(180deg,#0f172a 0%,#1e293b 100%);
+  --sidebar-text:#94a3b8;
+  --card-bg:#ffffff; --card-border:#e2e8f0;
+  --text-primary:#0f172a; --text-secondary:#475569; --text-muted:#94a3b8;
+  --success:#22c55e; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6;
+}
+
+/* ==============================
+   RESET & BASE
+   ============================== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  background:var(--bg-1);
+  min-height:100vh; color:var(--text-primary);
+  display:flex;
+}
+a{color:inherit;text-decoration:none}
+
+/* ==============================
+   SIDEBAR
+   ============================== */
+.sidebar{
+  position:fixed; left:0; top:0; bottom:0; width:260px; z-index:100;
+  background:var(--sidebar-bg);
+  display:flex; flex-direction:column;
+  padding:20px 14px 14px;
+  transition:transform .3s ease;
+}
+.sidebar-brand{
+  display:flex; align-items:center; gap:12px;
+  padding:4px 10px 20px; border-bottom:1px solid rgba(255,255,255,.08);
+  margin-bottom:14px;
+}
+.sidebar-brand img{ width:40px; height:40px; border-radius:10px; }
+.sidebar-brand span{ font-size:18px; font-weight:900; color:#fff; }
+.sidebar-brand small{ display:block; font-size:11px; color:#ef4444; font-weight:700; margin-top:2px; }
+.sidebar-nav{ flex:1; display:flex; flex-direction:column; gap:3px; }
+.nav-item{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 14px; border-radius:10px;
+  font-size:13px; font-weight:700;
+  color:var(--sidebar-text); opacity:.7;
+  cursor:pointer; transition:all .2s;
+  border:none; background:none; width:100%; text-align:left;
+  font-family:inherit;
+}
+.nav-item:hover{ opacity:1; background:rgba(255,255,255,.06); }
+.nav-item.active{
+  opacity:1; background:rgba(99,102,241,.15); color:#818cf8;
+  box-shadow:inset 3px 0 0 #6366f1;
+}
+.nav-item i{ width:18px; text-align:center; font-size:14px; }
+.nav-badge{
+  margin-left:auto; background:#ef4444; color:#fff;
+  padding:2px 7px; border-radius:99px; font-size:10px; font-weight:800;
+}
+.sidebar-footer{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:12px; margin-top:auto;
+}
+.nav-item.logout-btn{ color:#f87171; opacity:.9; }
+
+/* ==============================
+   MOBILE
+   ============================== */
+.mobile-toggle{
+  display:none; position:fixed; top:14px; left:14px; z-index:200;
+  width:42px; height:42px; border-radius:10px;
+  background:#fff; border:1px solid var(--card-border);
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+  font-size:16px; cursor:pointer; color:var(--text-primary);
+  font-family:inherit;
+}
+.mobile-overlay{
+  display:none; position:fixed; inset:0; z-index:90;
+  background:rgba(0,0,0,.4); backdrop-filter:blur(4px);
+}
+
+/* ==============================
+   MAIN
+   ============================== */
+.main{
+  flex:1; margin-left:260px;
+  padding:20px 28px;
+  min-height:100vh;
+}
+
+/* ==============================
+   TOP BAR
+   ============================== */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; flex-wrap:wrap; gap:14px;
+}
+.topbar h1{
+  font-size:24px; font-weight:900; letter-spacing:-.5px;
+}
+.topbar-right{ display:flex; align-items:center; gap:10px; }
+.admin-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  background:linear-gradient(135deg,#6366f1,#ec4899);
+  color:#fff; padding:6px 14px; border-radius:99px;
+  font-size:12px; font-weight:800;
+}
+
+/* ==============================
+   PAGES
+   ============================== */
+.page{ display:none; animation:fadeIn .3s ease; }
+.page.active{ display:block; }
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ==============================
+   STAT CARDS
+   ============================== */
+.stats-row{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+  margin-bottom:24px;
+}
+.stat-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:16px; padding:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+  transition:transform .2s, box-shadow .2s;
+  position:relative; overflow:hidden;
+}
+.stat-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.06); }
+.stat-card .s-icon{
+  width:40px; height:40px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; margin-bottom:12px; color:#fff;
+}
+.stat-card .s-label{
+  font-size:11px; font-weight:700; color:var(--text-muted);
+  text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;
+}
+.stat-card .s-value{
+  font-size:26px; font-weight:900; color:var(--text-primary);
+  letter-spacing:-.5px;
+}
+.stat-card .s-sub{ font-size:11px; color:var(--text-secondary); margin-top:2px; font-weight:600; }
+.s-purple{ background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+.s-green{ background:linear-gradient(135deg,#22c55e,#059669); }
+.s-blue{ background:linear-gradient(135deg,#3b82f6,#2563eb); }
+.s-amber{ background:linear-gradient(135deg,#f59e0b,#d97706); }
+.s-pink{ background:linear-gradient(135deg,#ec4899,#be185d); }
+.s-red{ background:linear-gradient(135deg,#ef4444,#dc2626); }
+.s-cyan{ background:linear-gradient(135deg,#06b6d4,#0891b2); }
+.s-teal{ background:linear-gradient(135deg,#14b8a6,#0d9488); }
+
+/* ==============================
+   CONTENT CARD
+   ============================== */
+.content-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:16px; padding:22px;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+  margin-bottom:18px;
+}
+.content-card h3{
+  font-size:16px; font-weight:800; margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+.content-card h3 i{ color:var(--accent); font-size:14px; }
+
+/* ==============================
+   GRIDS
+   ============================== */
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+
+/* ==============================
+   TABLE
+   ============================== */
+.data-table{ width:100%; border-collapse:collapse; }
+.data-table th{
+  text-align:left; font-size:10px; font-weight:700;
+  color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;
+  padding:8px 12px; border-bottom:2px solid var(--card-border);
+  white-space:nowrap;
+}
+.data-table td{
+  padding:10px 12px; border-bottom:1px solid #f1f5f9;
+  font-size:13px; font-weight:600; color:var(--text-secondary);
+}
+.data-table tr:hover td{ background:#f8faff; }
+.data-table tr:last-child td{ border-bottom:0; }
+.badge{
+  display:inline-flex; padding:3px 9px; border-radius:99px;
+  font-size:10px; font-weight:800; white-space:nowrap;
+}
+.b-active{ background:#dcfce7; color:#166534; }
+.b-inactive{ background:#fee2e2; color:#991b1b; }
+.b-open{ background:#dbeafe; color:#1e40af; }
+.b-progress{ background:#fef3c7; color:#92400e; }
+.b-resolved{ background:#d1fae5; color:#065f46; }
+.b-closed{ background:#e2e8f0; color:#475569; }
+.b-lead{ background:#f3e8ff; color:#6b21a8; }
+.b-contacted{ background:#e0e7ff; color:#3730a3; }
+.b-negotiating{ background:#fef3c7; color:#92400e; }
+.b-pending{ background:#fff7ed; color:#9a3412; }
+.b-funding{ background:#d1fae5; color:#065f46; }
+.b-low{ background:#e2e8f0; color:#475569; }
+.b-medium{ background:#fef3c7; color:#92400e; }
+.b-high{ background:#fed7aa; color:#9a3412; }
+.b-urgent{ background:#fee2e2; color:#991b1b; }
+
+.member-link{
+  font-weight:800; color:var(--accent); cursor:pointer;
+}
+.member-link:hover{ text-decoration:underline; }
+
+/* ==============================
+   FORMS
+   ============================== */
+.form-group{ margin-bottom:14px; }
+.form-group label{
+  display:block; font-size:12px; font-weight:700;
+  color:var(--text-secondary); margin-bottom:4px;
+}
+.form-input{
+  width:100%; padding:10px 14px;
+  border:2px solid var(--card-border); border-radius:10px;
+  background:#fff; color:var(--text-primary);
+  font:inherit; font-size:13px; font-weight:600;
+  transition:border-color .2s;
+}
+.form-input:focus{
+  outline:none; border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+.form-row{ display:flex; gap:12px; flex-wrap:wrap; }
+.form-row .form-group{ flex:1; min-width:180px; }
+select.form-input{
+  appearance:none; cursor:pointer;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+  background-repeat:no-repeat; background-position:right 12px center;
+  padding-right:36px;
+}
+textarea.form-input{ resize:vertical; min-height:80px; }
+
+/* ==============================
+   BUTTONS
+   ============================== */
+.btn{
+  padding:8px 18px; border:none; border-radius:10px;
+  font:inherit; font-size:12px; font-weight:800;
+  cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  transition:all .2s;
+}
+.btn-primary{ background:var(--accent); color:#fff; }
+.btn-primary:hover{ background:#4f46e5; }
+.btn-success{ background:var(--success); color:#fff; }
+.btn-danger{ background:var(--danger); color:#fff; }
+.btn-warning{ background:var(--warning); color:#fff; }
+.btn-ghost{
+  background:transparent; color:var(--text-secondary);
+  border:1px solid var(--card-border);
+}
+.btn-ghost:hover{ background:#f1f5f9; }
+.btn-sm{ padding:5px 10px; font-size:11px; border-radius:8px; }
+.btn-icon{
+  width:32px; height:32px; border-radius:8px; padding:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid var(--card-border); background:#fff;
+  cursor:pointer; transition:.2s; font-size:13px; color:var(--text-secondary);
+}
+.btn-icon:hover{ background:#f1f5f9; }
+
+/* ==============================
+   SEARCH BAR
+   ============================== */
+.search-bar{
+  position:relative; margin-bottom:16px;
+}
+.search-bar input{
+  width:100%; padding:10px 14px 10px 38px;
+  border:2px solid var(--card-border); border-radius:10px;
+  font:inherit; font-size:13px; font-weight:600;
+  background:#fff; color:var(--text-primary);
+}
+.search-bar input:focus{ outline:none; border-color:var(--accent); }
+.search-bar i{
+  position:absolute; left:14px; top:50%; transform:translateY(-50%);
+  color:var(--text-muted); font-size:13px;
+}
+
+/* ==============================
+   EMPTY STATE
+   ============================== */
+.empty-state{
+  text-align:center; padding:40px 20px; color:var(--text-muted);
+}
+.empty-state i{ font-size:48px; margin-bottom:12px; opacity:.3; }
+.empty-state p{ font-weight:600; font-size:14px; }
+
+/* ==============================
+   MODAL
+   ============================== */
+.modal-overlay{
+  position:fixed; inset:0; z-index:999;
+  background:rgba(15,23,42,.5); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px; animation:fadeIn .2s;
+}
+.modal-overlay.hidden{ display:none; }
+.modal-card{
+  background:#fff; border-radius:18px;
+  max-width:640px; width:100%; padding:28px;
+  box-shadow:0 24px 60px rgba(0,0,0,.2);
+  max-height:85vh; overflow-y:auto;
+  animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-head{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:18px;
+}
+.modal-head h3{ font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px; }
+.modal-head h3 i{ color:var(--accent); }
+.modal-close{
+  width:34px; height:34px; border-radius:10px;
+  border:1px solid var(--card-border); background:#fff;
+  cursor:pointer; font-size:14px; display:grid; place-items:center;
+  transition:.2s;
+}
+.modal-close:hover{ background:#f1f5f9; }
+.modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:18px; }
+
+/* ==============================
+   MEMBER DETAIL PANEL
+   ============================== */
+.detail-header{
+  display:flex; align-items:center; gap:18px; margin-bottom:20px;
+  padding-bottom:18px; border-bottom:1px solid var(--card-border);
+}
+.detail-avatar{
+  width:64px; height:64px; border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#ec4899);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:24px; font-weight:900;
+}
+.detail-name{ font-size:22px; font-weight:900; }
+.detail-id{ color:var(--accent); font-weight:700; font-size:13px; }
+.detail-meta{
+  display:flex; gap:20px; flex-wrap:wrap; margin-top:6px;
+}
+.detail-meta span{
+  font-size:12px; color:var(--text-muted); font-weight:600;
+  display:flex; align-items:center; gap:4px;
+}
+.detail-meta i{ font-size:11px; }
+
+/* ==============================
+   TABS
+   ============================== */
+.tab-bar{
+  display:flex; gap:6px; margin-bottom:16px;
+  border-bottom:2px solid var(--card-border);
+  padding-bottom:0;
+}
+.tab-btn{
+  padding:8px 16px; border:none; background:none;
+  font:inherit; font-size:12px; font-weight:800;
+  color:var(--text-muted); cursor:pointer;
+  border-bottom:2px solid transparent;
+  margin-bottom:-2px; transition:.2s;
+}
+.tab-btn:hover{ color:var(--text-primary); }
+.tab-btn.active{ color:var(--accent); border-bottom-color:var(--accent); }
+.tab-content{ display:none; }
+.tab-content.active{ display:block; }
+
+/* ==============================
+   RESPONSIVE
+   ============================== */
+@media(max-width:1100px){
+  .stats-row{ grid-template-columns:repeat(2,1fr); }
+  .grid-3{ grid-template-columns:1fr 1fr; }
+}
+@media(max-width:900px){
+  .sidebar{ transform:translateX(-100%); }
+  .sidebar.open{ transform:translateX(0); }
+  .main{ margin-left:0; padding:16px; padding-top:60px; }
+  .mobile-toggle{ display:grid; place-items:center; }
+  .mobile-overlay.show{ display:block; }
+}
+@media(max-width:640px){
+  .stats-row{ grid-template-columns:1fr; }
+  .grid-2,.grid-3{ grid-template-columns:1fr; }
+  .form-row{ flex-direction:column; }
+  .form-row .form-group{ min-width:100%; }
+  .topbar{ flex-direction:column; align-items:flex-start; }
+  .topbar h1{ font-size:20px; }
+  .tab-bar{ overflow-x:auto; }
+}
+.table-wrap{ overflow-x:auto; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div>
-        <h1>🛡️ Admin Dashboard<span class="admin-badge">Administrator</span></h1>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" id="mobileToggle"><i class="fa-solid fa-bars"></i></button>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- ======== SIDEBAR ======== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="assets/images/logo.png" alt="FWF">
+    <div>
+      <span>FWF</span>
+      <small>ADMIN PANEL</small>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-page="home">
+      <i class="fa-solid fa-chart-pie"></i> Dashboard
+    </button>
+    <button class="nav-item" data-page="members">
+      <i class="fa-solid fa-users"></i> Members
+    </button>
+    <button class="nav-item" data-page="csr">
+      <i class="fa-solid fa-handshake"></i> CSR Partners
+    </button>
+    <button class="nav-item" data-page="support">
+      <i class="fa-solid fa-headset"></i> Support
+      <span class="nav-badge" id="supportBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-item" data-page="points">
+      <i class="fa-solid fa-coins"></i> Points & Activity
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item logout-btn" id="logoutBtn">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </div>
+</aside>
+
+<!-- ======== MAIN ======== -->
+<main class="main">
+  <div class="topbar">
+    <h1 id="pageTitle"><i class="fa-solid fa-chart-pie"></i> Dashboard Overview</h1>
+    <div class="topbar-right">
+      <span class="admin-badge"><i class="fa-solid fa-shield-halved"></i> Administrator</span>
+    </div>
+  </div>
+
+  <!-- ===================== HOME / DASHBOARD ===================== -->
+  <div class="page active" id="page-home">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
+        <div class="s-label">Total Members</div>
+        <div class="s-value" id="hMembers">0</div>
       </div>
-      <div>
-        <button class="btn" id="logoutBtn">🚪 Logout</button>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-user-check"></i></div>
+        <div class="s-label">Active Members</div>
+        <div class="s-value" id="hActive">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-coins"></i></div>
+        <div class="s-label">Total Points Issued</div>
+        <div class="s-value" id="hPoints">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
+        <div class="s-label">Donations Collected</div>
+        <div class="s-value" id="hDonations">₹0</div>
+        <div class="s-sub" id="hDonCount">0 donations</div>
       </div>
     </div>
 
-    <div class="stats-grid">
+    <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon icon-members">👥</div>
-        <div class="stat-label">Total Members</div>
-        <div class="stat-value" id="mcount">0</div>
+        <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
+        <div class="s-label">Referrals</div>
+        <div class="s-value" id="hReferrals">0</div>
+        <div class="s-sub" id="hRefActive">0 active</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon icon-active">✓</div>
-        <div class="stat-label">Active Members</div>
-        <div class="stat-value" id="acount">0</div>
+        <div class="s-icon s-cyan"><i class="fa-solid fa-ticket"></i></div>
+        <div class="s-label">Quiz Tickets Sold</div>
+        <div class="s-value" id="hTickets">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-teal"><i class="fa-solid fa-handshake"></i></div>
+        <div class="s-label">CSR Partners</div>
+        <div class="s-value" id="hCSR">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-red"><i class="fa-solid fa-headset"></i></div>
+        <div class="s-label">Open Tickets</div>
+        <div class="s-value" id="hSupport">0</div>
       </div>
     </div>
 
-    <div class="table-section">
-      <h2>📋 Latest Members</h2>
-      <div class="table-wrapper">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Member ID</th>
-              <th>Name</th>
-              <th>Mobile</th>
-              <th>Joined Date</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">
-            <tr>
-              <td colspan="4">
-                <div class="empty-state">
-                  <div class="empty-state-icon">⏳</div>
-                  <div>Loading members...</div>
-                </div>
-              </td>
-            </tr>
+    <div class="content-card">
+      <h3><i class="fa-solid fa-clock"></i> Recent Members</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Member ID</th><th>Name</th><th>Mobile</th><th>Email</th><th>Status</th><th>Joined</th></tr></thead>
+          <tbody id="hLatest">
+            <tr><td colspan="6" class="empty-state"><p>Loading...</p></td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <script src="assets/js/fwf.js"></script>
-  <script src="auth.js"></script>
-  <script>
-    async function load() {
-      try {
-        const data = await AUTH.api('/api/admin/overview');
-        
-        document.getElementById('mcount').textContent = data.totals.members;
-        document.getElementById('acount').textContent = data.totals.active_members;
-        
-        const tbody = document.getElementById('tbody');
-        tbody.innerHTML = '';
-        
-        if (data.latest && data.latest.length > 0) {
-          data.latest.forEach(r => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td><span class="member-id">${r.member_id || '-'}</span></td>
-              <td>${r.name || '-'}</td>
-              <td>${r.mobile || '-'}</td>
-              <td><span class="date-cell">${new Date(r.created_at).toLocaleDateString('en-IN')}</span></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        } else {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="4">
-                <div class="empty-state">
-                  <div class="empty-state-icon">📭</div>
-                  <div>No members found</div>
-                </div>
-              </td>
-            </tr>
-          `;
-        }
-      } catch (e) {
-        FWF_Notify.toast('Session expired or unauthorized. Redirecting...', 'error');
-        setTimeout(() => location.href = 'admin-login.html', 2000);
-      }
+  <!-- ===================== MEMBERS PAGE ===================== -->
+  <div class="page" id="page-members">
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="search-bar">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="memberSearch" placeholder="Search by name, ID, mobile, email...">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
+        <button class="btn btn-ghost" onclick="loadMembers()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+        <button class="btn btn-primary" onclick="openResetPasswordModal()"><i class="fa-solid fa-key"></i> Reset Password</button>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-users"></i> All Members <span style="font-weight:500;color:var(--text-muted);font-size:12px;margin-left:8px" id="memberCountLabel">(0)</span></h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Email</th><th>Points</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="membersBody">
+            <tr><td colspan="8" class="empty-state"><p>Loading...</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CSR PARTNERS PAGE ===================== -->
+  <div class="page" id="page-csr">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-teal"><i class="fa-solid fa-building"></i></div>
+        <div class="s-label">Total Partners</div>
+        <div class="s-value" id="csrTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+        <div class="s-label">Active</div>
+        <div class="s-value" id="csrActive">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="s-label">Total Commitment</div>
+        <div class="s-value" id="csrCommit">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-coins"></i></div>
+        <div class="s-label">Total Paid</div>
+        <div class="s-value" id="csrPaid">₹0</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;display:flex;justify-content:flex-end;gap:10px">
+      <button class="btn btn-ghost" onclick="loadCSRPartners()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+      <button class="btn btn-primary" onclick="openAddCSRModal()"><i class="fa-solid fa-plus"></i> Add CSR Partner</button>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-handshake"></i> CSR Partners</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Partner ID</th><th>Company</th><th>Contact</th><th>Type</th><th>Commitment</th><th>Paid</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="csrBody">
+            <tr><td colspan="8" class="empty-state"><i class="fa-solid fa-handshake"></i><p>No CSR partners yet</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SUPPORT PAGE ===================== -->
+  <div class="page" id="page-support">
+    <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-ticket"></i></div>
+        <div class="s-label">Total Tickets</div>
+        <div class="s-value" id="supTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-red"><i class="fa-solid fa-exclamation-circle"></i></div>
+        <div class="s-label">Open</div>
+        <div class="s-value" id="supOpen">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-spinner"></i></div>
+        <div class="s-label">In Progress</div>
+        <div class="s-value" id="supProgress">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-check"></i></div>
+        <div class="s-label">Resolved</div>
+        <div class="s-value" id="supResolved">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-cyan"><i class="fa-solid fa-lock"></i></div>
+        <div class="s-label">Closed</div>
+        <div class="s-value" id="supClosed">0</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;display:flex;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="loadSupportTickets()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-headset"></i> Support Tickets</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Ticket ID</th><th>User</th><th>Subject</th><th>Category</th><th>Priority</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="supportBody">
+            <tr><td colspan="8" class="empty-state"><i class="fa-solid fa-headset"></i><p>No support tickets</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== POINTS & ACTIVITY PAGE ===================== -->
+  <div class="page" id="page-points">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="donations-tab">Donations</button>
+      <button class="tab-btn" data-tab="referrals-tab">Referrals</button>
+      <button class="tab-btn" data-tab="tickets-tab">Quiz Tickets</button>
+    </div>
+
+    <div class="tab-content active" id="donations-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-hand-holding-heart"></i> Donation Records</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Member</th><th>Amount</th><th>Donor</th><th>Points Earned</th><th>Date</th></tr></thead>
+            <tbody id="donationsBody">
+              <tr><td colspan="5" class="empty-state"><p>No donations yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="referrals-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-user-plus"></i> Referral Records</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Referrer</th><th>Referred Member</th><th>Payment</th><th>Points</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="referralsBody">
+              <tr><td colspan="7" class="empty-state"><p>No referrals yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tickets-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-ticket"></i> Quiz Ticket Sales</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Seller</th><th>Buyer</th><th>Price</th><th>Points Earned</th><th>Date</th></tr></thead>
+            <tbody id="ticketsBody">
+              <tr><td colspan="5" class="empty-state"><p>No tickets sold yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ======== MODALS ======== -->
+
+<!-- Reset Password Modal -->
+<div class="modal-overlay hidden" id="resetPwdModal">
+  <div class="modal-card" style="max-width:440px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-key"></i> Reset Member Password</h3>
+      <button class="modal-close" onclick="closeModal('resetPwdModal')">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>Member ID</label>
+      <input type="text" class="form-input" id="rpMemberId" placeholder="e.g. FWF-000001">
+    </div>
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="text" class="form-input" id="rpNewPass" placeholder="Enter new password">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('resetPwdModal')">Cancel</button>
+      <button class="btn btn-primary" id="rpSubmit"><i class="fa-solid fa-check"></i> Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add CSR Partner Modal -->
+<div class="modal-overlay hidden" id="addCSRModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-building"></i> Add CSR Partner</h3>
+      <button class="modal-close" onclick="closeModal('addCSRModal')">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>Company Name *</label>
+      <input type="text" class="form-input" id="csrCompany" placeholder="Company name">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Contact Person</label>
+        <input type="text" class="form-input" id="csrContact" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="form-input" id="csrEmail" placeholder="Email">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" class="form-input" id="csrPhone" placeholder="Phone">
+      </div>
+      <div class="form-group">
+        <label>Industry</label>
+        <input type="text" class="form-input" id="csrIndustry" placeholder="e.g. IT, Manufacturing">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Partnership Type</label>
+        <select class="form-input" id="csrType">
+          <option value="funding">Funding</option>
+          <option value="skill-training">Skill Training</option>
+          <option value="infrastructure">Infrastructure</option>
+          <option value="employment">Employment</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Commitment Amount (₹)</label>
+        <input type="number" class="form-input" id="csrAmount" placeholder="0" min="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-input" id="csrNotes" placeholder="Additional notes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addCSRModal')">Cancel</button>
+      <button class="btn btn-primary" id="csrSubmit"><i class="fa-solid fa-plus"></i> Add Partner</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update CSR Partner Modal -->
+<div class="modal-overlay hidden" id="editCSRModal">
+  <div class="modal-card" style="max-width:440px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-edit"></i> Update CSR Partner</h3>
+      <button class="modal-close" onclick="closeModal('editCSRModal')">&times;</button>
+    </div>
+    <input type="hidden" id="editCSRId">
+    <div class="form-group">
+      <label>Status</label>
+      <select class="form-input" id="editCSRStatus">
+        <option value="lead">Lead</option>
+        <option value="contacted">Contacted</option>
+        <option value="negotiating">Negotiating</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Paid Amount (₹)</label>
+      <input type="number" class="form-input" id="editCSRPaid" placeholder="0" min="0">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-input" id="editCSRNotes" placeholder="Update notes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('editCSRModal')">Cancel</button>
+      <button class="btn btn-primary" id="editCSRSubmit"><i class="fa-solid fa-save"></i> Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Support Ticket Reply Modal -->
+<div class="modal-overlay hidden" id="replyTicketModal">
+  <div class="modal-card" style="max-width:540px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-reply"></i> Reply to Ticket</h3>
+      <button class="modal-close" onclick="closeModal('replyTicketModal')">&times;</button>
+    </div>
+    <input type="hidden" id="replyTicketId">
+    <div class="content-card" style="background:#f8fafc;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text-muted);font-weight:700;margin-bottom:4px">Original Message</div>
+      <div id="replyOriginal" style="font-size:13px;font-weight:600;line-height:1.6"></div>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select class="form-input" id="replyStatus">
+        <option value="in-progress">In Progress</option>
+        <option value="resolved">Resolved</option>
+        <option value="closed">Closed</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Admin Reply</label>
+      <textarea class="form-input" id="replyMessage" placeholder="Type your reply..." rows="4"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('replyTicketModal')">Cancel</button>
+      <button class="btn btn-primary" id="replySubmit"><i class="fa-solid fa-paper-plane"></i> Send Reply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member Detail Modal -->
+<div class="modal-overlay hidden" id="memberDetailModal">
+  <div class="modal-card" style="max-width:720px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-user"></i> Member Details</h3>
+      <button class="modal-close" onclick="closeModal('memberDetailModal')">&times;</button>
+    </div>
+    <div id="memberDetailContent">Loading...</div>
+  </div>
+</div>
+
+<script src="assets/js/fwf.js"></script>
+<script src="auth.js"></script>
+<script>
+/* ============================================
+   NAVIGATION
+   ============================================ */
+const pageTitles = {
+  home: '<i class="fa-solid fa-chart-pie"></i> Dashboard Overview',
+  members: '<i class="fa-solid fa-users"></i> Members Management',
+  csr: '<i class="fa-solid fa-handshake"></i> CSR Partners',
+  support: '<i class="fa-solid fa-headset"></i> Support Tickets',
+  points: '<i class="fa-solid fa-coins"></i> Points & Activity'
+};
+
+function switchPage(page){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if(el) el.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(nav) nav.classList.add('active');
+  document.getElementById('pageTitle').innerHTML = pageTitles[page] || page;
+  closeMobile();
+
+  if(page === 'members') loadMembers();
+  if(page === 'csr') loadCSRPartners();
+  if(page === 'support') loadSupportTickets();
+  if(page === 'points') loadPointsActivity();
+}
+
+document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+// Mobile
+document.getElementById('mobileToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+});
+document.getElementById('mobileOverlay').addEventListener('click', closeMobile);
+function closeMobile(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+// Tabs (Points page)
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============================================
+   MODALS
+   ============================================ */
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+function openResetPasswordModal(){ openModal('resetPwdModal'); }
+function openAddCSRModal(){ openModal('addCSRModal'); }
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+function fmtN(n){ return Math.round(n||0).toLocaleString('en-IN'); }
+function fmtDate(d){
+  if(!d) return '—';
+  try{ return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+  catch(e){ return d; }
+}
+function notify(msg, type){
+  if(typeof FWF_Notify !== 'undefined') FWF_Notify.toast(msg, type);
+  else alert(msg);
+}
+function statusBadge(s){
+  const map = {active:'b-active',inactive:'b-inactive',open:'b-open','in-progress':'b-progress',resolved:'b-resolved',closed:'b-closed',lead:'b-lead',contacted:'b-contacted',negotiating:'b-negotiating',pending:'b-pending'};
+  return `<span class="badge ${map[s]||'b-open'}">${s}</span>`;
+}
+function priBadge(p){
+  const map = {low:'b-low',medium:'b-medium',high:'b-high',urgent:'b-urgent'};
+  return `<span class="badge ${map[p]||'b-medium'}">${p}</span>`;
+}
+
+/* ============================================
+   DASHBOARD (HOME)
+   ============================================ */
+async function loadDashboard(){
+  try {
+    const data = await AUTH.api('/api/admin/overview');
+    const t = data.totals;
+    document.getElementById('hMembers').textContent = fmtN(t.members);
+    document.getElementById('hActive').textContent = fmtN(t.active_members);
+    document.getElementById('hPoints').textContent = fmtN(t.total_points);
+    document.getElementById('hDonations').textContent = '₹' + fmtN(t.total_donations_amount);
+    document.getElementById('hDonCount').textContent = t.total_donations_count + ' donations';
+    document.getElementById('hReferrals').textContent = fmtN(t.total_referrals);
+    document.getElementById('hRefActive').textContent = t.active_referrals + ' active';
+    document.getElementById('hTickets').textContent = fmtN(t.total_tickets_sold);
+    document.getElementById('hCSR').textContent = fmtN(t.csr_partners);
+    document.getElementById('hSupport').textContent = fmtN(t.support_tickets);
+
+    const tbody = document.getElementById('hLatest');
+    if(data.latest && data.latest.length > 0){
+      tbody.innerHTML = data.latest.map(r => `<tr>
+        <td><span class="member-link" onclick="viewMember('${r.member_id}')">${r.member_id}</span></td>
+        <td style="font-weight:700">${r.name||'—'}</td>
+        <td>${r.mobile||'—'}</td>
+        <td>${r.email||'—'}</td>
+        <td>${r.membership_active ? statusBadge('active') : statusBadge('inactive')}</td>
+        <td style="color:var(--text-muted)">${fmtDate(r.created_at)}</td>
+      </tr>`).join('');
     }
 
-    document.getElementById('logoutBtn').onclick = () => {
-      FWF_Notify.confirm('Are you sure you want to logout?', async () => {
-        await AUTH.api('/api/auth/logout', {method: 'POST'});
-        FWF_Notify.toast('Logged out successfully', 'success');
-        setTimeout(() => location.href = 'admin-login.html', 1000);
-      });
-    };
+    // Load CSR + support counts
+    loadCSRCount();
+    loadSupportCount();
+  } catch(e){
+    notify('Session expired. Redirecting...', 'error');
+    setTimeout(() => location.href = '/admin-login', 2000);
+  }
+}
 
-    load();
-  </script>
+async function loadCSRCount(){
+  try{
+    const d = await AUTH.api('/api/admin/csr-partners');
+    document.getElementById('hCSR').textContent = fmtN(d.stats.total);
+  } catch(e){}
+}
+
+async function loadSupportCount(){
+  try{
+    const d = await AUTH.api('/api/admin/support-tickets');
+    document.getElementById('hSupport').textContent = fmtN(d.stats.open);
+    const badge = document.getElementById('supportBadge');
+    if(d.stats.open > 0){ badge.textContent = d.stats.open; badge.style.display = ''; }
+    else { badge.style.display = 'none'; }
+  } catch(e){}
+}
+
+/* ============================================
+   MEMBERS
+   ============================================ */
+let allMembers = [];
+
+async function loadMembers(){
+  try{
+    const d = await AUTH.api('/api/admin/members');
+    allMembers = d.members || [];
+    renderMembers(allMembers);
+  } catch(e){ notify('Failed to load members','error'); }
+}
+
+function renderMembers(list){
+  document.getElementById('memberCountLabel').textContent = `(${list.length})`;
+  const tbody = document.getElementById('membersBody');
+  if(!list.length){
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fa-solid fa-users"></i><p>No members found</p></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(m => `<tr>
+    <td><span class="member-link" onclick="viewMember('${m.member_id}')">${m.member_id}</span></td>
+    <td style="font-weight:700">${m.name||'—'}</td>
+    <td>${m.mobile||'—'}</td>
+    <td>${m.email||'—'}</td>
+    <td style="font-weight:800;color:var(--accent)">${fmtN(m.points_balance||0)}</td>
+    <td>${m.membership_active ? statusBadge('active') : statusBadge('inactive')}</td>
+    <td style="color:var(--text-muted)">${fmtDate(m.created_at)}</td>
+    <td>
+      <button class="btn-icon" title="View" onclick="viewMember('${m.member_id}')"><i class="fa-solid fa-eye"></i></button>
+      <button class="btn-icon" title="Toggle status" onclick="toggleMember('${m.member_id}')"><i class="fa-solid fa-toggle-${m.membership_active?'on':'off'}"></i></button>
+    </td>
+  </tr>`).join('');
+}
+
+document.getElementById('memberSearch').addEventListener('input', function(){
+  const q = this.value.toLowerCase().trim();
+  if(!q){ renderMembers(allMembers); return; }
+  const filtered = allMembers.filter(m =>
+    (m.name||'').toLowerCase().includes(q) ||
+    (m.member_id||'').toLowerCase().includes(q) ||
+    (m.mobile||'').includes(q) ||
+    (m.email||'').toLowerCase().includes(q)
+  );
+  renderMembers(filtered);
+});
+
+async function toggleMember(memberId){
+  try{
+    const r = await AUTH.api('/api/admin/toggle-member',{method:'POST',body:{memberId}});
+    notify(`${memberId} is now ${r.membership_active ? 'active' : 'inactive'}`,'success');
+    loadMembers();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+async function viewMember(memberId){
+  openModal('memberDetailModal');
+  const content = document.getElementById('memberDetailContent');
+  content.innerHTML = '<div class="empty-state"><p>Loading...</p></div>';
+  try{
+    const d = await AUTH.api('/api/admin/member/' + memberId);
+    const u = d.user, w = d.wallet || {};
+    const initials = (u.name||'M').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    let html = `
+      <div class="detail-header">
+        <div class="detail-avatar">${initials}</div>
+        <div>
+          <div class="detail-name">${u.name||'—'}</div>
+          <div class="detail-id">${u.member_id}</div>
+          <div class="detail-meta">
+            <span><i class="fa-solid fa-phone"></i> ${u.mobile||'—'}</span>
+            <span><i class="fa-solid fa-envelope"></i> ${u.email||'—'}</span>
+            <span><i class="fa-solid fa-calendar"></i> ${fmtDate(u.created_at)}</span>
+            <span>${u.membership_active ? statusBadge('active') : statusBadge('inactive')}</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        <div class="stat-card"><div class="s-label">Points</div><div class="s-value" style="font-size:20px">${fmtN(w.points_balance)}</div></div>
+        <div class="stat-card"><div class="s-label">Wallet ₹</div><div class="s-value" style="font-size:20px">${fmtN(w.balance_inr)}</div></div>
+        <div class="stat-card"><div class="s-label">Donation Pts</div><div class="s-value" style="font-size:20px">${fmtN(w.points_from_donations)}</div></div>
+        <div class="stat-card"><div class="s-label">Referral Pts</div><div class="s-value" style="font-size:20px">${fmtN(w.points_from_referrals)}</div></div>
+      </div>
+    `;
+    // Recent points
+    if(d.points && d.points.length){
+      html += '<h4 style="margin:12px 0 8px;font-size:13px;font-weight:800"><i class="fa-solid fa-clock" style="color:var(--accent)"></i> Recent Activity</h4>';
+      html += '<div class="table-wrap"><table class="data-table"><thead><tr><th>Type</th><th>Points</th><th>Description</th><th>Date</th></tr></thead><tbody>';
+      html += d.points.slice(0,10).map(p => `<tr><td>${statusBadge(p.type)}</td><td style="font-weight:800;color:var(--accent)">+${p.points}</td><td>${p.description||'—'}</td><td style="color:var(--text-muted)">${fmtDate(p.created_at)}</td></tr>`).join('');
+      html += '</tbody></table></div>';
+    }
+    content.innerHTML = html;
+  } catch(e){ content.innerHTML = '<div class="empty-state"><p>Failed to load member details</p></div>'; }
+}
+
+/* ============================================
+   CSR PARTNERS
+   ============================================ */
+async function loadCSRPartners(){
+  try{
+    const d = await AUTH.api('/api/admin/csr-partners');
+    const s = d.stats;
+    document.getElementById('csrTotal').textContent = fmtN(s.total);
+    document.getElementById('csrActive').textContent = fmtN(s.active);
+    document.getElementById('csrCommit').textContent = '₹' + fmtN(s.totalCommitment);
+    document.getElementById('csrPaid').textContent = '₹' + fmtN(s.totalPaid);
+    
+    const tbody = document.getElementById('csrBody');
+    if(!d.partners.length){
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fa-solid fa-handshake"></i><p>No CSR partners yet. Click "Add CSR Partner" to begin.</p></td></tr>';
+      return;
+    }
+    tbody.innerHTML = d.partners.map(p => `<tr>
+      <td style="font-weight:700;color:var(--accent)">${p.partner_id}</td>
+      <td style="font-weight:800">${p.company_name}</td>
+      <td>${p.contact_person||'—'}<br><span style="font-size:11px;color:var(--text-muted)">${p.email||''} ${p.phone||''}</span></td>
+      <td><span class="badge b-funding">${p.partnership_type}</span></td>
+      <td style="font-weight:700">₹${fmtN(p.commitment_amount)}</td>
+      <td style="font-weight:700;color:var(--success)">₹${fmtN(p.paid_amount)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td>
+        <button class="btn-icon" title="Edit" onclick="openEditCSR('${p.partner_id}','${p.status}',${p.paid_amount},'${(p.notes||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn-icon" title="Delete" onclick="deleteCSR('${p.partner_id}','${p.company_name}')"><i class="fa-solid fa-trash" style="color:var(--danger)"></i></button>
+      </td>
+    </tr>`).join('');
+  } catch(e){ notify('Failed to load CSR partners','error'); }
+}
+
+document.getElementById('csrSubmit').addEventListener('click', async ()=>{
+  const companyName = document.getElementById('csrCompany').value.trim();
+  if(!companyName) return notify('Company name required','warning');
+  try{
+    const r = await AUTH.api('/api/admin/csr-partner',{method:'POST',body:{
+      companyName,
+      contactPerson: document.getElementById('csrContact').value.trim(),
+      email: document.getElementById('csrEmail').value.trim(),
+      phone: document.getElementById('csrPhone').value.trim(),
+      industry: document.getElementById('csrIndustry').value.trim(),
+      partnershipType: document.getElementById('csrType').value,
+      commitmentAmount: document.getElementById('csrAmount').value,
+      notes: document.getElementById('csrNotes').value.trim()
+    }});
+    notify(r.message||'Partner added!','success');
+    closeModal('addCSRModal');
+    ['csrCompany','csrContact','csrEmail','csrPhone','csrIndustry','csrAmount','csrNotes'].forEach(id => document.getElementById(id).value = '');
+    loadCSRPartners();
+  } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+function openEditCSR(id, status, paid, notes){
+  document.getElementById('editCSRId').value = id;
+  document.getElementById('editCSRStatus').value = status;
+  document.getElementById('editCSRPaid').value = paid || 0;
+  document.getElementById('editCSRNotes').value = notes || '';
+  openModal('editCSRModal');
+}
+
+document.getElementById('editCSRSubmit').addEventListener('click', async ()=>{
+  const partnerId = document.getElementById('editCSRId').value;
+  try{
+    await AUTH.api('/api/admin/csr-partner/' + partnerId,{method:'POST',body:{
+      status: document.getElementById('editCSRStatus').value,
+      paidAmount: document.getElementById('editCSRPaid').value,
+      notes: document.getElementById('editCSRNotes').value.trim()
+    }});
+    notify('Partner updated!','success');
+    closeModal('editCSRModal');
+    loadCSRPartners();
+  } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+async function deleteCSR(id, name){
+  if(!confirm(`Delete CSR partner "${name}"?`)) return;
+  try{
+    await AUTH.api('/api/admin/csr-partner/' + id,{method:'DELETE'});
+    notify('Partner deleted','success');
+    loadCSRPartners();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+/* ============================================
+   SUPPORT TICKETS
+   ============================================ */
+async function loadSupportTickets(){
+  try{
+    const d = await AUTH.api('/api/admin/support-tickets');
+    const s = d.stats;
+    document.getElementById('supTotal').textContent = fmtN(s.total);
+    document.getElementById('supOpen').textContent = fmtN(s.open);
+    document.getElementById('supProgress').textContent = fmtN(s.inProgress);
+    document.getElementById('supResolved').textContent = fmtN(s.resolved);
+    document.getElementById('supClosed').textContent = fmtN(s.closed);
+
+    const badge = document.getElementById('supportBadge');
+    if(s.open > 0){ badge.textContent = s.open; badge.style.display = ''; }
+    else { badge.style.display = 'none'; }
+
+    const tbody = document.getElementById('supportBody');
+    if(!d.tickets.length){
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fa-solid fa-headset"></i><p>No support tickets</p></td></tr>';
+      return;
+    }
+    tbody.innerHTML = d.tickets.map(t => `<tr>
+      <td style="font-weight:700;color:var(--accent)">${t.ticket_id}</td>
+      <td>${t.user_name||'—'}<br><span style="font-size:11px;color:var(--text-muted)">${t.user_email||''}</span></td>
+      <td style="font-weight:700;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.subject}</td>
+      <td><span class="badge b-open">${t.category}</span></td>
+      <td>${priBadge(t.priority)}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td style="color:var(--text-muted)">${fmtDate(t.created_at)}</td>
+      <td>
+        <button class="btn-icon" title="Reply" onclick="openReplyTicket('${t.ticket_id}',\`${(t.message||'').replace(/`/g,"'").replace(/\\/g,"\\\\")}\`)"><i class="fa-solid fa-reply"></i></button>
+      </td>
+    </tr>`).join('');
+  } catch(e){ notify('Failed to load tickets','error'); }
+}
+
+function openReplyTicket(ticketId, message){
+  document.getElementById('replyTicketId').value = ticketId;
+  document.getElementById('replyOriginal').textContent = message;
+  document.getElementById('replyMessage').value = '';
+  openModal('replyTicketModal');
+}
+
+document.getElementById('replySubmit').addEventListener('click', async ()=>{
+  const ticketId = document.getElementById('replyTicketId').value;
+  const status = document.getElementById('replyStatus').value;
+  const adminReply = document.getElementById('replyMessage').value.trim();
+  try{
+    await AUTH.api('/api/admin/support-ticket/' + ticketId,{method:'POST',body:{status, adminReply}});
+    notify('Ticket updated!','success');
+    closeModal('replyTicketModal');
+    loadSupportTickets();
+  } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+/* ============================================
+   POINTS & ACTIVITY
+   ============================================ */
+async function loadPointsActivity(){
+  try{
+    const [dons, refs, tix] = await Promise.all([
+      AUTH.api('/api/admin/donations'),
+      AUTH.api('/api/admin/referrals'),
+      AUTH.api('/api/admin/tickets')
+    ]);
+
+    // Donations
+    const dBody = document.getElementById('donationsBody');
+    if(dons.donations.length){
+      dBody.innerHTML = dons.donations.map(d => `<tr>
+        <td><span class="member-link" onclick="viewMember('${d.member_id}')">${d.member_id}</span> <span style="font-weight:600;color:var(--text-muted)">${d.member_name||''}</span></td>
+        <td style="font-weight:800">₹${fmtN(d.amount)}</td>
+        <td>${d.donor_name||'Anonymous'}</td>
+        <td style="font-weight:800;color:var(--accent)">+${d.points_earned}</td>
+        <td style="color:var(--text-muted)">${fmtDate(d.created_at)}</td>
+      </tr>`).join('');
+    } else {
+      dBody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No donations yet</p></td></tr>';
+    }
+
+    // Referrals
+    const rBody = document.getElementById('referralsBody');
+    if(refs.referrals.length){
+      rBody.innerHTML = refs.referrals.map(r => `<tr>
+        <td style="font-weight:700">${r.referrer_member_id} <span style="color:var(--text-muted)">${r.referrer_name||''}</span></td>
+        <td>${r.referred_member_id} <span style="color:var(--text-muted)">${r.referred_name||''}</span></td>
+        <td style="font-weight:700">₹${fmtN(r.payment_amount)}</td>
+        <td style="font-weight:800;color:var(--accent)">+${r.referral_points||0}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td style="color:var(--text-muted)">${fmtDate(r.created_at)}</td>
+        <td>${r.status==='pending' ? `<button class="btn btn-sm btn-success" onclick="activateReferral('${r.referred_member_id}')"><i class="fa-solid fa-check"></i> Activate</button>` : ''}</td>
+      </tr>`).join('');
+    } else {
+      rBody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No referrals yet</p></td></tr>';
+    }
+
+    // Tickets
+    const tBody = document.getElementById('ticketsBody');
+    if(tix.tickets.length){
+      tBody.innerHTML = tix.tickets.map(t => `<tr>
+        <td><span class="member-link" onclick="viewMember('${t.seller_member_id}')">${t.seller_member_id}</span> <span style="color:var(--text-muted)">${t.seller_name||''}</span></td>
+        <td>${t.buyer_name||'—'}</td>
+        <td style="font-weight:700">₹${fmtN(t.ticket_price)}</td>
+        <td style="font-weight:800;color:var(--accent)">+${t.points_earned}</td>
+        <td style="color:var(--text-muted)">${fmtDate(t.sold_at)}</td>
+      </tr>`).join('');
+    } else {
+      tBody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No tickets sold yet</p></td></tr>';
+    }
+  } catch(e){ notify('Failed to load activity','error'); }
+}
+
+async function activateReferral(referredMemberId){
+  const amount = prompt('Enter payment amount for referral activation (default ₹500):','500');
+  if(amount === null) return;
+  try{
+    await AUTH.api('/api/member/activate-referral',{method:'POST',body:{referredMemberId, paymentAmount: parseFloat(amount)||500}});
+    notify('Referral activated! Points credited.','success');
+    loadPointsActivity();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+/* ============================================
+   RESET PASSWORD
+   ============================================ */
+document.getElementById('rpSubmit').addEventListener('click', async ()=>{
+  const memberId = document.getElementById('rpMemberId').value.trim();
+  const newPassword = document.getElementById('rpNewPass').value.trim();
+  if(!memberId || !newPassword) return notify('Fill all fields','warning');
+  try{
+    await AUTH.api('/api/admin/reset-password',{method:'POST',body:{memberId, newPassword}});
+    notify(`Password reset for ${memberId}!`,'success');
+    closeModal('resetPwdModal');
+    document.getElementById('rpMemberId').value = '';
+    document.getElementById('rpNewPass').value = '';
+  } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+/* ============================================
+   LOGOUT
+   ============================================ */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  if(typeof FWF_Notify !== 'undefined'){
+    FWF_Notify.confirm('Logout from admin panel?', async ()=>{
+      await AUTH.api('/api/auth/logout',{method:'POST'});
+      notify('Logged out','success');
+      setTimeout(()=> location.href = '/admin-login', 1000);
+    });
+  } else {
+    if(confirm('Logout?')){
+      AUTH.api('/api/auth/logout',{method:'POST'}).finally(()=> location.href = '/admin-login');
+    }
+  }
+});
+
+/* ============================================
+   INIT
+   ============================================ */
+loadDashboard();
+</script>
 </body>
 </html>

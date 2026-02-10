@@ -401,10 +401,253 @@ app.post('/api/member/apply-wallet', auth('member'), (req,res)=>{
 app.get('/api/admin/overview', auth('admin'), (req,res)=>{
   const totals = {
     members: db.prepare(`SELECT COUNT(*) as c FROM users WHERE role='member'`).get().c,
-    active_members: db.prepare(`SELECT COUNT(*) as c FROM users WHERE role='member' AND membership_active=1`).get().c
+    active_members: db.prepare(`SELECT COUNT(*) as c FROM users WHERE role='member' AND membership_active=1`).get().c,
+    total_points: db.prepare(`SELECT COALESCE(SUM(total_points_earned),0) as c FROM wallets`).get().c,
+    total_donations_count: db.prepare(`SELECT COUNT(*) as c FROM donations`).get().c,
+    total_donations_amount: db.prepare(`SELECT COALESCE(SUM(amount),0) as c FROM donations`).get().c,
+    total_referrals: db.prepare(`SELECT COUNT(*) as c FROM referrals`).get().c,
+    active_referrals: db.prepare(`SELECT COUNT(*) as c FROM referrals WHERE status='active'`).get().c,
+    total_tickets_sold: db.prepare(`SELECT COUNT(*) as c FROM quiz_tickets`).get().c,
+    csr_partners: 0,
+    support_tickets: 0
   };
-  const latest = db.prepare(`SELECT member_id,name,mobile,created_at FROM users WHERE role='member' ORDER BY id DESC LIMIT 10`).all();
+  const latest = db.prepare(`SELECT member_id,name,mobile,email,membership_active,created_at FROM users WHERE role='member' ORDER BY id DESC LIMIT 10`).all();
   res.json({ totals, latest });
+});
+
+// Admin: get all members with details
+app.get('/api/admin/members', auth('admin'), (req,res)=>{
+  const members = db.prepare(`
+    SELECT u.id, u.member_id, u.name, u.mobile, u.email, u.membership_active, u.referral_code, u.created_at,
+           w.balance_inr, w.points_balance, w.total_points_earned, w.points_from_donations, w.points_from_referrals, w.points_from_quiz
+    FROM users u LEFT JOIN wallets w ON u.id = w.user_id
+    WHERE u.role='member' ORDER BY u.id DESC
+  `).all();
+  res.json({ ok:true, members });
+});
+
+// Admin: get single member detail
+app.get('/api/admin/member/:memberId', auth('admin'), (req,res)=>{
+  const u = db.prepare(`SELECT * FROM users WHERE member_id=? AND role='member'`).get(req.params.memberId);
+  if(!u) return res.status(404).json({error:'Member not found'});
+  const w = db.prepare(`SELECT * FROM wallets WHERE user_id=?`).get(u.id) || {};
+  const donations = db.prepare(`SELECT * FROM donations WHERE member_id=? ORDER BY id DESC LIMIT 20`).all(u.id);
+  const referrals = db.prepare(`SELECT r.*, ref.name as referred_name, ref.member_id as referred_member_id FROM referrals r JOIN users ref ON r.referred_user_id = ref.id WHERE r.referrer_id=? ORDER BY r.id DESC`).all(u.id);
+  const tickets = db.prepare(`SELECT * FROM quiz_tickets WHERE seller_id=? ORDER BY id DESC LIMIT 20`).all(u.id);
+  const points = db.prepare(`SELECT * FROM points_ledger WHERE user_id=? ORDER BY id DESC LIMIT 30`).all(u.id);
+  const project = db.prepare(`SELECT * FROM member_projects WHERE user_id=?`).get(u.id) || null;
+  res.json({ ok:true, user:u, wallet:w, donations, referrals, tickets, points, project });
+});
+
+// Admin: toggle member active status
+app.post('/api/admin/toggle-member', auth('admin'), (req,res)=>{
+  const { memberId } = req.body;
+  if(!memberId) return res.status(400).json({error:'memberId required'});
+  const u = db.prepare(`SELECT id, membership_active FROM users WHERE member_id=?`).get(memberId);
+  if(!u) return res.status(404).json({error:'Member not found'});
+  const newStatus = u.membership_active ? 0 : 1;
+  db.prepare(`UPDATE users SET membership_active=? WHERE id=?`).run(newStatus, u.id);
+  res.json({ ok:true, membership_active: newStatus });
+});
+
+// Admin: search members
+app.get('/api/admin/search-members', auth('admin'), (req,res)=>{
+  const q = req.query.q || '';
+  if(!q || q.length < 2) return res.json({ ok:true, members:[] });
+  const like = `%${q}%`;
+  const members = db.prepare(`
+    SELECT u.id, u.member_id, u.name, u.mobile, u.email, u.membership_active, u.created_at,
+           w.points_balance
+    FROM users u LEFT JOIN wallets w ON u.id = w.user_id
+    WHERE u.role='member' AND (u.name LIKE ? OR u.member_id LIKE ? OR u.mobile LIKE ? OR u.email LIKE ?)
+    ORDER BY u.id DESC LIMIT 20
+  `).all(like, like, like, like);
+  res.json({ ok:true, members });
+});
+
+// Admin: get all donations
+app.get('/api/admin/donations', auth('admin'), (req,res)=>{
+  const donations = db.prepare(`
+    SELECT d.*, u.name as member_name, u.member_id 
+    FROM donations d JOIN users u ON d.member_id = u.id
+    ORDER BY d.id DESC LIMIT 50
+  `).all();
+  res.json({ ok:true, donations });
+});
+
+// Admin: get all referrals  
+app.get('/api/admin/referrals', auth('admin'), (req,res)=>{
+  const referrals = db.prepare(`
+    SELECT r.*, 
+           referrer.name as referrer_name, referrer.member_id as referrer_member_id,
+           referred.name as referred_name, referred.member_id as referred_member_id
+    FROM referrals r
+    JOIN users referrer ON r.referrer_id = referrer.id
+    JOIN users referred ON r.referred_user_id = referred.id
+    ORDER BY r.id DESC LIMIT 50
+  `).all();
+  res.json({ ok:true, referrals });
+});
+
+// Admin: get all quiz tickets
+app.get('/api/admin/tickets', auth('admin'), (req,res)=>{
+  const tickets = db.prepare(`
+    SELECT q.*, u.name as seller_name, u.member_id as seller_member_id
+    FROM quiz_tickets q JOIN users u ON q.seller_id = u.id
+    ORDER BY q.id DESC LIMIT 50
+  `).all();
+  res.json({ ok:true, tickets });
+});
+
+// ===== SUPPORT TICKETS SYSTEM =====
+// Create support_tickets table if not exists
+db.exec(`CREATE TABLE IF NOT EXISTS support_tickets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ticket_id TEXT UNIQUE NOT NULL,
+  user_id INTEGER,
+  user_name TEXT,
+  user_email TEXT,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  category TEXT CHECK(category IN ('general','technical','payment','membership','other')) DEFAULT 'general',
+  priority TEXT CHECK(priority IN ('low','medium','high','urgent')) DEFAULT 'medium',
+  status TEXT CHECK(status IN ('open','in-progress','resolved','closed')) DEFAULT 'open',
+  admin_reply TEXT,
+  replied_at TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+)`);
+
+// Generate ticket ID
+function nextTicketId(){
+  const row = db.prepare(`SELECT ticket_id FROM support_tickets ORDER BY id DESC LIMIT 1`).get();
+  let n = 0;
+  if(row && row.ticket_id){
+    const m = row.ticket_id.match(/(\d+)$/);
+    if(m) n = parseInt(m[1],10);
+  }
+  return `FWF-TKT-${(n+1).toString().padStart(4,'0')}`;
+}
+
+// Member: submit support ticket
+app.post('/api/member/support-ticket', auth('member'), (req,res)=>{
+  const { subject, message, category } = req.body;
+  if(!subject || !message) return res.status(400).json({error:'Subject and message required'});
+  const u = db.prepare(`SELECT name, email FROM users WHERE id=?`).get(req.user.uid);
+  const ticketId = nextTicketId();
+  db.prepare(`INSERT INTO support_tickets(ticket_id, user_id, user_name, user_email, subject, message, category) VALUES(?,?,?,?,?,?,?)`)
+    .run(ticketId, req.user.uid, u.name, u.email, subject, message, category || 'general');
+  res.json({ ok:true, ticketId, message:'Support ticket submitted!' });
+});
+
+// Member: get my tickets
+app.get('/api/member/support-tickets', auth('member'), (req,res)=>{
+  const tickets = db.prepare(`SELECT * FROM support_tickets WHERE user_id=? ORDER BY id DESC`).all(req.user.uid);
+  res.json({ ok:true, tickets });
+});
+
+// Admin: get all support tickets
+app.get('/api/admin/support-tickets', auth('admin'), (req,res)=>{
+  const tickets = db.prepare(`SELECT * FROM support_tickets ORDER BY CASE status WHEN 'open' THEN 1 WHEN 'in-progress' THEN 2 WHEN 'resolved' THEN 3 ELSE 4 END, id DESC`).all();
+  const stats = {
+    total: db.prepare(`SELECT COUNT(*) as c FROM support_tickets`).get().c,
+    open: db.prepare(`SELECT COUNT(*) as c FROM support_tickets WHERE status='open'`).get().c,
+    inProgress: db.prepare(`SELECT COUNT(*) as c FROM support_tickets WHERE status='in-progress'`).get().c,
+    resolved: db.prepare(`SELECT COUNT(*) as c FROM support_tickets WHERE status='resolved'`).get().c,
+    closed: db.prepare(`SELECT COUNT(*) as c FROM support_tickets WHERE status='closed'`).get().c
+  };
+  res.json({ ok:true, tickets, stats });
+});
+
+// Admin: reply to / update support ticket
+app.post('/api/admin/support-ticket/:ticketId', auth('admin'), (req,res)=>{
+  const { status, adminReply } = req.body;
+  const t = db.prepare(`SELECT * FROM support_tickets WHERE ticket_id=?`).get(req.params.ticketId);
+  if(!t) return res.status(404).json({error:'Ticket not found'});
+  const sets = ['updated_at=datetime(\'now\')'];
+  const vals = [];
+  if(status){ sets.push('status=?'); vals.push(status); }
+  if(adminReply){ sets.push('admin_reply=?'); vals.push(adminReply); sets.push('replied_at=datetime(\'now\')'); }
+  vals.push(req.params.ticketId);
+  db.prepare(`UPDATE support_tickets SET ${sets.join(',')} WHERE ticket_id=?`).run(...vals);
+  res.json({ ok:true, message:'Ticket updated' });
+});
+
+// ===== CSR PARTNERS SYSTEM =====
+db.exec(`CREATE TABLE IF NOT EXISTS csr_partners (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  partner_id TEXT UNIQUE NOT NULL,
+  company_name TEXT NOT NULL,
+  contact_person TEXT,
+  email TEXT,
+  phone TEXT,
+  industry TEXT,
+  partnership_type TEXT CHECK(partnership_type IN ('funding','skill-training','infrastructure','employment','other')) DEFAULT 'funding',
+  status TEXT CHECK(status IN ('lead','contacted','negotiating','active','inactive')) DEFAULT 'lead',
+  commitment_amount REAL DEFAULT 0,
+  paid_amount REAL DEFAULT 0,
+  notes TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+)`);
+
+function nextPartnerId(){
+  const row = db.prepare(`SELECT partner_id FROM csr_partners ORDER BY id DESC LIMIT 1`).get();
+  let n = 0;
+  if(row && row.partner_id){
+    const m = row.partner_id.match(/(\d+)$/);
+    if(m) n = parseInt(m[1],10);
+  }
+  return `CSR-${(n+1).toString().padStart(4,'0')}`;
+}
+
+// Admin: get all CSR partners
+app.get('/api/admin/csr-partners', auth('admin'), (req,res)=>{
+  const partners = db.prepare(`SELECT * FROM csr_partners ORDER BY id DESC`).all();
+  const stats = {
+    total: db.prepare(`SELECT COUNT(*) as c FROM csr_partners`).get().c,
+    active: db.prepare(`SELECT COUNT(*) as c FROM csr_partners WHERE status='active'`).get().c,
+    leads: db.prepare(`SELECT COUNT(*) as c FROM csr_partners WHERE status='lead'`).get().c,
+    totalCommitment: db.prepare(`SELECT COALESCE(SUM(commitment_amount),0) as c FROM csr_partners`).get().c,
+    totalPaid: db.prepare(`SELECT COALESCE(SUM(paid_amount),0) as c FROM csr_partners`).get().c
+  };
+  res.json({ ok:true, partners, stats });
+});
+
+// Admin: add CSR partner
+app.post('/api/admin/csr-partner', auth('admin'), (req,res)=>{
+  const { companyName, contactPerson, email, phone, industry, partnershipType, commitmentAmount, notes } = req.body;
+  if(!companyName) return res.status(400).json({error:'Company name required'});
+  const partnerId = nextPartnerId();
+  db.prepare(`INSERT INTO csr_partners(partner_id, company_name, contact_person, email, phone, industry, partnership_type, commitment_amount, notes)
+    VALUES(?,?,?,?,?,?,?,?,?)`)
+    .run(partnerId, companyName, contactPerson||null, email||null, phone||null, industry||null, partnershipType||'funding', parseFloat(commitmentAmount)||0, notes||null);
+  res.json({ ok:true, partnerId, message:'CSR Partner added!' });
+});
+
+// Admin: update CSR partner
+app.post('/api/admin/csr-partner/:partnerId', auth('admin'), (req,res)=>{
+  const { status, paidAmount, notes, commitmentAmount, contactPerson, email, phone } = req.body;
+  const p = db.prepare(`SELECT * FROM csr_partners WHERE partner_id=?`).get(req.params.partnerId);
+  if(!p) return res.status(404).json({error:'Partner not found'});
+  const sets = ['updated_at=datetime(\'now\')'];
+  const vals = [];
+  if(status){ sets.push('status=?'); vals.push(status); }
+  if(paidAmount !== undefined){ sets.push('paid_amount=?'); vals.push(parseFloat(paidAmount)||0); }
+  if(notes !== undefined){ sets.push('notes=?'); vals.push(notes); }
+  if(commitmentAmount !== undefined){ sets.push('commitment_amount=?'); vals.push(parseFloat(commitmentAmount)||0); }
+  if(contactPerson !== undefined){ sets.push('contact_person=?'); vals.push(contactPerson); }
+  if(email !== undefined){ sets.push('email=?'); vals.push(email); }
+  if(phone !== undefined){ sets.push('phone=?'); vals.push(phone); }
+  vals.push(req.params.partnerId);
+  db.prepare(`UPDATE csr_partners SET ${sets.join(',')} WHERE partner_id=?`).run(...vals);
+  res.json({ ok:true, message:'Partner updated' });
+});
+
+// Admin: delete CSR partner
+app.delete('/api/admin/csr-partner/:partnerId', auth('admin'), (req,res)=>{
+  db.prepare(`DELETE FROM csr_partners WHERE partner_id=?`).run(req.params.partnerId);
+  res.json({ ok:true, message:'Partner deleted' });
 });
 
 // Sentry error handler MUST be before other error handlers and after all routes

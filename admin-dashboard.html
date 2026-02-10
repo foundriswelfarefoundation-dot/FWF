@@ -247,11 +247,9 @@
   <script src="assets/js/fwf.js"></script>
   <script src="auth.js"></script>
   <script>
-    const BACKEND_URL = 'https://fwf-production.up.railway.app';
-
     async function load() {
       try {
-        const data = await AUTH.api(`${BACKEND_URL}/api/admin/overview`);
+        const data = await AUTH.api('/api/admin/overview');
         
         document.getElementById('mcount').textContent = data.totals.members;
         document.getElementById('acount').textContent = data.totals.active_members;

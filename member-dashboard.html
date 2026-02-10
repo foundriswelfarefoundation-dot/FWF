@@ -197,11 +197,9 @@
   <script src="assets/js/fwf.js"></script>
   <script src="auth.js"></script>
   <script>
-    const BACKEND_URL = 'https://fwf-production.up.railway.app';
-
     async function load() {
       try {
-        const data = await AUTH.api(`${BACKEND_URL}/api/member/me`);
+        const data = await AUTH.api('/api/member/me');
         document.getElementById('name').textContent = data.user.name || 'Member';
         document.getElementById('memberId').textContent = data.user.member_id;
         document.getElementById('wbal').textContent = (data.wallet.balance_inr || 0).toFixed(0);
@@ -223,7 +221,7 @@
         return;
       }
       try {
-        await AUTH.api(`${BACKEND_URL}/api/member/apply-wallet`, {method: 'POST', body: {amount: amt}});
+        await AUTH.api('/api/member/apply-wallet', {method: 'POST', body: {amount: amt}});
         FWF_Notify.toast(`₹${amt} applied to your project successfully!`, 'success');
         document.getElementById('amountInput').value = '';
         load();

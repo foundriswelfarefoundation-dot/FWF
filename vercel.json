@@ -11,7 +11,12 @@
     { "source": "/member-login", "destination": "/member-login.html" },
     { "source": "/admin-login", "destination": "/admin-login.html" },
     { "source": "/member-dashboard", "destination": "/member-dashboard.html" },
-    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" }
+    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" },
+    { "source": "/api/auth/:path*", "destination": "https://fwf-production.up.railway.app/api/auth/:path*" },
+    { "source": "/api/member/:path*", "destination": "https://fwf-production.up.railway.app/api/member/:path*" },
+    { "source": "/api/admin/:path*", "destination": "https://fwf-production.up.railway.app/api/admin/:path*" },
+    { "source": "/api/pay/:path*", "destination": "https://fwf-production.up.railway.app/api/pay/:path*" },
+    { "source": "/api/debug/:path*", "destination": "https://fwf-production.up.railway.app/api/debug/:path*" }
   ],
   "github": {
     "silent": true

@@ -1620,7 +1620,10 @@ async function loadCSRPartners(){
         <button class="btn-icon" title="Delete" onclick="deleteCSR('${p.partner_id}','${p.company_name}')"><i class="fa-solid fa-trash" style="color:var(--danger)"></i></button>
       </td>
     </tr>`).join('');
-  } catch(e){ notify('Failed to load CSR partners','error'); }
+  } catch(e){ 
+    document.getElementById('csrBody').innerHTML = '<tr><td colspan="8" class="empty-state" style="color:var(--danger)"><i class="fa-solid fa-exclamation-triangle"></i><p>⚠️ Backend server connection failed<br><small style="font-weight:600;opacity:.8">Please ensure Railway backend is deployed and running</small></p></td></tr>';
+    console.error('CSR load error:', e);
+  }
 }
 
 document.getElementById('csrSubmit').addEventListener('click', async ()=>{
@@ -1709,7 +1712,10 @@ async function loadSupportTickets(){
         <button class="btn-icon" title="Reply" onclick="openReplyTicket('${t.ticket_id}',\`${(t.message||'').replace(/`/g,"'").replace(/\\/g,"\\\\")}\`)"><i class="fa-solid fa-reply"></i></button>
       </td>
     </tr>`).join('');
-  } catch(e){ notify('Failed to load tickets','error'); }
+  } catch(e){ 
+    document.getElementById('supportBody').innerHTML = '<tr><td colspan="8" class="empty-state" style="color:var(--danger)"><i class="fa-solid fa-exclamation-triangle"></i><p>⚠️ Backend server connection failed<br><small style="font-weight:600;opacity:.8">Please ensure Railway backend is deployed and running</small></p></td></tr>';
+    console.error('Support tickets load error:', e);
+  }
 }
 
 function openReplyTicket(ticketId, message){

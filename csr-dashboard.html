@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CSR Partner Dashboard — FWF</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+/* ==============================
+   CSS VARIABLES
+   ============================== */
+:root {
+  --bg-1:#f0f2f8; --bg-2:#e8ecf4;
+  --accent:#0ea5e9; --accent2:#6366f1; --accent-soft:rgba(14,165,233,.1);
+  --sidebar-bg:linear-gradient(180deg,#0c4a6e 0%,#164e63 100%);
+  --sidebar-text:#94a3b8;
+  --card-bg:#ffffff; --card-border:#e2e8f0;
+  --text-primary:#0f172a; --text-secondary:#475569; --text-muted:#94a3b8;
+  --success:#22c55e; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  background:var(--bg-1);
+  min-height:100vh; color:var(--text-primary);
+  display:flex;
+}
+a{color:inherit;text-decoration:none}
+
+/* ==============================
+   SIDEBAR
+   ============================== */
+.sidebar{
+  position:fixed; left:0; top:0; bottom:0; width:260px; z-index:100;
+  background:var(--sidebar-bg);
+  display:flex; flex-direction:column;
+  padding:20px 14px 14px;
+  transition:transform .3s ease;
+}
+.sidebar-brand{
+  display:flex; align-items:center; gap:12px;
+  padding:4px 10px 20px; border-bottom:1px solid rgba(255,255,255,.08);
+  margin-bottom:14px;
+}
+.sidebar-brand img{ width:40px; height:40px; border-radius:10px; }
+.sidebar-brand span{ font-size:18px; font-weight:900; color:#fff; }
+.sidebar-brand small{ display:block; font-size:11px; color:#38bdf8; font-weight:700; margin-top:2px; }
+.sidebar-nav{ flex:1; display:flex; flex-direction:column; gap:3px; }
+.nav-item{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 14px; border-radius:10px;
+  font-size:13px; font-weight:700;
+  color:var(--sidebar-text); opacity:.7;
+  cursor:pointer; transition:all .2s;
+  border:none; background:none; width:100%; text-align:left;
+  font-family:inherit;
+}
+.nav-item:hover{ opacity:1; background:rgba(255,255,255,.06); }
+.nav-item.active{
+  opacity:1; background:rgba(14,165,233,.15); color:#7dd3fc;
+  box-shadow:inset 3px 0 0 #0ea5e9;
+}
+.nav-item i{ width:18px; text-align:center; font-size:14px; }
+.sidebar-footer{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:12px; margin-top:auto;
+}
+.nav-item.logout-btn{ color:#f87171; opacity:.9; }
+
+/* ==============================
+   MOBILE
+   ============================== */
+.mobile-toggle{
+  display:none; position:fixed; top:14px; left:14px; z-index:200;
+  width:42px; height:42px; border-radius:10px;
+  background:#fff; border:1px solid var(--card-border);
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+  font-size:16px; cursor:pointer; color:var(--text-primary);
+  font-family:inherit;
+}
+.mobile-overlay{
+  display:none; position:fixed; inset:0; z-index:90;
+  background:rgba(0,0,0,.4); backdrop-filter:blur(4px);
+}
+
+/* ==============================
+   MAIN
+   ============================== */
+.main{
+  flex:1; margin-left:260px;
+  padding:20px 28px;
+  min-height:100vh;
+}
+
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; flex-wrap:wrap; gap:14px;
+}
+.topbar h1{
+  font-size:24px; font-weight:900; letter-spacing:-.5px;
+}
+.topbar-right{ display:flex; align-items:center; gap:10px; }
+.csr-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  background:linear-gradient(135deg,#0ea5e9,#0284c7);
+  color:#fff; padding:6px 14px; border-radius:99px;
+  font-size:12px; font-weight:800;
+}
+
+/* ==============================
+   PAGES
+   ============================== */
+.page{ display:none; animation:fadeIn .3s ease; }
+.page.active{ display:block; }
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ==============================
+   STAT CARDS
+   ============================== */
+.stats-row{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+  margin-bottom:24px;
+}
+.stat-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:16px; padding:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+  transition:transform .2s, box-shadow .2s;
+  position:relative; overflow:hidden;
+}
+.stat-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.06); }
+.stat-card .s-icon{
+  width:40px; height:40px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; margin-bottom:12px; color:#fff;
+}
+.stat-card .s-label{
+  font-size:11px; font-weight:700; color:var(--text-muted);
+  text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;
+}
+.stat-card .s-value{
+  font-size:26px; font-weight:900; color:var(--text-primary);
+  letter-spacing:-.5px;
+}
+.stat-card .s-sub{ font-size:11px; color:var(--text-secondary); margin-top:2px; font-weight:600; }
+.s-purple{ background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+.s-green{ background:linear-gradient(135deg,#22c55e,#059669); }
+.s-blue{ background:linear-gradient(135deg,#3b82f6,#2563eb); }
+.s-amber{ background:linear-gradient(135deg,#f59e0b,#d97706); }
+.s-pink{ background:linear-gradient(135deg,#ec4899,#be185d); }
+.s-red{ background:linear-gradient(135deg,#ef4444,#dc2626); }
+.s-cyan{ background:linear-gradient(135deg,#0ea5e9,#0284c7); }
+.s-teal{ background:linear-gradient(135deg,#14b8a6,#0d9488); }
+
+/* ==============================
+   CONTENT CARD
+   ============================== */
+.content-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:16px; padding:22px;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+  margin-bottom:18px;
+}
+.content-card h3{
+  font-size:16px; font-weight:800; margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+.content-card h3 i{ color:var(--accent); font-size:14px; }
+
+/* ==============================
+   GRIDS
+   ============================== */
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+
+/* ==============================
+   TABLE
+   ============================== */
+.data-table{ width:100%; border-collapse:collapse; }
+.data-table th{
+  text-align:left; font-size:10px; font-weight:700;
+  color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;
+  padding:8px 12px; border-bottom:2px solid var(--card-border);
+  white-space:nowrap;
+}
+.data-table td{
+  padding:10px 12px; border-bottom:1px solid #f1f5f9;
+  font-size:13px; font-weight:600; color:var(--text-secondary);
+}
+.data-table tr:hover td{ background:#f8faff; }
+.data-table tr:last-child td{ border-bottom:0; }
+.badge{
+  display:inline-flex; padding:3px 9px; border-radius:99px;
+  font-size:10px; font-weight:800; white-space:nowrap;
+}
+.b-active{ background:#dcfce7; color:#166534; }
+.b-inactive{ background:#fee2e2; color:#991b1b; }
+.b-open{ background:#dbeafe; color:#1e40af; }
+.b-progress{ background:#fef3c7; color:#92400e; }
+.b-completed{ background:#d1fae5; color:#065f46; }
+.b-funding{ background:#dbeafe; color:#1e40af; }
+
+/* ==============================
+   BUTTONS
+   ============================== */
+.btn{
+  padding:8px 18px; border:none; border-radius:10px;
+  font:inherit; font-size:12px; font-weight:800;
+  cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  transition:all .2s;
+}
+.btn-primary{ background:var(--accent); color:#fff; }
+.btn-primary:hover{ background:#0284c7; }
+.btn-success{ background:var(--success); color:#fff; }
+.btn-danger{ background:var(--danger); color:#fff; }
+.btn-ghost{
+  background:transparent; color:var(--text-secondary);
+  border:1px solid var(--card-border);
+}
+.btn-ghost:hover{ background:#f1f5f9; }
+.btn-sm{ padding:5px 10px; font-size:11px; border-radius:8px; }
+
+/* ==============================
+   WELCOME BANNER
+   ============================== */
+.welcome-banner{
+  background:linear-gradient(135deg,#0c4a6e,#0ea5e9,#38bdf8);
+  border-radius:20px; padding:32px; color:#fff;
+  margin-bottom:24px; position:relative; overflow:hidden;
+}
+.welcome-banner::after{
+  content:''; position:absolute; right:-40px; top:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+.welcome-banner h2{ font-size:28px; font-weight:900; margin-bottom:6px; position:relative; z-index:1; }
+.welcome-banner p{ opacity:.85; font-weight:600; font-size:14px; position:relative; z-index:1; }
+
+/* ==============================
+   PROJECT CARD
+   ============================== */
+.project-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:16px; padding:22px;
+  transition:transform .2s, box-shadow .2s;
+}
+.project-card:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.06); }
+.project-card h4{ font-size:15px; font-weight:800; margin-bottom:6px; }
+.project-card p{ font-size:12px; color:var(--text-muted); font-weight:600; margin-bottom:12px; }
+.project-progress{
+  height:8px; background:#e2e8f0; border-radius:99px; overflow:hidden;
+  margin-bottom:8px;
+}
+.project-progress-bar{
+  height:100%; border-radius:99px; transition:width .5s;
+}
+.project-meta{
+  display:flex; justify-content:space-between; font-size:11px; font-weight:700;
+  color:var(--text-muted);
+}
+
+/* ==============================
+   IMPACT COUNTER
+   ============================== */
+.impact-card{
+  text-align:center; padding:20px;
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:16px;
+  transition:transform .2s;
+}
+.impact-card:hover{ transform:translateY(-2px); }
+.impact-icon{
+  width:56px; height:56px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; color:#fff; margin:0 auto 12px;
+}
+.impact-val{ font-size:32px; font-weight:900; color:var(--text-primary); margin-bottom:4px; }
+.impact-lbl{ font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; }
+
+/* ==============================
+   DOCUMENT CARD
+   ============================== */
+.doc-card{
+  display:flex; align-items:center; gap:16px;
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:14px; padding:16px 18px; margin-bottom:10px;
+  transition:box-shadow .2s;
+}
+.doc-card:hover{ box-shadow:0 4px 16px rgba(0,0,0,.06); }
+.doc-icon{
+  width:44px; height:44px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; color:#fff; flex-shrink:0;
+}
+.doc-info h4{ font-size:14px; font-weight:800; margin-bottom:2px; }
+.doc-info p{ font-size:12px; color:var(--text-muted); font-weight:600; }
+
+/* ==============================
+   GALLERY
+   ============================== */
+.gallery-grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+}
+.gallery-item{
+  border-radius:12px; overflow:hidden;
+  aspect-ratio:4/3; background:#f1f5f9;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-muted); font-size:36px;
+  transition:transform .2s;
+}
+.gallery-item:hover{ transform:scale(1.02); }
+
+/* ==============================
+   RESPONSIVE
+   ============================== */
+@media(max-width:1100px){
+  .stats-row{ grid-template-columns:repeat(2,1fr); }
+  .grid-3,.gallery-grid{ grid-template-columns:1fr 1fr; }
+}
+@media(max-width:900px){
+  .sidebar{ transform:translateX(-100%); }
+  .sidebar.open{ transform:translateX(0); }
+  .main{ margin-left:0; padding:16px; padding-top:60px; }
+  .mobile-toggle{ display:grid; place-items:center; }
+  .mobile-overlay.show{ display:block; }
+}
+@media(max-width:640px){
+  .stats-row{ grid-template-columns:1fr; }
+  .grid-2,.grid-3,.gallery-grid{ grid-template-columns:1fr; }
+  .topbar{ flex-direction:column; align-items:flex-start; }
+  .topbar h1{ font-size:20px; }
+  .welcome-banner h2{ font-size:22px; }
+}
+.table-wrap{ overflow-x:auto; }
+  </style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" id="mobileToggle"><i class="fa-solid fa-bars"></i></button>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- ======== SIDEBAR ======== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="assets/images/logo.png" alt="FWF">
+    <div>
+      <span>FWF</span>
+      <small>CSR PARTNER</small>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-page="home">
+      <i class="fa-solid fa-chart-pie"></i> Dashboard
+    </button>
+    <button class="nav-item" data-page="projects">
+      <i class="fa-solid fa-folder-tree"></i> CSR Projects
+    </button>
+    <button class="nav-item" data-page="impact">
+      <i class="fa-solid fa-chart-bar"></i> Impact Reports
+    </button>
+    <button class="nav-item" data-page="funding">
+      <i class="fa-solid fa-indian-rupee-sign"></i> Funding & Utilization
+    </button>
+    <button class="nav-item" data-page="compliance">
+      <i class="fa-solid fa-file-shield"></i> Compliance Docs
+    </button>
+    <button class="nav-item" data-page="communication">
+      <i class="fa-solid fa-comments"></i> Communication
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item logout-btn" id="logoutBtn">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </div>
+</aside>
+
+<!-- ======== MAIN ======== -->
+<main class="main">
+  <div class="topbar">
+    <h1 id="pageTitle"><i class="fa-solid fa-chart-pie"></i> Dashboard</h1>
+    <div class="topbar-right">
+      <span class="csr-badge" id="csrBadge"><i class="fa-solid fa-building"></i> CSR Partner</span>
+    </div>
+  </div>
+
+  <!-- ===================== HOME / DASHBOARD ===================== -->
+  <div class="page active" id="page-home">
+    <div class="welcome-banner">
+      <h2 id="csrWelcome">Welcome, CSR Partner!</h2>
+      <p>Transparency | Impact | Social Responsibility — Together for a better future.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-icon s-cyan"><i class="fa-solid fa-folder-open"></i></div>
+        <div class="s-label">Active Projects</div>
+        <div class="s-value" id="hProjects">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-users"></i></div>
+        <div class="s-label">Beneficiaries</div>
+        <div class="s-value" id="hBeneficiaries">1,250</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="s-label">Funds Contributed</div>
+        <div class="s-value" id="hFundsTotal">₹5,00,000</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="s-label">Fund Utilized</div>
+        <div class="s-value" id="hFundsUsed">₹3,75,000</div>
+        <div class="s-sub">75% utilization</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-bullseye"></i> Project Highlights</h3>
+        <div class="project-card" style="margin-bottom:12px">
+          <h4>Women Skill Training Program</h4>
+          <p>500 women trained in tailoring, digital skills & food processing</p>
+          <div class="project-progress">
+            <div class="project-progress-bar" style="width:85%;background:linear-gradient(90deg,#0ea5e9,#22c55e)"></div>
+          </div>
+          <div class="project-meta">
+            <span>85% Complete</span>
+            <span>₹2,50,000 utilized</span>
+          </div>
+        </div>
+        <div class="project-card">
+          <h4>Rural Health Initiative</h4>
+          <p>Free health camps in 10 villages, 750+ beneficiaries</p>
+          <div class="project-progress">
+            <div class="project-progress-bar" style="width:60%;background:linear-gradient(90deg,#6366f1,#ec4899)"></div>
+          </div>
+          <div class="project-meta">
+            <span>60% Complete</span>
+            <span>₹1,25,000 utilized</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <h3><i class="fa-solid fa-clock"></i> Recent Updates</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #f1f5f9">
+            <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#22c55e,#059669);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700">Batch 5 Training Completed</div>
+              <div style="font-size:11px;color:var(--text-muted)">50 women graduated from tailoring program</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">2 days ago</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #f1f5f9">
+            <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700">Fund Disbursement: ₹50,000</div>
+              <div style="font-size:11px;color:var(--text-muted)">Released for health camp equipment</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">5 days ago</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0">
+            <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">
+              <i class="fa-solid fa-file-alt"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700">Impact Report Generated</div>
+              <div style="font-size:11px;color:var(--text-muted)">Q3 2025 report ready for download</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">1 week ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CSR PROJECTS ===================== -->
+  <div class="page" id="page-projects">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <h3 style="font-size:16px;font-weight:800"><i class="fa-solid fa-folder-tree" style="color:var(--accent)"></i> CSR Projects Overview</h3>
+      <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Sponsor a Project</button>
+    </div>
+
+    <div class="grid-2">
+      <div class="project-card" style="border:1px solid var(--card-border);border-radius:16px;padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="badge b-active">Active</span>
+          <span style="font-size:11px;color:var(--text-muted);font-weight:700">PRJ-001</span>
+        </div>
+        <h4>Women Skill Training Program</h4>
+        <p>Comprehensive tailoring, computer & digital marketing training for 500 women across 5 districts.</p>
+        <div style="margin:12px 0">
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px">
+            <span>Progress</span><span style="color:var(--accent)">85%</span>
+          </div>
+          <div class="project-progress">
+            <div class="project-progress-bar" style="width:85%;background:linear-gradient(90deg,#0ea5e9,#22c55e)"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+          <div><span style="color:var(--text-muted)">Goal:</span> <strong>500 Women</strong></div>
+          <div><span style="color:var(--text-muted)">Trained:</span> <strong style="color:var(--success)">425</strong></div>
+          <div><span style="color:var(--text-muted)">Budget:</span> <strong>₹3,00,000</strong></div>
+          <div><span style="color:var(--text-muted)">Utilized:</span> <strong>₹2,50,000</strong></div>
+        </div>
+      </div>
+
+      <div class="project-card" style="border:1px solid var(--card-border);border-radius:16px;padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="badge b-active">Active</span>
+          <span style="font-size:11px;color:var(--text-muted);font-weight:700">PRJ-002</span>
+        </div>
+        <h4>Rural Health Initiative</h4>
+        <p>Free health camps including eye testing, blood pressure screening & nutrition counseling for rural women.</p>
+        <div style="margin:12px 0">
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px">
+            <span>Progress</span><span style="color:var(--accent)">60%</span>
+          </div>
+          <div class="project-progress">
+            <div class="project-progress-bar" style="width:60%;background:linear-gradient(90deg,#6366f1,#ec4899)"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+          <div><span style="color:var(--text-muted)">Goal:</span> <strong>10 Camps</strong></div>
+          <div><span style="color:var(--text-muted)">Done:</span> <strong style="color:var(--success)">6</strong></div>
+          <div><span style="color:var(--text-muted)">Budget:</span> <strong>₹1,50,000</strong></div>
+          <div><span style="color:var(--text-muted)">Utilized:</span> <strong>₹90,000</strong></div>
+        </div>
+      </div>
+
+      <div class="project-card" style="border:1px solid var(--card-border);border-radius:16px;padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="badge b-progress">In Progress</span>
+          <span style="font-size:11px;color:var(--text-muted);font-weight:700">PRJ-003</span>
+        </div>
+        <h4>Micro-Enterprise Support</h4>
+        <p>Helping women set up and run their own small businesses with seed funding and mentoring.</p>
+        <div style="margin:12px 0">
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px">
+            <span>Progress</span><span style="color:var(--accent)">30%</span>
+          </div>
+          <div class="project-progress">
+            <div class="project-progress-bar" style="width:30%;background:linear-gradient(90deg,#f59e0b,#ef4444)"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+          <div><span style="color:var(--text-muted)">Goal:</span> <strong>50 Women</strong></div>
+          <div><span style="color:var(--text-muted)">Started:</span> <strong style="color:var(--success)">15</strong></div>
+          <div><span style="color:var(--text-muted)">Budget:</span> <strong>₹2,00,000</strong></div>
+          <div><span style="color:var(--text-muted)">Utilized:</span> <strong>₹60,000</strong></div>
+        </div>
+      </div>
+
+      <div class="project-card" style="border:1px solid var(--card-border);border-radius:16px;padding:22px;border-style:dashed;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;min-height:200px">
+        <i class="fa-solid fa-plus" style="font-size:32px;color:var(--text-muted);opacity:.3;margin-bottom:12px"></i>
+        <h4 style="color:var(--text-muted)">Sponsor New Project</h4>
+        <p style="font-size:12px;color:var(--text-muted)">Support a new initiative and make an impact</p>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px"><i class="fa-solid fa-plus"></i> View Options</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== IMPACT REPORTS ===================== -->
+  <div class="page" id="page-impact">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="impact-card">
+        <div class="impact-icon s-cyan"><i class="fa-solid fa-female"></i></div>
+        <div class="impact-val">500</div>
+        <div class="impact-lbl">Women Trained</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon s-green"><i class="fa-solid fa-users"></i></div>
+        <div class="impact-val">1,250</div>
+        <div class="impact-lbl">Beneficiaries</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon s-purple"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="impact-val">6</div>
+        <div class="impact-lbl">Health Camps</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon s-amber"><i class="fa-solid fa-seedling"></i></div>
+        <div class="impact-val">200</div>
+        <div class="impact-lbl">Trees Planted</div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-images"></i> Activity Proof (Photos/Videos)</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)">
+          <i class="fa-solid fa-scissors"></i>
+        </div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)">
+          <i class="fa-solid fa-laptop"></i>
+        </div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+          <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">
+          <i class="fa-solid fa-tree"></i>
+        </div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe)">
+          <i class="fa-solid fa-chalkboard-teacher"></i>
+        </div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#ccfbf1,#99f6e4)">
+          <i class="fa-solid fa-hand-holding-heart"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="margin-bottom:0"><i class="fa-solid fa-file-pdf"></i> Quarterly Impact Reports</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Report</th><th>Period</th><th>Beneficiaries</th><th>Funds Used</th><th>Status</th><th>Download</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:800">Q3 2025 Report</td>
+              <td>Jul - Sep 2025</td>
+              <td style="font-weight:700">450</td>
+              <td style="font-weight:700">₹1,80,000</td>
+              <td><span class="badge b-active">Published</span></td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> PDF</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Q2 2025 Report</td>
+              <td>Apr - Jun 2025</td>
+              <td style="font-weight:700">380</td>
+              <td style="font-weight:700">₹1,20,000</td>
+              <td><span class="badge b-active">Published</span></td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> PDF</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Q1 2025 Report</td>
+              <td>Jan - Mar 2025</td>
+              <td style="font-weight:700">250</td>
+              <td style="font-weight:700">₹75,000</td>
+              <td><span class="badge b-active">Published</span></td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> PDF</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FUNDING & UTILIZATION ===================== -->
+  <div class="page" id="page-funding">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="s-label">Total Contributed</div>
+        <div class="s-value">₹5,00,000</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+        <div class="s-label">Funds Utilized</div>
+        <div class="s-value">₹3,75,000</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div>
+        <div class="s-label">Remaining Balance</div>
+        <div class="s-value">₹1,25,000</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-percent"></i></div>
+        <div class="s-label">Utilization Rate</div>
+        <div class="s-value">75%</div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-chart-bar"></i> Fund Usage Summary</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Project</th><th>Allocated</th><th>Utilized</th><th>Balance</th><th>Utilization</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:800">Women Skill Training</td>
+              <td style="font-weight:700">₹3,00,000</td>
+              <td style="font-weight:700;color:var(--success)">₹2,50,000</td>
+              <td>₹50,000</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden">
+                    <div style="width:83%;height:100%;background:var(--success);border-radius:99px"></div>
+                  </div>
+                  <span style="font-weight:700;font-size:11px">83%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Rural Health Initiative</td>
+              <td style="font-weight:700">₹1,50,000</td>
+              <td style="font-weight:700;color:var(--success)">₹90,000</td>
+              <td>₹60,000</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden">
+                    <div style="width:60%;height:100%;background:var(--warning);border-radius:99px"></div>
+                  </div>
+                  <span style="font-weight:700;font-size:11px">60%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Micro-Enterprise Support</td>
+              <td style="font-weight:700">₹2,00,000</td>
+              <td style="font-weight:700;color:var(--success)">₹60,000</td>
+              <td>₹1,40,000</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden">
+                    <div style="width:30%;height:100%;background:var(--danger);border-radius:99px"></div>
+                  </div>
+                  <span style="font-weight:700;font-size:11px">30%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-receipt"></i> Payment Receipts</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Receipt No.</th><th>Date</th><th>Amount</th><th>Purpose</th><th>Download</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700;color:var(--accent)">RCP-2025-003</td>
+              <td>15 Sep 2025</td>
+              <td style="font-weight:700">₹2,00,000</td>
+              <td>Micro-Enterprise Support</td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i></button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:var(--accent)">RCP-2025-002</td>
+              <td>01 Jun 2025</td>
+              <td style="font-weight:700">₹1,50,000</td>
+              <td>Rural Health Initiative</td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i></button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:var(--accent)">RCP-2025-001</td>
+              <td>15 Jan 2025</td>
+              <td style="font-weight:700">₹3,00,000</td>
+              <td>Women Skill Training Program</td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COMPLIANCE DOCUMENTS ===================== -->
+  <div class="page" id="page-compliance">
+    <div class="content-card">
+      <h3><i class="fa-solid fa-file-shield"></i> Compliance & Legal Documents</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">All documents are verified and up-to-date for CSR compliance requirements.</p>
+
+      <div class="doc-card">
+        <div class="doc-icon s-green"><i class="fa-solid fa-certificate"></i></div>
+        <div class="doc-info" style="flex:1">
+          <h4>80G Certificate</h4>
+          <p>Tax exemption certificate under Section 80G of Income Tax Act</p>
+        </div>
+        <button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> Download</button>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-icon s-blue"><i class="fa-solid fa-file-contract"></i></div>
+        <div class="doc-info" style="flex:1">
+          <h4>12A Certificate</h4>
+          <p>Registration under Section 12A for income tax exemption</p>
+        </div>
+        <button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> Download</button>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-icon s-purple"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="doc-info" style="flex:1">
+          <h4>NGO Registration Certificate</h4>
+          <p>Registered under Societies Registration Act / Trust Act</p>
+        </div>
+        <button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> Download</button>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-icon s-amber"><i class="fa-solid fa-id-card-clip"></i></div>
+        <div class="doc-info" style="flex:1">
+          <h4>PAN Card (Organization)</h4>
+          <p>Permanent Account Number of the foundation</p>
+        </div>
+        <button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> Download</button>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-icon s-teal"><i class="fa-solid fa-landmark"></i></div>
+        <div class="doc-info" style="flex:1">
+          <h4>FCRA Certificate</h4>
+          <p>Foreign Contribution Regulation Act registration</p>
+        </div>
+        <button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> Download</button>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-chart-pie"></i> Annual Reports</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Report</th><th>Year</th><th>Status</th><th>Download</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:800">Annual Report 2024-25</td>
+              <td>2024-25</td>
+              <td><span class="badge b-active">Published</span></td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> PDF</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Annual Report 2023-24</td>
+              <td>2023-24</td>
+              <td><span class="badge b-active">Published</span></td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> PDF</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Annual Report 2022-23</td>
+              <td>2022-23</td>
+              <td><span class="badge b-active">Published</span></td>
+              <td><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-download"></i> PDF</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COMMUNICATION ===================== -->
+  <div class="page" id="page-communication">
+    <div class="grid-2">
+      <div>
+        <div class="content-card">
+          <h3><i class="fa-solid fa-calendar-check"></i> Upcoming Meetings</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:center;padding:12px;background:#f8fafc;border-radius:12px">
+              <div style="width:48px;height:48px;border-radius:10px;background:var(--accent);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+                <div style="font-size:16px;font-weight:900;line-height:1">20</div>
+                <div style="font-size:9px;font-weight:700">MAR</div>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:800">Quarterly Review Meeting</div>
+                <div style="font-size:11px;color:var(--text-muted)"><i class="fa-solid fa-video"></i> Online via Zoom &bull; 3:00 PM</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;padding:12px;background:#f8fafc;border-radius:12px">
+              <div style="width:48px;height:48px;border-radius:10px;background:var(--success);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+                <div style="font-size:16px;font-weight:900;line-height:1">10</div>
+                <div style="font-size:9px;font-weight:700">APR</div>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:800">Project Visit — Field Day</div>
+                <div style="font-size:11px;color:var(--text-muted)"><i class="fa-solid fa-location-dot"></i> Training Center, Kanpur</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-address-book"></i> Direct NGO Contact</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+              <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px">FW</div>
+              <div>
+                <div style="font-size:13px;font-weight:800">FWF Program Director</div>
+                <div style="font-size:12px;color:var(--text-muted)">director@fwfindia.org</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+              <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#059669);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px">CS</div>
+              <div>
+                <div style="font-size:13px;font-weight:800">CSR Coordination Cell</div>
+                <div style="font-size:12px;color:var(--text-muted)">csr@fwfindia.org</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+              <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px">FN</div>
+              <div>
+                <div style="font-size:13px;font-weight:800">Finance Department</div>
+                <div style="font-size:12px;color:var(--text-muted)">finance@fwfindia.org</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="content-card">
+          <h3><i class="fa-solid fa-message"></i> Support Chat</h3>
+          <div style="background:#f8fafc;border-radius:12px;padding:16px;min-height:200px;display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+            <div style="align-self:flex-start;background:#fff;border:1px solid var(--card-border);padding:10px 14px;border-radius:12px 12px 12px 2px;max-width:80%">
+              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px">FWF Team</div>
+              <div style="font-size:13px;color:var(--text-secondary)">Welcome to FWF CSR Partner Support! How can we help you today?</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">10:00 AM</div>
+            </div>
+            <div style="align-self:flex-end;background:var(--accent);color:#fff;padding:10px 14px;border-radius:12px 12px 2px 12px;max-width:80%">
+              <div style="font-size:13px">Hi! I need the latest impact report for Q3 2025.</div>
+              <div style="font-size:10px;opacity:.7;margin-top:4px">10:05 AM</div>
+            </div>
+            <div style="align-self:flex-start;background:#fff;border:1px solid var(--card-border);padding:10px 14px;border-radius:12px 12px 12px 2px;max-width:80%">
+              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px">FWF Team</div>
+              <div style="font-size:13px;color:var(--text-secondary)">Sure! The Q3 2025 report is available in the Impact Reports section. You can download it from there.</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">10:07 AM</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <input type="text" style="flex:1;padding:10px 14px;border:2px solid var(--card-border);border-radius:10px;font:inherit;font-size:13px" placeholder="Type a message...">
+            <button class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-phone"></i> Quick Support</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="https://wa.me/919580118412" target="_blank" class="btn btn-success" style="justify-content:center"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</a>
+            <a href="mailto:csr@fwfindia.org" class="btn btn-ghost" style="justify-content:center"><i class="fa-solid fa-envelope"></i> Email CSR Cell</a>
+            <a href="tel:+919580118412" class="btn btn-ghost" style="justify-content:center"><i class="fa-solid fa-phone"></i> Call: +91-9580118412</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="assets/js/fwf.js"></script>
+<script src="auth.js"></script>
+<script>
+/* ============================================
+   NAVIGATION
+   ============================================ */
+const pageTitles = {
+  home: '<i class="fa-solid fa-chart-pie"></i> Dashboard',
+  projects: '<i class="fa-solid fa-folder-tree"></i> CSR Projects',
+  impact: '<i class="fa-solid fa-chart-bar"></i> Impact Reports',
+  funding: '<i class="fa-solid fa-indian-rupee-sign"></i> Funding & Utilization',
+  compliance: '<i class="fa-solid fa-file-shield"></i> Compliance Documents',
+  communication: '<i class="fa-solid fa-comments"></i> Communication'
+};
+
+function switchPage(page){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if(el) el.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(nav) nav.classList.add('active');
+  document.getElementById('pageTitle').innerHTML = pageTitles[page] || page;
+  closeMobile();
+}
+
+document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+// Mobile
+document.getElementById('mobileToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+});
+document.getElementById('mobileOverlay').addEventListener('click', closeMobile);
+function closeMobile(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+function notify(msg, type){
+  if(typeof FWF_Notify !== 'undefined') FWF_Notify.toast(msg, type);
+  else alert(msg);
+}
+
+/* ============================================
+   LOGOUT
+   ============================================ */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  if(typeof FWF_Notify !== 'undefined'){
+    FWF_Notify.confirm('Logout from CSR Partner Panel?', async ()=>{
+      try{ await AUTH.api('/api/auth/logout',{method:'POST'}); }catch(e){}
+      notify('Logged out','success');
+      setTimeout(()=> location.href = '/', 1000);
+    });
+  } else {
+    if(confirm('Logout?')){
+      AUTH.api('/api/auth/logout',{method:'POST'}).catch(()=>{}).finally(()=> location.href = '/');
+    }
+  }
+});
+
+/* ============================================
+   INIT — Load CSR Partner Data
+   ============================================ */
+(async function(){
+  // CSR Dashboard currently uses static/demo data
+  // Will be connected to backend CSR APIs when available
+  console.log('CSR Partner Dashboard loaded');
+})();
+</script>
+</body>
+</html>

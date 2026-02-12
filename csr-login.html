@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CSR Partner Login — FWF</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/images/logo.png">
+<link rel="apple-touch-icon" href="assets/images/logo.png">
+<link rel="shortcut icon" href="assets/images/logo.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#0c4a6e 0%,#0ea5e9 50%,#38bdf8 100%);
+  background-size:200% 200%;
+  animation:gradientShift 15s ease infinite;
+  padding:20px;
+  position:relative;
+  overflow:hidden;
+}
+@keyframes gradientShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+body::before{
+  content:"";position:absolute;inset:0;
+  background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,138.7C960,139,1056,117,1152,101.3C1248,85,1344,75,1392,69.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+  background-size:cover;
+  background-position:bottom;
+  pointer-events:none;
+}
+
+.login-container{
+  width:100%;max-width:440px;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(20px) saturate(180%);
+  border-radius:24px;
+  padding:48px 40px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3),0 0 1px rgba(255,255,255,.5) inset;
+  position:relative;
+  animation:slideUp .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(30px) scale(.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.logo-box{
+  text-align:center;margin-bottom:32px;
+}
+.logo-img{
+  width:80px;height:80px;border-radius:20px;
+  box-shadow:0 8px 24px rgba(14,165,233,.3);
+  margin-bottom:16px;
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+.logo-title{
+  font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,#0c4a6e,#0ea5e9);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  letter-spacing:-.5px;
+}
+.logo-subtitle{
+  color:#64748b;font-size:14px;font-weight:600;
+  margin-top:4px;letter-spacing:.3px;
+}
+
+.input-group{
+  position:relative;margin-bottom:24px;
+}
+.input-icon{
+  position:absolute;left:18px;top:50%;transform:translateY(-50%);
+  color:#0ea5e9;font-size:18px;transition:all .3s;
+  pointer-events:none;
+}
+.input-field{
+  width:100%;padding:16px 20px 16px 52px;
+  border:2px solid #e2e8f0;
+  border-radius:14px;
+  background:#f8fafc;
+  font-size:15px;font-weight:600;
+  color:#1e293b;
+  transition:all .3s;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.input-field:focus{
+  outline:none;
+  border-color:#0ea5e9;
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(14,165,233,.1);
+}
+.input-field::placeholder{color:#94a3b8;font-weight:500}
+
+.login-btn{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,#0c4a6e,#0ea5e9);
+  color:#fff;border:none;border-radius:14px;
+  font-size:16px;font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(14,165,233,.4);
+  transition:all .3s;
+  letter-spacing:.5px;
+  position:relative;
+  overflow:hidden;
+}
+.login-btn::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,#0ea5e9,#38bdf8);
+  opacity:0;transition:opacity .3s;
+}
+.login-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(14,165,233,.5);
+}
+.login-btn:hover::before{opacity:1}
+.login-btn:active{transform:translateY(0)}
+.login-btn span{position:relative;z-index:1}
+
+.divider{
+  display:flex;align-items:center;gap:12px;
+  margin:28px 0;color:#94a3b8;font-size:13px;font-weight:600;
+}
+.divider::before,.divider::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,#e2e8f0,transparent);
+}
+
+.signup-link{
+  text-align:center;font-size:14px;color:#64748b;font-weight:600;
+}
+.signup-link a{
+  color:#0ea5e9;text-decoration:none;font-weight:800;
+  transition:color .3s;
+}
+.signup-link a:hover{color:#0c4a6e}
+
+.home-btn{
+  position:fixed;top:24px;left:24px;
+  width:48px;height:48px;
+  background:rgba(255,255,255,.9);
+  border-radius:12px;
+  display:grid;place-items:center;
+  color:#0ea5e9;font-size:20px;
+  text-decoration:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  transition:all .3s;
+}
+.home-btn:hover{
+  transform:scale(1.05);
+  background:#fff;
+  box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
+
+@media (max-width:480px){
+  .login-container{padding:36px 28px}
+  .logo-title{font-size:24px}
+}
+</style>
+</head><body>
+<a href="/" class="home-btn" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+
+<div class="login-container">
+  <div class="logo-box">
+    <img src="assets/images/logo.png" alt="FWF" class="logo-img">
+    <h1 class="logo-title">CSR Partner Login</h1>
+    <p class="logo-subtitle">Access your impact dashboard</p>
+  </div>
+
+  <form id="loginForm">
+    <div class="input-group">
+      <input id="csrEmail" class="input-field" type="email" placeholder="partner@company.com" required autocomplete="username">
+      <i class="input-icon fa-solid fa-building"></i>
+    </div>
+
+    <div class="input-group">
+      <input id="csrPwd" class="input-field" type="password" placeholder="••••••••" required autocomplete="current-password">
+      <i class="input-icon fa-solid fa-lock"></i>
+    </div>
+
+    <button type="submit" class="login-btn">
+      <span id="btnText"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Dashboard</span>
+    </button>
+  </form>
+
+  <div class="divider">Interested in CSR?</div>
+
+  <div class="signup-link">
+    <a href="/csr"><i class="fa-solid fa-handshake"></i> Learn about CSR Partnership</a>
+  </div>
+</div>
+
+<script src="assets/js/fwf.js"></script>
+<script src="auth.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.querySelector('.login-btn');
+  const btnText = document.getElementById('btnText');
+  const email = document.getElementById('csrEmail').value.trim();
+  const password = document.getElementById('csrPwd').value.trim();
+  
+  btn.disabled = true;
+  btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+  
+  try{
+    await AUTH.api('/api/auth/login',{method:'POST',body:{memberId: email, password}});
+    btnText.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+    setTimeout(() => location.href = '/csr-dashboard', 500);
+  }catch(e){ 
+    btnText.innerHTML = '<i class="fa-solid fa-xmark"></i> Login Failed';
+    FWF_Notify.toast(e.message || 'Invalid credentials', 'error');
+    setTimeout(() => {
+      btnText.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Dashboard';
+      btn.disabled = false;
+    }, 2000);
+  }
+});
+</script>
+</body></html>

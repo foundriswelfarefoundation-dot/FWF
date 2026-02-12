@@ -446,6 +446,21 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <button class="nav-item" data-page="points">
       <i class="fa-solid fa-coins"></i> Points & Activity
     </button>
+    <button class="nav-item" data-page="courses">
+      <i class="fa-solid fa-graduation-cap"></i> Courses
+    </button>
+    <button class="nav-item" data-page="marketplace">
+      <i class="fa-solid fa-store"></i> Marketplace
+    </button>
+    <button class="nav-item" data-page="funds">
+      <i class="fa-solid fa-piggy-bank"></i> Funds & Loans
+    </button>
+    <button class="nav-item" data-page="reports">
+      <i class="fa-solid fa-chart-bar"></i> Reports
+    </button>
+    <button class="nav-item" data-page="settings">
+      <i class="fa-solid fa-gear"></i> Settings
+    </button>
   </nav>
   <div class="sidebar-footer">
     <button class="nav-item logout-btn" id="logoutBtn">
@@ -693,6 +708,486 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
+  <!-- ===================== COURSE MANAGEMENT ===================== -->
+  <div class="page" id="page-courses">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-book-open"></i></div>
+        <div class="s-label">Total Courses</div>
+        <div class="s-value">6</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-users"></i></div>
+        <div class="s-label">Total Enrollments</div>
+        <div class="s-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-check-circle"></i></div>
+        <div class="s-label">Completed</div>
+        <div class="s-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-certificate"></i></div>
+        <div class="s-label">Certificates Issued</div>
+        <div class="s-value">0</div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:800"><i class="fa-solid fa-graduation-cap" style="color:var(--accent)"></i> Course Management</h3>
+      <button class="btn btn-primary" onclick="openModal('addCourseModal')"><i class="fa-solid fa-plus"></i> Add Course</button>
+    </div>
+
+    <div class="content-card">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Course</th><th>Category</th><th>Duration</th><th>Enrollments</th><th>Completed</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:800">Tailoring & Stitching</td>
+              <td><span class="badge b-active">Skill</span></td>
+              <td>4 Weeks</td>
+              <td style="font-weight:700">0</td>
+              <td>0</td>
+              <td><span class="badge b-active">Active</span></td>
+              <td>
+                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-icon" title="Toggle"><i class="fa-solid fa-toggle-on"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Basic Computer Skills</td>
+              <td><span class="badge b-open">Digital</span></td>
+              <td>6 Weeks</td>
+              <td style="font-weight:700">0</td>
+              <td>0</td>
+              <td><span class="badge b-active">Active</span></td>
+              <td>
+                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-icon" title="Toggle"><i class="fa-solid fa-toggle-on"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Food Processing & Packaging</td>
+              <td><span class="badge b-progress">Business</span></td>
+              <td>3 Weeks</td>
+              <td style="font-weight:700">0</td>
+              <td>0</td>
+              <td><span class="badge b-active">Active</span></td>
+              <td>
+                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-icon" title="Toggle"><i class="fa-solid fa-toggle-on"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Handicraft & Mehndi Art</td>
+              <td><span class="badge b-active">Skill</span></td>
+              <td>3 Weeks</td>
+              <td style="font-weight:700">0</td>
+              <td>0</td>
+              <td><span class="badge b-active">Active</span></td>
+              <td>
+                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-icon" title="Toggle"><i class="fa-solid fa-toggle-on"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Digital Marketing</td>
+              <td><span class="badge b-open">Digital</span></td>
+              <td>5 Weeks</td>
+              <td style="font-weight:700">0</td>
+              <td>0</td>
+              <td><span class="badge b-active">Active</span></td>
+              <td>
+                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-icon" title="Toggle"><i class="fa-solid fa-toggle-on"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:800">Organic Farming</td>
+              <td><span class="badge b-resolved">Agriculture</span></td>
+              <td>4 Weeks</td>
+              <td style="font-weight:700">0</td>
+              <td>0</td>
+              <td><span class="badge b-active">Active</span></td>
+              <td>
+                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-icon" title="Toggle"><i class="fa-solid fa-toggle-on"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MARKETPLACE MANAGEMENT ===================== -->
+  <div class="page" id="page-marketplace">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-teal"><i class="fa-solid fa-store"></i></div>
+        <div class="s-label">Total Sellers</div>
+        <div class="s-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-box-open"></i></div>
+        <div class="s-label">Total Products</div>
+        <div class="s-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-shopping-cart"></i></div>
+        <div class="s-label">Total Orders</div>
+        <div class="s-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="s-label">Total Sales</div>
+        <div class="s-value">₹0</div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="m-sellers-tab">Seller Verification</button>
+      <button class="tab-btn" data-tab="m-products-tab">Product Approval</button>
+      <button class="tab-btn" data-tab="m-orders-tab">Orders & Payments</button>
+    </div>
+
+    <div class="tab-content active" id="m-sellers-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-user-check"></i> Seller Verification Queue</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Member ID</th><th>Name</th><th>Products</th><th>Status</th><th>Applied</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td colspan="6" class="empty-state"><i class="fa-solid fa-store"></i><p>No seller verification requests yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="m-products-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-box-open"></i> Product Approval Queue</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Product</th><th>Seller</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td colspan="6" class="empty-state"><i class="fa-solid fa-box-open"></i><p>No products pending approval</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="m-orders-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-receipt"></i> Order & Payment Monitoring</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Seller</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+              <tr><td colspan="7" class="empty-state"><i class="fa-solid fa-shopping-cart"></i><p>No orders yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FUND & LOAN MANAGEMENT ===================== -->
+  <div class="page" id="page-funds">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-piggy-bank"></i></div>
+        <div class="s-label">Care Fund Balance</div>
+        <div class="s-value">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-file-invoice"></i></div>
+        <div class="s-label">Pending Requests</div>
+        <div class="s-value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div class="s-label">Loans Disbursed</div>
+        <div class="s-value">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-check-double"></i></div>
+        <div class="s-label">Loans Repaid</div>
+        <div class="s-value">₹0</div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="f-requests-tab">Fund Requests</button>
+      <button class="tab-btn" data-tab="f-loans-tab">Interest-Free Loans</button>
+      <button class="tab-btn" data-tab="f-tracking-tab">Fund Tracking</button>
+    </div>
+
+    <div class="tab-content active" id="f-requests-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-file-invoice"></i> Member Care Fund Requests</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Member</th><th>Amount</th><th>Purpose</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td colspan="7" class="empty-state"><i class="fa-solid fa-hand-holding-heart"></i><p>No fund requests yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="f-loans-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-hand-holding-dollar"></i> Interest-Free Loan Approvals</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Member</th><th>Loan Amount</th><th>Purpose</th><th>Tenure</th><th>EMI</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td colspan="7" class="empty-state"><i class="fa-solid fa-piggy-bank"></i><p>No loan applications yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="f-tracking-tab">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-chart-line"></i> Fund Balance Tracking</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Credit</th><th>Debit</th><th>Balance</th></tr></thead>
+            <tbody>
+              <tr><td colspan="6" class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No fund transactions yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== REPORTS & ANALYTICS ===================== -->
+  <div class="page" id="page-reports">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
+        <div class="s-label">Total Members</div>
+        <div class="s-value" id="rMembers">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-hand-holding-heart"></i></div>
+        <div class="s-label">Total Donations</div>
+        <div class="s-value" id="rDonations">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-handshake"></i></div>
+        <div class="s-label">CSR Funds</div>
+        <div class="s-value" id="rCSR">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-store"></i></div>
+        <div class="s-label">Marketplace Sales</div>
+        <div class="s-value">₹0</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="content-card">
+        <h3><i class="fa-solid fa-chart-pie"></i> Member Distribution</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+            <span style="font-weight:700;font-size:13px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--success);margin-right:8px"></span>Active Members</span>
+            <span style="font-weight:900;color:var(--success)" id="rActive">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+            <span style="font-weight:700;font-size:13px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--danger);margin-right:8px"></span>Inactive Members</span>
+            <span style="font-weight:900;color:var(--danger)" id="rInactive">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+            <span style="font-weight:700;font-size:13px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--info);margin-right:8px"></span>Total Referrals</span>
+            <span style="font-weight:900;color:var(--info)" id="rReferrals">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <span style="font-weight:700;font-size:13px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:8px"></span>Total Points Issued</span>
+            <span style="font-weight:900;color:var(--accent)" id="rPoints">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <h3><i class="fa-solid fa-calendar"></i> Monthly Activity Summary</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+            <span style="font-weight:700;font-size:13px">New Members (this month)</span>
+            <span style="font-weight:900" id="rNewMembers">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+            <span style="font-weight:700;font-size:13px">Donations Collected</span>
+            <span style="font-weight:900" id="rMonthDon">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+            <span style="font-weight:700;font-size:13px">Tickets Sold</span>
+            <span style="font-weight:900" id="rMonthTix">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <span style="font-weight:700;font-size:13px">Support Tickets Resolved</span>
+            <span style="font-weight:900" id="rMonthResolved">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="margin-bottom:0"><i class="fa-solid fa-download"></i> Download Reports</h3>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost"><i class="fa-solid fa-file-csv"></i> Members CSV</button>
+        <button class="btn btn-ghost"><i class="fa-solid fa-file-csv"></i> Donations CSV</button>
+        <button class="btn btn-ghost"><i class="fa-solid fa-file-csv"></i> Points Ledger CSV</button>
+        <button class="btn btn-ghost"><i class="fa-solid fa-file-csv"></i> CSR Partners CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== WEBSITE & SYSTEM SETTINGS ===================== -->
+  <div class="page" id="page-settings">
+    <div class="grid-2">
+      <div>
+        <div class="content-card">
+          <h3><i class="fa-solid fa-image"></i> Homepage Banners</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Manage homepage hero banners and announcements</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#f8fafc;border-radius:10px">
+              <div style="width:80px;height:50px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#ec4899);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:700">Hero Banner 1</div>
+                <div style="font-size:11px;color:var(--text-muted)">Active</div>
+              </div>
+              <button class="btn-icon"><i class="fa-solid fa-pen"></i></button>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Banner</button>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Send notifications to members</p>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-input" placeholder="Notification title">
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea class="form-input" placeholder="Notification message..." rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Send to</label>
+            <select class="form-input">
+              <option>All Members</option>
+              <option>Active Members Only</option>
+              <option>CSR Partners</option>
+            </select>
+          </div>
+          <button class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Send Notification</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="content-card">
+          <h3><i class="fa-solid fa-shield-halved"></i> Roles & Permissions</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:10px">
+              <div>
+                <div style="font-size:13px;font-weight:800">Admin</div>
+                <div style="font-size:11px;color:var(--text-muted)">Full system access</div>
+              </div>
+              <span class="badge b-active">Active</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:10px">
+              <div>
+                <div style="font-size:13px;font-weight:800">Member</div>
+                <div style="font-size:11px;color:var(--text-muted)">Dashboard, wallet, marketplace</div>
+              </div>
+              <span class="badge b-active">Active</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:10px">
+              <div>
+                <div style="font-size:13px;font-weight:800">CSR Partner</div>
+                <div style="font-size:11px;color:var(--text-muted)">Impact reports, funding view</div>
+              </div>
+              <span class="badge b-active">Active</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-plug"></i> Integrations</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fa-brands fa-whatsapp" style="font-size:20px;color:#25D366"></i>
+                <div>
+                  <div style="font-size:13px;font-weight:800">WhatsApp</div>
+                  <div style="font-size:11px;color:var(--text-muted)">Message notifications</div>
+                </div>
+              </div>
+              <span class="badge b-progress">Setup</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fa-solid fa-envelope" style="font-size:20px;color:var(--accent)"></i>
+                <div>
+                  <div style="font-size:13px;font-weight:800">Email (SMTP)</div>
+                  <div style="font-size:11px;color:var(--text-muted)">Transactional emails</div>
+                </div>
+              </div>
+              <span class="badge b-active">Connected</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fa-solid fa-bug" style="font-size:20px;color:#362d59"></i>
+                <div>
+                  <div style="font-size:13px;font-weight:800">Sentry</div>
+                  <div style="font-size:11px;color:var(--text-muted)">Error monitoring</div>
+                </div>
+              </div>
+              <span class="badge b-active">Connected</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-coins"></i> Points Configuration</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Donation Points (%)</label>
+              <input type="number" class="form-input" value="10" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label>Referral Points (%)</label>
+              <input type="number" class="form-input" value="50" min="0" max="100">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Quiz Ticket Points (%)</label>
+              <input type="number" class="form-input" value="10" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label>Default Ticket Price (₹)</label>
+              <input type="number" class="form-input" value="100" min="1">
+            </div>
+          </div>
+          <button class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Config</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ======== MODALS ======== -->
@@ -863,7 +1358,12 @@ const pageTitles = {
   members: '<i class="fa-solid fa-users"></i> Members Management',
   csr: '<i class="fa-solid fa-handshake"></i> CSR Partners',
   support: '<i class="fa-solid fa-headset"></i> Support Tickets',
-  points: '<i class="fa-solid fa-coins"></i> Points & Activity'
+  points: '<i class="fa-solid fa-coins"></i> Points & Activity',
+  courses: '<i class="fa-solid fa-graduation-cap"></i> Course Management',
+  marketplace: '<i class="fa-solid fa-store"></i> Marketplace Management',
+  funds: '<i class="fa-solid fa-piggy-bank"></i> Fund & Loan Management',
+  reports: '<i class="fa-solid fa-chart-bar"></i> Reports & Analytics',
+  settings: '<i class="fa-solid fa-gear"></i> Website & Settings'
 };
 
 function switchPage(page){
@@ -880,6 +1380,7 @@ function switchPage(page){
   if(page === 'csr') loadCSRPartners();
   if(page === 'support') loadSupportTickets();
   if(page === 'points') loadPointsActivity();
+  if(page === 'reports') loadReports();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -897,11 +1398,12 @@ function closeMobile(){
   document.getElementById('mobileOverlay').classList.remove('show');
 }
 
-// Tabs (Points page)
+// Tabs (scoped to parent page)
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const parentPage = btn.closest('.page') || btn.parentElement;
+    parentPage.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    parentPage.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
@@ -1294,6 +1796,26 @@ async function activateReferral(referredMemberId){
     notify('Referral activated! Points credited.','success');
     loadPointsActivity();
   } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+/* ============================================
+   REPORTS & ANALYTICS
+   ============================================ */
+async function loadReports(){
+  try{
+    const data = await AUTH.api('/api/admin/overview');
+    document.getElementById('rMembers').textContent = data.totalMembers||0;
+    document.getElementById('rActive').textContent = data.activeMembers||0;
+    document.getElementById('rInactive').textContent = (data.totalMembers||0) - (data.activeMembers||0);
+    document.getElementById('rDonations').textContent = '₹' + fmtN(data.totalDonationsINR||0);
+    document.getElementById('rCSR').textContent = '₹' + fmtN(data.totalCSR||0);
+    document.getElementById('rReferrals').textContent = data.totalReferrals||0;
+    document.getElementById('rPoints').textContent = fmtN(data.totalPointsIssued||0);
+    document.getElementById('rNewMembers').textContent = data.newMembersThisMonth||0;
+    document.getElementById('rMonthDon').textContent = data.donationsThisMonth||0;
+    document.getElementById('rMonthTix').textContent = data.ticketsSoldThisMonth||0;
+    document.getElementById('rMonthResolved').textContent = data.resolvedThisMonth||0;
+  } catch(e){ /* silent */ }
 }
 
 /* ============================================

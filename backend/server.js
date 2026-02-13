@@ -411,8 +411,18 @@ app.get('/api/admin/overview', auth('admin'), (req,res)=>{
     active_referrals: db.prepare(`SELECT COUNT(*) as c FROM referrals WHERE status='active'`).get().c,
     total_tickets_sold: db.prepare(`SELECT COUNT(*) as c FROM quiz_tickets`).get().c,
     csr_partners: 0,
-    support_tickets: 0
+    support_tickets: 0,
+    pending_fees: 0,
+    total_fee_collected: 0
   };
+  try {
+    totals.pending_fees = db.prepare(`SELECT COUNT(*) as c FROM membership_fees WHERE status='pending'`).get().c;
+    totals.total_fee_collected = db.prepare(`SELECT COALESCE(SUM(amount),0) as c FROM membership_fees WHERE status='verified'`).get().c;
+  } catch(e){}
+  try {
+    totals.csr_partners = db.prepare(`SELECT COUNT(*) as c FROM csr_partners`).get().c;
+    totals.support_tickets = db.prepare(`SELECT COUNT(*) as c FROM support_tickets WHERE status='open'`).get().c;
+  } catch(e){}
   const latest = db.prepare(`SELECT member_id,name,mobile,email,membership_active,created_at FROM users WHERE role='member' ORDER BY id DESC LIMIT 10`).all();
   res.json({ totals, latest });
 });
@@ -650,6 +660,110 @@ app.post('/api/admin/csr-partner/:partnerId', auth('admin'), (req,res)=>{
 app.delete('/api/admin/csr-partner/:partnerId', auth('admin'), (req,res)=>{
   db.prepare(`DELETE FROM csr_partners WHERE partner_id=?`).run(req.params.partnerId);
   res.json({ ok:true, message:'Partner deleted' });
+});
+
+// ===== MEMBERSHIP FEE TRANSACTIONS =====
+db.exec(`CREATE TABLE IF NOT EXISTS membership_fees (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  txn_id TEXT UNIQUE NOT NULL,
+  member_id TEXT NOT NULL,
+  user_id INTEGER,
+  member_name TEXT,
+  amount REAL NOT NULL DEFAULT 0,
+  fee_type TEXT CHECK(fee_type IN ('joining','renewal','upgrade','other')) DEFAULT 'joining',
+  payment_mode TEXT CHECK(payment_mode IN ('upi','bank_transfer','cash','cheque','online','other')) DEFAULT 'online',
+  payment_ref TEXT,
+  status TEXT CHECK(status IN ('pending','verified','rejected','refunded')) DEFAULT 'pending',
+  verified_by TEXT,
+  verified_at TEXT,
+  notes TEXT,
+  receipt_url TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+)`);
+
+function nextTxnId(){
+  const row = db.prepare(`SELECT txn_id FROM membership_fees ORDER BY id DESC LIMIT 1`).get();
+  let n = 0;
+  if(row && row.txn_id){
+    const m = row.txn_id.match(/(\d+)$/);
+    if(m) n = parseInt(m[1],10);
+  }
+  return `FWF-TXN-${(n+1).toString().padStart(5,'0')}`;
+}
+
+// Admin: get all membership fee transactions
+app.get('/api/admin/membership-fees', auth('admin'), (req,res)=>{
+  const fees = db.prepare(`SELECT * FROM membership_fees ORDER BY id DESC`).all();
+  const stats = {
+    total: db.prepare(`SELECT COUNT(*) as c FROM membership_fees`).get().c,
+    pending: db.prepare(`SELECT COUNT(*) as c FROM membership_fees WHERE status='pending'`).get().c,
+    verified: db.prepare(`SELECT COUNT(*) as c FROM membership_fees WHERE status='verified'`).get().c,
+    rejected: db.prepare(`SELECT COUNT(*) as c FROM membership_fees WHERE status='rejected'`).get().c,
+    totalAmount: db.prepare(`SELECT COALESCE(SUM(amount),0) as c FROM membership_fees WHERE status='verified'`).get().c,
+    pendingAmount: db.prepare(`SELECT COALESCE(SUM(amount),0) as c FROM membership_fees WHERE status='pending'`).get().c
+  };
+  res.json({ ok:true, fees, stats });
+});
+
+// Admin: add a membership fee record manually
+app.post('/api/admin/membership-fee', auth('admin'), (req,res)=>{
+  const { memberId, amount, feeType, paymentMode, paymentRef, status, notes } = req.body;
+  if(!memberId || !amount) return res.status(400).json({error:'Member ID and amount required'});
+  
+  const u = db.prepare(`SELECT id, name FROM users WHERE member_id=?`).get(memberId);
+  if(!u) return res.status(404).json({error:'Member not found'});
+  
+  const txnId = nextTxnId();
+  const finalStatus = status || 'pending';
+  
+  db.prepare(`INSERT INTO membership_fees(txn_id, member_id, user_id, member_name, amount, fee_type, payment_mode, payment_ref, status, notes)
+    VALUES(?,?,?,?,?,?,?,?,?,?)`)
+    .run(txnId, memberId, u.id, u.name, parseFloat(amount), feeType||'joining', paymentMode||'online', paymentRef||null, finalStatus, notes||null);
+  
+  // If verified immediately, activate membership
+  if(finalStatus === 'verified'){
+    db.prepare(`UPDATE membership_fees SET verified_by=?, verified_at=datetime('now') WHERE txn_id=?`).run(req.user.name||'Admin', txnId);
+    db.prepare(`UPDATE users SET membership_active=1 WHERE id=?`).run(u.id);
+  }
+  
+  res.json({ ok:true, txnId, message:'Fee record added!' });
+});
+
+// Admin: update fee status (verify/reject/refund)
+app.post('/api/admin/membership-fee/:txnId', auth('admin'), (req,res)=>{
+  const { status, notes, paymentRef } = req.body;
+  const f = db.prepare(`SELECT * FROM membership_fees WHERE txn_id=?`).get(req.params.txnId);
+  if(!f) return res.status(404).json({error:'Transaction not found'});
+  
+  const sets = ['updated_at=datetime(\'now\')'];
+  const vals = [];
+  if(status){ 
+    sets.push('status=?'); vals.push(status);
+    if(status === 'verified'){
+      sets.push('verified_by=?'); vals.push(req.user.name||'Admin');
+      sets.push('verified_at=datetime(\'now\')');
+      // Activate member
+      if(f.user_id) db.prepare(`UPDATE users SET membership_active=1 WHERE id=?`).run(f.user_id);
+    }
+    if(status === 'rejected' || status === 'refunded'){
+      // Optionally deactivate
+      if(f.user_id && f.fee_type === 'joining'){
+        db.prepare(`UPDATE users SET membership_active=0 WHERE id=?`).run(f.user_id);
+      }
+    }
+  }
+  if(notes !== undefined){ sets.push('notes=?'); vals.push(notes); }
+  if(paymentRef !== undefined){ sets.push('payment_ref=?'); vals.push(paymentRef); }
+  vals.push(req.params.txnId);
+  db.prepare(`UPDATE membership_fees SET ${sets.join(',')} WHERE txn_id=?`).run(...vals);
+  res.json({ ok:true, message:'Transaction updated' });
+});
+
+// Admin: get fee summary for a specific member
+app.get('/api/admin/membership-fees/:memberId', auth('admin'), (req,res)=>{
+  const fees = db.prepare(`SELECT * FROM membership_fees WHERE member_id=? ORDER BY id DESC`).all(req.params.memberId);
+  res.json({ ok:true, fees });
 });
 
 // Sentry error handler MUST be before other error handlers and after all routes

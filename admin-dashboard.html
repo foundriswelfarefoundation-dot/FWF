@@ -443,6 +443,10 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <i class="fa-solid fa-headset"></i> Support
       <span class="nav-badge" id="supportBadge" style="display:none">0</span>
     </button>
+    <button class="nav-item" data-page="payments">
+      <i class="fa-solid fa-indian-rupee-sign"></i> Payments
+      <span class="nav-badge" id="paymentBadge" style="display:none">0</span>
+    </button>
     <button class="nav-item" data-page="points">
       <i class="fa-solid fa-coins"></i> Points & Activity
     </button>
@@ -528,6 +532,19 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
+    <div class="stats-row" style="grid-template-columns:repeat(2,1fr)">
+      <div class="stat-card" style="cursor:pointer" onclick="switchPage('payments')">
+        <div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="s-label">Fee Collected</div>
+        <div class="s-value" id="hFeeCollected">₹0</div>
+      </div>
+      <div class="stat-card" style="cursor:pointer" onclick="switchPage('payments')">
+        <div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div>
+        <div class="s-label">Pending Fee Verifications</div>
+        <div class="s-value" id="hFeePending">0</div>
+      </div>
+    </div>
+
     <div class="content-card">
       <h3><i class="fa-solid fa-clock"></i> Recent Members</h3>
       <div class="table-wrap">
@@ -561,6 +578,65 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <thead><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Email</th><th>Points</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
           <tbody id="membersBody">
             <tr><td colspan="8" class="empty-state"><p>Loading...</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAYMENTS / MEMBERSHIP FEES ===================== -->
+  <div class="page" id="page-payments">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="s-label">Total Collected</div>
+        <div class="s-value" id="feeCollected">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div>
+        <div class="s-label">Pending</div>
+        <div class="s-value" id="feePending">0</div>
+        <div class="s-sub" id="feePendingAmt">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-check-double"></i></div>
+        <div class="s-label">Verified</div>
+        <div class="s-value" id="feeVerified">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-red"><i class="fa-solid fa-xmark"></i></div>
+        <div class="s-label">Rejected</div>
+        <div class="s-value" id="feeRejected">0</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="search-bar">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="feeSearch" placeholder="Search by member ID, name, transaction ID...">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
+        <select id="feeFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+          <option value="rejected">Rejected</option>
+          <option value="refunded">Refunded</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadMembershipFees()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+        <button class="btn btn-primary" onclick="openModal('addFeeModal')"><i class="fa-solid fa-plus"></i> Add Fee Record</button>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-receipt"></i> Membership Fee Transactions</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>TXN ID</th><th>Member</th><th>Amount</th><th>Type</th><th>Payment Mode</th><th>Ref</th><th>Status</th><th>Date</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="feesBody">
+            <tr><td colspan="9" class="empty-state"><p>Loading...</p></td></tr>
           </tbody>
         </table>
       </div>
@@ -1347,6 +1423,102 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   </div>
 </div>
 
+<!-- Add Fee Record Modal -->
+<div class="modal-overlay hidden" id="addFeeModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-indian-rupee-sign"></i> Add Fee Record</h3>
+      <button class="modal-close" onclick="closeModal('addFeeModal')">&times;</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Member ID *</label>
+        <input type="text" class="form-input" id="afMemberId" placeholder="e.g. FWF-000001">
+      </div>
+      <div class="form-group">
+        <label>Amount (₹) *</label>
+        <input type="number" class="form-input" id="afAmount" placeholder="500" min="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fee Type</label>
+        <select class="form-input" id="afType">
+          <option value="joining">Joining Fee</option>
+          <option value="renewal">Renewal</option>
+          <option value="upgrade">Upgrade</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select class="form-input" id="afMode">
+          <option value="upi">UPI</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="cash">Cash</option>
+          <option value="cheque">Cheque</option>
+          <option value="online">Online</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Payment Reference / UTR</label>
+        <input type="text" class="form-input" id="afRef" placeholder="UTR / Reference number">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-input" id="afStatus">
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-input" id="afNotes" placeholder="Optional notes..." rows="2"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addFeeModal')">Cancel</button>
+      <button class="btn btn-primary" id="afSubmit"><i class="fa-solid fa-plus"></i> Add Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Fee Status Modal -->
+<div class="modal-overlay hidden" id="updateFeeModal">
+  <div class="modal-card" style="max-width:480px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-edit"></i> Update Transaction</h3>
+      <button class="modal-close" onclick="closeModal('updateFeeModal')">&times;</button>
+    </div>
+    <input type="hidden" id="ufTxnId">
+    <div id="ufInfo" style="padding:10px;background:#f8fafc;border-radius:10px;margin-bottom:12px;font-size:13px;font-weight:600"></div>
+    <div class="form-group">
+      <label>Status</label>
+      <select class="form-input" id="ufStatus">
+        <option value="pending">Pending</option>
+        <option value="verified">Verified ✅</option>
+        <option value="rejected">Rejected ❌</option>
+        <option value="refunded">Refunded 🔄</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Payment Reference / UTR</label>
+      <input type="text" class="form-input" id="ufRef" placeholder="UTR / Reference number">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-input" id="ufNotes" placeholder="Admin notes..." rows="2"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('updateFeeModal')">Cancel</button>
+      <button class="btn btn-primary" id="ufSubmit"><i class="fa-solid fa-check"></i> Update</button>
+    </div>
+  </div>
+</div>
+
 <script src="assets/js/fwf.js"></script>
 <script src="auth.js"></script>
 <script>
@@ -1358,6 +1530,7 @@ const pageTitles = {
   members: '<i class="fa-solid fa-users"></i> Members Management',
   csr: '<i class="fa-solid fa-handshake"></i> CSR Partners',
   support: '<i class="fa-solid fa-headset"></i> Support Tickets',
+  payments: '<i class="fa-solid fa-indian-rupee-sign"></i> Membership Fee Payments',
   points: '<i class="fa-solid fa-coins"></i> Points & Activity',
   courses: '<i class="fa-solid fa-graduation-cap"></i> Course Management',
   marketplace: '<i class="fa-solid fa-store"></i> Marketplace Management',
@@ -1379,6 +1552,7 @@ function switchPage(page){
   if(page === 'members') loadMembers();
   if(page === 'csr') loadCSRPartners();
   if(page === 'support') loadSupportTickets();
+  if(page === 'payments') loadMembershipFees();
   if(page === 'points') loadPointsActivity();
   if(page === 'reports') loadReports();
 }
@@ -1431,7 +1605,7 @@ function notify(msg, type){
   else alert(msg);
 }
 function statusBadge(s){
-  const map = {active:'b-active',inactive:'b-inactive',open:'b-open','in-progress':'b-progress',resolved:'b-resolved',closed:'b-closed',lead:'b-lead',contacted:'b-contacted',negotiating:'b-negotiating',pending:'b-pending'};
+  const map = {active:'b-active',inactive:'b-inactive',open:'b-open','in-progress':'b-progress',resolved:'b-resolved',closed:'b-closed',lead:'b-lead',contacted:'b-contacted',negotiating:'b-negotiating',pending:'b-pending',verified:'b-active',rejected:'b-inactive',refunded:'b-closed'};
   return `<span class="badge ${map[s]||'b-open'}">${s}</span>`;
 }
 function priBadge(p){
@@ -1456,6 +1630,8 @@ async function loadDashboard(){
     document.getElementById('hTickets').textContent = fmtN(t.total_tickets_sold);
     document.getElementById('hCSR').textContent = fmtN(t.csr_partners);
     document.getElementById('hSupport').textContent = fmtN(t.support_tickets);
+    document.getElementById('hFeeCollected').textContent = '₹' + fmtN(t.total_fee_collected);
+    document.getElementById('hFeePending').textContent = fmtN(t.pending_fees);
 
     const tbody = document.getElementById('hLatest');
     if(data.latest && data.latest.length > 0){
@@ -1469,9 +1645,10 @@ async function loadDashboard(){
       </tr>`).join('');
     }
 
-    // Load CSR + support counts
+    // Load CSR + support + fee counts
     loadCSRCount();
     loadSupportCount();
+    loadFeeCount();
   } catch(e){
     notify('Session expired. Redirecting...', 'error');
     setTimeout(() => location.href = '/admin-login', 2000);
@@ -1491,6 +1668,17 @@ async function loadSupportCount(){
     document.getElementById('hSupport').textContent = fmtN(d.stats.open);
     const badge = document.getElementById('supportBadge');
     if(d.stats.open > 0){ badge.textContent = d.stats.open; badge.style.display = ''; }
+    else { badge.style.display = 'none'; }
+  } catch(e){}
+}
+
+async function loadFeeCount(){
+  try{
+    const d = await AUTH.api('/api/admin/membership-fees');
+    document.getElementById('hFeeCollected').textContent = '₹' + fmtN(d.stats.totalAmount);
+    document.getElementById('hFeePending').textContent = fmtN(d.stats.pending);
+    const badge = document.getElementById('paymentBadge');
+    if(d.stats.pending > 0){ badge.textContent = d.stats.pending; badge.style.display = ''; }
     else { badge.style.display = 'none'; }
   } catch(e){}
 }
@@ -1588,6 +1776,159 @@ async function viewMember(memberId){
     }
     content.innerHTML = html;
   } catch(e){ content.innerHTML = '<div class="empty-state"><p>Failed to load member details</p></div>'; }
+}
+
+/* ============================================
+   MEMBERSHIP FEE PAYMENTS
+   ============================================ */
+let allFees = [];
+
+async function loadMembershipFees(){
+  try{
+    const d = await AUTH.api('/api/admin/membership-fees');
+    const s = d.stats;
+    allFees = d.fees || [];
+    document.getElementById('feeCollected').textContent = '₹' + fmtN(s.totalAmount);
+    document.getElementById('feePending').textContent = fmtN(s.pending);
+    document.getElementById('feePendingAmt').textContent = '₹' + fmtN(s.pendingAmount);
+    document.getElementById('feeVerified').textContent = fmtN(s.verified);
+    document.getElementById('feeRejected').textContent = fmtN(s.rejected);
+    
+    // Update dashboard badge
+    const badge = document.getElementById('paymentBadge');
+    if(s.pending > 0){ badge.textContent = s.pending; badge.style.display = ''; }
+    else { badge.style.display = 'none'; }
+    
+    renderFees(allFees);
+  } catch(e){
+    document.getElementById('feesBody').innerHTML = '<tr><td colspan="9" class="empty-state" style="color:var(--danger)"><i class="fa-solid fa-exclamation-triangle"></i><p>⚠️ Failed to load payment data<br><small>Backend may be unavailable</small></p></td></tr>';
+    console.error('Fee load error:', e);
+  }
+}
+
+function renderFees(list){
+  const tb = document.getElementById('feesBody');
+  if(!list.length){ tb.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fa-solid fa-receipt"></i><p>No fee transactions yet</p></td></tr>'; return; }
+  tb.innerHTML = list.map(f => {
+    const feeTypeLabel = {joining:'Joining',renewal:'Renewal',upgrade:'Upgrade',other:'Other'}[f.fee_type]||f.fee_type;
+    const modeLabel = {upi:'UPI',bank_transfer:'Bank Transfer',cash:'Cash',cheque:'Cheque',online:'Online',other:'Other'}[f.payment_mode]||f.payment_mode;
+    return `<tr>
+      <td><span style="font-weight:800;color:var(--accent);font-size:11px">${f.txn_id}</span></td>
+      <td>
+        <div style="font-weight:700;font-size:12px">${f.member_name||'—'}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${f.member_id}</div>
+      </td>
+      <td style="font-weight:800;color:#059669">₹${fmtN(f.amount)}</td>
+      <td><span class="badge b-${f.fee_type==='joining'?'active':f.fee_type==='renewal'?'progress':'open'}">${feeTypeLabel}</span></td>
+      <td style="font-size:12px;font-weight:600">${modeLabel}</td>
+      <td style="font-size:11px;color:var(--text-muted)">${f.payment_ref||'—'}</td>
+      <td>${statusBadge(f.status)}</td>
+      <td style="color:var(--text-muted);font-size:12px">${fmtDate(f.created_at)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" title="Update" onclick="openUpdateFee('${f.txn_id}')"><i class="fa-solid fa-pen"></i></button>
+          ${f.status==='pending'?`<button class="btn-icon" title="Quick Verify" style="color:#059669" onclick="quickVerifyFee('${f.txn_id}')"><i class="fa-solid fa-check"></i></button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// Search & Filter
+document.getElementById('feeSearch')?.addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  const filtered = allFees.filter(f => 
+    (f.txn_id||'').toLowerCase().includes(q) || 
+    (f.member_id||'').toLowerCase().includes(q) || 
+    (f.member_name||'').toLowerCase().includes(q) ||
+    (f.payment_ref||'').toLowerCase().includes(q)
+  );
+  renderFees(filtered);
+});
+
+document.getElementById('feeFilter')?.addEventListener('change', e => {
+  const val = e.target.value;
+  if(val === 'all') renderFees(allFees);
+  else renderFees(allFees.filter(f => f.status === val));
+});
+
+// Add Fee Record
+document.getElementById('afSubmit')?.addEventListener('click', async ()=>{
+  const memberId = document.getElementById('afMemberId').value.trim();
+  const amount = document.getElementById('afAmount').value;
+  if(!memberId || !amount){ notify('Member ID and Amount required','error'); return; }
+  
+  try{
+    const res = await AUTH.api('/api/admin/membership-fee', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        memberId,
+        amount: parseFloat(amount),
+        feeType: document.getElementById('afType').value,
+        paymentMode: document.getElementById('afMode').value,
+        paymentRef: document.getElementById('afRef').value.trim() || null,
+        status: document.getElementById('afStatus').value,
+        notes: document.getElementById('afNotes').value.trim() || null
+      })
+    });
+    notify('Fee record added: ' + res.txnId, 'success');
+    closeModal('addFeeModal');
+    document.getElementById('afMemberId').value = '';
+    document.getElementById('afAmount').value = '';
+    document.getElementById('afRef').value = '';
+    document.getElementById('afNotes').value = '';
+    loadMembershipFees();
+  } catch(e){ notify('Failed to add: ' + (e.message||'error'), 'error'); }
+});
+
+// Open Update Fee Modal
+function openUpdateFee(txnId){
+  const f = allFees.find(x => x.txn_id === txnId);
+  if(!f) return;
+  document.getElementById('ufTxnId').value = txnId;
+  document.getElementById('ufInfo').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>${f.txn_id}</strong> · ${f.member_name} (${f.member_id})</div>
+      <div style="font-weight:800;color:#059669">₹${fmtN(f.amount)}</div>
+    </div>`;
+  document.getElementById('ufStatus').value = f.status;
+  document.getElementById('ufRef').value = f.payment_ref || '';
+  document.getElementById('ufNotes').value = f.notes || '';
+  openModal('updateFeeModal');
+}
+
+// Update Fee Status
+document.getElementById('ufSubmit')?.addEventListener('click', async ()=>{
+  const txnId = document.getElementById('ufTxnId').value;
+  try{
+    await AUTH.api('/api/admin/membership-fee/' + txnId, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        status: document.getElementById('ufStatus').value,
+        paymentRef: document.getElementById('ufRef').value.trim() || undefined,
+        notes: document.getElementById('ufNotes').value.trim() || undefined
+      })
+    });
+    notify('Transaction updated!', 'success');
+    closeModal('updateFeeModal');
+    loadMembershipFees();
+  } catch(e){ notify('Failed to update: ' + (e.message||'error'), 'error'); }
+});
+
+// Quick Verify
+async function quickVerifyFee(txnId){
+  if(!confirm('Mark this transaction as VERIFIED? This will activate the member\\'s membership.')) return;
+  try{
+    await AUTH.api('/api/admin/membership-fee/' + txnId, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status: 'verified' })
+    });
+    notify('Transaction verified!', 'success');
+    loadMembershipFees();
+  } catch(e){ notify('Error: ' + (e.message||''), 'error'); }
 }
 
 /* ============================================

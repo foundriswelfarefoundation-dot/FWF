@@ -1919,7 +1919,7 @@ document.getElementById('ufSubmit')?.addEventListener('click', async ()=>{
 
 // Quick Verify
 async function quickVerifyFee(txnId){
-  if(!confirm('Mark this transaction as VERIFIED? This will activate the member\\'s membership.')) return;
+  if(!confirm('Mark this transaction as VERIFIED? This will activate the member\'s membership.')) return;
   try{
     await AUTH.api('/api/admin/membership-fee/' + txnId, {
       method:'POST',

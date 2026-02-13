@@ -47,7 +47,6 @@
   }
   .brand{ display:flex; align-items:center; gap:8px }
   .brand img{ width:48px; height:48px; object-fit:contain; border-radius:12px }
-  .brand-name{ font-weight:900; font-size:1.15rem; background:linear-gradient(135deg,var(--gA),var(--gB)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent }
 
   /* Nav links */
   nav{ display:flex; align-items:center; gap:6px }
@@ -92,7 +91,7 @@
   /* =============== HERO BANNER =============== */
   .store-hero{
     background:linear-gradient(135deg,var(--deep) 0%,#1a1040 40%,#0c2340 100%);
-    padding:52px 0 44px; position:relative; overflow:hidden
+    padding:36px 0 32px; position:relative; overflow:hidden
   }
   .store-hero::before{
     content:""; position:absolute; top:-50%; right:-20%; width:500px; height:500px;
@@ -107,14 +106,21 @@
   .hero-tag{
     display:inline-flex; align-items:center; gap:6px; background:rgba(96,165,250,.12);
     color:var(--gA); font-size:.78rem; font-weight:700; padding:6px 14px; border-radius:20px;
-    border:1px solid rgba(96,165,250,.2); margin-bottom:16px; letter-spacing:.04em; text-transform:uppercase
+    border:1px solid rgba(96,165,250,.2); margin-bottom:12px; letter-spacing:.04em; text-transform:uppercase
   }
+  .hero-impact{
+    display:inline-flex; align-items:center; gap:8px; background:rgba(34,197,94,.08);
+    color:var(--gC); font-size:.82rem; font-weight:600; padding:8px 16px; border-radius:12px;
+    border:1px solid rgba(34,197,94,.15); margin-bottom:18px; backdrop-filter:blur(8px)
+  }
+  .hero-impact i{ font-size:1.1rem }
   .hero-text h1{
-    font-size:clamp(1.6rem,3.5vw,2.4rem); font-weight:900; color:#fff;
-    margin:0 0 10px; line-height:1.2; letter-spacing:-.02em
+    font-size:clamp(1.5rem,3.2vw,2.2rem); font-weight:900; color:#fff;
+    margin:0 0 12px; line-height:1.2; letter-spacing:-.02em
   }
   .hero-text h1 span{ background:linear-gradient(90deg,var(--gA),var(--gD)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent }
-  .hero-text p{ color:#94a3b8; font-size:1rem; margin:0 0 20px; max-width:500px; line-height:1.6 }
+  .hero-text p{ color:#94a3b8; font-size:.95rem; margin:0 0 14px; max-width:520px; line-height:1.6 }
+  .hero-text .subtext{ color:#64748b; font-size:.88rem; font-style:italic; margin:0 0 18px; max-width:520px; line-height:1.5 }
   .hero-stats{ display:flex; gap:28px }
   .hero-stat{ text-align:center }
   .hero-stat .num{ font-size:1.5rem; font-weight:900; color:#fff }
@@ -523,7 +529,6 @@
   <div class="H">
     <a href="index.html" class="brand">
       <img src="assets/images/logo.png" alt="FWF"/>
-      <span class="brand-name">FWF Store</span>
     </a>
     <nav id="mainNav">
       <ul class="navList">
@@ -553,12 +558,14 @@
     <div class="hero-inner">
       <div class="hero-text">
         <div class="hero-tag"><i class="fas fa-sparkles"></i> Women-led Marketplace</div>
-        <h1>Discover <span>Handcrafted</span> Products from Our Community</h1>
-        <p>Shop artisan goods, organic products &amp; handmade creations directly from women entrepreneurs across India.</p>
+        <h1>Shop with <span>Purpose</span> • Empower with <span>Every Purchase</span></h1>
+        <p>Each product you buy creates sustainable livelihoods for women artisans and their families. Your purchase is more than a transaction—it's an investment in empowerment.</p>
+        <p class="subtext">"When you shop here, you're not just buying a product, you're providing employment, dignity, and hope."</p>
+        <div class="hero-impact"><i class="fas fa-hand-holding-heart"></i> Every purchase creates employment opportunities for women entrepreneurs</div>
         <div class="hero-stats">
           <div class="hero-stat"><div class="num" id="heroTotal">--</div><div class="lbl">Products</div></div>
           <div class="hero-stat"><div class="num" id="heroCats">12</div><div class="lbl">Categories</div></div>
-          <div class="hero-stat"><div class="num">100%</div><div class="lbl">Verified Sellers</div></div>
+          <div class="hero-stat"><div class="num">100%</div><div class="lbl">Women Artisans</div></div>
         </div>
       </div>
       <div class="hero-visual">

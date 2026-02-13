@@ -1031,7 +1031,7 @@ window.addEventListener('scroll', () => {
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){
     closeProductModal();
-    if(document.getElementById('cartDrawer').classList.contains('open')) toggle CartDrawer();
+    if(document.getElementById('cartDrawer').classList.contains('open')) toggleCartDrawer();
     if(document.getElementById('wishDrawer').classList.contains('open')) toggleWishDrawer();
   }
 });

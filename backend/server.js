@@ -766,6 +766,357 @@ app.get('/api/admin/membership-fees/:memberId', auth('admin'), (req,res)=>{
   res.json({ ok:true, fees });
 });
 
+// ===== MARKETPLACE / PRODUCTS SYSTEM =====
+db.exec(`CREATE TABLE IF NOT EXISTS products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id TEXT UNIQUE NOT NULL,
+  seller_user_id INTEGER NOT NULL,
+  seller_name TEXT,
+  seller_member_id TEXT,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT NOT NULL DEFAULT 'other',
+  subcategory TEXT,
+  brand TEXT,
+  price REAL NOT NULL DEFAULT 0,
+  mrp REAL,
+  discount_percent REAL DEFAULT 0,
+  stock INTEGER DEFAULT 1,
+  unit TEXT DEFAULT 'piece',
+  weight TEXT,
+  dimensions TEXT,
+  material TEXT,
+  color TEXT,
+  size TEXT,
+  tags TEXT,
+  images TEXT DEFAULT '[]',
+  thumbnail TEXT,
+  condition TEXT CHECK(condition IN ('new','like-new','used','refurbished')) DEFAULT 'new',
+  status TEXT CHECK(status IN ('draft','pending','approved','rejected','out-of-stock','archived')) DEFAULT 'pending',
+  admin_notes TEXT,
+  rating_avg REAL DEFAULT 0,
+  rating_count INTEGER DEFAULT 0,
+  total_sold INTEGER DEFAULT 0,
+  views INTEGER DEFAULT 0,
+  featured INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+)`);
+
+db.exec(`CREATE TABLE IF NOT EXISTS orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id TEXT UNIQUE NOT NULL,
+  product_id TEXT NOT NULL,
+  product_title TEXT,
+  buyer_name TEXT,
+  buyer_contact TEXT,
+  buyer_email TEXT,
+  buyer_address TEXT,
+  seller_user_id INTEGER,
+  seller_member_id TEXT,
+  quantity INTEGER DEFAULT 1,
+  unit_price REAL,
+  total_amount REAL,
+  payment_mode TEXT DEFAULT 'online',
+  payment_ref TEXT,
+  status TEXT CHECK(status IN ('pending','confirmed','processing','shipped','delivered','cancelled','refunded')) DEFAULT 'pending',
+  tracking_info TEXT,
+  notes TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+)`);
+
+// Flipkart/Amazon style category tree
+const PRODUCT_CATEGORIES = {
+  'electronics': { label: 'Electronics', icon: 'fa-laptop', subs: ['Mobile Phones','Laptops','Tablets','Cameras','Headphones','Speakers','Smartwatches','Accessories','Chargers & Cables','Power Banks'] },
+  'fashion-women': { label: 'Women\'s Fashion', icon: 'fa-person-dress', subs: ['Sarees','Kurtis & Kurtas','Dress Materials','Lehengas','Tops & T-Shirts','Jeans & Pants','Dupatta','Jewellery','Footwear','Bags & Clutches'] },
+  'fashion-men': { label: 'Men\'s Fashion', icon: 'fa-shirt', subs: ['Shirts','T-Shirts','Kurtas','Jeans & Trousers','Shoes','Wallets','Belts','Caps & Hats'] },
+  'home-kitchen': { label: 'Home & Kitchen', icon: 'fa-house', subs: ['Cookware','Storage & Containers','Kitchen Tools','Dinnerware','Home Decor','Bedsheets & Curtains','Cleaning Supplies','Pooja Items','Handloom Textiles'] },
+  'beauty-health': { label: 'Beauty & Health', icon: 'fa-spa', subs: ['Skincare','Haircare','Makeup','Perfumes','Ayurvedic Products','Essential Oils','Herbal Supplements','Personal Care'] },
+  'handicraft': { label: 'Handicraft & Art', icon: 'fa-palette', subs: ['Madhubani Painting','Pottery','Bamboo Craft','Jute Products','Embroidery','Wood Carving','Metal Art','Handloom','Paper Craft','Block Print'] },
+  'organic-natural': { label: 'Organic & Natural', icon: 'fa-leaf', subs: ['Organic Honey','Organic Spices','Herbal Tea','Cold-Pressed Oil','Natural Soaps','Incense Sticks','Dry Fruits','Organic Grains'] },
+  'food-beverages': { label: 'Food & Beverages', icon: 'fa-utensils', subs: ['Pickles & Chutneys','Sweets & Namkeen','Papad & Chips','Jams & Preserves','Ready to Cook','Beverages','Masalas'] },
+  'books-stationery': { label: 'Books & Stationery', icon: 'fa-book', subs: ['Books','Notebooks','Handmade Paper','Art Supplies','Office Supplies'] },
+  'toys-kids': { label: 'Toys & Kids', icon: 'fa-baby', subs: ['Wooden Toys','Educational Toys','Kids Clothing','School Bags','Baby Care'] },
+  'agriculture': { label: 'Agriculture & Garden', icon: 'fa-seedling', subs: ['Seeds','Fertilizers','Garden Tools','Plants & Saplings','Organic Compost','Farm Equipment'] },
+  'services': { label: 'Services', icon: 'fa-hands-helping', subs: ['Tailoring','Mehendi','Beauty Services','Home Repair','Tutoring','Cooking Classes'] }
+};
+
+function nextProductId(){
+  const row = db.prepare(`SELECT product_id FROM products ORDER BY id DESC LIMIT 1`).get();
+  let n = 0;
+  if(row && row.product_id){
+    const m = row.product_id.match(/(\d+)$/);
+    if(m) n = parseInt(m[1],10);
+  }
+  return `PROD-${(n+1).toString().padStart(5,'0')}`;
+}
+function nextOrderId(){
+  const row = db.prepare(`SELECT order_id FROM orders ORDER BY id DESC LIMIT 1`).get();
+  let n = 0;
+  if(row && row.order_id){
+    const m = row.order_id.match(/(\d+)$/);
+    if(m) n = parseInt(m[1],10);
+  }
+  return `ORD-${(n+1).toString().padStart(5,'0')}`;
+}
+
+// Image security: validate base64 images
+const ALLOWED_IMAGE_TYPES = ['image/jpeg','image/png','image/webp','image/gif'];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB per image
+const MAX_IMAGES = 8;
+
+function validateImage(base64Str){
+  if(!base64Str) return { valid:false, error:'No image data' };
+  // Check base64 prefix
+  const match = base64Str.match(/^data:(image\/[a-z+]+);base64,/i);
+  if(!match) return { valid:false, error:'Invalid image format' };
+  const mimeType = match[1].toLowerCase();
+  if(!ALLOWED_IMAGE_TYPES.includes(mimeType)) return { valid:false, error:`File type ${mimeType} not allowed. Use JPEG, PNG, WebP, or GIF.` };
+  // Check size
+  const base64Data = base64Str.replace(/^data:image\/[a-z+]+;base64,/i, '');
+  const sizeBytes = Math.ceil(base64Data.length * 3/4);
+  if(sizeBytes > MAX_IMAGE_SIZE) return { valid:false, error:`Image too large (${(sizeBytes/1024/1024).toFixed(1)}MB). Max 5MB.` };
+  // Check for script injection in base64 data
+  const decodedSample = Buffer.from(base64Data.substring(0,200), 'base64').toString('utf8');
+  if(/<script|javascript:|onerror|onload|eval\(/i.test(decodedSample)){
+    return { valid:false, error:'Image contains suspicious content' };
+  }
+  // Check magic bytes (file signature)
+  const bytes = Buffer.from(base64Data.substring(0,12), 'base64');
+  const isJPEG = bytes[0]===0xFF && bytes[1]===0xD8;
+  const isPNG = bytes[0]===0x89 && bytes[1]===0x50 && bytes[2]===0x4E && bytes[3]===0x47;
+  const isGIF = bytes[0]===0x47 && bytes[1]===0x49 && bytes[2]===0x46;
+  const isWEBP = bytes[0]===0x52 && bytes[1]===0x49 && bytes[2]===0x46 && bytes[3]===0x46;
+  if(!isJPEG && !isPNG && !isGIF && !isWEBP) return { valid:false, error:'Image file signature mismatch. File may be corrupted or disguised.' };
+  return { valid:true, mimeType, sizeBytes };
+}
+
+// GET categories list (public)
+app.get('/api/store/categories', (req,res)=>{
+  res.json({ ok:true, categories: PRODUCT_CATEGORIES });
+});
+
+// GET all approved products (public store)
+app.get('/api/store/products', (req,res)=>{
+  const { category, subcategory, search, sort, page: pg, limit: lim } = req.query;
+  let sql = `SELECT product_id, title, description, category, subcategory, brand, price, mrp, discount_percent, stock, unit, images, thumbnail, condition, rating_avg, rating_count, total_sold, seller_name, seller_member_id, created_at FROM products WHERE status='approved'`;
+  const params = [];
+  if(category){ sql += ` AND category=?`; params.push(category); }
+  if(subcategory){ sql += ` AND subcategory=?`; params.push(subcategory); }
+  if(search){ sql += ` AND (title LIKE ? OR description LIKE ? OR tags LIKE ? OR brand LIKE ?)`; const s = `%${search}%`; params.push(s,s,s,s); }
+  
+  // Sort
+  if(sort === 'price-low') sql += ` ORDER BY price ASC`;
+  else if(sort === 'price-high') sql += ` ORDER BY price DESC`;
+  else if(sort === 'rating') sql += ` ORDER BY rating_avg DESC`;
+  else if(sort === 'popular') sql += ` ORDER BY total_sold DESC`;
+  else if(sort === 'newest') sql += ` ORDER BY created_at DESC`;
+  else sql += ` ORDER BY featured DESC, created_at DESC`;
+  
+  const page = parseInt(pg) || 1;
+  const limit = Math.min(parseInt(lim) || 24, 100);
+  const offset = (page - 1) * limit;
+  
+  const countSql = sql.replace(/SELECT .* FROM/, 'SELECT COUNT(*) as total FROM').replace(/ORDER BY.*$/, '');
+  const total = db.prepare(countSql).get(...params).total;
+  
+  sql += ` LIMIT ? OFFSET ?`;
+  params.push(limit, offset);
+  const products = db.prepare(sql).all(...params);
+  
+  // Parse images JSON
+  products.forEach(p => {
+    try { p.images = JSON.parse(p.images || '[]'); } catch(e){ p.images = []; }
+  });
+  
+  const catStats = db.prepare(`SELECT category, COUNT(*) as count FROM products WHERE status='approved' GROUP BY category`).all();
+  
+  res.json({ ok:true, products, total, page, limit, pages: Math.ceil(total/limit), categoryStats: catStats });
+});
+
+// GET single product detail (public)
+app.get('/api/store/product/:productId', (req,res)=>{
+  const p = db.prepare(`SELECT * FROM products WHERE product_id=? AND status='approved'`).get(req.params.productId);
+  if(!p) return res.status(404).json({error:'Product not found'});
+  try { p.images = JSON.parse(p.images || '[]'); } catch(e){ p.images = []; }
+  // Increment views
+  db.prepare(`UPDATE products SET views = views + 1 WHERE product_id=?`).run(req.params.productId);
+  res.json({ ok:true, product: p });
+});
+
+// Member: add product (seller listing)
+app.post('/api/member/add-product', auth('member'), (req,res)=>{
+  const { title, description, category, subcategory, brand, price, mrp, stock, unit, weight, dimensions, material, color, size, tags, images, condition } = req.body;
+  if(!title || !price || !category) return res.status(400).json({error:'Title, price, and category required'});
+  
+  // Validate images
+  let validatedImages = [];
+  if(images && Array.isArray(images)){
+    if(images.length > MAX_IMAGES) return res.status(400).json({error:`Maximum ${MAX_IMAGES} images allowed`});
+    for(let i = 0; i < images.length; i++){
+      const result = validateImage(images[i]);
+      if(!result.valid) return res.status(400).json({error:`Image ${i+1}: ${result.error}`});
+      validatedImages.push(images[i]);
+    }
+  }
+  
+  const u = db.prepare(`SELECT name, member_id FROM users WHERE id=?`).get(req.user.uid);
+  const productId = nextProductId();
+  const discountPct = mrp && mrp > price ? Math.round(((mrp - price)/mrp)*100) : 0;
+  
+  db.prepare(`INSERT INTO products(product_id, seller_user_id, seller_name, seller_member_id, title, description, category, subcategory, brand, price, mrp, discount_percent, stock, unit, weight, dimensions, material, color, size, tags, images, thumbnail, condition)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .run(productId, req.user.uid, u.name, u.member_id, title, description||null, category, subcategory||null, brand||null, parseFloat(price), parseFloat(mrp)||null, discountPct, parseInt(stock)||1, unit||'piece', weight||null, dimensions||null, material||null, color||null, size||null, tags||null, JSON.stringify(validatedImages), validatedImages[0]||null, condition||'new');
+  
+  res.json({ ok:true, productId, message:'Product submitted for approval!' });
+});
+
+// Member: get my products
+app.get('/api/member/my-products', auth('member'), (req,res)=>{
+  const products = db.prepare(`SELECT * FROM products WHERE seller_user_id=? ORDER BY id DESC`).all(req.user.uid);
+  products.forEach(p => { try { p.images = JSON.parse(p.images || '[]'); } catch(e){ p.images = []; } });
+  
+  const stats = {
+    total: products.length,
+    approved: products.filter(p => p.status === 'approved').length,
+    pending: products.filter(p => p.status === 'pending').length,
+    totalSold: products.reduce((s,p) => s + (p.total_sold||0), 0)
+  };
+  res.json({ ok:true, products, stats });
+});
+
+// Member: update own product
+app.post('/api/member/update-product/:productId', auth('member'), (req,res)=>{
+  const p = db.prepare(`SELECT * FROM products WHERE product_id=? AND seller_user_id=?`).get(req.params.productId, req.user.uid);
+  if(!p) return res.status(404).json({error:'Product not found or not yours'});
+  
+  const { title, description, category, subcategory, brand, price, mrp, stock, unit, weight, dimensions, material, color, size, tags, images, condition } = req.body;
+  
+  let validatedImages;
+  if(images && Array.isArray(images)){
+    if(images.length > MAX_IMAGES) return res.status(400).json({error:`Maximum ${MAX_IMAGES} images allowed`});
+    validatedImages = [];
+    for(let i = 0; i < images.length; i++){
+      const result = validateImage(images[i]);
+      if(!result.valid) return res.status(400).json({error:`Image ${i+1}: ${result.error}`});
+      validatedImages.push(images[i]);
+    }
+  }
+  
+  const sets = ['updated_at=datetime(\'now\')', 'status=\'pending\''];
+  const vals = [];
+  if(title){ sets.push('title=?'); vals.push(title); }
+  if(description !== undefined){ sets.push('description=?'); vals.push(description); }
+  if(category){ sets.push('category=?'); vals.push(category); }
+  if(subcategory !== undefined){ sets.push('subcategory=?'); vals.push(subcategory); }
+  if(brand !== undefined){ sets.push('brand=?'); vals.push(brand); }
+  if(price){ sets.push('price=?'); vals.push(parseFloat(price)); }
+  if(mrp !== undefined){ sets.push('mrp=?'); vals.push(parseFloat(mrp)||null); }
+  if(stock !== undefined){ sets.push('stock=?'); vals.push(parseInt(stock)||0); }
+  if(validatedImages){ sets.push('images=?'); vals.push(JSON.stringify(validatedImages)); sets.push('thumbnail=?'); vals.push(validatedImages[0]||null); }
+  if(condition){ sets.push('condition=?'); vals.push(condition); }
+  if(tags !== undefined){ sets.push('tags=?'); vals.push(tags); }
+  
+  vals.push(req.params.productId);
+  db.prepare(`UPDATE products SET ${sets.join(',')} WHERE product_id=?`).run(...vals);
+  res.json({ ok:true, message:'Product updated & sent for re-approval' });
+});
+
+// Member: delete own product
+app.delete('/api/member/product/:productId', auth('member'), (req,res)=>{
+  db.prepare(`DELETE FROM products WHERE product_id=? AND seller_user_id=?`).run(req.params.productId, req.user.uid);
+  res.json({ ok:true, message:'Product deleted' });
+});
+
+// Place order (public / auth optional)
+app.post('/api/store/order', (req,res)=>{
+  const { productId, quantity, buyerName, buyerContact, buyerEmail, buyerAddress, paymentMode } = req.body;
+  if(!productId || !buyerName || !buyerContact) return res.status(400).json({error:'Product, name & contact required'});
+  const p = db.prepare(`SELECT * FROM products WHERE product_id=? AND status='approved'`).get(productId);
+  if(!p) return res.status(404).json({error:'Product not found or unavailable'});
+  if(p.stock < (quantity||1)) return res.status(400).json({error:'Insufficient stock'});
+  
+  const qty = parseInt(quantity) || 1;
+  const total = p.price * qty;
+  const orderId = nextOrderId();
+  
+  db.transaction(()=>{
+    db.prepare(`INSERT INTO orders(order_id, product_id, product_title, buyer_name, buyer_contact, buyer_email, buyer_address, seller_user_id, seller_member_id, quantity, unit_price, total_amount, payment_mode) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      .run(orderId, productId, p.title, buyerName, buyerContact, buyerEmail||null, buyerAddress||null, p.seller_user_id, p.seller_member_id, qty, p.price, total, paymentMode||'online');
+    db.prepare(`UPDATE products SET stock = stock - ?, total_sold = total_sold + ? WHERE product_id=?`).run(qty, qty, productId);
+    if(p.stock - qty <= 0) db.prepare(`UPDATE products SET status='out-of-stock' WHERE product_id=?`).run(productId);
+  })();
+  
+  res.json({ ok:true, orderId, total, message:'Order placed successfully!' });
+});
+
+// Member: get my orders (as seller)
+app.get('/api/member/seller-orders', auth('member'), (req,res)=>{
+  const orders = db.prepare(`SELECT * FROM orders WHERE seller_user_id=? ORDER BY id DESC`).all(req.user.uid);
+  const stats = {
+    total: orders.length,
+    pending: orders.filter(o => o.status === 'pending').length,
+    totalEarnings: orders.filter(o => ['confirmed','processing','shipped','delivered'].includes(o.status)).reduce((s,o) => s + (o.total_amount||0), 0)
+  };
+  res.json({ ok:true, orders, stats });
+});
+
+// Admin: get all products (all statuses)
+app.get('/api/admin/products', auth('admin'), (req,res)=>{
+  const products = db.prepare(`SELECT * FROM products ORDER BY CASE status WHEN 'pending' THEN 1 WHEN 'approved' THEN 2 ELSE 3 END, id DESC`).all();
+  products.forEach(p => { try { p.images = JSON.parse(p.images || '[]'); } catch(e){ p.images = []; } });
+  const stats = {
+    total: products.length,
+    pending: products.filter(p => p.status === 'pending').length,
+    approved: products.filter(p => p.status === 'approved').length,
+    rejected: products.filter(p => p.status === 'rejected').length,
+    sellers: new Set(products.map(p => p.seller_user_id)).size
+  };
+  res.json({ ok:true, products, stats });
+});
+
+// Admin: approve/reject product
+app.post('/api/admin/product/:productId', auth('admin'), (req,res)=>{
+  const { status, adminNotes, featured } = req.body;
+  const p = db.prepare(`SELECT * FROM products WHERE product_id=?`).get(req.params.productId);
+  if(!p) return res.status(404).json({error:'Product not found'});
+  const sets = ['updated_at=datetime(\'now\')'];
+  const vals = [];
+  if(status){ sets.push('status=?'); vals.push(status); }
+  if(adminNotes !== undefined){ sets.push('admin_notes=?'); vals.push(adminNotes); }
+  if(featured !== undefined){ sets.push('featured=?'); vals.push(featured ? 1 : 0); }
+  vals.push(req.params.productId);
+  db.prepare(`UPDATE products SET ${sets.join(',')} WHERE product_id=?`).run(...vals);
+  res.json({ ok:true, message:'Product updated' });
+});
+
+// Admin: get all orders
+app.get('/api/admin/orders', auth('admin'), (req,res)=>{
+  const orders = db.prepare(`SELECT * FROM orders ORDER BY id DESC`).all();
+  const stats = {
+    total: orders.length,
+    pending: orders.filter(o => o.status === 'pending').length,
+    totalRevenue: orders.filter(o => ['delivered','confirmed','processing','shipped'].includes(o.status)).reduce((s,o) => s + (o.total_amount||0), 0)
+  };
+  res.json({ ok:true, orders, stats });
+});
+
+// Admin: update order status
+app.post('/api/admin/order/:orderId', auth('admin'), (req,res)=>{
+  const { status, trackingInfo, notes } = req.body;
+  const o = db.prepare(`SELECT * FROM orders WHERE order_id=?`).get(req.params.orderId);
+  if(!o) return res.status(404).json({error:'Order not found'});
+  const sets = ['updated_at=datetime(\'now\')'];
+  const vals = [];
+  if(status){ sets.push('status=?'); vals.push(status); }
+  if(trackingInfo !== undefined){ sets.push('tracking_info=?'); vals.push(trackingInfo); }
+  if(notes !== undefined){ sets.push('notes=?'); vals.push(notes); }
+  vals.push(req.params.orderId);
+  db.prepare(`UPDATE orders SET ${sets.join(',')} WHERE order_id=?`).run(...vals);
+  res.json({ ok:true, message:'Order updated' });
+});
+
 // Sentry error handler MUST be before other error handlers and after all routes
 app.use(errorHandler);
 

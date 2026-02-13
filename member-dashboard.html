@@ -1046,77 +1046,25 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <div class="page" id="page-marketplace">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <h3 style="font-size:16px;font-weight:800"><i class="fa-solid fa-store" style="color:var(--accent)"></i> Member Marketplace</h3>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost cat-filter active" data-cat="all">All</button>
-        <button class="btn btn-ghost cat-filter" data-cat="organic">Organic</button>
-        <button class="btn btn-ghost cat-filter" data-cat="handicraft">Handicraft</button>
-        <button class="btn btn-ghost cat-filter" data-cat="clothing">Clothing</button>
-        <button class="btn btn-ghost cat-filter" data-cat="food">Food</button>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="text" class="form-input" id="marketSearch" placeholder="Search products..." style="max-width:200px;padding:8px 12px;font-size:13px">
+        <select class="form-input" id="marketCatFilter" style="max-width:180px;padding:8px 12px;font-size:13px" onchange="loadMarketProducts()">
+          <option value="">All Categories</option>
+        </select>
+        <select class="form-input" id="marketSort" style="max-width:160px;padding:8px 12px;font-size:13px" onchange="loadMarketProducts()">
+          <option value="">Featured</option>
+          <option value="newest">Newest</option>
+          <option value="price-low">Price: Low → High</option>
+          <option value="price-high">Price: High → Low</option>
+          <option value="popular">Most Popular</option>
+        </select>
+        <a href="store.html" class="btn btn-primary btn-sm" target="_blank"><i class="fa-solid fa-external-link"></i> Full Store</a>
       </div>
     </div>
-
     <div class="grid-3" id="marketGrid">
-      <div class="product-card" data-cat="organic">
-        <div class="product-thumb"><i class="fa-solid fa-leaf"></i></div>
-        <div class="product-info">
-          <h4>Organic Honey (500g)</h4>
-          <div class="seller">By Sunita Devi • Kanpur</div>
-          <div class="product-price">₹350</div>
-          <div class="product-rating">★★★★★ (4.8)</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-        </div>
-      </div>
-      <div class="product-card" data-cat="handicraft">
-        <div class="product-thumb" style="background:#fff3e0"><i class="fa-solid fa-palette"></i></div>
-        <div class="product-info">
-          <h4>Handmade Madhubani Painting</h4>
-          <div class="seller">By Rani Kumari • Bihar</div>
-          <div class="product-price">₹850</div>
-          <div class="product-rating">★★★★★ (5.0)</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-        </div>
-      </div>
-      <div class="product-card" data-cat="clothing">
-        <div class="product-thumb" style="background:#fce4ec"><i class="fa-solid fa-shirt"></i></div>
-        <div class="product-info">
-          <h4>Hand Embroidered Kurti</h4>
-          <div class="seller">By Priya Verma • Lucknow</div>
-          <div class="product-price">₹1,200</div>
-          <div class="product-rating">★★★★☆ (4.5)</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-        </div>
-      </div>
-      <div class="product-card" data-cat="food">
-        <div class="product-thumb" style="background:#e8f5e9"><i class="fa-solid fa-jar"></i></div>
-        <div class="product-info">
-          <h4>Homemade Pickles (Set of 3)</h4>
-          <div class="seller">By Kamla Devi • Varanasi</div>
-          <div class="product-price">₹450</div>
-          <div class="product-rating">★★★★★ (4.9)</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-        </div>
-      </div>
-      <div class="product-card" data-cat="handicraft">
-        <div class="product-thumb" style="background:#e3f2fd"><i class="fa-solid fa-mug-hot"></i></div>
-        <div class="product-info">
-          <h4>Hand-painted Ceramic Mugs (2)</h4>
-          <div class="seller">By Neha Singh • Jaipur</div>
-          <div class="product-price">₹550</div>
-          <div class="product-rating">★★★★☆ (4.3)</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-        </div>
-      </div>
-      <div class="product-card" data-cat="organic">
-        <div class="product-thumb" style="background:#f1f8e9"><i class="fa-solid fa-mortar-pestle"></i></div>
-        <div class="product-info">
-          <h4>Organic Spice Box (6 spices)</h4>
-          <div class="seller">By Meera Bai • Rajasthan</div>
-          <div class="product-price">₹650</div>
-          <div class="product-rating">★★★★★ (4.7)</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;justify-content:center"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-        </div>
-      </div>
+      <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading products...</p></div>
     </div>
+    <div id="marketPagination" style="display:flex;justify-content:center;gap:6px;margin-top:16px"></div>
   </div>
 
   <!-- ===================== SELLER PANEL ===================== -->
@@ -1126,6 +1074,12 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="seller-stat">
           <div class="val" id="selProducts">0</div>
           <div class="lbl">Products</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="seller-stat">
+          <div class="val" id="selApproved">0</div>
+          <div class="lbl">Approved</div>
         </div>
       </div>
       <div class="stat-card">
@@ -1140,12 +1094,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <div class="lbl">Earnings</div>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="seller-stat">
-          <div class="val" id="selPending">₹0</div>
-          <div class="lbl">Pending Withdrawal</div>
-        </div>
-      </div>
     </div>
 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -1153,21 +1101,20 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <button class="btn btn-primary" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add Product</button>
     </div>
 
-    <div class="content-card">
+    <div class="content-card" id="sellerProductsList">
       <div class="empty-state">
-        <i class="fa-solid fa-store"></i>
-        <p>No products listed yet. Start selling your handmade products!</p>
-        <button class="btn btn-primary" style="margin-top:12px" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add First Product</button>
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Loading your products...</p>
       </div>
     </div>
 
-    <div class="content-card">
-      <h3><i class="fa-solid fa-receipt"></i> Recent Orders</h3>
+    <div class="content-card" style="margin-top:18px">
+      <h3 style="margin-bottom:12px"><i class="fa-solid fa-receipt"></i> Recent Orders</h3>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody>
-            <tr><td colspan="6" class="empty-state"><p>No orders yet</p></td></tr>
+          <thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Qty</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="sellerOrdersBody">
+            <tr><td colspan="7" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></td></tr>
           </tbody>
         </table>
       </div>
@@ -1374,44 +1321,136 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- Add Product Modal -->
+<!-- Add Product Modal (Rich Flipkart/Amazon style) -->
 <div class="modal-overlay hidden" id="addProductModal">
-  <div class="modal-card">
+  <div class="modal-card" style="max-width:680px;max-height:90vh;overflow-y:auto">
     <div class="modal-head">
       <h3><i class="fa-solid fa-box-open"></i> Add Product</h3>
       <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
     </div>
-    <div class="form-group">
-      <label>Product Name</label>
-      <input type="text" class="form-input" id="prodName" placeholder="e.g. Handmade Candles">
-    </div>
-    <div class="form-row">
+
+    <!-- STEP 1: Basic Info -->
+    <div style="background:var(--bg-soft);border-radius:10px;padding:14px;margin-bottom:14px">
+      <h4 style="font-size:13px;font-weight:800;color:var(--accent);margin:0 0 10px"><i class="fa-solid fa-info-circle"></i> Basic Information</h4>
       <div class="form-group">
-        <label>Category</label>
-        <select class="form-input" id="prodCat">
-          <option value="organic">Organic</option>
-          <option value="handicraft">Handicraft</option>
-          <option value="clothing">Clothing</option>
-          <option value="food">Food Items</option>
-          <option value="other">Other</option>
-        </select>
+        <label>Product Title *</label>
+        <input type="text" class="form-input" id="prodTitle" placeholder="e.g. Handmade Madhubani Painting - Large Frame">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category *</label>
+          <select class="form-input" id="prodCat" onchange="loadSubcategories()">
+            <option value="">Select Category</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sub-Category</label>
+          <select class="form-input" id="prodSubCat">
+            <option value="">Select Sub-Category</option>
+          </select>
+        </div>
       </div>
       <div class="form-group">
-        <label>Price (₹)</label>
-        <input type="number" class="form-input" id="prodPrice" placeholder="0" min="1">
+        <label>Brand / Maker Name</label>
+        <input type="text" class="form-input" id="prodBrand" placeholder="e.g. FWF Artisans, Your Brand Name">
       </div>
     </div>
-    <div class="form-group">
-      <label>Description</label>
-      <textarea class="form-input" id="prodDesc" placeholder="Describe your product..." rows="3"></textarea>
+
+    <!-- STEP 2: Pricing -->
+    <div style="background:var(--bg-soft);border-radius:10px;padding:14px;margin-bottom:14px">
+      <h4 style="font-size:13px;font-weight:800;color:var(--accent);margin:0 0 10px"><i class="fa-solid fa-indian-rupee-sign"></i> Pricing & Stock</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Selling Price (₹) *</label>
+          <input type="number" class="form-input" id="prodPrice" placeholder="0" min="1">
+        </div>
+        <div class="form-group">
+          <label>MRP (₹) <small style="color:var(--text-muted)">(Original price)</small></label>
+          <input type="number" class="form-input" id="prodMRP" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Stock Quantity</label>
+          <input type="number" class="form-input" id="prodStock" placeholder="1" min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select class="form-input" id="prodUnit">
+            <option value="piece">Piece</option>
+            <option value="kg">Kg</option>
+            <option value="gram">Gram</option>
+            <option value="litre">Litre</option>
+            <option value="ml">ml</option>
+            <option value="pack">Pack</option>
+            <option value="set">Set</option>
+            <option value="pair">Pair</option>
+            <option value="box">Box</option>
+            <option value="dozen">Dozen</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Product Image</label>
-      <input type="file" class="form-input" id="prodImage" accept="image/*">
+
+    <!-- STEP 3: Details -->
+    <div style="background:var(--bg-soft);border-radius:10px;padding:14px;margin-bottom:14px">
+      <h4 style="font-size:13px;font-weight:800;color:var(--accent);margin:0 0 10px"><i class="fa-solid fa-list-check"></i> Product Details</h4>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-input" id="prodDesc" placeholder="Describe your product in detail — material, usage, care instructions..." rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Condition</label>
+          <select class="form-input" id="prodCondition">
+            <option value="new">New</option>
+            <option value="like-new">Like New</option>
+            <option value="used">Used</option>
+            <option value="refurbished">Refurbished</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Weight</label>
+          <input type="text" class="form-input" id="prodWeight" placeholder="e.g. 500g, 1.2kg">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Material</label>
+          <input type="text" class="form-input" id="prodMaterial" placeholder="e.g. Cotton, Wood, Silver">
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <input type="text" class="form-input" id="prodColor" placeholder="e.g. Red, Multi-color">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Size</label>
+          <input type="text" class="form-input" id="prodSize" placeholder="e.g. Large, 12x18 inches">
+        </div>
+        <div class="form-group">
+          <label>Tags <small style="color:var(--text-muted)">(comma sep)</small></label>
+          <input type="text" class="form-input" id="prodTags" placeholder="e.g. handmade, organic, gift">
+        </div>
+      </div>
     </div>
+
+    <!-- STEP 4: Images -->
+    <div style="background:var(--bg-soft);border-radius:10px;padding:14px;margin-bottom:14px">
+      <h4 style="font-size:13px;font-weight:800;color:var(--accent);margin:0 0 10px"><i class="fa-solid fa-images"></i> Product Images <small style="font-weight:600;color:var(--text-muted)">(Max 8 images, 5MB each — JPG, PNG, WebP)</small></h4>
+      <div style="border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.2s;background:#fff" id="imageDropZone" onclick="document.getElementById('prodImages').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="handleImageDrop(event)">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem;color:var(--accent);margin-bottom:8px;display:block"></i>
+        <p style="font-size:13px;font-weight:700;margin:0">Click to upload or drag & drop images</p>
+        <p style="font-size:11px;color:var(--text-muted);margin:4px 0 0">First image will be the thumbnail</p>
+      </div>
+      <input type="file" id="prodImages" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="display:none" onchange="handleImageSelect(event)">
+      <div id="imagePreviewGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px"></div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('addProductModal')">Cancel</button>
-      <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Product</button>
+      <button class="btn btn-primary" id="submitProductBtn" onclick="submitProduct()"><i class="fa-solid fa-rocket"></i> Submit for Approval</button>
     </div>
   </div>
 </div>
@@ -1450,6 +1489,8 @@ function switchPage(page){
   if(page === 'redeem') loadRedeemPage();
   if(page === 'support') loadMyTickets();
   if(page === 'profile') loadProfile();
+  if(page === 'marketplace') loadMarketProducts();
+  if(page === 'seller') loadSellerData();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -1478,17 +1519,260 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Category filters (marketplace)
-document.querySelectorAll('.cat-filter').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.cat-filter').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const cat = btn.dataset.cat;
-    document.querySelectorAll('#marketGrid .product-card').forEach(card => {
-      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
-    });
+// Category filters (marketplace) - now handled by loadMarketProducts()
+// Image upload for Seller panel
+let selectedImages = [];
+
+function handleImageSelect(e){
+  addImages(Array.from(e.target.files));
+}
+function handleImageDrop(e){
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--border)';
+  addImages(Array.from(e.dataTransfer.files));
+}
+function addImages(files){
+  const MAX = 8, MAX_SIZE = 5*1024*1024;
+  const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+  for(const f of files){
+    if(selectedImages.length >= MAX){ notify(`Max ${MAX} images allowed`,'warning'); break; }
+    if(!allowed.includes(f.type)){ notify(`${f.name}: Only JPG, PNG, WebP, GIF allowed`,'warning'); continue; }
+    if(f.size > MAX_SIZE){ notify(`${f.name}: Max 5MB per image`,'warning'); continue; }
+    selectedImages.push(f);
+  }
+  renderImagePreviews();
+}
+function renderImagePreviews(){
+  const grid = document.getElementById('imagePreviewGrid');
+  grid.innerHTML = selectedImages.map((f,i) => {
+    const url = URL.createObjectURL(f);
+    return `<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid ${i===0?'var(--accent)':'var(--border)'}">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover"/>
+      ${i===0?'<div style="position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px">THUMB</div>':''}
+      <button onclick="removeImage(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;font-size:11px">&times;</button>
+    </div>`;
+  }).join('');
+}
+function removeImage(i){ selectedImages.splice(i,1); renderImagePreviews(); }
+
+// Convert File to base64
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
   });
-});
+}
+
+// Load categories for dropdowns
+let storeCategories = {};
+async function loadStoreCategories(){
+  try{
+    const r = await fetch('/api/store/categories');
+    const d = await r.json();
+    if(d.ok) storeCategories = d.categories;
+  } catch(e){}
+  // Populate Add Product category dropdown
+  const sel = document.getElementById('prodCat');
+  const filterSel = document.getElementById('marketCatFilter');
+  sel.innerHTML = '<option value="">Select Category</option>';
+  for(const [key,cat] of Object.entries(storeCategories)){
+    sel.innerHTML += `<option value="${key}">${cat.label}</option>`;
+    filterSel.innerHTML += `<option value="${key}">${cat.label}</option>`;
+  }
+}
+function loadSubcategories(){
+  const cat = document.getElementById('prodCat').value;
+  const sub = document.getElementById('prodSubCat');
+  sub.innerHTML = '<option value="">Select Sub-Category</option>';
+  if(cat && storeCategories[cat] && storeCategories[cat].subs){
+    storeCategories[cat].subs.forEach(s => {
+      sub.innerHTML += `<option value="${s}">${s}</option>`;
+    });
+  }
+}
+
+// Submit product
+async function submitProduct(){
+  const title = document.getElementById('prodTitle').value.trim();
+  const category = document.getElementById('prodCat').value;
+  const price = parseFloat(document.getElementById('prodPrice').value);
+  if(!title){ notify('Product title is required','warning'); return; }
+  if(!category){ notify('Select a category','warning'); return; }
+  if(!price || price <= 0){ notify('Enter a valid price','warning'); return; }
+
+  const btn = document.getElementById('submitProductBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+
+  try{
+    // Convert images to base64
+    const images = [];
+    for(const f of selectedImages){
+      const b64 = await fileToBase64(f);
+      images.push(b64);
+    }
+
+    const body = {
+      title,
+      category,
+      subcategory: document.getElementById('prodSubCat').value || null,
+      brand: document.getElementById('prodBrand').value.trim() || null,
+      price,
+      mrp: parseFloat(document.getElementById('prodMRP').value) || null,
+      stock: parseInt(document.getElementById('prodStock').value) || 1,
+      unit: document.getElementById('prodUnit').value,
+      description: document.getElementById('prodDesc').value.trim() || null,
+      condition: document.getElementById('prodCondition').value,
+      weight: document.getElementById('prodWeight').value.trim() || null,
+      material: document.getElementById('prodMaterial').value.trim() || null,
+      color: document.getElementById('prodColor').value.trim() || null,
+      size: document.getElementById('prodSize').value.trim() || null,
+      tags: document.getElementById('prodTags').value.trim() || null,
+      images
+    };
+
+    const r = await AUTH.api('/api/member/add-product', { method:'POST', body });
+    notify(r.message || 'Product submitted!', 'success');
+    closeModal('addProductModal');
+    // Reset form
+    selectedImages = [];
+    renderImagePreviews();
+    document.querySelectorAll('#addProductModal input, #addProductModal textarea').forEach(el => el.value = '');
+    document.querySelectorAll('#addProductModal select').forEach(el => el.selectedIndex = 0);
+    loadSellerData();
+  } catch(e){
+    notify(e.message || 'Failed to submit product','error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Submit for Approval';
+  }
+}
+
+// Load marketplace products (browse)
+let marketPage = 1;
+async function loadMarketProducts(){
+  const grid = document.getElementById('marketGrid');
+  grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></div>';
+  const params = new URLSearchParams();
+  const cat = document.getElementById('marketCatFilter').value;
+  if(cat) params.set('category', cat);
+  const search = document.getElementById('marketSearch').value.trim();
+  if(search) params.set('search', search);
+  const sort = document.getElementById('marketSort').value;
+  if(sort) params.set('sort', sort);
+  params.set('page', marketPage);
+  params.set('limit', 12);
+  try{
+    const r = await fetch('/api/store/products?' + params.toString());
+    const d = await r.json();
+    if(!d.ok || !d.products.length){
+      grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><p>No products found. Check back soon!</p></div>';
+      document.getElementById('marketPagination').innerHTML = '';
+      return;
+    }
+    grid.innerHTML = d.products.map(p => {
+      const img = p.thumbnail || (p.images && p.images[0]);
+      const catInfo = storeCategories[p.category];
+      const catLabel = catInfo ? catInfo.label : p.category;
+      return `<div class="product-card" style="cursor:pointer" onclick="window.open('store.html','_blank')">
+        <div class="product-thumb" style="${img ? 'padding:0' : ''}">
+          ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:10px 10px 0 0"/>` : `<i class="fa-solid fa-image"></i>`}
+        </div>
+        <div class="product-info">
+          <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:2px">${catLabel}</div>
+          <h4 style="font-size:13px;margin:0 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</h4>
+          <div class="seller" style="font-size:11px">By ${p.seller_name || 'FWF Seller'}</div>
+          <div class="product-price" style="display:flex;align-items:baseline;gap:6px">
+            ₹${fmtN(p.price)}
+            ${p.mrp && p.mrp > p.price ? `<span style="font-size:11px;color:var(--text-muted);text-decoration:line-through">₹${fmtN(p.mrp)}</span><span style="font-size:10px;color:var(--success);font-weight:800">${p.discount_percent}% off</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    // Simple pagination
+    const pag = document.getElementById('marketPagination');
+    if(d.pages > 1){
+      let ph = '';
+      for(let i=1;i<=d.pages;i++) ph += `<button class="btn btn-ghost btn-sm ${i===d.page?'active':''}" onclick="marketPage=${i};loadMarketProducts()" style="${i===d.page?'background:var(--accent);color:#fff':''}">${i}</button>`;
+      pag.innerHTML = ph;
+    } else pag.innerHTML = '';
+  } catch(e){
+    grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><p>Failed to load. Try again.</p></div>';
+  }
+}
+document.getElementById('marketSearch').addEventListener('keydown', e => { if(e.key==='Enter'){ marketPage=1; loadMarketProducts(); } });
+
+// Load seller data
+async function loadSellerData(){
+  try{
+    const [prods, orders] = await Promise.all([
+      AUTH.api('/api/member/my-products'),
+      AUTH.api('/api/member/seller-orders')
+    ]);
+    // Stats
+    if(prods.stats){
+      document.getElementById('selProducts').textContent = prods.stats.total;
+      document.getElementById('selApproved').textContent = prods.stats.approved;
+    }
+    if(orders.stats){
+      document.getElementById('selOrders').textContent = orders.stats.total;
+      document.getElementById('selEarnings').textContent = '₹' + fmtN(orders.stats.totalEarnings);
+    }
+    // Products list
+    const list = document.getElementById('sellerProductsList');
+    if(!prods.products || !prods.products.length){
+      list.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-store"></i>
+        <p>No products listed yet. Start selling!</p>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add First Product</button>
+      </div>`;
+    } else {
+      list.innerHTML = `<div style="display:grid;gap:10px">${prods.products.map(p => {
+        const img = p.thumbnail || (p.images && p.images[0]);
+        const statusColors = {pending:'#f59e0b',approved:'#22c55e',rejected:'#ef4444','out-of-stock':'#6b7280',draft:'#94a3b8',archived:'#6b7280'};
+        return `<div style="display:flex;gap:12px;align-items:center;padding:12px;background:var(--bg-soft);border-radius:12px;border:1px solid var(--border)">
+          <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+            ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover"/>` : '<i class="fa-solid fa-image" style="color:var(--border);font-size:1.5rem"></i>'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${p.product_id} • ₹${fmtN(p.price)} • Stock: ${p.stock}</div>
+          </div>
+          <span style="font-size:11px;font-weight:800;color:${statusColors[p.status]||'#6b7280'};background:${statusColors[p.status]||'#6b7280'}15;padding:3px 10px;border-radius:8px;text-transform:uppercase">${p.status}</span>
+          <button class="btn btn-ghost btn-sm" onclick="deleteProduct('${p.product_id}')" title="Delete"><i class="fa-solid fa-trash" style="color:#ef4444"></i></button>
+        </div>`;
+      }).join('')}</div>`;
+    }
+    // Orders
+    const tbody = document.getElementById('sellerOrdersBody');
+    if(!orders.orders || !orders.orders.length){
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No orders yet</p></td></tr>';
+    } else {
+      tbody.innerHTML = orders.orders.map(o => `<tr>
+        <td style="font-weight:700;color:var(--accent);font-size:12px">${o.order_id}</td>
+        <td style="font-size:12px">${o.product_title||o.product_id}</td>
+        <td style="font-size:12px">${o.buyer_name}<br><span style="color:var(--text-muted)">${o.buyer_contact}</span></td>
+        <td>${o.quantity}</td>
+        <td style="font-weight:700">₹${fmtN(o.total_amount)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(o.created_at)}</td>
+      </tr>`).join('');
+    }
+  } catch(e){
+    console.error('Seller data error:', e);
+  }
+}
+
+async function deleteProduct(productId){
+  if(!confirm('Delete this product?')) return;
+  try{
+    await AUTH.api('/api/member/product/' + productId, { method:'DELETE' });
+    notify('Product deleted','success');
+    loadSellerData();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
 
 /* ============================================
    MODALS
@@ -1769,6 +2053,7 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
    INIT
    ============================================ */
 loadDashboard();
+loadStoreCategories();
 </script>
 </body>
 </html>

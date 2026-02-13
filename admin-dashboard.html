@@ -903,53 +903,49 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <div class="stat-card">
         <div class="s-icon s-teal"><i class="fa-solid fa-store"></i></div>
         <div class="s-label">Total Sellers</div>
-        <div class="s-value">0</div>
+        <div class="s-value" id="mkSellers">0</div>
       </div>
       <div class="stat-card">
         <div class="s-icon s-purple"><i class="fa-solid fa-box-open"></i></div>
         <div class="s-label">Total Products</div>
-        <div class="s-value">0</div>
+        <div class="s-value" id="mkProducts">0</div>
       </div>
       <div class="stat-card">
         <div class="s-icon s-green"><i class="fa-solid fa-shopping-cart"></i></div>
         <div class="s-label">Total Orders</div>
-        <div class="s-value">0</div>
+        <div class="s-value" id="mkOrders">0</div>
       </div>
       <div class="stat-card">
         <div class="s-icon s-amber"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-        <div class="s-label">Total Sales</div>
-        <div class="s-value">₹0</div>
+        <div class="s-label">Total Revenue</div>
+        <div class="s-value" id="mkRevenue">₹0</div>
       </div>
     </div>
 
     <div class="tab-bar">
-      <button class="tab-btn active" data-tab="m-sellers-tab">Seller Verification</button>
-      <button class="tab-btn" data-tab="m-products-tab">Product Approval</button>
-      <button class="tab-btn" data-tab="m-orders-tab">Orders & Payments</button>
+      <button class="tab-btn active" data-tab="m-products-tab">Product Approval</button>
+      <button class="tab-btn" data-tab="m-orders-tab">Orders</button>
     </div>
 
-    <div class="tab-content active" id="m-sellers-tab">
+    <div class="tab-content active" id="m-products-tab">
       <div class="content-card">
-        <h3><i class="fa-solid fa-user-check"></i> Seller Verification Queue</h3>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Member ID</th><th>Name</th><th>Products</th><th>Status</th><th>Applied</th><th>Actions</th></tr></thead>
-            <tbody>
-              <tr><td colspan="6" class="empty-state"><i class="fa-solid fa-store"></i><p>No seller verification requests yet</p></td></tr>
-            </tbody>
-          </table>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <h3 style="margin:0"><i class="fa-solid fa-box-open"></i> All Products</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="form-input" id="mkProdFilter" style="padding:8px 12px;font-size:12px;max-width:150px" onchange="renderAdminProducts()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="out-of-stock">Out of Stock</option>
+            </select>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="m-products-tab">
-      <div class="content-card">
-        <h3><i class="fa-solid fa-box-open"></i> Product Approval Queue</h3>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Product</th><th>Seller</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody>
-              <tr><td colspan="6" class="empty-state"><i class="fa-solid fa-box-open"></i><p>No products pending approval</p></td></tr>
+            <thead><tr><th>Image</th><th>Product</th><th>Seller</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="mkProductsBody">
+              <tr><td colspan="8" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></td></tr>
             </tbody>
           </table>
         </div>
@@ -958,12 +954,12 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
     <div class="tab-content" id="m-orders-tab">
       <div class="content-card">
-        <h3><i class="fa-solid fa-receipt"></i> Order & Payment Monitoring</h3>
+        <h3 style="margin-bottom:12px"><i class="fa-solid fa-receipt"></i> All Orders</h3>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Seller</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
-            <tbody>
-              <tr><td colspan="7" class="empty-state"><i class="fa-solid fa-shopping-cart"></i><p>No orders yet</p></td></tr>
+            <thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Seller</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="mkOrdersBody">
+              <tr><td colspan="10" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></td></tr>
             </tbody>
           </table>
         </div>
@@ -1555,6 +1551,7 @@ function switchPage(page){
   if(page === 'payments') loadMembershipFees();
   if(page === 'points') loadPointsActivity();
   if(page === 'reports') loadReports();
+  if(page === 'marketplace') loadMarketplaceAdmin();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -2197,6 +2194,126 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
     }
   }
 });
+
+/* ============================================
+   MARKETPLACE ADMIN
+   ============================================ */
+let allAdminProducts = [];
+let allAdminOrders = [];
+
+async function loadMarketplaceAdmin(){
+  try{
+    const [prodData, ordData] = await Promise.all([
+      AUTH.api('/api/admin/products'),
+      AUTH.api('/api/admin/orders')
+    ]);
+    allAdminProducts = prodData.products || [];
+    allAdminOrders = ordData.orders || [];
+
+    // Stats
+    if(prodData.stats){
+      document.getElementById('mkSellers').textContent = prodData.stats.sellers || 0;
+      document.getElementById('mkProducts').textContent = prodData.stats.total || 0;
+    }
+    if(ordData.stats){
+      document.getElementById('mkOrders').textContent = ordData.stats.total || 0;
+      document.getElementById('mkRevenue').textContent = '₹' + fmtN(ordData.stats.totalRevenue || 0);
+    }
+    renderAdminProducts();
+    renderAdminOrders();
+  } catch(e){
+    console.error('Marketplace admin load error:', e);
+  }
+}
+
+function renderAdminProducts(){
+  const filter = document.getElementById('mkProdFilter').value;
+  let prods = allAdminProducts;
+  if(filter) prods = prods.filter(p => p.status === filter);
+  
+  const tbody = document.getElementById('mkProductsBody');
+  if(!prods.length){
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fa-solid fa-box-open"></i><p>No products found</p></td></tr>';
+    return;
+  }
+  const statusColors = {pending:'#f59e0b',approved:'#22c55e',rejected:'#ef4444','out-of-stock':'#6b7280',draft:'#94a3b8',archived:'#6b7280'};
+  tbody.innerHTML = prods.map(p => {
+    const img = p.thumbnail || (p.images && p.images.length ? p.images[0] : '');
+    return `<tr>
+      <td><div style="width:45px;height:45px;border-radius:8px;overflow:hidden;background:var(--soft);display:flex;align-items:center;justify-content:center">
+        ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover"/>` : '<i class="fa-solid fa-image" style="color:var(--muted)"></i>'}
+      </div></td>
+      <td><div style="font-weight:700;font-size:12px">${p.title}</div><div style="font-size:10px;color:var(--muted)">${p.product_id}</div></td>
+      <td><div style="font-size:12px">${p.seller_name||'—'}</div><div style="font-size:10px;color:var(--muted)">${p.seller_member_id||''}</div></td>
+      <td style="font-size:12px">${p.category}${p.subcategory ? '<br><span style="color:var(--muted)">'+p.subcategory+'</span>' : ''}</td>
+      <td style="font-weight:700">₹${fmtN(p.price)}${p.mrp && p.mrp > p.price ? '<br><span style="font-size:10px;color:var(--muted);text-decoration:line-through">₹'+fmtN(p.mrp)+'</span>' : ''}</td>
+      <td style="text-align:center">${p.stock}</td>
+      <td><span style="font-size:11px;font-weight:800;color:${statusColors[p.status]||'#6b7280'};background:${statusColors[p.status]||'#6b7280'}15;padding:3px 10px;border-radius:8px;text-transform:uppercase">${p.status}</span></td>
+      <td style="white-space:nowrap">
+        ${p.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="adminProductAction('${p.product_id}','approved')" title="Approve"><i class="fa-solid fa-check"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="adminProductAction('${p.product_id}','rejected')" title="Reject"><i class="fa-solid fa-times"></i></button>` : ''}
+        ${p.status === 'approved' ? `<button class="btn btn-ghost btn-sm" onclick="adminProductAction('${p.product_id}','rejected')" title="Disable"><i class="fa-solid fa-ban"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="adminToggleFeatured('${p.product_id}',${p.featured?0:1})" title="${p.featured?'Unfeature':'Feature'}"><i class="fa-solid fa-star" style="color:${p.featured?'#f59e0b':'var(--muted)'}"></i></button>` : ''}
+        ${p.status === 'rejected' ? `<button class="btn btn-success btn-sm" onclick="adminProductAction('${p.product_id}','approved')" title="Approve"><i class="fa-solid fa-check"></i></button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function adminProductAction(productId, status){
+  const notes = status === 'rejected' ? prompt('Rejection reason (optional):') : null;
+  try{
+    await AUTH.api('/api/admin/product/' + productId, {
+      method: 'POST',
+      body: { status, adminNotes: notes || undefined }
+    });
+    notify(`Product ${status}!`, 'success');
+    loadMarketplaceAdmin();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+async function adminToggleFeatured(productId, featured){
+  try{
+    await AUTH.api('/api/admin/product/' + productId, { method:'POST', body:{ featured } });
+    notify(featured ? 'Product featured!' : 'Feature removed', 'success');
+    loadMarketplaceAdmin();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+function renderAdminOrders(){
+  const tbody = document.getElementById('mkOrdersBody');
+  if(!allAdminOrders.length){
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fa-solid fa-shopping-cart"></i><p>No orders yet</p></td></tr>';
+    return;
+  }
+  tbody.innerHTML = allAdminOrders.map(o => `<tr>
+    <td style="font-weight:700;color:var(--accent);font-size:12px">${o.order_id}</td>
+    <td style="font-size:12px">${o.product_title||o.product_id}</td>
+    <td style="font-size:12px">${o.buyer_name||'—'}<br><span style="color:var(--muted)">${o.buyer_contact||''}</span></td>
+    <td style="font-size:12px">${o.seller_member_id||'—'}</td>
+    <td style="text-align:center">${o.quantity}</td>
+    <td style="font-weight:700">₹${fmtN(o.total_amount)}</td>
+    <td style="font-size:11px">${o.payment_mode||'—'}</td>
+    <td>${statusBadge(o.status)}</td>
+    <td style="color:var(--muted);font-size:12px">${fmtDate(o.created_at)}</td>
+    <td><select class="form-input" style="padding:4px 8px;font-size:11px;min-width:100px" onchange="updateOrderStatus('${o.order_id}',this.value)">
+      <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
+      <option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option>
+      <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
+      <option value="shipped" ${o.status==='shipped'?'selected':''}>Shipped</option>
+      <option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option>
+      <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
+      <option value="refunded" ${o.status==='refunded'?'selected':''}>Refunded</option>
+    </select></td>
+  </tr>`).join('');
+}
+
+async function updateOrderStatus(orderId, status){
+  try{
+    await AUTH.api('/api/admin/order/' + orderId, { method:'POST', body:{ status } });
+    notify('Order status updated!','success');
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
 
 /* ============================================
    INIT

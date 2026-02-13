@@ -88,76 +88,76 @@
     .navList a.active::after{ display:none }
   }
 
-  /* =============== HERO BANNER =============== */
-  .store-hero{
-    background:linear-gradient(135deg,var(--deep) 0%,#1a1040 40%,#0c2340 100%);
-    padding:36px 0 32px; position:relative; overflow:hidden
+  /* =============== IMPACT BANNER =============== */
+  .impact-banner{
+    background:linear-gradient(135deg,var(--deep) 0%,#1a1040 50%,#0c2340 100%); position:relative;
+    overflow:hidden; border-bottom:1px solid rgba(96,165,250,.1)
   }
-  .store-hero::before{
-    content:""; position:absolute; top:-50%; right:-20%; width:500px; height:500px;
-    background:radial-gradient(circle,rgba(96,165,250,.15),transparent 70%); border-radius:50%
+  .impact-banner::before{
+    content:""; position:absolute; top:-50%; right:-10%; width:300px; height:300px;
+    background:radial-gradient(circle,rgba(96,165,250,.12),transparent 70%); border-radius:50%
   }
-  .store-hero::after{
-    content:""; position:absolute; bottom:-30%; left:-10%; width:400px; height:400px;
-    background:radial-gradient(circle,rgba(167,139,250,.12),transparent 70%); border-radius:50%
+  .impact-content{
+    position:relative; z-index:1; display:grid; grid-template-columns:1fr auto; gap:24px;
+    align-items:center; padding:24px 0
   }
-  .hero-inner{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:32px }
-  .hero-text{ flex:1 }
-  .hero-tag{
-    display:inline-flex; align-items:center; gap:6px; background:rgba(96,165,250,.12);
-    color:var(--gA); font-size:.78rem; font-weight:700; padding:6px 14px; border-radius:20px;
-    border:1px solid rgba(96,165,250,.2); margin-bottom:12px; letter-spacing:.04em; text-transform:uppercase
+  .impact-text{ display:flex; flex-direction:column; gap:8px }
+  .impact-headline{
+    font-size:1.35rem; font-weight:900; color:#fff; margin:0;
+    background:linear-gradient(90deg,#fff,var(--gA)); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent; line-height:1.3
   }
-  .hero-impact{
-    display:inline-flex; align-items:center; gap:8px; background:rgba(34,197,94,.08);
-    color:var(--gC); font-size:.82rem; font-weight:600; padding:8px 16px; border-radius:12px;
-    border:1px solid rgba(34,197,94,.15); margin-bottom:18px; backdrop-filter:blur(8px)
+  .impact-desc{
+    color:#94a3b8; font-size:.92rem; margin:0; max-width:580px; line-height:1.5
   }
-  .hero-impact i{ font-size:1.1rem }
-  .hero-text h1{
-    font-size:clamp(1.5rem,3.2vw,2.2rem); font-weight:900; color:#fff;
-    margin:0 0 12px; line-height:1.2; letter-spacing:-.02em
+  .impact-badge{
+    display:inline-flex; align-items:center; gap:8px; background:rgba(34,197,94,.12);
+    color:var(--gC); font-size:.82rem; font-weight:700; padding:8px 16px; border-radius:30px;
+    border:1px solid rgba(34,197,94,.2); backdrop-filter:blur(8px); margin-top:6px;
+    align-self:flex-start
   }
-  .hero-text h1 span{ background:linear-gradient(90deg,var(--gA),var(--gD)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent }
-  .hero-text p{ color:#94a3b8; font-size:.95rem; margin:0 0 14px; max-width:520px; line-height:1.6 }
-  .hero-text .subtext{ color:#64748b; font-size:.88rem; font-style:italic; margin:0 0 18px; max-width:520px; line-height:1.5 }
-  .hero-stats{ display:flex; gap:28px }
-  .hero-stat{ text-align:center }
-  .hero-stat .num{ font-size:1.5rem; font-weight:900; color:#fff }
-  .hero-stat .lbl{ font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.06em; font-weight:600 }
-  .hero-visual{ flex:0 0 auto; display:flex; gap:12px }
-  .hero-card{
-    width:140px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
-    border-radius:16px; padding:16px; backdrop-filter:blur(10px); text-align:center
+  .impact-badge i{ font-size:1rem }
+  .impact-stats{
+    display:flex; gap:32px; align-items:center; padding-right:12px
   }
-  .hero-card i{ font-size:2rem; margin-bottom:8px; display:block }
-  .hero-card:nth-child(1) i{ color:var(--gA) }
-  .hero-card:nth-child(2) i{ color:var(--gB) }
-  .hero-card:nth-child(3) i{ color:var(--gC) }
-  .hero-card span{ color:#cbd5e1; font-size:.78rem; font-weight:600 }
-  @media(max-width:780px){
-    .hero-visual{ display:none }
-    .hero-stats{ gap:20px }
+  .impact-stat{ text-align:center; min-width:80px }
+  .impact-stat .num{
+    font-size:1.8rem; font-weight:900; color:#fff; line-height:1;
+    background:linear-gradient(135deg,var(--gA),var(--gD)); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent
+  }
+  .impact-stat .lbl{
+    font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.06em;
+    font-weight:600; margin-top:4px
+  }
+  @media(max-width:900px){
+    .impact-content{ grid-template-columns:1fr; gap:16px }
+    .impact-stats{ gap:24px; justify-content:center; padding:12px 0 0 }
   }
 
-  /* =============== SEARCH =============== */
+  /* =============== SEARCH + FILTERS =============== */
   .search-section{
-    background:var(--card); border-bottom:1px solid var(--brd); padding:14px 0;
-    position:sticky; top:72px; z-index:100; transition:top .25s
+    background:var(--card); border-bottom:1px solid var(--brd); padding:18px 0;
+    position:sticky; top:72px; z-index:100; transition:top .25s;
+    box-shadow:0 2px 12px rgba(15,23,42,.04)
   }
   .header.scrolled ~ .search-section{ top:64px }
-  .search-bar{ display:flex; gap:10px; align-items:center; max-width:640px; margin:0 auto }
+  .search-wrapper{ display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap }
+  .search-bar{ display:flex; gap:10px; align-items:center; flex:1; min-width:320px; max-width:600px }
   .search-bar input{
-    flex:1; padding:11px 18px; border-radius:12px; border:2px solid var(--brd);
+    flex:1; padding:12px 18px; border-radius:12px; border:2px solid var(--brd);
     font-size:.95rem; font-family:inherit; outline:none; transition:.2s; background:var(--soft)
   }
   .search-bar input:focus{ border-color:var(--gA); box-shadow:0 0 0 3px rgba(96,165,250,.12); background:#fff }
   .search-bar button{
-    padding:11px 22px; border:none; border-radius:12px;
+    padding:12px 24px; border:none; border-radius:12px;
     background:linear-gradient(135deg,var(--gA),var(--gB)); color:#fff;
     font-weight:700; font-size:.92rem; cursor:pointer; transition:.2s; white-space:nowrap
   }
   .search-bar button:hover{ box-shadow:0 6px 20px rgba(96,165,250,.25); transform:translateY(-1px) }
+  .view-toggle{ display:flex; gap:6px; align-items:center }
+  .view-toggle span{ font-size:.85rem; color:var(--muted); font-weight:600 }
+  @media(max-width:780px){ .search-wrapper{ flex-direction:column; align-items:stretch } .search-bar{ max-width:100% } }
 
   /* =============== MAIN LAYOUT =============== */
   .store-layout{
@@ -552,37 +552,35 @@
   </div>
 </div>
 
-<!-- HERO -->
-<div class="store-hero">
+<!-- IMPACT BANNER -->
+<div class="impact-banner">
   <div class="container">
-    <div class="hero-inner">
-      <div class="hero-text">
-        <div class="hero-tag"><i class="fas fa-sparkles"></i> Empowerment Marketplace</div>
-        <h1>Shop with <span>Purpose</span> • Empower with <span>Every Purchase</span></h1>
-        <p>Each product you buy creates sustainable livelihoods for artisans and their families. Your purchase is more than a transaction—it's an investment in empowerment.</p>
-        <p class="subtext">"When you shop here, you're not just buying a product, you're providing employment, dignity, and hope."</p>
-        <div class="hero-impact"><i class="fas fa-hand-holding-heart"></i> Every purchase creates employment opportunities for unemployed artisans</div>
-        <div class="hero-stats">
-          <div class="hero-stat"><div class="num" id="heroTotal">--</div><div class="lbl">Products</div></div>
-          <div class="hero-stat"><div class="num" id="heroCats">12</div><div class="lbl">Categories</div></div>
-          <div class="hero-stat"><div class="num">100%</div><div class="lbl">Verified Artisans</div></div>
-        </div>
+    <div class="impact-content">
+      <div class="impact-text">
+        <h1 class="impact-headline">Shop with Purpose • Empower with Every Purchase</h1>
+        <p class="impact-desc">Each product creates sustainable livelihoods. Your purchase provides employment, dignity, and hope to unemployed artisans across India.</p>
+        <div class="impact-badge"><i class="fas fa-hand-holding-heart"></i> Every purchase creates real employment opportunities</div>
       </div>
-      <div class="hero-visual">
-        <div class="hero-card"><i class="fas fa-hands-holding-heart"></i><span>Handcrafted</span></div>
-        <div class="hero-card"><i class="fas fa-leaf"></i><span>Organic</span></div>
-        <div class="hero-card"><i class="fas fa-award"></i><span>Trusted</span></div>
+      <div class="impact-stats">
+        <div class="impact-stat"><div class="num" id="heroTotal">--</div><div class="lbl">Products</div></div>
+        <div class="impact-stat"><div class="num" id="heroCats">12</div><div class="lbl">Categories</div></div>
+        <div class="impact-stat"><div class="num">100%</div><div class="lbl">Verified</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SEARCH -->
+<!-- SEARCH & FILTERS -->
 <div class="search-section">
   <div class="container">
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search products, brands, categories..." />
-      <button onclick="searchProducts()"><i class="fas fa-search"></i> Search</button>
+    <div class="search-wrapper">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search handcrafted products, artisan goods, categories..." />
+        <button onclick="searchProducts()"><i class="fas fa-search"></i> Search</button>
+      </div>
+      <div class="view-toggle">
+        <span id="resultsCount">0 products</span>
+      </div>
     </div>
   </div>
 </div>
@@ -605,7 +603,7 @@
     <!-- PRODUCTS -->
     <div class="products-area">
       <div class="products-bar">
-        <span class="count" id="resultsCount">0 products</span>
+        <span class="count" style="opacity:0">--</span>
         <select id="sortSelect" onchange="loadProducts()">
           <option value="">Featured</option>
           <option value="newest">Newest First</option>

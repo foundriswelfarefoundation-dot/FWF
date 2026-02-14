@@ -191,8 +191,12 @@ body::before{
 
     <div class="input-group">
       <input id="pwd" class="input-field" type="password" placeholder="••••••••" required autocomplete="current-password">
-      <i class="input-icon fa-solid fa-lock"></i>
+      <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Toggle password visibility">
+        <i class="fa-solid fa-eye" id="toggleIcon"></i>
+      </button>
     </div>
+
+    <a href="#" class="forgot-password" onclick="handleForgotPassword(event)"><i class="fa-solid fa-key"></i> Forgot Password?</a>
 
     <button type="submit" class="login-btn">
       <span id="btnText"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Dashboard</span>
@@ -209,6 +213,26 @@ body::before{
 <script src="assets/js/fwf.js"></script>
 <script src="auth.js"></script>
 <script>
+// Password visibility toggle
+function togglePassword() {
+  const pwdInput = document.getElementById('pwd');
+  const toggleIcon = document.getElementById('toggleIcon');
+  
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleIcon.className = 'fa-solid fa-eye-slash';
+  } else {
+    pwdInput.type = 'password';
+    toggleIcon.className = 'fa-solid fa-eye';
+  }
+}
+
+// Forgot password handler
+function handleForgotPassword(e) {
+  e.preventDefault();
+  FWF_Notify.toast('Password reset feature coming soon! Please contact support at support@fwf.org', 'info', 5000);
+}
+
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.querySelector('.login-btn');

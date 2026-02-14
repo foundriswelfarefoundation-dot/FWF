@@ -215,6 +215,121 @@ body::before{
   .login-container{padding:36px 28px}
   .logo-title{font-size:24px}
 }
+
+/* Forgot Password Modal */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  z-index:9999;
+  animation:fadeIn .3s;
+}
+.modal-overlay.active{display:flex}
+
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.modal-container{
+  background:#fff;
+  border-radius:24px;
+  max-width:440px;width:90%;
+  padding:40px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+  animation:slideUp .4s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  background:transparent;border:none;
+  font-size:24px;color:#94a3b8;
+  cursor:pointer;width:40px;height:40px;
+  border-radius:50%;
+  display:grid;place-items:center;
+  transition:all .3s;
+}
+.modal-close:hover{
+  background:#f1f5f9;color:#667eea;
+  transform:rotate(90deg);
+}
+
+.modal-title{
+  font-size:24px;font-weight:800;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:8px;
+}
+
+.modal-subtitle{
+  color:#64748b;font-size:14px;
+  margin-bottom:28px;line-height:1.6;
+}
+
+.modal-step{
+  display:none;
+}
+.modal-step.active{
+  display:block;
+  animation:fadeIn .3s;
+}
+
+.success-icon{
+  width:80px;height:80px;
+  background:linear-gradient(135deg,#10b981,#059669);
+  border-radius:50%;
+  display:grid;place-items:center;
+  color:#fff;font-size:40px;
+  margin:20px auto;
+  animation:scaleIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes scaleIn{
+  from{transform:scale(0);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+.otp-inputs{
+  display:flex;gap:12px;justify-content:center;
+  margin:24px 0;
+}
+
+.otp-input{
+  width:50px;height:56px;
+  border:2px solid #e2e8f0;
+  border-radius:12px;
+  text-align:center;
+  font-size:24px;font-weight:800;
+  color:#1e293b;
+  background:#f8fafc;
+  transition:all .3s;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.otp-input:focus{
+  outline:none;
+  border-color:#667eea;
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(102,126,234,.1);
+}
+
+.resend-otp{
+  display:block;text-align:center;
+  margin-top:16px;font-size:13px;
+  color:#667eea;text-decoration:none;
+  font-weight:700;transition:color .3s;
+}
+.resend-otp:hover{color:#764ba2}
+.resend-otp:disabled{
+  color:#94a3b8;cursor:not-allowed;
+  pointer-events:none;
+}
+
 </style>
 </head><body>
 <a href="/" class="home-btn" aria-label="Home"><i class="fa-solid fa-house"></i></a>
@@ -254,6 +369,72 @@ body::before{
   </div>
 </div>
 
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-container">
+    <button class="modal-close" onclick="closeForgotModal()">&times;</button>
+    
+    <!-- Step 1: Enter Member ID -->
+    <div class="modal-step active" id="step1">
+      <h2 class="modal-title">Forgot Password?</h2>
+      <p class="modal-subtitle">Enter your Member ID to receive an OTP on your registered email.</p>
+      
+      <form id="requestOtpForm">
+        <div class="input-group">
+          <input id="resetMemberId" class="input-field" type="text" placeholder="FWF-000001" required>
+          <i class="input-icon fa-solid fa-id-card"></i>
+        </div>
+        
+        <button type="submit" class="login-btn">
+          <span id="otpBtnText"><i class="fa-solid fa-paper-plane"></i> Send OTP</span>
+        </button>
+      </form>
+    </div>
+    
+    <!-- Step 2: Enter OTP and New Password -->
+    <div class="modal-step" id="step2">
+      <h2 class="modal-title">Verify OTP</h2>
+      <p class="modal-subtitle">Enter the 6-digit OTP sent to <strong id="maskedEmail"></strong></p>
+      
+      <form id="resetPasswordForm">
+        <div class="otp-inputs">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="0">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="1">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="2">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="3">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="4">
+          <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="5">
+        </div>
+        
+        <a href="#" class="resend-otp" id="resendBtn" onclick="resendOTP(event)">
+          <i class="fa-solid fa-rotate-right"></i> Resend OTP (<span id="timer">60</span>s)
+        </a>
+        
+        <div class="input-group has-toggle" style="margin-top:24px">
+          <input id="newPassword" class="input-field" type="password" placeholder="New Password (min 8 characters)" required minlength="8">
+          <i class="input-icon fa-solid fa-lock"></i>
+          <button type="button" class="toggle-password" onclick="toggleNewPassword()" aria-label="Toggle password visibility">
+            <i class="fa-solid fa-eye" id="toggleNewIcon"></i>
+          </button>
+        </div>
+        
+        <button type="submit" class="login-btn" style="margin-top:8px">
+          <span id="resetBtnText"><i class="fa-solid fa-check"></i> Reset Password</span>
+        </button>
+      </form>
+    </div>
+    
+    <!-- Step 3: Success -->
+    <div class="modal-step" id="step3">
+      <div class="success-icon">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h2 class="modal-title" style="text-align:center">Password Reset Successful!</h2>
+      <p class="modal-subtitle" style="text-align:center">Your password has been updated. Redirecting to login...</p>
+    </div>
+  </div>
+</div>
+
 <script src="assets/js/fwf.js"></script>
 <script src="auth.js"></script>
 <script>
@@ -272,9 +453,202 @@ function togglePassword() {
 }
 
 // Forgot password handler
+let timerInterval;
+let currentMemberId = '';
+
 function handleForgotPassword(e) {
   e.preventDefault();
-  FWF_Notify.toast('Password reset feature coming soon! Please contact support at support@fwf.org', 'info', 5000);
+  document.getElementById('forgotModal').classList.add('active');
+  showStep(1);
+}
+
+function closeForgotModal() {
+  document.getElementById('forgotModal').classList.remove('active');
+  resetModal();
+}
+
+function resetModal() {
+  showStep(1);
+  document.getElementById('resetMemberId').value = '';
+  document.getElementById('newPassword').value = '';
+  document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+  if(timerInterval) clearInterval(timerInterval);
+  currentMemberId = '';
+}
+
+function showStep(step) {
+  document.querySelectorAll('.modal-step').forEach(s => s.classList.remove('active'));
+  document.getElementById(`step${step}`).classList.add('active');
+}
+
+function toggleNewPassword() {
+  const pwdInput = document.getElementById('newPassword');
+  const toggleIcon = document.getElementById('toggleNewIcon');
+  
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleIcon.className = 'fa-solid fa-eye-slash';
+  } else {
+    pwdInput.type = 'password';
+    toggleIcon.className = 'fa-solid fa-eye';
+  }
+}
+
+// OTP input auto-focus
+document.addEventListener('DOMContentLoaded', () => {
+  const otpInputs = document.querySelectorAll('.otp-input');
+  otpInputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      if(e.target.value.length === 1 && index < otpInputs.length - 1) {
+        otpInputs[index + 1].focus();
+      }
+    });
+    input.addEventListener('keydown', (e) => {
+      if(e.key === 'Backspace' && !e.target.value && index > 0) {
+        otpInputs[index - 1].focus();
+      }
+    });
+  });
+});
+
+// Request OTP
+document.getElementById('requestOtpForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btnText = document.getElementById('otpBtnText');
+  const memberId = document.getElementById('resetMemberId').value.trim();
+  
+  if(!memberId) {
+    FWF_Notify.toast('Please enter your Member ID', 'error');
+    return;
+  }
+  
+  btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending OTP...';
+  
+  try {
+    const res = await fetch('/api/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId })
+    });
+    
+    const data = await res.json();
+    
+    if(!res.ok) {
+      throw new Error(data.error || 'Failed to send OTP');
+    }
+    
+    currentMemberId = memberId;
+    document.getElementById('maskedEmail').textContent = data.email;
+    FWF_Notify.toast(data.message, 'success');
+    showStep(2);
+    startTimer();
+    
+  } catch(err) {
+    FWF_Notify.toast(err.message || 'Failed to send OTP', 'error');
+  } finally {
+    btnText.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send OTP';
+  }
+});
+
+// Reset password with OTP
+document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btnText = document.getElementById('resetBtnText');
+  
+  const otpInputs = document.querySelectorAll('.otp-input');
+  const otp = Array.from(otpInputs).map(input => input.value).join('');
+  const newPassword = document.getElementById('newPassword').value;
+  
+  if(otp.length !== 6) {
+    FWF_Notify.toast('Please enter complete OTP', 'error');
+    return;
+  }
+  
+  if(newPassword.length < 8) {
+    FWF_Notify.toast('Password must be at least 8 characters', 'error');
+    return;
+  }
+  
+  btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resetting...';
+  
+  try {
+    const res = await fetch('/api/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId: currentMemberId, otp, newPassword })
+    });
+    
+    const data = await res.json();
+    
+    if(!res.ok) {
+      throw new Error(data.error || 'Failed to reset password');
+    }
+    
+    showStep(3);
+    FWF_Notify.toast(data.message, 'success');
+    
+    setTimeout(() => {
+      closeForgotModal();
+      location.reload();
+    }, 3000);
+    
+  } catch(err) {
+    FWF_Notify.toast(err.message || 'Failed to reset password', 'error');
+    btnText.innerHTML = '<i class="fa-solid fa-check"></i> Reset Password';
+  }
+});
+
+// Resend OTP
+async function resendOTP(e) {
+  e.preventDefault();
+  const btnText = document.getElementById('otpBtnText');
+  
+  btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending OTP...';
+  
+  try {
+    const res = await fetch('/api/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId: currentMemberId })
+    });
+    
+    const data = await res.json();
+    
+    if(!res.ok) {
+      throw new Error(data.error || 'Failed to send OTP');
+    }
+    
+    FWF_Notify.toast('OTP resent successfully', 'success');
+    startTimer();
+    
+  } catch(err) {
+    FWF_Notify.toast(err.message || 'Failed to resend OTP', 'error');
+  } finally {
+    btnText.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send OTP';
+  }
+}
+
+// Timer for resend OTP
+function startTimer() {
+  let timeLeft = 60;
+  const timerEl = document.getElementById('timer');
+  const resendBtn = document.getElementById('resendBtn');
+  
+  resendBtn.style.pointerEvents = 'none';
+  resendBtn.style.color = '#94a3b8';
+  
+  if(timerInterval) clearInterval(timerInterval);
+  
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+    
+    if(timeLeft <= 0) {
+      clearInterval(timerInterval);
+      resendBtn.style.pointerEvents = 'auto';
+      resendBtn.style.color = '#667eea';
+    }
+  }, 1000);
 }
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {

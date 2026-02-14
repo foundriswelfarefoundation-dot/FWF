@@ -250,6 +250,32 @@ app.post('/api/auth/logout', (req,res)=>{
   res.json({ ok:true });
 });
 
+// Get user email by member ID (for password reset)
+app.post('/api/auth/get-user-email', (req,res)=>{
+  const { memberId } = req.body;
+  if(!memberId) return res.status(400).json({error:'Member ID is required'});
+  
+  const u = db.prepare(`SELECT email FROM users WHERE member_id=?`).get(memberId);
+  if(!u) return res.status(404).json({error:'Member ID not found'});
+  
+  res.json({ email: u.email });
+});
+
+// Update password (for password reset)
+app.post('/api/auth/update-password', (req,res)=>{
+  const { memberId, newPassword } = req.body;
+  if(!memberId || !newPassword) return res.status(400).json({error:'Member ID and new password are required'});
+  
+  const u = db.prepare(`SELECT id FROM users WHERE member_id=?`).get(memberId);
+  if(!u) return res.status(404).json({error:'Member ID not found'});
+  
+  const hash = bcrypt.hashSync(newPassword, 10);
+  db.prepare(`UPDATE users SET password_hash=? WHERE id=?`).run(hash, u.id);
+  
+  addBreadcrumb('auth', 'Password reset', { memberId });
+  res.json({ ok:true, message:'Password updated successfully' });
+});
+
 app.get('/api/member/me', auth('member'), (req,res)=>{
   const u = db.prepare(`SELECT id, member_id, name, mobile, email, created_at, first_login_done, referral_code, avatar_url, bio FROM users WHERE id=?`).get(req.user.uid);
   const w = db.prepare(`SELECT balance_inr, lifetime_earned_inr, lifetime_applied_inr, points_balance, points_from_donations, points_from_referrals, points_from_quiz, total_points_earned FROM wallets WHERE user_id=?`).get(req.user.uid) 

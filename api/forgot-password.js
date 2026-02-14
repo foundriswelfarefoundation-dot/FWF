@@ -17,7 +17,7 @@ async function handler(req, res) {
     }
 
     // Call backend to get user email
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+    const backendUrl = process.env.BACKEND_URL || "https://fwf-production.up.railway.app";
     console.log(`[forgot-password] Looking up email for ${memberId} via ${backendUrl}`);
     
     const internalKey = process.env.INTERNAL_API_KEY || 'fwf-internal-secret-key-change-in-production';

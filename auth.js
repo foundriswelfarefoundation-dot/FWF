@@ -1,12 +1,7 @@
 window.AUTH = {
-  // Backend URL - Railway deployment
-  BACKEND_URL: 'https://fwf-production.up.railway.app',
-  
   async api(url, opts={}){
-    // Prepend backend URL for auth/member/admin endpoints
-    const fullUrl = url.startsWith('/api/') ? `${this.BACKEND_URL}${url}` : url;
-    
-    const res = await fetch(fullUrl, {
+    // Use relative URLs — Vercel rewrites proxy /api/* to Railway backend
+    const res = await fetch(url, {
       method: opts.method||'GET',
       headers: {'Content-Type':'application/json'},
       body: opts.body?JSON.stringify(opts.body):undefined,

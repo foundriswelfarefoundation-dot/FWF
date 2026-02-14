@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     let memberId = "";
     let password = "";
     try {
-      const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+      const backendUrl = process.env.BACKEND_URL || "https://fwf-production.up.railway.app";
       const response = await fetch(`${backendUrl}/api/pay/simulate-join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

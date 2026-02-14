@@ -186,6 +186,31 @@ app.get('/api/debug/users', (req,res)=>{
   }
 });
 
+// Debug endpoint - check specific user password hash
+app.get('/api/debug/user/:memberId', (req,res)=>{
+  try {
+    const { memberId } = req.params;
+    const u = db.prepare(`SELECT member_id, name, email, password_hash, created_at FROM users WHERE member_id=?`).get(memberId);
+    if(!u) return res.status(404).json({error: 'Member not found'});
+    
+    // Return hash info (first 20 chars only for security)
+    res.json({
+      ok: true,
+      memberId: u.member_id,
+      name: u.name,
+      email: u.email,
+      passwordHashPreview: u.password_hash.substring(0, 20) + '...',
+      hashLength: u.password_hash.length,
+      isBcrypt: u.password_hash.startsWith('$2'),
+      createdAt: u.created_at,
+      dbPath: dbPath,
+      dbExists: fs.existsSync(dbPath)
+    });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // simulate join payment (replace with gateway webhook later)
 app.post('/api/pay/simulate-join', (req,res)=>{
   const { name, mobile, email } = req.body;
@@ -277,11 +302,23 @@ app.post('/api/auth/update-password', internalAuth, (req,res)=>{
   const { memberId, newPassword } = req.body;
   if(!memberId || !newPassword) return res.status(400).json({error:'Member ID and new password are required'});
   
-  const u = db.prepare(`SELECT id FROM users WHERE member_id=?`).get(memberId);
+  const u = db.prepare(`SELECT id, password_hash FROM users WHERE member_id=?`).get(memberId);
   if(!u) return res.status(404).json({error:'Member ID not found'});
   
+  const oldHashPreview = u.password_hash.substring(0, 15);
   const hash = bcrypt.hashSync(newPassword, 10);
   db.prepare(`UPDATE users SET password_hash=? WHERE id=?`).run(hash, u.id);
+  
+  // Verify update
+  const updated = db.prepare(`SELECT password_hash FROM users WHERE id=?`).get(u.id);
+  const newHashPreview = updated.password_hash.substring(0, 15);
+  
+  console.log(`✅ Password updated for ${memberId}:`, {
+    oldHash: oldHashPreview + '...',
+    newHash: newHashPreview + '...',
+    verified: updated.password_hash === hash,
+    dbPath
+  });
   
   addBreadcrumb('auth', 'Password reset', { memberId });
   res.json({ ok:true, message:'Password updated successfully' });

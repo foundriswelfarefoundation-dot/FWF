@@ -33,22 +33,38 @@ async function handler(req, res) {
       return res.status(400).json({ error: "Invalid or expired OTP" });
     }
 
-    // Mark OTP as used
-    resetRequest.used = true;
-    await resetRequest.save();
-
-    // Update password in backend SQLite database
+    // Update password in backend SQLite database FIRST (before marking OTP as used)
     const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
-    const response = await fetch(`${backendUrl}/api/auth/update-password`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ memberId, newPassword })
-    });
+    console.log(`[reset-password] Updating password for ${memberId} via ${backendUrl}`);
+    
+    const internalKey = process.env.INTERNAL_API_KEY || 'fwf-internal-secret-key-change-in-production';
+    let response;
+    try {
+      response = await fetch(`${backendUrl}/api/auth/update-password`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-internal-api-key": internalKey
+        },
+        body: JSON.stringify({ memberId, newPassword })
+      });
+    } catch (fetchErr) {
+      console.error(`[reset-password] Failed to reach backend at ${backendUrl}:`, fetchErr.message);
+      return res.status(502).json({ 
+        error: "Could not connect to authentication server. Please try again later." 
+      });
+    }
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
+      console.error(`[reset-password] Backend returned ${response.status}:`, error);
       return res.status(400).json({ error: error.error || "Failed to update password" });
     }
+
+    // Only mark OTP as used AFTER password is successfully updated
+    resetRequest.used = true;
+    await resetRequest.save();
+    console.log(`[reset-password] Password updated successfully for ${memberId}`);
 
     res.json({ 
       ok: true, 

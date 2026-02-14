@@ -18,11 +18,23 @@ async function handler(req, res) {
 
     // Call backend to get user email
     const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
-    const response = await fetch(`${backendUrl}/api/auth/get-user-email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ memberId })
-    });
+    console.log(`[forgot-password] Looking up email for ${memberId} via ${backendUrl}`);
+    
+    const internalKey = process.env.INTERNAL_API_KEY || 'fwf-internal-secret-key-change-in-production';
+    let response;
+    try {
+      response = await fetch(`${backendUrl}/api/auth/get-user-email`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-internal-api-key": internalKey
+        },
+        body: JSON.stringify({ memberId })
+      });
+    } catch (fetchErr) {
+      console.error(`[forgot-password] Failed to reach backend at ${backendUrl}:`, fetchErr.message);
+      return res.status(502).json({ error: "Could not connect to authentication server. Please try again later." });
+    }
 
     if (!response.ok) {
       return res.status(404).json({ error: "Member ID not found" });
@@ -91,7 +103,13 @@ async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Forgot password error:", error);
+    console.error("[forgot-password] Error:", error.message, error.stack);
+    
+    // Distinguish between different failure types
+    if (error.message && (error.message.includes('SMTP') || error.message.includes('transport') || error.message.includes('ECONNREFUSED') || error.message.includes('ETIMEDOUT'))) {
+      return res.status(503).json({ error: "Email service temporarily unavailable. Please try again in a few minutes." });
+    }
+    
     res.status(500).json({ error: "Failed to send OTP. Please try again." });
   }
 }

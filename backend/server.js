@@ -250,8 +250,19 @@ app.post('/api/auth/logout', (req,res)=>{
   res.json({ ok:true });
 });
 
-// Get user email by member ID (for password reset)
-app.post('/api/auth/get-user-email', (req,res)=>{
+// --- Internal API middleware (Vercel → Railway calls) ---
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || 'fwf-internal-secret-key-change-in-production';
+function internalAuth(req, res, next) {
+  const key = req.headers['x-internal-api-key'];
+  if (key !== INTERNAL_API_KEY) {
+    console.warn(`⚠️ Unauthorized internal API call to ${req.path} from ${req.ip}`);
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  next();
+}
+
+// Get user email by member ID (for password reset) — internal only
+app.post('/api/auth/get-user-email', internalAuth, (req,res)=>{
   const { memberId } = req.body;
   if(!memberId) return res.status(400).json({error:'Member ID is required'});
   
@@ -261,8 +272,8 @@ app.post('/api/auth/get-user-email', (req,res)=>{
   res.json({ email: u.email });
 });
 
-// Update password (for password reset)
-app.post('/api/auth/update-password', (req,res)=>{
+// Update password (for password reset) — internal only
+app.post('/api/auth/update-password', internalAuth, (req,res)=>{
   const { memberId, newPassword } = req.body;
   if(!memberId || !newPassword) return res.status(400).json({error:'Member ID and new password are required'});
   

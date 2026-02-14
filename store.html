@@ -34,8 +34,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:76px;transition:background .4s,backdrop-filter .4s}
 nav.scrolled{background:rgba(7,7,7,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(201,150,58,.1)}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:.18em;color:var(--gold-light);text-decoration:none}
-.nav-logo span{font-style:italic}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-logo img{height:48px;width:auto;object-fit:contain;filter:brightness(1.2)}
 .nav-links{display:flex;gap:40px;list-style:none}
 .nav-links a{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .25s}
 .nav-links a:hover,.nav-links a.active{color:var(--gold-light)}
@@ -102,8 +102,8 @@ nav.scrolled{background:rgba(7,7,7,.85);backdrop-filter:blur(20px);border-bottom
 .section-title em{font-style:italic;color:var(--gold-light)}
 
 /* ── CATEGORY PILLS ── */
-.category-scroll{padding:0 56px;overflow-x:auto;display:flex;gap:10px;margin-bottom:56px;scrollbar-width:none}
-.category-scroll::-webkit-scrollbar{display:none}
+.category-scroll{padding:0 56px;overflow-x:auto;overflow-y:hidden;display:flex;gap:10px;margin-bottom:56px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.category-scroll::-webkit-scrollbar{display:none;height:0}
 .cat-pill{display:flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--muted2);background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:none;white-space:nowrap;transition:all .25s;border-radius:0;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .cat-pill:hover{border-color:var(--gold-dim);color:var(--white)}
 .cat-pill.active{background:var(--gold);color:var(--black);border-color:var(--gold);font-weight:700}
@@ -321,7 +321,7 @@ footer p{font-size:11px;color:var(--muted);letter-spacing:.05em}
 
 <!-- Nav -->
 <nav id="navbar">
-  <a href="index.html" class="nav-logo">F<span>W</span>F</a>
+  <a href="index.html" class="nav-logo"><img src="assets/images/logo.png" alt="FWF"/></a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
     <li><a href="about.html">About</a></li>
@@ -351,14 +351,14 @@ footer p{font-size:11px;color:var(--muted);letter-spacing:.05em}
   <div class="hero-content">
     <div class="hero-eyebrow">
       <div class="eyebrow-line"></div>
-      <span class="eyebrow-text">Verified Artisan Collective — India</span>
+      <span class="eyebrow-text">🇮🇳 Made in India • Vocal for Local</span>
     </div>
     <h1>
       Shop with<br/>
       <em>Purpose.</em>
       <span class="sub">Empower Artisans.</span>
     </h1>
-    <p class="hero-desc">Each purchase creates real employment — dignity and sustainable livelihoods for craftspeople across rural India. Luxury that means something.</p>
+<p class="hero-desc">Support Indian artisans directly. Every purchase empowers local karigars, preserves traditional crafts, and strengthens Bharat's economy. Be Vocal for Local.</p>
     <div class="hero-actions">
       <a href="#store" class="btn-gold">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -392,22 +392,22 @@ footer p{font-size:11px;color:var(--muted);letter-spacing:.05em}
 <!-- Marquee -->
 <div class="marquee-strip">
   <div class="marquee-track" id="marqueeTrack">
-    <div class="marquee-item">🌿 Handcrafted<span class="marquee-dot"></span></div>
-    <div class="marquee-item">Ethically Sourced<span class="marquee-dot"></span></div>
-    <div class="marquee-item">🪡 Artisan Made<span class="marquee-dot"></span></div>
+    <div class="marquee-item">�🇳 Made in India<span class="marquee-dot"></span></div>
+    <div class="marquee-item">Vocal for Local<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🌿 Handcrafted by Indian Artisans<span class="marquee-dot"></span></div>
     <div class="marquee-item">Zero Middlemen<span class="marquee-dot"></span></div>
-    <div class="marquee-item">✦ Direct from India<span class="marquee-dot"></span></div>
-    <div class="marquee-item">Sustainability First<span class="marquee-dot"></span></div>
-    <div class="marquee-item">🤝 Real Employment<span class="marquee-dot"></span></div>
-    <div class="marquee-item">Verified Quality<span class="marquee-dot"></span></div>
-    <div class="marquee-item">🌿 Handcrafted<span class="marquee-dot"></span></div>
-    <div class="marquee-item">Ethically Sourced<span class="marquee-dot"></span></div>
-    <div class="marquee-item">🪡 Artisan Made<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🪡 Swadeshi Products<span class="marquee-dot"></span></div>
+    <div class="marquee-item">Support Local Karigars<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🤝 Empower Bharat<span class="marquee-dot"></span></div>
+    <div class="marquee-item">100% Authentic Indian Craft<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🇮🇳 Made in India<span class="marquee-dot"></span></div>
+    <div class="marquee-item">Vocal for Local<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🌿 Handcrafted by Indian Artisans<span class="marquee-dot"></span></div>
     <div class="marquee-item">Zero Middlemen<span class="marquee-dot"></span></div>
-    <div class="marquee-item">✦ Direct from India<span class="marquee-dot"></span></div>
-    <div class="marquee-item">Sustainability First<span class="marquee-dot"></span></div>
-    <div class="marquee-item">🤝 Real Employment<span class="marquee-dot"></span></div>
-    <div class="marquee-item">Verified Quality<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🪡 Swadeshi Products<span class="marquee-dot"></span></div>
+    <div class="marquee-item">Support Local Karigars<span class="marquee-dot"></span></div>
+    <div class="marquee-item">🤝 Empower Bharat<span class="marquee-dot"></span></div>
+    <div class="marquee-item">100% Authentic Indian Craft<span class="marquee-dot"></span></div>
   </div>
 </div>
 
@@ -415,8 +415,8 @@ footer p{font-size:11px;color:var(--muted);letter-spacing:.05em}
 <section class="store-section" id="store">
   <div class="section-header">
     <div>
-      <div class="section-eyebrow">Curated Collection</div>
-      <h2 class="section-title">The <em>Artisan</em><br/>Marketplace</h2>
+      <div class="section-eyebrow">🇮🇳 Made in India Collection</div>
+      <h2 class="section-title">Support <em>Local</em><br/>Karigars</h2>
     </div>
     <select id="sortSelect" onchange="loadProducts()" style="background:var(--black3);border:1px solid var(--muted2);color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;padding:12px 20px;outline:none;letter-spacing:.08em;cursor:pointer">
       <option value="">✦ Featured First</option>

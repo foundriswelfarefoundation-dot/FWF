@@ -429,6 +429,65 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   border-bottom:2px solid var(--card-border);
   margin-bottom:20px;
 }
+
+/* ==============================
+   WALLET SINGLE PAGE LAYOUT
+   ============================== */
+.wallet-single-section{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:14px;
+  padding:24px;
+}
+.wallet-section-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:18px;
+  font-weight:900;
+  padding-bottom:14px;
+  border-bottom:2px solid var(--card-border);
+  margin-bottom:18px;
+  margin-top:0;
+}
+.inner-tabs{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  flex-wrap:wrap;
+  background:var(--bg-1);
+  border-radius:10px;
+  padding:4px;
+}
+.inner-tab{
+  padding:10px 18px;
+  border:none;
+  background:transparent;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-muted);
+  cursor:pointer;
+  border-radius:8px;
+  transition:all .2s;
+  font-family:inherit;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.inner-tab:hover{
+  color:var(--text-primary);
+  background:rgba(99,102,241,.08);
+}
+.inner-tab.active{
+  color:#fff;
+  background:var(--accent);
+  box-shadow:0 2px 8px rgba(99,102,241,.3);
+}
+.inner-tab i{ font-size:12px; }
+.inner-tab-content{
+  animation:fadeIn .3s;
+}
 @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
 /* ==============================
@@ -1016,8 +1075,8 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <!-- ===================== WALLET ===================== -->
   <div class="page" id="page-wallet">
     <!-- Wallet Overview Stats -->
-    <div class="stats-row" style="margin-bottom:20px">
-      <div class="stat-card">
+    <div class="stats-row" style="margin-bottom:24px">
+      <div class="stat-card" style="cursor:pointer" onclick="scrollToSection('section-points')">
         <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
         <div class="s-label">Total Points</div>
         <div class="s-value" id="walletTotalPoints">0</div>
@@ -1039,20 +1098,18 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- Wallet Tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--card-border);padding-bottom:2px;overflow-x:auto;flex-wrap:wrap">
-      <button class="wallet-tab active" data-tab="activity"><i class="fa-solid fa-list"></i> My Activity</button>
-      <button class="wallet-tab" data-tab="referrals"><i class="fa-solid fa-user-plus"></i> Referrals & Earnings</button>
-      <button class="wallet-tab" data-tab="points"><i class="fa-solid fa-star"></i> Points</button>
-    </div>
-
-    <!-- Tab Content -->
-    <!-- My Activity Section -->
-    <div class="wallet-section active" id="wallet-activity">
-      <h3 style=\"font-size:18px;font-weight:900\"><i class=\"fa-solid fa-list\" style=\"color:var(--accent)\"></i> My Activity</h3>
+    <!-- ==================== SECTION 1: MY ACTIVITY ==================== -->
+    <div class="wallet-single-section" style="margin-bottom:28px">
+      <h3 class="wallet-section-title"><i class="fa-solid fa-list" style="color:var(--accent)"></i> My Activity</h3>
       
-      <div class="grid-2">
-        <!-- Membership Fees -->
+      <!-- Inner Tabs -->
+      <div class="inner-tabs" style="margin-bottom:16px">
+        <button class="inner-tab active" data-group="activity" data-target="tab-membership"><i class="fa-solid fa-credit-card"></i> Membership Details</button>
+        <button class="inner-tab" data-group="activity" data-target="tab-donations"><i class="fa-solid fa-hand-holding-heart"></i> My Donations</button>
+      </div>
+
+      <!-- Tab: Membership Details -->
+      <div class="inner-tab-content active" id="tab-membership">
         <div class="content-card">
           <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-credit-card" style="color:var(--info)"></i> Membership Fees & Invoices</h4>
           <div class="table-wrap">
@@ -1064,8 +1121,10 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             </table>
           </div>
         </div>
+      </div>
 
-        <!-- Donation History -->
+      <!-- Tab: My Donations -->
+      <div class="inner-tab-content" id="tab-donations" style="display:none">
         <div class="content-card">
           <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> My Donation History</h4>
           <div class="table-wrap">
@@ -1078,122 +1137,127 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </div>
         </div>
       </div>
-
-      <!-- Quiz Participation -->
-      <div class="content-card" style="margin-top:16px">
-        <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Quiz Ticket Sales</h4>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Buyer</th><th>Contact</th><th>Price</th><th>Points Earned</th><th>Date</th></tr></thead>
-            <tbody id="quizTicketsBody">
-              <tr><td colspan="5" class="empty-state"><p>No quiz tickets sold yet</p></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
 
-    <!-- Referrals & Earnings Section -->
-    <div class="wallet-section" id="wallet-referrals" style="display:none">
-      <h3 style=\"font-size:18px;font-weight:900\"><i class=\"fa-solid fa-user-plus\" style=\"color:var(--accent)\"></i> Referrals & Earnings</h3>
+    <!-- ==================== SECTION 2: REFERRALS & ACTIONS ==================== -->
+    <div class="wallet-single-section" style="margin-bottom:28px">
+      <h3 class="wallet-section-title"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
       
-      <!-- Referral Code -->
-      <div class="content-card" style="margin-bottom:16px">
+      <!-- Referral Code Bar -->
+      <div class="content-card" style="margin-bottom:16px;background:linear-gradient(135deg,#ede9fe,#e0e7ff);border:1px solid #c7d2fe">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
           <div>
-            <h4 style="margin-bottom:4px;font-size:14px"><i class="fa-solid fa-link"></i> Your Referral Code</h4>
-            <p style="font-size:12px;color:var(--text-muted)">Share with friends to earn 250 points when they join!</p>
+            <h4 style="margin-bottom:4px;font-size:14px;color:#4c1d95"><i class="fa-solid fa-link"></i> Your Referral Code</h4>
+            <p style="font-size:12px;color:#6d28d9">Share with friends to earn 250 points when they join!</p>
           </div>
           <div style="display:flex;gap:10px;align-items:center">
-            <input type="text" class="form-input" id="refCode" readonly style="font-weight:900;font-size:16px;text-align:center;max-width:200px">
-            <button class="btn btn-ghost" onclick="copyRefCode()"><i class="fa-solid fa-copy"></i></button>
+            <input type="text" class="form-input" id="refCode" readonly style="font-weight:900;font-size:16px;text-align:center;max-width:200px;background:#fff">
+            <button class="btn btn-ghost" onclick="copyRefCode()" style="background:#fff"><i class="fa-solid fa-copy"></i></button>
           </div>
         </div>
       </div>
 
-      <div class="grid-2">
-        <!-- Add Member -->
+      <!-- Inner Tabs -->
+      <div class="inner-tabs" style="margin-bottom:16px">
+        <button class="inner-tab active" data-group="referral" data-target="tab-add-member"><i class="fa-solid fa-user-plus"></i> Add Member</button>
+        <button class="inner-tab" data-group="referral" data-target="tab-add-supporter"><i class="fa-solid fa-hands-helping"></i> Add Supporter</button>
+        <button class="inner-tab" data-group="referral" data-target="tab-receive-donation"><i class="fa-solid fa-hand-holding-heart"></i> Receive Donation</button>
+        <button class="inner-tab" data-group="referral" data-target="tab-sell-ticket"><i class="fa-solid fa-ticket"></i> Sell Quiz Ticket</button>
+      </div>
+
+      <!-- Tab: Add Member -->
+      <div class="inner-tab-content active" id="tab-add-member">
         <div class="content-card">
-          <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Add New Member</h4>
+          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Add New Member</h4>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Refer a new member and earn 250 points on successful payment!</p>
-          <div class="form-group">
-            <label>Member Name</label>
-            <input type="text" class="form-input" id="newMemberName" placeholder="Full name">
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Member Name</label>
+              <input type="text" class="form-input" id="newMemberName" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <input type="tel" class="form-input" id="newMemberMobile" placeholder="10-digit mobile">
+            </div>
+            <div class="form-group">
+              <label>Payment Amount (₹)</label>
+              <input type="number" class="form-input" id="newMemberAmount" placeholder="500" value="500">
+            </div>
           </div>
-          <div class="form-group">
-            <label>Mobile Number</label>
-            <input type="tel" class="form-input" id="newMemberMobile" placeholder="10-digit mobile">
-          </div>
-          <div class="form-group">
-            <label>Payment Amount (₹)</label>
-            <input type="number" class="form-input" id="newMemberAmount" placeholder="500" value="500">
-          </div>
-          <button class="btn btn-success" id="addMemberBtn"><i class="fa-solid fa-plus"></i> Add Member</button>
+          <button class="btn btn-success" id="addMemberBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Member</button>
         </div>
+      </div>
 
-        <!-- Add Supporter/Volunteer -->
+      <!-- Tab: Add Supporter -->
+      <div class="inner-tab-content" id="tab-add-supporter" style="display:none">
         <div class="content-card">
-          <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-hands-helping" style="color:var(--success)"></i> Add Supporter (Volunteer)</h4>
+          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-hands-helping" style="color:var(--success)"></i> Add Supporter (Volunteer)</h4>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Add a volunteer supporter!</p>
-          <div class="form-group">
-            <label>Supporter Name</label>
-            <input type="text" class="form-input" id="supporterName" placeholder="Full name">
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Supporter Name</label>
+              <input type="text" class="form-input" id="supporterName" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label>Contact</label>
+              <input type="text" class="form-input" id="supporterContact" placeholder="Phone/Email">
+            </div>
+            <div class="form-group">
+              <label>Role</label>
+              <input type="text" class="form-input" id="supporterRole" placeholder="Volunteer role">
+            </div>
           </div>
-          <div class="form-group">
-            <label>Contact</label>
-            <input type="text" class="form-input" id="supporterContact" placeholder="Phone/Email">
-          </div>
-          <div class="form-group">
-            <label>Role</label>
-            <input type="text" class="form-input" id="supporterRole" placeholder="Volunteer role">
-          </div>
-          <button class="btn btn-success" id="addSupporterBtn"><i class="fa-solid fa-plus"></i> Add Supporter</button>
+          <button class="btn btn-success" id="addSupporterBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Supporter</button>
         </div>
       </div>
 
-      <!-- Record Donation -->
-      <div class="content-card" style="margin-top:16px">
-        <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-hand-holding-heart" style="color:var(--accent2)"></i> Record Donation</h4>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Collected a donation? Record it to earn 10% as reward points!</p>
-        <div class="grid-3">
-          <div class="form-group">
-            <label>Donation Amount (₹)</label>
-            <input type="number" class="form-input" id="donAmount" placeholder="e.g. 500" min="1">
+      <!-- Tab: Receive Donation -->
+      <div class="inner-tab-content" id="tab-receive-donation" style="display:none">
+        <div class="content-card">
+          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-hand-holding-heart" style="color:var(--accent2)"></i> Record Donation</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Collected a donation? Record it to earn 10% as reward points!</p>
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Donation Amount (₹)</label>
+              <input type="number" class="form-input" id="donAmount" placeholder="e.g. 500" min="1">
+            </div>
+            <div class="form-group">
+              <label>Donor Name</label>
+              <input type="text" class="form-input" id="donName" placeholder="Donor name">
+            </div>
+            <div class="form-group">
+              <label>Donor Contact</label>
+              <input type="text" class="form-input" id="donContact" placeholder="Phone/Email">
+            </div>
           </div>
-          <div class="form-group">
-            <label>Donor Name</label>
-            <input type="text" class="form-input" id="donName" placeholder="Donor name">
-          </div>
-          <div class="form-group">
-            <label>Donor Contact</label>
-            <input type="text" class="form-input" id="donContact" placeholder="Phone/Email">
-          </div>
+          <button class="btn btn-success" id="recordDonBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Donation</button>
         </div>
-        <button class="btn btn-success" id="recordDonBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Donation</button>
       </div>
 
-      <!-- Sell Quiz Ticket -->
-      <div class="content-card" style="margin-top:16px">
-        <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Sell Quiz Ticket</h4>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Sold a quiz ticket? Record it and process payment to earn 10% points!</p>
-        <div class="grid-3">
-          <div class="form-group">
-            <label>Buyer Name</label>
-            <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer name">
+      <!-- Tab: Sell Quiz Ticket -->
+      <div class="inner-tab-content" id="tab-sell-ticket" style="display:none">
+        <div class="content-card">
+          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Sell Quiz Ticket</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Sold a quiz ticket? Record it and process payment to earn 10% points!</p>
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Buyer Name</label>
+              <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer name">
+            </div>
+            <div class="form-group">
+              <label>Buyer Contact</label>
+              <input type="text" class="form-input" id="tickContact" placeholder="Phone/Email">
+            </div>
+            <div class="form-group">
+              <label>Ticket Price (₹)</label>
+              <input type="number" class="form-input" id="tickPrice" placeholder="100" value="100" min="1">
+            </div>
           </div>
-          <div class="form-group">
-            <label>Buyer Contact</label>
-            <input type="text" class="form-input" id="tickContact" placeholder="Phone/Email">
-          </div>
-          <div class="form-group">
-            <label>Ticket Price (₹)</label>
-            <input type="number" class="form-input" id="tickPrice" placeholder="100" value="100" min="1">
-          </div>
+          <button class="btn btn-success" id="sellTicketBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Ticket Sale</button>
         </div>
-        <button class="btn btn-success" id="sellTicketBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Ticket Sale</button>
       </div>
 
-      <!-- Referral Tracking Table -->
+      <!-- Referral Tracking Table (always visible) -->
       <div class="content-card" style="margin-top:16px">
         <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-list"></i> My Referrals</h4>
         <div class="table-wrap">
@@ -1207,9 +1271,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- Points Section -->
-    <div class="wallet-section" id="wallet-points" style="display:none">
-      <h3 style="margin-bottom:16px;font-size:18px;font-weight:900"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
+    <!-- ==================== SECTION 3: POINTS ==================== -->
+    <div class="wallet-single-section" id="section-points">
+      <h3 class="wallet-section-title"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
       
       <!-- Points Breakdown -->
       <div class="stats-row" style="margin-bottom:20px">
@@ -2356,21 +2420,37 @@ async function loadWallet(){
 }
 
 /* ============================================
-   WALLET TABS
+   INNER TABS (Wallet Single Page)
    ============================================ */
-document.querySelectorAll('.wallet-tab').forEach(tab => {
+document.querySelectorAll('.inner-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    const target = tab.dataset.tab;
+    const group = tab.dataset.group;
+    const target = tab.dataset.target;
     
-    // Update tabs
-    document.querySelectorAll('.wallet-tab').forEach(t => t.classList.remove('active'));
+    // Update tabs in same group
+    document.querySelectorAll(`.inner-tab[data-group="${group}"]`).forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     
-    // Update sections
-    document.querySelectorAll('.wallet-section').forEach(s => s.style.display = 'none');
-    document.getElementById('wallet-' + target).style.display = 'block';
+    // Hide all tab contents in same parent
+    const parent = tab.closest('.wallet-single-section');
+    parent.querySelectorAll('.inner-tab-content').forEach(c => {
+      c.style.display = 'none';
+      c.classList.remove('active');
+    });
+    
+    // Show target
+    const targetEl = document.getElementById(target);
+    if(targetEl){
+      targetEl.style.display = 'block';
+      targetEl.classList.add('active');
+    }
   });
 });
+
+function scrollToSection(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
 
 /* ============================================
    REDEEM MODAL

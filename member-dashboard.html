@@ -397,96 +397,119 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 .redeem-cost{ font-size:13px; font-weight:800; color:var(--accent); margin-bottom:8px; }
 
 /* ==============================
-   WALLET TABS
-   ============================== */
-.wallet-tab{
-  padding:12px 24px; border:none; background:transparent;
-  font-size:13px; font-weight:800; color:var(--text-muted);
-  cursor:pointer; border-bottom:3px solid transparent;
-  transition:all .2s; font-family:inherit;
-  white-space:nowrap; position:relative;
-}
-.wallet-tab:hover{ 
-  color:var(--text-primary); 
-  background:rgba(99,102,241,.05);
-  border-radius:8px 8px 0 0;
-}
-.wallet-tab.active{
-  color:var(--accent); 
-  border-bottom-color:var(--accent);
-  background:rgba(99,102,241,.08);
-  border-radius:8px 8px 0 0;
-}
-.wallet-tab i{ margin-right:6px; }
-.wallet-section{ 
-  animation:fadeIn .3s; 
-}
-.wallet-section h3{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding-bottom:12px;
-  border-bottom:2px solid var(--card-border);
-  margin-bottom:20px;
-}
-
-/* ==============================
-   WALLET SINGLE PAGE LAYOUT
+   WALLET SINGLE PAGE - APP STYLE
    ============================== */
 .wallet-single-section{
   background:var(--card-bg);
   border:1px solid var(--card-border);
-  border-radius:14px;
-  padding:24px;
+  border-radius:16px;
+  overflow:hidden;
 }
-.wallet-section-title{
+.wallet-section-header{
   display:flex;
   align-items:center;
   gap:10px;
-  font-size:18px;
+  font-size:16px;
   font-weight:900;
-  padding-bottom:14px;
-  border-bottom:2px solid var(--card-border);
-  margin-bottom:18px;
-  margin-top:0;
+  padding:18px 20px 0;
+  margin:0;
+  color:var(--text-primary);
 }
-.inner-tabs{
+.wallet-section-header i{ font-size:18px; }
+
+/* Mobile App Style Tabs */
+.app-tabs{
   display:flex;
-  gap:6px;
+  gap:0;
   overflow-x:auto;
-  flex-wrap:wrap;
-  background:var(--bg-1);
-  border-radius:10px;
-  padding:4px;
+  padding:12px 16px 0;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-.inner-tab{
-  padding:10px 18px;
+.app-tabs::-webkit-scrollbar{ display:none; }
+.app-tab{
+  flex:1;
+  min-width:0;
+  padding:12px 6px 14px;
   border:none;
   background:transparent;
-  font-size:12px;
+  font-size:11px;
   font-weight:700;
   color:var(--text-muted);
   cursor:pointer;
-  border-radius:8px;
-  transition:all .2s;
   font-family:inherit;
-  white-space:nowrap;
   display:flex;
+  flex-direction:column;
   align-items:center;
   gap:6px;
+  position:relative;
+  transition:color .2s;
+  text-align:center;
+  white-space:nowrap;
 }
-.inner-tab:hover{
+.app-tab::after{
+  content:'';
+  position:absolute;
+  bottom:0;
+  left:20%;
+  right:20%;
+  height:3px;
+  border-radius:3px 3px 0 0;
+  background:transparent;
+  transition:all .25s;
+}
+.app-tab:hover{
   color:var(--text-primary);
-  background:rgba(99,102,241,.08);
 }
-.inner-tab.active{
-  color:#fff;
+.app-tab.active{
+  color:var(--accent);
+}
+.app-tab.active::after{
   background:var(--accent);
-  box-shadow:0 2px 8px rgba(99,102,241,.3);
+  left:10%;
+  right:10%;
 }
-.inner-tab i{ font-size:12px; }
-.inner-tab-content{
-  animation:fadeIn .3s;
+.app-tab .tab-icon{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  background:var(--bg-1);
+  color:var(--text-muted);
+  transition:all .25s;
+}
+.app-tab.active .tab-icon{
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(99,102,241,.3);
+  transform:scale(1.05);
+}
+.app-tab .tab-label{
+  font-size:10px;
+  line-height:1.2;
+}
+@media(max-width:560px){
+  .app-tab .tab-label{ font-size:9px; }
+  .app-tab .tab-icon{ width:32px; height:32px; font-size:13px; }
+  .app-tab{ padding:10px 4px 12px; }
+}
+
+/* Tab content area */
+.app-tab-divider{
+  height:1px;
+  background:var(--card-border);
+  margin:0;
+}
+.app-tab-body{
+  padding:18px 20px 20px;
+  animation:tabSlideIn .3s ease;
+}
+@keyframes tabSlideIn{
+  from{ opacity:0; transform:translateY(8px); }
+  to{ opacity:1; transform:translateY(0); }
 }
 @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
@@ -1099,181 +1122,193 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
 
     <!-- ==================== SECTION 1: MY ACTIVITY ==================== -->
-    <div class="wallet-single-section" style="margin-bottom:28px">
-      <h3 class="wallet-section-title"><i class="fa-solid fa-list" style="color:var(--accent)"></i> My Activity</h3>
+    <div class="wallet-single-section" style="margin-bottom:24px">
+      <h3 class="wallet-section-header"><i class="fa-solid fa-list" style="color:var(--accent)"></i> My Activity</h3>
       
-      <!-- Inner Tabs -->
-      <div class="inner-tabs" style="margin-bottom:16px">
-        <button class="inner-tab active" data-group="activity" data-target="tab-membership"><i class="fa-solid fa-credit-card"></i> Membership Details</button>
-        <button class="inner-tab" data-group="activity" data-target="tab-donations"><i class="fa-solid fa-hand-holding-heart"></i> My Donations</button>
+      <!-- App Style Tabs -->
+      <div class="app-tabs">
+        <button class="app-tab active" data-group="activity" data-target="tab-membership">
+          <div class="tab-icon"><i class="fa-solid fa-credit-card"></i></div>
+          <span class="tab-label">Membership</span>
+        </button>
+        <button class="app-tab" data-group="activity" data-target="tab-donations">
+          <div class="tab-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <span class="tab-label">My Donations</span>
+        </button>
       </div>
+      <div class="app-tab-divider"></div>
 
       <!-- Tab: Membership Details -->
-      <div class="inner-tab-content active" id="tab-membership">
-        <div class="content-card">
-          <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-credit-card" style="color:var(--info)"></i> Membership Fees & Invoices</h4>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Invoice</th></tr></thead>
-              <tbody id="membershipFeesBody">
-                <tr><td colspan="4" class="empty-state"><p>No records yet</p></td></tr>
-              </tbody>
-            </table>
-          </div>
+      <div class="app-tab-body" id="tab-membership">
+        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-credit-card" style="color:var(--info)"></i> Membership Fees & Invoices</h4>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Invoice</th></tr></thead>
+            <tbody id="membershipFeesBody">
+              <tr><td colspan="4" class="empty-state"><p>No records yet</p></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <!-- Tab: My Donations -->
-      <div class="inner-tab-content" id="tab-donations" style="display:none">
-        <div class="content-card">
-          <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> My Donation History</h4>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>Donor</th><th>Amount</th><th>Points</th><th>Date</th></tr></thead>
-              <tbody id="myDonationsBody">
-                <tr><td colspan="4" class="empty-state"><p>No donations yet</p></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== SECTION 2: REFERRALS & ACTIONS ==================== -->
-    <div class="wallet-single-section" style="margin-bottom:28px">
-      <h3 class="wallet-section-title"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
-      
-      <!-- Referral Code Bar -->
-      <div class="content-card" style="margin-bottom:16px;background:linear-gradient(135deg,#ede9fe,#e0e7ff);border:1px solid #c7d2fe">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-          <div>
-            <h4 style="margin-bottom:4px;font-size:14px;color:#4c1d95"><i class="fa-solid fa-link"></i> Your Referral Code</h4>
-            <p style="font-size:12px;color:#6d28d9">Share with friends to earn 250 points when they join!</p>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center">
-            <input type="text" class="form-input" id="refCode" readonly style="font-weight:900;font-size:16px;text-align:center;max-width:200px;background:#fff">
-            <button class="btn btn-ghost" onclick="copyRefCode()" style="background:#fff"><i class="fa-solid fa-copy"></i></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Inner Tabs -->
-      <div class="inner-tabs" style="margin-bottom:16px">
-        <button class="inner-tab active" data-group="referral" data-target="tab-add-member"><i class="fa-solid fa-user-plus"></i> Add Member</button>
-        <button class="inner-tab" data-group="referral" data-target="tab-add-supporter"><i class="fa-solid fa-hands-helping"></i> Add Supporter</button>
-        <button class="inner-tab" data-group="referral" data-target="tab-receive-donation"><i class="fa-solid fa-hand-holding-heart"></i> Receive Donation</button>
-        <button class="inner-tab" data-group="referral" data-target="tab-sell-ticket"><i class="fa-solid fa-ticket"></i> Sell Quiz Ticket</button>
-      </div>
-
-      <!-- Tab: Add Member -->
-      <div class="inner-tab-content active" id="tab-add-member">
-        <div class="content-card">
-          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Add New Member</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Refer a new member and earn 250 points on successful payment!</p>
-          <div class="grid-3">
-            <div class="form-group">
-              <label>Member Name</label>
-              <input type="text" class="form-input" id="newMemberName" placeholder="Full name">
-            </div>
-            <div class="form-group">
-              <label>Mobile Number</label>
-              <input type="tel" class="form-input" id="newMemberMobile" placeholder="10-digit mobile">
-            </div>
-            <div class="form-group">
-              <label>Payment Amount (₹)</label>
-              <input type="number" class="form-input" id="newMemberAmount" placeholder="500" value="500">
-            </div>
-          </div>
-          <button class="btn btn-success" id="addMemberBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Member</button>
-        </div>
-      </div>
-
-      <!-- Tab: Add Supporter -->
-      <div class="inner-tab-content" id="tab-add-supporter" style="display:none">
-        <div class="content-card">
-          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-hands-helping" style="color:var(--success)"></i> Add Supporter (Volunteer)</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Add a volunteer supporter!</p>
-          <div class="grid-3">
-            <div class="form-group">
-              <label>Supporter Name</label>
-              <input type="text" class="form-input" id="supporterName" placeholder="Full name">
-            </div>
-            <div class="form-group">
-              <label>Contact</label>
-              <input type="text" class="form-input" id="supporterContact" placeholder="Phone/Email">
-            </div>
-            <div class="form-group">
-              <label>Role</label>
-              <input type="text" class="form-input" id="supporterRole" placeholder="Volunteer role">
-            </div>
-          </div>
-          <button class="btn btn-success" id="addSupporterBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Supporter</button>
-        </div>
-      </div>
-
-      <!-- Tab: Receive Donation -->
-      <div class="inner-tab-content" id="tab-receive-donation" style="display:none">
-        <div class="content-card">
-          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-hand-holding-heart" style="color:var(--accent2)"></i> Record Donation</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Collected a donation? Record it to earn 10% as reward points!</p>
-          <div class="grid-3">
-            <div class="form-group">
-              <label>Donation Amount (₹)</label>
-              <input type="number" class="form-input" id="donAmount" placeholder="e.g. 500" min="1">
-            </div>
-            <div class="form-group">
-              <label>Donor Name</label>
-              <input type="text" class="form-input" id="donName" placeholder="Donor name">
-            </div>
-            <div class="form-group">
-              <label>Donor Contact</label>
-              <input type="text" class="form-input" id="donContact" placeholder="Phone/Email">
-            </div>
-          </div>
-          <button class="btn btn-success" id="recordDonBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Donation</button>
-        </div>
-      </div>
-
-      <!-- Tab: Sell Quiz Ticket -->
-      <div class="inner-tab-content" id="tab-sell-ticket" style="display:none">
-        <div class="content-card">
-          <h4 style="margin-bottom:6px;font-size:14px"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Sell Quiz Ticket</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Sold a quiz ticket? Record it and process payment to earn 10% points!</p>
-          <div class="grid-3">
-            <div class="form-group">
-              <label>Buyer Name</label>
-              <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer name">
-            </div>
-            <div class="form-group">
-              <label>Buyer Contact</label>
-              <input type="text" class="form-input" id="tickContact" placeholder="Phone/Email">
-            </div>
-            <div class="form-group">
-              <label>Ticket Price (₹)</label>
-              <input type="number" class="form-input" id="tickPrice" placeholder="100" value="100" min="1">
-            </div>
-          </div>
-          <button class="btn btn-success" id="sellTicketBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Ticket Sale</button>
-        </div>
-      </div>
-
-      <!-- Referral Tracking Table (always visible) -->
-      <div class="content-card" style="margin-top:16px">
-        <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-list"></i> My Referrals</h4>
+      <div class="app-tab-body" id="tab-donations" style="display:none">
+        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> My Donation History</h4>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>Member ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
-            <tbody id="referralsBody">
-              <tr><td colspan="6" class="empty-state"><p>No referrals yet</p></td></tr>
+            <thead><tr><th>Donor</th><th>Amount</th><th>Points</th><th>Date</th></tr></thead>
+            <tbody id="myDonationsBody">
+              <tr><td colspan="4" class="empty-state"><p>No donations yet</p></td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
+    <!-- ==================== SECTION 2: REFERRALS & ACTIONS ==================== -->
+    <div class="wallet-single-section" style="margin-bottom:24px">
+      <h3 class="wallet-section-header"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
+      
+      <!-- Referral Code Bar -->
+      <div style="margin:14px 20px 0;background:linear-gradient(135deg,#ede9fe,#e0e7ff);border:1px solid #c7d2fe;border-radius:12px;padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <h4 style="margin:0 0 4px;font-size:13px;color:#4c1d95"><i class="fa-solid fa-link"></i> Your Referral Code</h4>
+            <p style="font-size:11px;color:#6d28d9;margin:0">Share with friends to earn 250 points!</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" class="form-input" id="refCode" readonly style="font-weight:900;font-size:15px;text-align:center;max-width:180px;background:#fff;padding:8px 12px">
+            <button class="btn btn-ghost" onclick="copyRefCode()" style="background:#fff;padding:8px 12px"><i class="fa-solid fa-copy"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Style Tabs -->
+      <div class="app-tabs">
+        <button class="app-tab active" data-group="referral" data-target="tab-add-member">
+          <div class="tab-icon"><i class="fa-solid fa-user-plus"></i></div>
+          <span class="tab-label">Add Member</span>
+        </button>
+        <button class="app-tab" data-group="referral" data-target="tab-add-supporter">
+          <div class="tab-icon"><i class="fa-solid fa-hands-helping"></i></div>
+          <span class="tab-label">Add Supporter</span>
+        </button>
+        <button class="app-tab" data-group="referral" data-target="tab-receive-donation">
+          <div class="tab-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <span class="tab-label">Receive Donation</span>
+        </button>
+        <button class="app-tab" data-group="referral" data-target="tab-sell-ticket">
+          <div class="tab-icon"><i class="fa-solid fa-ticket"></i></div>
+          <span class="tab-label">Sell Ticket</span>
+        </button>
+      </div>
+      <div class="app-tab-divider"></div>
+
+      <!-- Tab: Add Member -->
+      <div class="app-tab-body" id="tab-add-member">
+        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Add New Member</h4>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Refer a new member and earn 250 points on successful payment!</p>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Member Name</label>
+            <input type="text" class="form-input" id="newMemberName" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Mobile Number</label>
+            <input type="tel" class="form-input" id="newMemberMobile" placeholder="10-digit mobile">
+          </div>
+          <div class="form-group">
+            <label>Payment Amount (₹)</label>
+            <input type="number" class="form-input" id="newMemberAmount" placeholder="500" value="500">
+          </div>
+        </div>
+        <button class="btn btn-success" id="addMemberBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Member</button>
+      </div>
+
+      <!-- Tab: Add Supporter -->
+      <div class="app-tab-body" id="tab-add-supporter" style="display:none">
+        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-hands-helping" style="color:var(--success)"></i> Add Supporter (Volunteer)</h4>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Add a volunteer supporter!</p>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Supporter Name</label>
+            <input type="text" class="form-input" id="supporterName" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Contact</label>
+            <input type="text" class="form-input" id="supporterContact" placeholder="Phone/Email">
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <input type="text" class="form-input" id="supporterRole" placeholder="Volunteer role">
+          </div>
+        </div>
+        <button class="btn btn-success" id="addSupporterBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Supporter</button>
+      </div>
+
+      <!-- Tab: Receive Donation -->
+      <div class="app-tab-body" id="tab-receive-donation" style="display:none">
+        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-hand-holding-heart" style="color:var(--accent2)"></i> Record Donation</h4>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Collected a donation? Record it to earn 10% as reward points!</p>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Donation Amount (₹)</label>
+            <input type="number" class="form-input" id="donAmount" placeholder="e.g. 500" min="1">
+          </div>
+          <div class="form-group">
+            <label>Donor Name</label>
+            <input type="text" class="form-input" id="donName" placeholder="Donor name">
+          </div>
+          <div class="form-group">
+            <label>Donor Contact</label>
+            <input type="text" class="form-input" id="donContact" placeholder="Phone/Email">
+          </div>
+        </div>
+        <button class="btn btn-success" id="recordDonBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Donation</button>
+      </div>
+
+      <!-- Tab: Sell Quiz Ticket -->
+      <div class="app-tab-body" id="tab-sell-ticket" style="display:none">
+        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Sell Quiz Ticket</h4>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Sold a quiz ticket? Record it and process payment to earn 10% points!</p>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Buyer Name</label>
+            <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer name">
+          </div>
+          <div class="form-group">
+            <label>Buyer Contact</label>
+            <input type="text" class="form-input" id="tickContact" placeholder="Phone/Email">
+          </div>
+          <div class="form-group">
+            <label>Ticket Price (₹)</label>
+            <input type="number" class="form-input" id="tickPrice" placeholder="100" value="100" min="1">
+          </div>
+        </div>
+        <button class="btn btn-success" id="sellTicketBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Ticket Sale</button>
+      </div>
+
+      <!-- Referral Tracking Table (always visible below tabs) -->
+      <div style="padding:0 20px 20px">
+        <div style="border-top:1px solid var(--card-border);padding-top:16px">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-list"></i> My Referrals</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Member ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="referralsBody">
+                <tr><td colspan="6" class="empty-state"><p>No referrals yet</p></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ==================== SECTION 3: POINTS ==================== -->
     <div class="wallet-single-section" id="section-points">
-      <h3 class="wallet-section-title"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
+      <h3 class="wallet-section-header" style="padding-bottom:18px"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
+      <div class="app-tab-divider"></div>
+      <div style="padding:18px 20px 20px">
       
       <!-- Points Breakdown -->
       <div class="stats-row" style="margin-bottom:20px">
@@ -1345,6 +1380,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -2420,29 +2456,27 @@ async function loadWallet(){
 }
 
 /* ============================================
-   INNER TABS (Wallet Single Page)
+   APP-STYLE TABS (Wallet Single Page)
    ============================================ */
-document.querySelectorAll('.inner-tab').forEach(tab => {
+document.querySelectorAll('.app-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const group = tab.dataset.group;
     const target = tab.dataset.target;
     
     // Update tabs in same group
-    document.querySelectorAll(`.inner-tab[data-group="${group}"]`).forEach(t => t.classList.remove('active'));
+    document.querySelectorAll(`.app-tab[data-group="${group}"]`).forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     
-    // Hide all tab contents in same parent
+    // Hide all tab bodies in same section
     const parent = tab.closest('.wallet-single-section');
-    parent.querySelectorAll('.inner-tab-content').forEach(c => {
+    parent.querySelectorAll('.app-tab-body').forEach(c => {
       c.style.display = 'none';
-      c.classList.remove('active');
     });
     
     // Show target
     const targetEl = document.getElementById(target);
     if(targetEl){
       targetEl.style.display = 'block';
-      targetEl.classList.add('active');
     }
   });
 });

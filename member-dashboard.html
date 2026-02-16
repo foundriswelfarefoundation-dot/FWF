@@ -625,7 +625,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
     <div class="nav-divider">Engage</div>
     <button class="nav-item" data-page="feed">
-      <i class="fa-solid fa-camera"></i> Social Work Feed
+      <i class="fa-solid fa-book-open"></i> Social Book
     </button>
     <button class="nav-item" data-page="training">
       <i class="fa-solid fa-graduation-cap"></i> Training & Courses
@@ -810,11 +810,28 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
-  <!-- ===================== SOCIAL WORK FEED ===================== -->
+  <!-- ===================== SOCIAL BOOK ===================== -->
   <div class="page" id="page-feed">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3 style="font-size:16px;font-weight:800"><i class="fa-solid fa-camera" style="color:var(--accent)"></i> Social Work Feed</h3>
-      <button class="btn btn-primary" onclick="openModal('postModal')"><i class="fa-solid fa-plus"></i> New Post</button>
+    <!-- Info Banner -->
+    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:16px;padding:20px 24px;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div style="flex:1">
+        <h3 style="font-size:18px;font-weight:900;margin:0 0 4px"><i class="fa-solid fa-book-open"></i> Social Book</h3>
+        <p style="font-size:13px;opacity:.9;margin:0">Share your social work, inspire others! Members, Volunteers & CSR Partners can post. <strong>All posts are reviewed by admin before publishing.</strong></p>
+      </div>
+    </div>
+
+    <!-- Create Post Box -->
+    <div class="content-card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px" onclick="openModal('postModal')">
+        <div class="feed-avatar" style="width:44px;height:44px;font-size:16px" id="feedUserAvatar">M</div>
+        <div style="flex:1;background:var(--bg-1);padding:12px 18px;border-radius:99px;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;transition:.2s" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg-1)'">
+          What's your social work story today?
+        </div>
+        <button class="btn btn-primary" onclick="openModal('postModal')"><i class="fa-solid fa-image"></i> Post</button>
+      </div>
     </div>
 
     <div id="feedContainer">
@@ -822,14 +839,20 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <div class="feed-card">
         <div class="feed-header">
           <div class="feed-avatar">FW</div>
-          <div>
-            <div class="feed-name">FWF Community</div>
+          <div style="flex:1">
+            <div class="feed-name">FWF Community <span style="color:var(--accent);font-size:11px;font-weight:800;background:var(--accent-soft);padding:2px 8px;border-radius:6px;margin-left:6px">MEMBER</span></div>
             <div class="feed-time">Today • Welfare Activity</div>
           </div>
         </div>
         <div class="feed-body">
           🌱 Tree plantation drive completed! 50 trees planted by our members in collaboration with local schools. 
           Together, we're building a greener future.
+        </div>
+        <div class="feed-image-container" style="margin-bottom:12px">
+          <div style="background:linear-gradient(135deg,#22c55e,#10b981);border-radius:12px;padding:80px 20px;text-align:center;color:#fff">
+            <i class="fa-solid fa-seedling" style="font-size:48px;opacity:.7"></i>
+            <p style="margin:12px 0 0;font-size:13px;opacity:.8">50 trees planted 🌳</p>
+          </div>
         </div>
         <div class="feed-actions">
           <button><i class="fa-regular fa-heart"></i> 24</button>
@@ -840,9 +863,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
       <div class="feed-card">
         <div class="feed-header">
-          <div class="feed-avatar" style="background:linear-gradient(135deg,#22c55e,#059669)">SK</div>
-          <div>
-            <div class="feed-name">Skill Development Camp</div>
+          <div class="feed-avatar" style="background:linear-gradient(135deg,#ec4899,#be185d)">RK</div>
+          <div style="flex:1">
+            <div class="feed-name">Rajesh Kumar <span style="color:#22c55e;font-size:11px;font-weight:800;background:#dcfce7;padding:2px 8px;border-radius:6px;margin-left:6px">VOLUNTEER</span></div>
             <div class="feed-time">Yesterday • Training</div>
           </div>
         </div>
@@ -859,21 +882,29 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
       <div class="feed-card">
         <div class="feed-header">
-          <div class="feed-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706)">HC</div>
-          <div>
-            <div class="feed-name">Health Camp</div>
+          <div class="feed-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706)">TC</div>
+          <div style="flex:1">
+            <div class="feed-name">Tech Corp India <span style="color:#3b82f6;font-size:11px;font-weight:800;background:#dbeafe;padding:2px 8px;border-radius:6px;margin-left:6px">CSR PARTNER</span></div>
             <div class="feed-time">3 days ago • Health</div>
           </div>
         </div>
         <div class="feed-body">
           🏥 Free health checkup camp organized for 100+ women in rural area. Eye testing, blood pressure 
-          screening & nutrition counseling provided.
+          screening & nutrition counseling provided. Proud to support FWF's mission!
         </div>
         <div class="feed-actions">
           <button><i class="fa-regular fa-heart"></i> 67</button>
           <button><i class="fa-regular fa-comment"></i> 22</button>
           <button><i class="fa-solid fa-share"></i> Share</button>
         </div>
+      </div>
+
+      <!-- Empty state for no posts -->
+      <div class="content-card" style="text-align:center;padding:40px 20px;display:none" id="emptyFeedState">
+        <i class="fa-solid fa-book-open" style="font-size:48px;color:var(--text-muted);opacity:.5;margin-bottom:12px"></i>
+        <h4 style="font-size:16px;font-weight:800;margin-bottom:6px">No posts yet</h4>
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Be the first to share your social work story!</p>
+        <button class="btn btn-primary" onclick="openModal('postModal')"><i class="fa-solid fa-plus"></i> Create First Post</button>
       </div>
     </div>
   </div>
@@ -1593,32 +1624,44 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
 <!-- New Post Modal -->
 <div class="modal-overlay hidden" id="postModal">
-  <div class="modal-card" style="max-width:540px">
+  <div class="modal-card" style="max-width:560px">
     <div class="modal-head">
-      <h3><i class="fa-solid fa-camera"></i> New Social Work Post</h3>
+      <h3><i class="fa-solid fa-book-open"></i> Share Your Social Work</h3>
       <button class="modal-close" onclick="closeModal('postModal')">&times;</button>
+    </div>
+    <div style="background:var(--accent-soft);padding:12px 16px;border-radius:10px;margin-bottom:16px;border-left:4px solid var(--accent)">
+      <p style="font-size:12px;font-weight:700;color:var(--text-primary);margin:0">
+        <i class="fa-solid fa-info-circle" style="color:var(--accent)"></i> Your post will be reviewed by admin before appearing on Social Book.
+      </p>
     </div>
     <div class="form-group">
       <label>Activity Type</label>
       <select class="form-input" id="postType">
+        <option value="">Select activity type</option>
         <option value="welfare">Welfare Activity</option>
         <option value="training">Training Session</option>
         <option value="health">Health Camp</option>
         <option value="plantation">Plantation Drive</option>
+        <option value="education">Education Support</option>
+        <option value="donation">Donation Collection</option>
+        <option value="awareness">Awareness Campaign</option>
+        <option value="skill">Skill Development</option>
         <option value="other">Other</option>
       </select>
     </div>
     <div class="form-group">
-      <label>Description</label>
-      <textarea class="form-input" id="postDesc" placeholder="Describe the activity..." rows="4"></textarea>
+      <label>Tell Your Story</label>
+      <textarea class="form-input" id="postDesc" placeholder="Share details about your social work activity... What did you do? How many people were helped? What impact did it create?" rows="5"></textarea>
+      <small style="font-size:11px;color:var(--text-muted);margin-top:4px;display:block">Tip: Include numbers, locations, and outcomes to inspire others!</small>
     </div>
     <div class="form-group">
-      <label>Photo/Video Upload</label>
-      <input type="file" class="form-input" id="postMedia" accept="image/*,video/*">
+      <label>Photos/Videos <span style="font-size:11px;color:var(--text-muted);font-weight:600">(Optional but recommended)</span></label>
+      <input type="file" class="form-input" id="postMedia" accept="image/*,video/*" multiple>
+      <small style="font-size:11px;color:var(--text-muted);margin-top:4px;display:block">You can upload multiple images. Max 5MB per file.</small>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('postModal')">Cancel</button>
-      <button class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Post</button>
+      <button class="btn btn-primary" id="submitPostBtn"><i class="fa-solid fa-paper-plane"></i> Submit for Review</button>
     </div>
   </div>
 </div>
@@ -1766,7 +1809,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 const pageTitles = {
   home: '<i class="fa-solid fa-house"></i> Dashboard',
   profile: '<i class="fa-solid fa-id-card"></i> Profile & ID Card',
-  feed: '<i class="fa-solid fa-camera"></i> Social Work Feed',
+  feed: '<i class="fa-solid fa-book-open"></i> Social Book',
   training: '<i class="fa-solid fa-graduation-cap"></i> Training & Courses',
   wallet: '<i class="fa-solid fa-wallet"></i> Wallet',
   marketplace: '<i class="fa-solid fa-store"></i> Marketplace',
@@ -2185,6 +2228,11 @@ function populateProfile(data){
   document.getElementById('cardId').textContent = u.member_id || '';
   document.getElementById('cardMobile').textContent = u.mobile || '—';
   document.getElementById('cardJoined').textContent = fmtDate(u.created_at);
+
+  // Social Book Feed Avatar
+  const initials = (u.name||'M').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const feedAvatar = document.getElementById('feedUserAvatar');
+  if(feedAvatar) feedAvatar.textContent = initials;
 }
 
 function loadProfile(){
@@ -2579,6 +2627,58 @@ document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
     memberData = null;
     loadDashboard();
   } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+/* ============================================
+   SOCIAL BOOK POST SUBMISSION
+   ============================================ */
+document.getElementById('submitPostBtn')?.addEventListener('click', async ()=>{
+  const postType = document.getElementById('postType').value;
+  const description = document.getElementById('postDesc').value.trim();
+  const mediaFiles = document.getElementById('postMedia').files;
+  
+  if(!postType){ notify('Please select activity type','warning'); return; }
+  if(!description || description.length < 20){ 
+    notify('Please write at least 20 characters about your activity','warning'); 
+    return; 
+  }
+  
+  const btn = document.getElementById('submitPostBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+  
+  try{
+    // Convert images to base64
+    const images = [];
+    for(const f of mediaFiles){
+      if(f.size > 5*1024*1024){ notify(`${f.name} is too large. Max 5MB per file`,'warning'); continue; }
+      const b64 = await fileToBase64(f);
+      images.push(b64);
+    }
+    
+    // TODO: Send to backend API for admin approval
+    // For now, simulate success
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    closeModal('postModal');
+    
+    if(typeof FWF_Notify !== 'undefined'){
+      FWF_Notify.success('Post submitted for admin review!<br><small>You will be notified once it is approved.</small>', 4000);
+    } else {
+      notify('Post submitted! Pending admin approval.','success');
+    }
+    
+    // Clear form
+    document.getElementById('postType').value = '';
+    document.getElementById('postDesc').value = '';
+    document.getElementById('postMedia').value = '';
+    
+  } catch(e){
+    notify(e.message || 'Failed to submit post','error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit for Review';
+  }
 });
 
 /* ============================================

@@ -400,17 +400,35 @@ textarea.form-input{ resize:vertical; min-height:80px; }
    WALLET TABS
    ============================== */
 .wallet-tab{
-  padding:10px 20px; border:none; background:transparent;
-  font-size:13px; font-weight:700; color:var(--text-muted);
+  padding:12px 24px; border:none; background:transparent;
+  font-size:13px; font-weight:800; color:var(--text-muted);
   cursor:pointer; border-bottom:3px solid transparent;
   transition:all .2s; font-family:inherit;
-  white-space:nowrap;
+  white-space:nowrap; position:relative;
 }
-.wallet-tab:hover{ color:var(--text-primary); }
+.wallet-tab:hover{ 
+  color:var(--text-primary); 
+  background:rgba(99,102,241,.05);
+  border-radius:8px 8px 0 0;
+}
 .wallet-tab.active{
-  color:var(--accent); border-bottom-color:var(--accent);
+  color:var(--accent); 
+  border-bottom-color:var(--accent);
+  background:rgba(99,102,241,.08);
+  border-radius:8px 8px 0 0;
 }
-.wallet-section{ animation:fadeIn .3s; }
+.wallet-tab i{ margin-right:6px; }
+.wallet-section{ 
+  animation:fadeIn .3s; 
+}
+.wallet-section h3{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-bottom:12px;
+  border-bottom:2px solid var(--card-border);
+  margin-bottom:20px;
+}
 @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
 /* ==============================
@@ -477,6 +495,43 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 /* ==============================
    MODAL
    ============================== */
+.modal{
+  position:fixed; inset:0; z-index:999;
+  background:rgba(15,23,42,.5); backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center;
+  padding:20px; animation:fadeIn .2s;
+}
+.modal.show{ display:flex; }
+.modal-content{
+  background:#fff; border-radius:18px;
+  max-width:640px; width:100%; padding:0;
+  box-shadow:0 24px 60px rgba(0,0,0,.2);
+  max-height:85vh; overflow:hidden;
+  animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex; flex-direction:column;
+}
+.modal-header{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:24px 28px 20px;
+  border-bottom:1px solid var(--card-border);
+}
+.modal-header h3{ 
+  font-size:18px; font-weight:900; 
+  display:flex; align-items:center; gap:8px; 
+  margin:0;
+}
+.modal-header h3 i{ color:var(--accent); }
+.modal-body{
+  padding:24px 28px;
+  overflow-y:auto;
+  flex:1;
+}
+.modal-actions{ 
+  display:flex; gap:10px; justify-content:flex-end; 
+  padding:20px 28px;
+  border-top:1px solid var(--card-border);
+  background:var(--bg-1);
+}
 .modal-overlay{
   position:fixed; inset:0; z-index:999;
   background:rgba(15,23,42,.5); backdrop-filter:blur(6px);
@@ -901,17 +956,41 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== WALLET ===================== -->
   <div class="page" id="page-wallet">
+    <!-- Wallet Overview Stats -->
+    <div class="stats-row" style="margin-bottom:20px">
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
+        <div class="s-label">Total Points</div>
+        <div class="s-value" id="walletTotalPoints">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-wallet"></i></div>
+        <div class="s-label">Wallet Balance</div>
+        <div class="s-value" id="walletBalance">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
+        <div class="s-label">Total Referrals</div>
+        <div class="s-value" id="walletReferrals">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-hand-holding-heart"></i></div>
+        <div class="s-label">Donations Earned</div>
+        <div class="s-value" id="walletDonations">₹0</div>
+      </div>
+    </div>
+
     <!-- Wallet Tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--card-border);padding-bottom:2px;overflow-x:auto">
+    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--card-border);padding-bottom:2px;overflow-x:auto;flex-wrap:wrap">
       <button class="wallet-tab active" data-tab="activity"><i class="fa-solid fa-list"></i> My Activity</button>
       <button class="wallet-tab" data-tab="referrals"><i class="fa-solid fa-user-plus"></i> Referrals & Earnings</button>
-      <button class="wallet-tab" data-tab="points"><i class="fa-solid fa-star"></i> Points & Redeem</button>
+      <button class="wallet-tab" data-tab="points"><i class="fa-solid fa-star"></i> Points</button>
     </div>
 
     <!-- Tab Content -->
     <!-- My Activity Section -->
     <div class="wallet-section active" id="wallet-activity">
-      <h3 style="margin-bottom:16px;font-size:16px;font-weight:800"><i class="fa-solid fa-list"></i> My Activity</h3>
+      <h3 style=\"font-size:18px;font-weight:900\"><i class=\"fa-solid fa-list\" style=\"color:var(--accent)\"></i> My Activity</h3>
       
       <div class="grid-2">
         <!-- Membership Fees -->
@@ -957,7 +1036,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
     <!-- Referrals & Earnings Section -->
     <div class="wallet-section" id="wallet-referrals" style="display:none">
-      <h3 style="margin-bottom:16px;font-size:16px;font-weight:800"><i class="fa-solid fa-user-plus"></i> Referrals & Earnings</h3>
+      <h3 style=\"font-size:18px;font-weight:900\"><i class=\"fa-solid fa-user-plus\" style=\"color:var(--accent)\"></i> Referrals & Earnings</h3>
       
       <!-- Referral Code -->
       <div class="content-card" style="margin-bottom:16px">
@@ -1069,12 +1148,12 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- Points & Redeem Section -->
+    <!-- Points Section -->
     <div class="wallet-section" id="wallet-points" style="display:none">
-      <h3 style="margin-bottom:16px;font-size:16px;font-weight:800"><i class="fa-solid fa-star"></i> Points & Redeem</h3>
+      <h3 style="margin-bottom:16px;font-size:18px;font-weight:900"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
       
-      <!-- Points Stats -->
-      <div class="stats-row">
+      <!-- Points Breakdown -->
+      <div class="stats-row" style="margin-bottom:20px">
         <div class="stat-card">
           <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
           <div class="s-label">Total Points</div>
@@ -1097,20 +1176,44 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
       </div>
 
-      <!-- Redeem Button -->
-      <div class="content-card" style="margin-top:16px;margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-          <div>
-            <h4 style="margin-bottom:4px;font-size:16px"><i class="fa-solid fa-gift"></i> Redeem Your Points</h4>
-            <p style="font-size:13px;color:var(--text-muted)">Convert your points to support social causes</p>
+      <div class="grid-2">
+        <!-- Redeem Action Card -->
+        <div class="content-card" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none">
+          <div style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;padding:20px">
+            <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px">
+              <i class="fa-solid fa-gift"></i>
+            </div>
+            <h4 style="margin:0;font-size:18px;font-weight:900">Redeem Points</h4>
+            <p style="font-size:13px;opacity:.9;margin:0">Convert your points to support social causes and make a difference</p>
+            <button class="btn" onclick="openRedeemModal()" style="background:#fff;color:var(--accent);font-weight:800;margin-top:8px">
+              <i class="fa-solid fa-arrow-right"></i> Start Redeeming
+            </button>
           </div>
-          <button class="btn btn-primary" onclick="openRedeemModal()"><i class="fa-solid fa-gift"></i> Redeem Points</button>
+        </div>
+
+        <!-- Points Summary -->
+        <div class="content-card">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-chart-pie"></i> Points Summary</h4>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> Donations</span>
+              <span style="font-weight:900;color:var(--success)" id="pointsDonSummary">0 pts</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-user-plus" style="color:var(--info)"></i> Referrals</span>
+              <span style="font-weight:900;color:var(--info)" id="pointsRefSummary">0 pts</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Quiz Tickets</span>
+              <span style="font-weight:900;color:var(--warning)" id="pointsQuizSummary">0 pts</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Points History -->
-      <div class="content-card">
-        <h4 style="margin-bottom:12px;font-size:14px"><i class="fa-solid fa-clock-rotate-left"></i> Points History</h4>
+      <div class="content-card" style="margin-top:16px">
+        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-clock-rotate-left"></i> Points History</h4>
         <div class="table-wrap">
           <table class="data-table">
             <thead><tr><th>Type</th><th>Points</th><th>Description</th><th>Date</th></tr></thead>
@@ -1945,8 +2048,22 @@ async function deleteProduct(productId){
 /* ============================================
    MODALS
    ============================================ */
-function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+function openModal(id){ 
+  const modal = document.getElementById(id);
+  if(modal.classList.contains('modal-overlay')){
+    modal.classList.remove('hidden'); 
+  } else {
+    modal.classList.add('show');
+  }
+}
+function closeModal(id){ 
+  const modal = document.getElementById(id);
+  if(modal.classList.contains('modal-overlay')){
+    modal.classList.add('hidden'); 
+  } else {
+    modal.classList.remove('show');
+  }
+}
 
 /* ============================================
    UTILITIES
@@ -2048,10 +2165,22 @@ async function loadWallet(){
     memberData = data;
     const w = data.wallet || {};
 
+    // Overview stats
+    document.getElementById('walletTotalPoints').textContent = fmtN(w.points_balance || w.total_points_earned);
+    document.getElementById('walletBalance').textContent = '₹' + fmtN(w.balance_inr);
+    document.getElementById('walletReferrals').textContent = fmtN(data.referralStats?.total || 0);
+    document.getElementById('walletDonations').textContent = '₹' + fmtN(data.recentDonations?.reduce((s,d)=>s+(d.amount||0),0) || 0);
+
+    // Points section stats
     document.getElementById('wPoints').textContent = fmtN(w.points_balance || w.total_points_earned);
     document.getElementById('wDonPts').textContent = fmtN(w.points_from_donations);
     document.getElementById('wRefPts').textContent = fmtN(w.points_from_referrals);
     document.getElementById('wQuizPts').textContent = fmtN(w.points_from_quiz);
+
+    // Points summary (new)
+    document.getElementById('pointsDonSummary').textContent = fmtN(w.points_from_donations) + ' pts';
+    document.getElementById('pointsRefSummary').textContent = fmtN(w.points_from_referrals) + ' pts';
+    document.getElementById('pointsQuizSummary').textContent = fmtN(w.points_from_quiz) + ' pts';
 
     // Referral code
     document.getElementById('refCode').value = data.user?.referral_code || 'N/A';
@@ -2077,6 +2206,20 @@ async function loadWallet(){
         <td style="font-weight:800">₹${fmtN(d.amount)}</td>
         <td style="color:var(--success);font-weight:700">+${d.points_earned}</td>
         <td style="color:var(--text-muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      </tr>`).join('');
+    }
+
+    // Load referrals
+    const refs = data.referrals || [];
+    const refBody = document.getElementById('referralsBody');
+    if(refs.length){
+      refBody.innerHTML = refs.map(r => `<tr>
+        <td style="font-weight:700">${r.referred_name || '—'}</td>
+        <td style="font-family:monospace;font-size:12px">${r.referred_member_id || '—'}</td>
+        <td style="font-weight:800">₹${fmtN(r.amount)}</td>
+        <td style="color:var(--success);font-weight:700">+${r.points_earned}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(r.created_at)}</td>
       </tr>`).join('');
     }
 
@@ -2112,6 +2255,20 @@ function openRedeemModal(){
   document.getElementById('availPointsDisplay').textContent = pts;
   openModal('redeemModal');
 }
+
+// Close modal on outside click
+document.addEventListener('click', (e) => {
+  if(e.target.classList.contains('modal')){
+    closeModal(e.target.id);
+  }
+});
+
+// Close modal on ESC key
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id));
+  }
+});
 
 // Payment method toggle
 document.getElementById('bankRadio').addEventListener('change', () => {

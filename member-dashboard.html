@@ -1621,46 +1621,89 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
 <!-- ======== MODALS ======== -->
 
-<!-- New Post Modal -->
+<!-- New Post Modal - Instagram Style -->
 <div class="modal-overlay hidden" id="postModal">
-  <div class="modal-card" style="max-width:560px">
-    <div class="modal-head">
-      <h3><i class="fa-solid fa-book-open"></i> Share Your Social Work</h3>
-      <button class="modal-close" onclick="closeModal('postModal')">&times;</button>
+  <div class="modal-card" style="max-width:580px;background:#fff;border-radius:20px;padding:0;overflow:hidden">
+    <!-- Header -->\n    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:20px 28px;color:#fff;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1)">
+      <h3 style="margin:0;font-size:20px;font-weight:900;display:flex;align-items:center;gap:10px">
+        <i class="fa-solid fa-sparkles"></i> Share Your Story
+      </h3>
+      <button class="modal-close" onclick="closeModal('postModal')" style="background:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;opacity:.6;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">&times;</button>
     </div>
-    <div style="background:var(--accent-soft);padding:12px 16px;border-radius:10px;margin-bottom:16px;border-left:4px solid var(--accent)">
-      <p style="font-size:12px;font-weight:700;color:var(--text-primary);margin:0">
-        <i class="fa-solid fa-info-circle" style="color:var(--accent)"></i> Your post will be reviewed by admin before appearing on Social Book.
-      </p>
+
+    <!-- Body -->
+    <div class="modal-body" style="padding:28px;background:#f9fafb">
+      <!-- Info Banner -->
+      <div style="background:#e0e7ff;padding:14px 16px;border-radius:12px;margin-bottom:24px;border-left:4px solid #6366f1;display:flex;gap:12px">
+        <i class="fa-solid fa-check-circle" style="color:#6366f1;font-size:18px;flex-shrink:0\"></i>
+        <div style="font-size:13px;color:#4c1d95;font-weight:600\">All posts are reviewed by admin before appearing on Social Book</div>
+      </div>
+
+      <!-- Activity Type -->
+      <div class="form-group" style="margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-primary);margin-bottom:8px">
+          <i class="fa-solid fa-tag\" style="color:#6366f1;font-size:16px\"></i> Activity Type
+        </label>
+        <select class="form-input" id="postType" style="border:2px solid #e5e7eb;padding:12px 14px;font-size:14px;border-radius:12px;background:#fff;transition:.2s;cursor:pointer" onchange="updateTemplate()">
+          <option value="">✨ Select what you're sharing...</option>
+          <option value="welfare">🤝 Welfare Activity</option>
+          <option value="training">🎓 Training Session</option>
+          <option value="health">🏥 Health Camp</option>
+          <option value="plantation">🌱 Plantation Drive</option>
+          <option value="education">📚 Education Support</option>
+          <option value="donation">💝 Donation Collection</option>
+          <option value="awareness">📣 Awareness Campaign</option>
+          <option value="skill">💼 Skill Development</option>
+          <option value="other">✨ Other</option>
+        </select>
+      </div>
+
+      <!-- Tell Your Story -->
+      <div class="form-group" style="margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-primary);margin-bottom:8px">
+          <i class="fa-solid fa-pen-fancy\" style="color:#8b5cf6;font-size:16px\"></i> Tell Your Story
+        </label>
+        <textarea class="form-input" id="postDesc" style="border:2px solid #e5e7eb;padding:14px;font-size:14px;border-radius:12px;background:#fff;font-family:inherit;min-height:120px;resize:vertical;transition:.2s" placeholder="📍 Location: [Enter location]
+👥 Participants: [Number of people]
+🎯 Activity: [What you organized]
+💚 Impact: [How it helped people]
+
+Example:
+📍 Location: Village School, Kanpur
+👥 Participants: 50 women
+🎯 Activity: Free tailoring workshop
+💚 Impact: 30 women got jobs, earning ₹15,000/month"></textarea>
+        <small style="font-size:11px;color:#6b7280;margin-top:8px;display:flex;align-items:center;gap:6px\">
+          <i class="fa-solid fa-lightbulb\"></i> Pro tip: Use the template above - members love inspiring numbers&numbers!
+        </small>
+      </div>
+
+      <!-- Image Upload - Instagram Style -->
+      <div class="form-group" style="margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-primary);margin-bottom:12px">
+          <i class="fa-solid fa-image\" style="color:#ec4899;font-size:16px\"></i> Add Photos/Videos
+        </label>
+        
+        <!-- Upload Area -->
+        <div style="border:2px dashed #d1d5db;border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .3s;background:#fff\" id="imageDropZone\" onclick=\"document.getElementById('postMedia').click()\" ondragover=\"this.style.borderColor='#6366f1';this.style.background='#ede9fe'\" ondragleave=\"this.style.borderColor='#d1d5db';this.style.background='#fff'\" ondrop=\"handlePostImageDrop(event)\">
+          <i class="fa-solid fa-cloud-arrow-up\" style=\"font-size:40px;color:#6366f1;margin-bottom:12px;display:block\"></i>
+          <p style=\"font-weight:800;font-size:14px;color:var(--text-primary);margin:0 0 4px\">Click to upload or drag & drop</p>
+          <p style=\"font-size:12px;color:#6b7280;margin:0\">PNG, JPG, GIF up to 5MB • Multiple images supported</p>
+        </div>
+        
+        <!-- Image Preview -->
+        <div id=\"postImagePreviewGrid\" style=\"display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px\"></div>
+        
+        <input type=\"file\" id=\"postMedia\" accept=\"image/*,video/*\" multiple style=\"display:none\" onchange=\"handlePostImageSelect(event)\">
+      </div>
     </div>
-    <div class="form-group">
-      <label>Activity Type</label>
-      <select class="form-input" id="postType">
-        <option value="">Select activity type</option>
-        <option value="welfare">Welfare Activity</option>
-        <option value="training">Training Session</option>
-        <option value="health">Health Camp</option>
-        <option value="plantation">Plantation Drive</option>
-        <option value="education">Education Support</option>
-        <option value="donation">Donation Collection</option>
-        <option value="awareness">Awareness Campaign</option>
-        <option value="skill">Skill Development</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Tell Your Story</label>
-      <textarea class="form-input" id="postDesc" placeholder="Share details about your social work activity... What did you do? How many people were helped? What impact did it create?" rows="5"></textarea>
-      <small style="font-size:11px;color:var(--text-muted);margin-top:4px;display:block">Tip: Include numbers, locations, and outcomes to inspire others!</small>
-    </div>
-    <div class="form-group">
-      <label>Photos/Videos <span style="font-size:11px;color:var(--text-muted);font-weight:600">(Optional but recommended)</span></label>
-      <input type="file" class="form-input" id="postMedia" accept="image/*,video/*" multiple>
-      <small style="font-size:11px;color:var(--text-muted);margin-top:4px;display:block">You can upload multiple images. Max 5MB per file.</small>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('postModal')">Cancel</button>
-      <button class="btn btn-primary" id="submitPostBtn" onclick="submitPost()"><i class="fa-solid fa-paper-plane"></i> Submit for Review</button>
+
+    <!-- Footer Actions -->
+    <div class="modal-actions" style="display:flex;gap:10px;justify-content:flex-end;padding:20px 28px;background:#f9fafb;border-top:1px solid #e5e7eb\">
+      <button class="btn btn-ghost" onclick="closeModal('postModal')" style=\"padding:10px 24px;font-weight:700;color:var(--text-secondary);border:1px solid #d1d5db;border-radius:10px;background:#fff;transition:.2s\" onmouseover=\"this.style.background='#f3f4f6'\" onmouseout=\"this.style.background='#fff'\">Cancel</button>
+      <button class="btn btn-primary" id="submitPostBtn" onclick="submitPost()" style="padding:10px 28px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:8px" onmouseover=\"this.style.opacity='0.9'\" onmouseout=\"this.style.opacity='1'\">
+        <i class="fa-solid fa-paper-plane\"></i> Share Now
+      </button>
     </div>
   </div>
 </div>
@@ -2630,6 +2673,239 @@ document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
 /* ============================================
    SOCIAL BOOK POST SUBMISSION
    ============================================ */
+
+// Post templates for each activity type
+const POST_TEMPLATES = {
+  welfare: `📍 Location: [Enter location]
+👥 Participants: [Number of people]
+🎯 Activity: [What you did]
+💚 Impact: [How many benefited]
+✨ Outcome: [Positive results]
+
+Example:
+📍 Location: Village School, Kanpur
+👥 Participants: 50 women
+🎯 Activity: Free tailoring workshop
+💚 Impact: 30 women got jobs
+✨ Outcome: Average earning ₹15,000/month`,
+  
+  training: `🎓 Course: [Training name]
+📍 Location: [Venue]
+👥 Participants: [Number]
+📚 Topics Covered: [List skills taught]
+✅ Certification: [Yes/No and details]
+💼 Placement Rate: [% got jobs]
+
+Example:
+🎓 Course: Digital Marketing
+📍 Location: FWF Center, Delhi
+👥 Participants: 25 girls
+📚 Topics: Social Media, SEO, Content
+✅ Certification: Yes - Google Certified
+💼 Placement Rate: 80% placed`,
+  
+  health: `🏥 Camp Type: [Medical/Health Check/Vaccination]
+📍 Location: [Camp venue]
+👥 Beneficiaries: [Number of people]
+💊 Services: [Medical services provided]
+🎯 Impact: [People screened/treated]
+
+Example:
+🏥 Camp Type: Free Health Checkup
+📍 Location: Slum Area, Mumbai
+👥 Beneficiaries: 150 women
+💊 Services: BP check, Eye exam, Gynec consultation
+🎯 Impact: 45 referred for further treatment`,
+  
+  plantation: `🌱 Trees Planted: [Number]
+📍 Location: [Area/City]
+👥 Volunteers: [Number of people]
+🌍 Area Covered: [Acres/sq meters]
+🌿 Species: [Types of trees]
+🎯 Sustainability: [Care plan]
+
+Example:
+🌱 Trees Planted: 500 mango & neem
+📍 Location: Dry land, Jaipur
+👥 Volunteers: 100 women
+🌍 Area Covered: 2 acres
+🌿 Species: Mango, Neem, Amla
+🎯 Sustainability: Monthly watering schedule in place`,
+  
+  education: `📚 Program: [Education initiative]
+👥 Students: [Number]
+📍 Location: [School/center]
+📖 Subjects: [Subjects covered]
+🎯 Results: [Impact on performance]
+✨ Success Story: [Best performer story]
+
+Example:
+📚 Program: Free Tuition Center
+👥 Students: 40 underprivileged girls
+📍 Location: Community Center, Indore
+📖 Subjects: Maths, Science, English
+🎯 Results: 35 students improved grades
+✨ Success Story: Priya scored 92% (was 45% before)`,
+  
+  donation: `💝 Items Collected: [What donated]
+📊 Quantity: [Amount]
+👥 Donors: [Number of people]
+📍 Location: [Collection point]
+🎁 Beneficiaries: [Who received]
+😊 Gratitude: [Feedback from beneficiaries]
+
+Example:
+💝 Items: Clothes, books, toys
+📊 Quantity: 200 items
+👥 Donors: 50 families
+📍 Location: FWF Office, Bangalore
+🎁 Beneficiaries: 30 children in orphanage
+😊 Gratitude: Children are so happy! Many said it's their best gift`,
+  
+  awareness: `📣 Campaign: [Topic]
+🎯 Message: [Main message]
+👥 Reached: [Number of people]
+📍 Location: [Area]
+📊 Methods: [Awareness methods used]
+💡 Impact: [Behavioral changes noted]
+
+Example:
+📣 Campaign: Period Poverty Awareness
+🎯 Message: Menstruation is natural, not a taboo
+👥 Reached: 200 girls
+📍 Location: 3 schools in UP
+📊 Methods: Interactive sessions, videos, Q&A
+💡 Impact: Girls now openly discuss periods`,
+  
+  skill: `💼 Skill: [Skill name]
+👥 Trained: [Number]
+⏱️ Duration: [Hours/weeks]
+📍 Location: [Location]
+🏆 Certification: [Type of certification]
+🎯 Employability: [Job placement details]
+
+Example:
+💼 Skill: Basic Accounting
+👥 Trained: 30 women
+⏱️ Duration: 6 weeks
+📍 Location: FWF Training Center
+🏆 Certification: Ministry of Skill Certified
+🎯 Employability: 50% already hired by local shops`,
+  
+  other: `📌 Activity: [What was done]
+📍 Location: [Location]
+👥 Involved: [Number of people]
+🎯 Goal: [Objective]
+✅ Completed: [Outcome]
+💫 Special: [Something special about it]`
+};
+
+// Update textarea template when activity type changes
+function updateTemplate(){
+  const type = document.getElementById('postType').value;
+  const textarea = document.getElementById('postDesc');
+  
+  if(type && POST_TEMPLATES[type]){
+    // Only replace if textarea is empty or still has old template
+    if(!textarea.value || textarea.value.includes('📍') || textarea.value.includes('📌')){
+      textarea.value = POST_TEMPLATES[type];
+      textarea.style.minHeight = '200px';
+    }
+  }
+  textarea.focus();
+}
+
+// Handle drag and drop for image upload
+function handlePostImageDrop(e){
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const dropZone = document.getElementById('imageDropZone');
+  dropZone.style.borderColor = '#d1d5db';
+  dropZone.style.background = '#fff';
+  
+  const files = e.dataTransfer.files;
+  if(files.length > 0){
+    document.getElementById('postMedia').files = files;
+    handlePostImageSelect({target: {files}});
+  }
+}
+
+// Handle image file selection and show preview
+function handlePostImageSelect(e){
+  const files = e.target.files || [];
+  const previewGrid = document.getElementById('postImagePreviewGrid');
+  previewGrid.innerHTML = '';
+  
+  let validFiles = 0;
+  
+  for(const file of files){
+    if(file.size > 5 * 1024 * 1024){
+      notify(`${file.name} is too large (max 5MB)`,'warning');
+      continue;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      validFiles++;
+      const preview = document.createElement('div');
+      preview.style.cssText = `
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(99,102,241,.15);
+        aspect-ratio: 1;
+      `;
+      
+      const img = document.createElement('img');
+      img.src = event.target.result;
+      img.style.cssText = `
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      `;
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.style.cssText = `
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0,0,0,.5);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: background .2s;
+      `;
+      removeBtn.innerHTML = '&times;';
+      removeBtn.onmouseover = () => removeBtn.style.background = 'rgba(0,0,0,.8)';
+      removeBtn.onmouseout = () => removeBtn.style.background = 'rgba(0,0,0,.5)';
+      removeBtn.onclick = (e) => {
+        e.preventDefault();
+        preview.remove();
+        validFiles--;
+      };
+      
+      preview.appendChild(img);
+      preview.appendChild(removeBtn);
+      previewGrid.appendChild(preview);
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  // Show count
+  if(validFiles > 0){
+    previewGrid.style.marginTop = '14px';
+  }
+}
+
 async function submitPost(){
   const postType = document.getElementById('postType').value;
   const description = document.getElementById('postDesc').value.trim();
@@ -2661,7 +2937,7 @@ async function submitPost(){
     closeModal('postModal');
     
     if(typeof FWF_Notify !== 'undefined'){
-      FWF_Notify.success('Post submitted for admin review!<br><small>You will be notified once it is approved.</small>', 4000);
+      FWF_Notify.success('🎉 Post submitted for admin review!<br><small>You will be notified once it is approved.</small>', 4000);
     } else {
       notify('Post submitted! Pending admin approval.','success');
     }
@@ -2670,12 +2946,13 @@ async function submitPost(){
     document.getElementById('postType').value = '';
     document.getElementById('postDesc').value = '';
     document.getElementById('postMedia').value = '';
+    document.getElementById('postImagePreviewGrid').innerHTML = '';
     
   } catch(e){
     notify(e.message || 'Failed to submit post','error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit for Review';
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Share Now';
   }
 }
 

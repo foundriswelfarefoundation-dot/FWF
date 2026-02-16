@@ -1660,7 +1660,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('postModal')">Cancel</button>
-      <button class="btn btn-primary" id="submitPostBtn"><i class="fa-solid fa-paper-plane"></i> Submit for Review</button>
+      <button class="btn btn-primary" id="submitPostBtn" onclick="submitPost()"><i class="fa-solid fa-paper-plane"></i> Submit for Review</button>
     </div>
   </div>
 </div>
@@ -2630,7 +2630,7 @@ document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
 /* ============================================
    SOCIAL BOOK POST SUBMISSION
    ============================================ */
-document.getElementById('submitPostBtn')?.addEventListener('click', async ()=>{
+async function submitPost(){
   const postType = document.getElementById('postType').value;
   const description = document.getElementById('postDesc').value.trim();
   const mediaFiles = document.getElementById('postMedia').files;
@@ -2677,7 +2677,7 @@ document.getElementById('submitPostBtn')?.addEventListener('click', async ()=>{
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit for Review';
   }
-});
+}
 
 /* ============================================
    LOGOUT

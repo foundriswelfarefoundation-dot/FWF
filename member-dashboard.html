@@ -1528,9 +1528,12 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <h3 style="font-size:16px;font-weight:800"><i class="fa-solid fa-boxes-stacked" style="color:var(--accent)"></i> Your Products</h3>
-      <button class="btn btn-primary" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add Product</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="openModal('aiListingModal')" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-weight:700;border:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Smart Listing</button>
+        <button class="btn btn-primary" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add Product</button>
+      </div>
     </div>
 
     <div class="content-card" id="sellerProductsList">
@@ -1943,6 +1946,178 @@ Example:
   </div>
 </div>
 
+<!-- AI Smart Listing Modal -->
+<div class="modal-overlay hidden" id="aiListingModal">
+  <div class="modal-card" style="max-width:700px;background:#fff;border-radius:20px;padding:0;overflow:hidden;max-height:92vh;display:flex;flex-direction:column">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#8b5cf6,#ec4899);padding:18px 24px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+      <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:10px">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Smart Listing
+      </h3>
+      <button class="modal-close" onclick="resetAIListing();closeModal('aiListingModal')" style="background:rgba(255,255,255,.2);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center">&times;</button>
+    </div>
+
+    <!-- Steps Indicator -->
+    <div style="display:flex;padding:16px 24px;background:#faf5ff;border-bottom:1px solid #e9d5ff;gap:4px;flex-shrink:0" id="aiStepsBar">
+      <div class="ai-step active" id="aiStep1"><span class="ai-step-num">1</span> Upload</div>
+      <div class="ai-step-line"></div>
+      <div class="ai-step" id="aiStep2"><span class="ai-step-num">2</span> AI Chat</div>
+      <div class="ai-step-line"></div>
+      <div class="ai-step" id="aiStep3"><span class="ai-step-num">3</span> Preview</div>
+    </div>
+
+    <!-- Body (scrollable) -->
+    <div style="flex:1;overflow-y:auto;padding:24px" id="aiModalBody">
+
+      <!-- STEP 1: Upload Image -->
+      <div id="aiUploadStep">
+        <p style="font-size:14px;color:var(--text-secondary);margin:0 0 16px;font-weight:600">Upload your product image and AI will help you create a professional listing</p>
+        <div style="border:2px dashed #d1d5db;border-radius:16px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .3s;background:#faf5ff" id="aiDropZone" onclick="document.getElementById('aiImageInput').click()" ondragover="event.preventDefault();this.style.borderColor='#8b5cf6';this.style.background='#ede9fe'" ondragleave="this.style.borderColor='#d1d5db';this.style.background='#faf5ff'" ondrop="handleAIImageDrop(event)">
+          <i class="fa-solid fa-camera" style="font-size:48px;color:#8b5cf6;margin-bottom:14px;display:block"></i>
+          <p style="font-weight:800;font-size:15px;color:var(--text-primary);margin:0 0 6px">Upload Product Photo</p>
+          <p style="font-size:12px;color:#6b7280;margin:0">Click or drag & drop • JPG, PNG, WebP • Max 5MB</p>
+        </div>
+        <input type="file" id="aiImageInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleAIImageUpload(event)">
+
+        <!-- Image Preview -->
+        <div id="aiImagePreview" style="display:none;margin-top:16px;text-align:center">
+          <img id="aiPreviewImg" style="max-height:220px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.1);margin-bottom:12px">
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button class="btn btn-ghost" onclick="document.getElementById('aiImageInput').click()" style="font-size:12px"><i class="fa-solid fa-rotate"></i> Change</button>
+            <button class="btn" onclick="startAIAnalysis()" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-weight:700;font-size:13px"><i class="fa-solid fa-wand-magic-sparkles"></i> Analyze with AI</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: AI Chat -->
+      <div id="aiChatStep" style="display:none">
+        <div id="aiChatMessages" style="display:flex;flex-direction:column;gap:12px;min-height:200px"></div>
+        
+        <!-- User Input Area -->
+        <div id="aiUserInputArea" style="display:none;margin-top:16px;border-top:1px solid #e5e7eb;padding-top:16px">
+          <div id="aiQuickOptions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="aiUserInput" placeholder="Type your answer..." style="flex:1;border-radius:12px;padding:12px 16px" onkeydown="if(event.key==='Enter')sendAIAnswer()">
+            <button class="btn" onclick="sendAIAnswer()" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;border:none;border-radius:12px;padding:12px 18px"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Preview -->
+      <div id="aiPreviewStep" style="display:none">
+        <div id="aiListingPreview" style="border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.06)"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+          <button class="btn" onclick="editAIListing()" style="background:#f3f4f6;color:var(--text-primary);font-weight:700;border:1px solid #d1d5db;border-radius:12px;padding:12px 24px"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button class="btn" onclick="deleteAIListing()" style="background:#fef2f2;color:#dc2626;font-weight:700;border:1px solid #fecaca;border-radius:12px;padding:12px 24px"><i class="fa-solid fa-trash"></i> Delete</button>
+          <button class="btn" onclick="postAIListing()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;border:none;border-radius:12px;padding:12px 28px"><i class="fa-solid fa-rocket"></i> Post Listing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.ai-step{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;color:#a78bfa;
+  transition:all .3s;
+}
+.ai-step.active{ color:#7c3aed; }
+.ai-step.done{ color:#22c55e; }
+.ai-step-num{
+  width:24px;height:24px;border-radius:50%;
+  background:#ede9fe;color:#8b5cf6;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:900;
+}
+.ai-step.active .ai-step-num{ background:#8b5cf6;color:#fff; }
+.ai-step.done .ai-step-num{ background:#22c55e;color:#fff; }
+.ai-step-line{
+  flex:1;height:2px;background:#e9d5ff;border-radius:2px;
+  margin:0 4px;
+}
+.ai-msg{
+  max-width:85%;padding:14px 18px;
+  border-radius:16px;font-size:13px;line-height:1.5;
+  animation:tabSlideIn .3s ease;
+}
+.ai-msg.bot{
+  background:linear-gradient(135deg,#f5f3ff,#ede9fe);
+  border:1px solid #e9d5ff;
+  color:#4c1d95;
+  align-self:flex-start;
+  border-bottom-left-radius:4px;
+}
+.ai-msg.user{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;
+  align-self:flex-end;
+  border-bottom-right-radius:4px;
+}
+.ai-msg.bot .typing-dots span{
+  display:inline-block;width:6px;height:6px;
+  background:#8b5cf6;border-radius:50%;
+  margin:0 2px;animation:dotPulse 1.4s infinite;
+}
+.ai-msg.bot .typing-dots span:nth-child(2){ animation-delay:.2s; }
+.ai-msg.bot .typing-dots span:nth-child(3){ animation-delay:.4s; }
+@keyframes dotPulse{ 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+.ai-quick-btn{
+  padding:8px 14px;border-radius:20px;
+  background:#f5f3ff;border:1px solid #d8b4fe;
+  color:#7c3aed;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;font-family:inherit;
+}
+.ai-quick-btn:hover{ background:#ede9fe;border-color:#8b5cf6; }
+
+/* AI Preview Card */
+.ai-preview-header{ padding:0; }
+.ai-preview-header img{
+  width:100%;height:240px;object-fit:cover;
+}
+.ai-preview-body{ padding:20px; }
+.ai-preview-title{
+  font-size:18px;font-weight:900;margin:0 0 8px;
+  color:var(--text-primary);
+}
+.ai-preview-price{
+  font-size:22px;font-weight:900;color:#22c55e;
+  margin:0 0 4px;
+}
+.ai-preview-mrp{
+  font-size:13px;color:var(--text-muted);
+  text-decoration:line-through;margin-left:8px;
+}
+.ai-preview-discount{
+  font-size:12px;color:#dc2626;font-weight:800;
+  background:#fef2f2;padding:2px 8px;border-radius:6px;margin-left:8px;
+}
+.ai-preview-meta{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid #f3f4f6;
+}
+.ai-preview-meta-item{
+  font-size:12px;color:var(--text-secondary);
+}
+.ai-preview-meta-item strong{
+  color:var(--text-primary);font-weight:700;
+}
+.ai-preview-desc{
+  font-size:13px;color:var(--text-secondary);line-height:1.6;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid #f3f4f6;
+}
+.ai-preview-tags{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;
+}
+.ai-preview-tag{
+  padding:4px 10px;border-radius:20px;
+  background:#f5f3ff;color:#7c3aed;
+  font-size:11px;font-weight:700;
+}
+</style>
+
 <script src="assets/js/fwf.js"></script>
 <script src="auth.js"></script>
 <script>
@@ -2053,6 +2228,402 @@ function fileToBase64(file){
 
 // Load categories for dropdowns
 let storeCategories = {};
+
+/* ============================================
+   AI SMART LISTING - ChatGPT Integration
+   ============================================ */
+let aiImageBase64 = null;
+let aiConversation = [];
+let aiProductData = {};
+let aiCurrentStep = 1;
+let aiQuestionIndex = 0;
+
+const AI_QUESTIONS = [
+  { key:'title', q:'Product ka naam kya hai? (What is the product name?)', placeholder:'e.g. Handmade Aloe Vera Soap' },
+  { key:'price', q:'Selling price kitna rakhna hai? (₹)', placeholder:'e.g. 70', type:'number' },
+  { key:'mrp', q:'MRP (original price) kya hai? (₹)', placeholder:'e.g. 90', type:'number' },
+  { key:'stock', q:'Kitna stock hai? (How many units available?)', placeholder:'e.g. 100', type:'number' },
+  { key:'weight', q:'Weight/Size kya hai?', placeholder:'e.g. 100g, 500ml' },
+];
+
+function resetAIListing(){
+  aiImageBase64 = null;
+  aiConversation = [];
+  aiProductData = {};
+  aiCurrentStep = 1;
+  aiQuestionIndex = 0;
+  document.getElementById('aiUploadStep').style.display = 'block';
+  document.getElementById('aiChatStep').style.display = 'none';
+  document.getElementById('aiPreviewStep').style.display = 'none';
+  document.getElementById('aiImagePreview').style.display = 'none';
+  document.getElementById('aiDropZone').style.display = 'block';
+  document.getElementById('aiChatMessages').innerHTML = '';
+  document.getElementById('aiImageInput').value = '';
+  setAIStep(1);
+}
+
+function setAIStep(n){
+  aiCurrentStep = n;
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('aiStep'+i);
+    el.classList.remove('active','done');
+    if(i < n) el.classList.add('done');
+    if(i === n) el.classList.add('active');
+  });
+}
+
+function handleAIImageDrop(e){
+  e.preventDefault();
+  const dt = e.dataTransfer;
+  if(dt.files.length > 0){
+    document.getElementById('aiImageInput').files = dt.files;
+    handleAIImageUpload({target:{files:dt.files}});
+  }
+  document.getElementById('aiDropZone').style.borderColor = '#d1d5db';
+  document.getElementById('aiDropZone').style.background = '#faf5ff';
+}
+
+function handleAIImageUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ notify('Image too large. Max 5MB','warning'); return; }
+  
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    aiImageBase64 = ev.target.result;
+    document.getElementById('aiPreviewImg').src = aiImageBase64;
+    document.getElementById('aiDropZone').style.display = 'none';
+    document.getElementById('aiImagePreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function addAIMessage(text, type){
+  const container = document.getElementById('aiChatMessages');
+  const msg = document.createElement('div');
+  msg.className = 'ai-msg ' + type;
+  msg.innerHTML = text;
+  container.appendChild(msg);
+  msg.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+function showTyping(){
+  const container = document.getElementById('aiChatMessages');
+  const msg = document.createElement('div');
+  msg.className = 'ai-msg bot';
+  msg.id = 'aiTyping';
+  msg.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  container.appendChild(msg);
+  msg.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+function removeTyping(){
+  const el = document.getElementById('aiTyping');
+  if(el) el.remove();
+}
+
+async function startAIAnalysis(){
+  if(!aiImageBase64){ notify('Please upload an image first','warning'); return; }
+  
+  // Move to step 2
+  document.getElementById('aiUploadStep').style.display = 'none';
+  document.getElementById('aiChatStep').style.display = 'block';
+  setAIStep(2);
+  
+  // Show uploaded image in chat
+  addAIMessage(`<img src="${aiImageBase64}" style="max-height:150px;border-radius:10px;margin-bottom:8px;display:block"><span style="font-size:11px;opacity:.7">Product image uploaded</span>`, 'user');
+  
+  showTyping();
+  
+  try{
+    // Call serverless proxy to analyze image via ChatGPT Vision
+    const response = await fetch('/api/ai-analyze', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ image: aiImageBase64 })
+    });
+    
+    const data = await response.json();
+    removeTyping();
+    
+    if(!data.ok){
+      addAIMessage('Sorry, AI analysis failed: ' + (data.error || 'Unknown error'), 'bot');
+      return;
+    }
+    
+    const aiText = data.result;
+    
+    // Try to parse JSON from AI response
+    try{
+      const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+      if(jsonMatch){
+        const parsed = JSON.parse(jsonMatch[0]);
+        aiProductData = {
+          title: parsed.title || '',
+          category: parsed.category || '',
+          subcategory: parsed.subcategory || '',
+          description: parsed.description || '',
+          material: parsed.material || '',
+          color: parsed.color || '',
+          condition: parsed.condition || 'new',
+          price: parsed.suggested_price || 0,
+          mrp: 0,
+          stock: 1,
+          weight: '',
+          tags: (parsed.tags || []).join(', '),
+          brand: ''
+        };
+        
+        addAIMessage(`<strong><i class="fa-solid fa-sparkles"></i> AI ne aapka product analyze kar liya!</strong><br><br>
+          <strong>Product:</strong> ${aiProductData.title}<br>
+          <strong>Category:</strong> ${aiProductData.category}<br>
+          <strong>Description:</strong> ${aiProductData.description}<br>
+          <strong>Material:</strong> ${aiProductData.material}<br>
+          <strong>Color:</strong> ${aiProductData.color}<br>
+          <strong>Suggested Price:</strong> ₹${aiProductData.price}<br><br>
+          <em>Ab mujhe kuch aur details chahiye listing ke liye...</em>`, 'bot');
+        
+        // Start asking additional questions
+        aiQuestionIndex = 0;
+        setTimeout(() => askNextQuestion(), 800);
+      }
+    } catch(parseErr){
+      addAIMessage('AI ne product identify kiya: ' + aiText + '<br><br><em>Ab mujhe kuch details chahiye...</em>', 'bot');
+      aiQuestionIndex = 0;
+      setTimeout(() => askNextQuestion(), 800);
+    }
+    
+  } catch(err){
+    removeTyping();
+    addAIMessage('Network error. Please check your internet connection.', 'bot');
+  }
+}
+
+function askNextQuestion(){
+  if(aiQuestionIndex >= AI_QUESTIONS.length){
+    // All questions answered, generate preview
+    generateAIPreview();
+    return;
+  }
+  
+  const q = AI_QUESTIONS[aiQuestionIndex];
+  addAIMessage(`<strong>${q.q}</strong>`, 'bot');
+  
+  // Show input area
+  const inputArea = document.getElementById('aiUserInputArea');
+  inputArea.style.display = 'block';
+  const input = document.getElementById('aiUserInput');
+  input.placeholder = q.placeholder || 'Type your answer...';
+  input.type = q.type || 'text';
+  input.value = aiProductData[q.key] || '';
+  input.focus();
+  
+  // Quick options for some questions
+  const optionsDiv = document.getElementById('aiQuickOptions');
+  optionsDiv.innerHTML = '';
+  if(q.key === 'stock'){
+    ['10','50','100','500','1000'].forEach(v => {
+      optionsDiv.innerHTML += `<button class="ai-quick-btn" onclick="quickAnswer('${v}')">${v}</button>`;
+    });
+  }
+}
+
+function quickAnswer(val){
+  document.getElementById('aiUserInput').value = val;
+  sendAIAnswer();
+}
+
+function sendAIAnswer(){
+  const input = document.getElementById('aiUserInput');
+  const val = input.value.trim();
+  if(!val) return;
+  
+  const q = AI_QUESTIONS[aiQuestionIndex];
+  aiProductData[q.key] = val;
+  
+  addAIMessage(val, 'user');
+  input.value = '';
+  document.getElementById('aiQuickOptions').innerHTML = '';
+  
+  aiQuestionIndex++;
+  setTimeout(() => askNextQuestion(), 500);
+}
+
+function generateAIPreview(){
+  document.getElementById('aiUserInputArea').style.display = 'none';
+  
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    addAIMessage('<strong><i class="fa-solid fa-check-circle" style="color:#22c55e"></i> Listing ready!</strong><br>Aapka product preview dekh lo...', 'bot');
+    
+    // Move to step 3
+    setTimeout(() => {
+      document.getElementById('aiChatStep').style.display = 'none';
+      document.getElementById('aiPreviewStep').style.display = 'block';
+      setAIStep(3);
+      renderAIPreview();
+    }, 800);
+  }, 1000);
+}
+
+function renderAIPreview(){
+  const p = aiProductData;
+  const discount = p.mrp && p.mrp > p.price ? Math.round((1 - p.price/p.mrp)*100) : 0;
+  
+  document.getElementById('aiListingPreview').innerHTML = `
+    <div class="ai-preview-header">
+      <img src="${aiImageBase64}" alt="${p.title}">
+    </div>
+    <div class="ai-preview-body">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="background:#f0fdf4;color:#16a34a;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;text-transform:uppercase">${p.category || 'General'}</span>
+        ${p.subcategory ? `<span style="background:#f5f3ff;color:#7c3aed;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px">${p.subcategory}</span>` : ''}
+      </div>
+      <h3 class="ai-preview-title">${p.title || 'Untitled Product'}</h3>
+      <div style="display:flex;align-items:baseline">
+        <span class="ai-preview-price">₹${p.price || 0}</span>
+        ${p.mrp && p.mrp > p.price ? `<span class="ai-preview-mrp">₹${p.mrp}</span><span class="ai-preview-discount">${discount}% OFF</span>` : ''}
+      </div>
+      
+      <div class="ai-preview-meta">
+        <div class="ai-preview-meta-item"><i class="fa-solid fa-box" style="color:var(--accent);margin-right:4px"></i> <strong>Stock:</strong> ${p.stock || 1} ${p.unit || 'piece'}</div>
+        <div class="ai-preview-meta-item"><i class="fa-solid fa-weight-scale" style="color:var(--accent);margin-right:4px"></i> <strong>Weight:</strong> ${p.weight || 'N/A'}</div>
+        <div class="ai-preview-meta-item"><i class="fa-solid fa-paint-brush" style="color:var(--accent);margin-right:4px"></i> <strong>Material:</strong> ${p.material || 'N/A'}</div>
+        <div class="ai-preview-meta-item"><i class="fa-solid fa-palette" style="color:var(--accent);margin-right:4px"></i> <strong>Color:</strong> ${p.color || 'N/A'}</div>
+        <div class="ai-preview-meta-item"><i class="fa-solid fa-tag" style="color:var(--accent);margin-right:4px"></i> <strong>Condition:</strong> ${p.condition || 'New'}</div>
+        ${p.brand ? `<div class="ai-preview-meta-item"><i class="fa-solid fa-building" style="color:var(--accent);margin-right:4px"></i> <strong>Brand:</strong> ${p.brand}</div>` : ''}
+      </div>
+      
+      <div class="ai-preview-desc">
+        <strong><i class="fa-solid fa-align-left" style="margin-right:4px"></i> Description</strong><br>
+        ${p.description || 'No description provided'}
+      </div>
+      
+      ${p.tags ? `<div class="ai-preview-tags">${p.tags.split(',').map(t => `<span class="ai-preview-tag">#${t.trim()}</span>`).join('')}</div>` : ''}
+    </div>
+  `;
+}
+
+function editAIListing(){
+  // Go back to chat to edit
+  document.getElementById('aiPreviewStep').style.display = 'none';
+  document.getElementById('aiChatStep').style.display = 'block';
+  setAIStep(2);
+  
+  addAIMessage('<strong><i class="fa-solid fa-pen"></i> Edit mode!</strong><br>Kya change karna hai? Koi bhi field bata do...', 'bot');
+  
+  // Show edit options
+  const optionsDiv = document.getElementById('aiQuickOptions');
+  optionsDiv.innerHTML = '';
+  ['Title','Price','MRP','Description','Stock','Weight','Tags'].forEach(field => {
+    optionsDiv.innerHTML += `<button class="ai-quick-btn" onclick="editAIField('${field.toLowerCase()}')">${field}</button>`;
+  });
+  
+  document.getElementById('aiUserInputArea').style.display = 'block';
+  document.getElementById('aiUserInput').placeholder = 'Type field name or new value...';
+}
+
+let aiEditingField = null;
+function editAIField(field){
+  aiEditingField = field;
+  const labels = {title:'Product Name', price:'Selling Price (₹)', mrp:'MRP (₹)', description:'Description', stock:'Stock Quantity', weight:'Weight', tags:'Tags'};
+  addAIMessage(`<strong>${labels[field] || field}</strong> ka naya value type karo:`, 'bot');
+  const input = document.getElementById('aiUserInput');
+  input.value = aiProductData[field] || '';
+  input.focus();
+  document.getElementById('aiQuickOptions').innerHTML = '';
+  
+  // Override sendAIAnswer for editing
+  input.onkeydown = (e) => {
+    if(e.key === 'Enter'){
+      const val = input.value.trim();
+      if(!val) return;
+      aiProductData[aiEditingField] = val;
+      addAIMessage(val, 'user');
+      input.value = '';
+      aiEditingField = null;
+      input.onkeydown = (e) => { if(e.key==='Enter') sendAIAnswer(); };
+      
+      addAIMessage('<strong><i class="fa-solid fa-check" style="color:#22c55e"></i> Updated!</strong> Preview refresh ho raha hai...', 'bot');
+      
+      setTimeout(() => {
+        document.getElementById('aiChatStep').style.display = 'none';
+        document.getElementById('aiPreviewStep').style.display = 'block';
+        setAIStep(3);
+        renderAIPreview();
+      }, 800);
+    }
+  };
+}
+
+function deleteAIListing(){
+  if(typeof FWF_Notify !== 'undefined'){
+    FWF_Notify.confirm('Are you sure? This will discard the AI listing.', () => {
+      resetAIListing();
+      closeModal('aiListingModal');
+      notify('Listing deleted', 'info');
+    });
+  } else {
+    if(confirm('Discard this listing?')){
+      resetAIListing();
+      closeModal('aiListingModal');
+    }
+  }
+}
+
+async function postAIListing(){
+  const p = aiProductData;
+  if(!p.title || !p.price){
+    notify('Product title and price required','warning');
+    return;
+  }
+  
+  const postBtn = document.querySelector('#aiPreviewStep .btn:last-child');
+  postBtn.disabled = true;
+  postBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
+  
+  try{
+    const images = aiImageBase64 ? [aiImageBase64] : [];
+    
+    const body = {
+      title: p.title,
+      category: p.category || 'other',
+      subcategory: p.subcategory || null,
+      brand: p.brand || null,
+      price: parseFloat(p.price) || 0,
+      mrp: parseFloat(p.mrp) || null,
+      stock: parseInt(p.stock) || 1,
+      unit: p.unit || 'piece',
+      description: p.description || null,
+      condition: p.condition || 'new',
+      weight: p.weight || null,
+      material: p.material || null,
+      color: p.color || null,
+      size: p.size || null,
+      tags: p.tags || null,
+      images
+    };
+    
+    const r = await AUTH.api('/api/member/add-product', {method:'POST', body});
+    
+    if(typeof FWF_Notify !== 'undefined'){
+      FWF_Notify.success('🎉 Product listing submitted for approval!<br><small>You will be notified once it\'s approved.</small>', 4000);
+    } else {
+      notify(r.message || 'Product submitted!','success');
+    }
+    
+    resetAIListing();
+    closeModal('aiListingModal');
+    loadSellerData();
+    
+  } catch(e){
+    notify(e.message || 'Failed to post product','error');
+  } finally {
+    postBtn.disabled = false;
+    postBtn.innerHTML = '<i class="fa-solid fa-rocket"></i> Post Listing';
+  }
+}
 async function loadStoreCategories(){
   try{
     const r = await fetch('/api/store/categories');

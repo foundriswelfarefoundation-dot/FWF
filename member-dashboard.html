@@ -716,6 +716,35 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
       </div>
     </div>
+
+    <!-- Member ID Card -->
+    <div class="content-card" style="margin-top:18px">
+      <h3><i class="fa-solid fa-id-card"></i> Your Member ID Card</h3>
+      <div style="max-width:500px;margin:16px auto 0">
+        <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:24px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.2)">
+          <div style="position:absolute;right:-20px;top:-20px;width:140px;height:140px;border-radius:50%;background:rgba(99,102,241,.15)"></div>
+          <div style="position:absolute;left:-30px;bottom:-30px;width:100px;height:100px;border-radius:50%;background:rgba(236,72,153,.1)"></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;position:relative;z-index:1">
+            <img src="assets/images/logo.png" alt="FWF" style="width:44px;height:44px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.3)">
+            <div>
+              <div style="font-size:17px;font-weight:900;letter-spacing:-.3px">Foundris Welfare Foundation</div>
+              <div style="font-size:10px;opacity:.7;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Member Identity Card</div>
+            </div>
+          </div>
+          <div style="position:relative;z-index:1">
+            <div style="font-size:24px;font-weight:900;margin-bottom:6px;letter-spacing:-.5px" id="dashCardName">Member Name</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(129,140,248,.2);padding:6px 14px;border-radius:8px;margin-bottom:18px">
+              <i class="fa-solid fa-id-badge" style="color:#818cf8"></i>
+              <span style="font-size:15px;font-weight:800;color:#a5b4fc" id="dashCardId">FWF-000000</span>
+            </div>
+            <div style="display:flex;gap:24px;font-size:12px;opacity:.85;font-weight:600;flex-wrap:wrap">
+              <span><i class="fa-solid fa-phone" style="margin-right:6px;color:#818cf8"></i><span id="dashCardMobile">—</span></span>
+              <span><i class="fa-solid fa-calendar" style="margin-right:6px;color:#818cf8"></i>Joined <span id="dashCardJoined">—</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ===================== PROFILE & ID CARD ===================== -->
@@ -2145,7 +2174,13 @@ function populateProfile(data){
   document.getElementById('editName').value = u.name || '';
   document.getElementById('editBio').value = u.bio || '';
 
-  // ID Card
+  // Dashboard ID Card
+  document.getElementById('dashCardName').textContent = u.name || 'Member';
+  document.getElementById('dashCardId').textContent = u.member_id || 'FWF-000000';
+  document.getElementById('dashCardMobile').textContent = u.mobile || '—';
+  document.getElementById('dashCardJoined').textContent = fmtDate(u.created_at);
+
+  // Profile ID Card
   document.getElementById('cardName').textContent = u.name || 'Member';
   document.getElementById('cardId').textContent = u.member_id || '';
   document.getElementById('cardMobile').textContent = u.mobile || '—';

@@ -1724,93 +1724,87 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
 <!-- ======== MODALS ======== -->
 
-<!-- New Post Modal - Instagram Style -->
+<!-- New Post Modal - WhatsApp Style -->
 <div class="modal-overlay hidden" id="postModal">
-  <div class="modal-card" style="max-width:580px;background:#fff;border-radius:20px;padding:0;overflow:hidden">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:20px 28px;color:#fff;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1)">
-      <h3 style="margin:0;font-size:20px;font-weight:900;display:flex;align-items:center;gap:10px">
-        <i class="fa-solid fa-sparkles"></i> Share Your Story
-      </h3>
-      <button class="modal-close" onclick="closeModal('postModal')" style="background:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;opacity:.6;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">&times;</button>
+  <div class="modal-card" style="max-width:480px;background:#fff;border-radius:16px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <!-- Header - WhatsApp green -->
+    <div style="background:#075e54;padding:14px 18px;color:#fff;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="closeModal('postModal')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0;display:flex;align-items:center"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="feed-avatar" id="postModalAvatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0">M</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700">New Post</div>
+        <div style="font-size:11px;opacity:.75">visible after admin approval</div>
+      </div>
     </div>
 
-    <!-- Body -->
-    <div class="modal-body" style="padding:28px;background:#f9fafb">
-      <!-- Info Banner -->
-      <div style="background:#e0e7ff;padding:14px 16px;border-radius:12px;margin-bottom:24px;border-left:4px solid #6366f1;display:flex;gap:12px">
-        <i class="fa-solid fa-check-circle" style="color:#6366f1;font-size:18px;flex-shrink:0"></i>
-        <div style="font-size:13px;color:#4c1d95;font-weight:600">All posts are reviewed by admin before appearing on Social Book</div>
-      </div>
-
-      <!-- Activity Type -->
-      <div class="form-group" style="margin-bottom:20px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-primary);margin-bottom:8px">
-          <i class="fa-solid fa-tag" style="color:#6366f1;font-size:16px"></i> Activity Type
-        </label>
-        <select class="form-input" id="postType" style="border:2px solid #e5e7eb;padding:12px 14px;font-size:14px;border-radius:12px;background:#fff;transition:.2s;cursor:pointer" onchange="updateTemplate()">
-          <option value="">✨ Select what you're sharing...</option>
-          <option value="welfare">🤝 Welfare Activity</option>
-          <option value="training">🎓 Training Session</option>
-          <option value="health">🏥 Health Camp</option>
-          <option value="plantation">🌱 Plantation Drive</option>
-          <option value="education">📚 Education Support</option>
-          <option value="donation">💝 Donation Collection</option>
-          <option value="awareness">📣 Awareness Campaign</option>
-          <option value="skill">💼 Skill Development</option>
-          <option value="other">✨ Other</option>
-        </select>
-      </div>
-
-      <!-- Tell Your Story -->
-      <div class="form-group" style="margin-bottom:20px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-primary);margin-bottom:8px">
-          <i class="fa-solid fa-pen-fancy" style="color:#8b5cf6;font-size:16px"></i> Tell Your Story
-        </label>
-        <textarea class="form-input" id="postDesc" style="border:2px solid #e5e7eb;padding:14px;font-size:14px;border-radius:12px;background:#fff;font-family:inherit;min-height:120px;resize:vertical;transition:.2s" placeholder="📍 Location: [Enter location]
-👥 Participants: [Number of people]
-🎯 Activity: [What you organized]
-💚 Impact: [How it helped people]
-
-Example:
-📍 Location: Village School, Kanpur
-👥 Participants: 50 women
-🎯 Activity: Free tailoring workshop
-💚 Impact: 30 women got jobs, earning ₹15,000/month"></textarea>
-        <small style="font-size:11px;color:#6b7280;margin-top:8px;display:flex;align-items:center;gap:6px">
-          <i class="fa-solid fa-lightbulb"></i> Pro tip: Use the template above - members love inspiring numbers!
-        </small>
-      </div>
-
-      <!-- Image Upload - Instagram Style -->
-      <div class="form-group" style="margin-bottom:20px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text-primary);margin-bottom:12px">
-          <i class="fa-solid fa-image" style="color:#ec4899;font-size:16px"></i> Add Photos/Videos
-        </label>
-        
-        <!-- Upload Area -->
-        <div style="border:2px dashed #d1d5db;border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .3s;background:#fff" id="imageDropZone" onclick="document.getElementById('postMedia').click()" ondragover="this.style.borderColor='#6366f1';this.style.background='#ede9fe'" ondragleave="this.style.borderColor='#d1d5db';this.style.background='#fff'" ondrop="handlePostImageDrop(event)">
-          <i class="fa-solid fa-cloud-arrow-up" style="font-size:40px;color:#6366f1;margin-bottom:12px;display:block"></i>
-          <p style="font-weight:800;font-size:14px;color:var(--text-primary);margin:0 0 4px">Click to upload or drag & drop</p>
-          <p style="font-size:12px;color:#6b7280;margin:0">PNG, JPG, GIF up to 5MB • Multiple images supported</p>
+    <!-- Chat area - scrollable -->
+    <div style="flex:1;overflow-y:auto;background:#e5ddd5;padding:16px;background-image:url('data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M0 0h20v20H0z%22 fill=%22%23e5ddd5%22/%3E%3Cpath d=%22M10 3l1 2 2 .3-1.5 1.4.4 2L10 8l-1.9 .7.4-2L7 5.3l2-.3z%22 fill=%22%23d4ccb5%22 opacity=%22.15%22/%3E%3C/svg%3E')">
+      
+      <!-- Activity Type - pill selector -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#667781;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:4px">What did you do?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="postTypePills">
+          <button type="button" class="post-pill" data-value="welfare" onclick="selectPostPill(this)">🤝 Welfare</button>
+          <button type="button" class="post-pill" data-value="training" onclick="selectPostPill(this)">🎓 Training</button>
+          <button type="button" class="post-pill" data-value="health" onclick="selectPostPill(this)">🏥 Health</button>
+          <button type="button" class="post-pill" data-value="plantation" onclick="selectPostPill(this)">🌱 Plantation</button>
+          <button type="button" class="post-pill" data-value="education" onclick="selectPostPill(this)">📚 Education</button>
+          <button type="button" class="post-pill" data-value="donation" onclick="selectPostPill(this)">💝 Donation</button>
+          <button type="button" class="post-pill" data-value="awareness" onclick="selectPostPill(this)">📣 Awareness</button>
+          <button type="button" class="post-pill" data-value="skill" onclick="selectPostPill(this)">💼 Skill Dev</button>
+          <button type="button" class="post-pill" data-value="other" onclick="selectPostPill(this)">✨ Other</button>
         </div>
-        
-        <!-- Image Preview -->
-        <div id="postImagePreviewGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px"></div>
-        
-        <input type="file" id="postMedia" accept="image/*,video/*" multiple style="display:none" onchange="handlePostImageSelect(event)">
+        <input type="hidden" id="postType" value="">
       </div>
+
+      <!-- Image preview strip -->
+      <div id="postImagePreviewGrid" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+
+      <!-- Story bubble -->
+      <div style="background:#dcf8c6;border-radius:0 12px 12px 12px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.08);margin-bottom:8px;position:relative">
+        <textarea class="form-input" id="postDesc" style="border:none;padding:0;font-size:14px;background:transparent;font-family:inherit;min-height:80px;resize:none;width:100%;outline:none;line-height:1.5;color:#303030" placeholder="Share your story here... 
+
+📍 Where? 👥 Who? 🎯 What? 💚 Impact?"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px">
+          <span style="font-size:10px;color:#667781" id="postCharCount">0</span>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Footer Actions -->
-    <div class="modal-actions" style="display:flex;gap:10px;justify-content:flex-end;padding:20px 28px;background:#f9fafb;border-top:1px solid #e5e7eb">
-      <button class="btn btn-ghost" onclick="closeModal('postModal')" style="padding:10px 24px;font-weight:700;color:var(--text-secondary);border:1px solid #d1d5db;border-radius:10px;background:#fff;transition:.2s" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'">Cancel</button>
-      <button class="btn btn-primary" id="submitPostBtn" onclick="submitPost()" style="padding:10px 28px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:8px" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-        <i class="fa-solid fa-paper-plane"></i> Share Now
+    <!-- Bottom bar - WhatsApp style -->
+    <div style="background:#f0f0f0;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-top:1px solid #dfe5e7">
+      <!-- Attach photos -->
+      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Add Photos">
+        <i class="fa-solid fa-camera"></i>
+      </button>
+      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Attach File">
+        <i class="fa-solid fa-paperclip"></i>
+      </button>
+      
+      <input type="file" id="postMedia" accept="image/*,video/*" multiple style="display:none" onchange="handlePostImageSelect(event)">
+      
+      <!-- Spacer -->
+      <div style="flex:1"></div>
+      
+      <!-- Image count badge -->
+      <span id="postImageCount" style="display:none;font-size:11px;color:#667781;font-weight:600"><i class="fa-solid fa-image"></i> <span id="postImgNum">0</span> photo(s)</span>
+      
+      <!-- Send button - WhatsApp green circle -->
+      <button type="button" id="submitPostBtn" onclick="submitPost()" style="background:#00a884;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all .2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,168,132,.3)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+        <i class="fa-solid fa-paper-plane"></i>
       </button>
     </div>
   </div>
 </div>
+
+<style>
+.post-pill{
+  background:#fff;border:1.5px solid #d1d5db;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:#303030;white-space:nowrap;
+}
+.post-pill:hover{background:#f0f0f0}
+.post-pill.active{background:#dcf8c6;border-color:#25d366;color:#075e54;font-weight:700;box-shadow:0 0 0 2px rgba(37,211,102,.15)}
+</style>
 
 <!-- Add Product Modal (Rich Flipkart/Amazon style) -->
 <div class="modal-overlay hidden" id="addProductModal">
@@ -3486,109 +3480,87 @@ Example:
 💫 Special: [Something special about it]`
 };
 
-// Update textarea template when activity type changes
-function updateTemplate(){
-  const type = document.getElementById('postType').value;
+// (pill selector replaces updateTemplate - moved below)
+
+// (drag-drop handled inline in the new compact UI)
+
+// Pill selector for activity type
+function selectPostPill(btn){
+  document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('postType').value = btn.dataset.value;
+  // Update template
+  const type = btn.dataset.value;
   const textarea = document.getElementById('postDesc');
-  
   if(type && POST_TEMPLATES[type]){
-    // Only replace if textarea is empty or still has old template
-    if(!textarea.value || textarea.value.includes('📍') || textarea.value.includes('📌')){
+    if(!textarea.value || textarea.value.includes('📍') || textarea.value.includes('📌') || textarea.value.length < 5){
       textarea.value = POST_TEMPLATES[type];
-      textarea.style.minHeight = '200px';
     }
   }
   textarea.focus();
 }
 
-// Handle drag and drop for image upload
-function handlePostImageDrop(e){
-  e.preventDefault();
-  e.stopPropagation();
-  
-  const dropZone = document.getElementById('imageDropZone');
-  dropZone.style.borderColor = '#d1d5db';
-  dropZone.style.background = '#fff';
-  
-  const files = e.dataTransfer.files;
-  if(files.length > 0){
-    document.getElementById('postMedia').files = files;
-    handlePostImageSelect({target: {files}});
+// Char counter for post textarea
+(function(){
+  const desc = document.getElementById('postDesc');
+  const counter = document.getElementById('postCharCount');
+  if(desc && counter){
+    desc.addEventListener('input', () => { counter.textContent = desc.value.length; });
   }
-}
+})();
 
 // Handle image file selection and show preview
+let postImageFiles = []; // track files separately
 function handlePostImageSelect(e){
-  const files = e.target.files || [];
+  const files = Array.from(e.target.files || []);
   const previewGrid = document.getElementById('postImagePreviewGrid');
-  previewGrid.innerHTML = '';
-  
-  let validFiles = 0;
   
   for(const file of files){
     if(file.size > 5 * 1024 * 1024){
       notify(`${file.name} is too large (max 5MB)`,'warning');
       continue;
     }
+    postImageFiles.push(file);
     
     const reader = new FileReader();
     reader.onload = (event) => {
-      validFiles++;
       const preview = document.createElement('div');
-      preview.style.cssText = `
-        position: relative;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(99,102,241,.15);
-        aspect-ratio: 1;
-      `;
+      preview.style.cssText = 'position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)';
       
       const img = document.createElement('img');
       img.src = event.target.result;
-      img.style.cssText = `
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      `;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover';
       
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
-      removeBtn.style.cssText = `
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        background: rgba(0,0,0,.5);
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        transition: background .2s;
-      `;
+      removeBtn.style.cssText = 'position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px';
       removeBtn.innerHTML = '&times;';
-      removeBtn.onmouseover = () => removeBtn.style.background = 'rgba(0,0,0,.8)';
-      removeBtn.onmouseout = () => removeBtn.style.background = 'rgba(0,0,0,.5)';
-      removeBtn.onclick = (e) => {
-        e.preventDefault();
+      const idx = postImageFiles.length - 1;
+      removeBtn.onclick = (ev) => {
+        ev.preventDefault();
         preview.remove();
-        validFiles--;
+        postImageFiles.splice(idx, 1);
+        updatePostImageCount();
       };
       
       preview.appendChild(img);
       preview.appendChild(removeBtn);
       previewGrid.appendChild(preview);
+      updatePostImageCount();
     };
     reader.readAsDataURL(file);
   }
-  
-  // Show count
-  if(validFiles > 0){
-    previewGrid.style.marginTop = '14px';
+}
+
+function updatePostImageCount(){
+  const countEl = document.getElementById('postImageCount');
+  const numEl = document.getElementById('postImgNum');
+  const n = document.getElementById('postImagePreviewGrid').children.length;
+  if(n > 0){
+    countEl.style.display = 'inline';
+    numEl.textContent = n;
+  } else {
+    countEl.style.display = 'none';
   }
 }
 
@@ -3605,12 +3577,13 @@ async function submitPost(){
   
   const btn = document.getElementById('submitPostBtn');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
   
   try{
     // Convert images to base64
     const images = [];
-    for(const f of mediaFiles){
+    const allFiles = postImageFiles.length > 0 ? postImageFiles : Array.from(mediaFiles);
+    for(const f of allFiles){
       if(f.size > 5*1024*1024){ notify(`${f.name} is too large. Max 5MB per file`,'warning'); continue; }
       const b64 = await fileToBase64(f);
       images.push(b64);
@@ -3633,12 +3606,16 @@ async function submitPost(){
     document.getElementById('postDesc').value = '';
     document.getElementById('postMedia').value = '';
     document.getElementById('postImagePreviewGrid').innerHTML = '';
+    document.getElementById('postCharCount').textContent = '0';
+    document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));
+    postImageFiles = [];
+    updatePostImageCount();
     
   } catch(e){
     notify(e.message || 'Failed to submit post','error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Share Now';
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
   }
 }
 

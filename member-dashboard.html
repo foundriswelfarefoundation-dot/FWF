@@ -1531,7 +1531,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <h3 style="font-size:16px;font-weight:800"><i class="fa-solid fa-boxes-stacked" style="color:var(--accent)"></i> Your Products</h3>
       <div style="display:flex;gap:8px">
-        <button class="btn" onclick="openModal('aiListingModal')" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-weight:700;border:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Smart Listing</button>
+        <button class="btn" onclick="openModal('aiListingModal')" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-weight:700;border:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-wand-magic-sparkles"></i> FWF Assistant</button>
         <button class="btn btn-primary" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add Product</button>
       </div>
     </div>
@@ -1940,13 +1940,13 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- AI Smart Listing Modal -->
+<!-- FWF Assistant Modal -->
 <div class="modal-overlay hidden" id="aiListingModal">
   <div class="modal-card" style="max-width:700px;background:#fff;border-radius:20px;padding:0;overflow:hidden;max-height:92vh;display:flex;flex-direction:column">
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#8b5cf6,#ec4899);padding:18px 24px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
       <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:10px">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Smart Listing
+        <i class="fa-solid fa-wand-magic-sparkles"></i> FWF Assistant
       </h3>
       <button class="modal-close" onclick="resetAIListing();closeModal('aiListingModal')" style="background:rgba(255,255,255,.2);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center">&times;</button>
     </div>
@@ -2224,7 +2224,7 @@ function fileToBase64(file){
 let storeCategories = {};
 
 /* ============================================
-   AI SMART LISTING - ChatGPT Integration
+   FWF ASSISTANT - ChatGPT Integration
    ============================================ */
 let aiImageBase64 = null;
 let aiConversation = [];
@@ -2602,7 +2602,7 @@ async function postAIListing(){
     const r = await AUTH.api('/api/member/add-product', {method:'POST', body});
     
     if(typeof FWF_Notify !== 'undefined'){
-      FWF_Notify.success('🎉 Product listing submitted for approval!<br><small>You will be notified once it\'s approved.</small>', 4000);
+      FWF_Notify.toast('🎉 Product listing submitted for approval!<br><small>You will be notified once it\'s approved.</small>', 'success');
     } else {
       notify(r.message || 'Product submitted!','success');
     }
@@ -3596,7 +3596,7 @@ async function submitPost(){
     closeModal('postModal');
     
     if(typeof FWF_Notify !== 'undefined'){
-      FWF_Notify.success('🎉 Post submitted for admin review!<br><small>You will be notified once it is approved.</small>', 4000);
+      FWF_Notify.toast('🎉 Post submitted for admin review!<br><small>You will be notified once it is approved.</small>', 'success');
     } else {
       notify('Post submitted! Pending admin approval.','success');
     }

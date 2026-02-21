@@ -15,12 +15,46 @@
     { "source": "/csr-login", "destination": "/csr-login.html" },
     { "source": "/csr-dashboard", "destination": "/csr-dashboard.html" },
     { "source": "/store", "destination": "/store.html" },
+    { "source": "/m/:page", "destination": "/m/:page.html" },
     { "source": "/api/store/:path*", "destination": "https://fwf-production.up.railway.app/api/store/:path*" },
     { "source": "/api/auth/:path*", "destination": "https://fwf-production.up.railway.app/api/auth/:path*" },
     { "source": "/api/member/:path*", "destination": "https://fwf-production.up.railway.app/api/member/:path*" },
     { "source": "/api/admin/:path*", "destination": "https://fwf-production.up.railway.app/api/admin/:path*" },
     { "source": "/api/pay/:path*", "destination": "https://fwf-production.up.railway.app/api/pay/:path*" },
     { "source": "/api/debug/:path*", "destination": "https://fwf-production.up.railway.app/api/debug/:path*" }
+  ],
+  "headers": [
+    {
+      "source": "/service-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
   ],
   "github": {
     "silent": true

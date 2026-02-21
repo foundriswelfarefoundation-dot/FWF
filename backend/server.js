@@ -5,8 +5,10 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
+import Razorpay from 'razorpay';
 import { initSentry, setUserContext, captureError, addBreadcrumb } from './lib/sentry.js';
 import User from './models/User.js';
 import Referral from './models/Referral.js';
@@ -32,6 +34,12 @@ app.use(requestHandler);
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'change_me_secret';
 const ORG_PREFIX = process.env.ORG_PREFIX || 'FWF';
+
+// --- Razorpay instance ---
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_SIo6l7VT2rKYDr',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa',
+});
 
 // Static site root one level up from backend/
 const siteRoot = path.resolve(__dirname, '..');
@@ -198,7 +206,7 @@ app.get('/', (req, res) => {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet'],
       admin: ['/api/admin/overview'],
-      payment: ['/api/pay/simulate-join'],
+      payment: ['/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       debug: ['/api/debug/users (development only)']
     }
   });
@@ -270,6 +278,203 @@ app.post('/api/pay/simulate-join', async (req, res) => {
   });
 
   res.json({ ok: true, memberId, password: plain });
+});
+
+// ═══════════════════════════════════════════════════════
+// RAZORPAY PAYMENT GATEWAY
+// ═══════════════════════════════════════════════════════
+
+// Create Razorpay Order
+app.post('/api/pay/create-order', async (req, res) => {
+  try {
+    const { amount, currency = 'INR', type = 'membership', notes = {} } = req.body;
+    if (!amount || amount < 1) return res.status(400).json({ error: 'Valid amount required (min ₹1)' });
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount * 100), // Razorpay expects amount in paise
+      currency,
+      receipt: `fwf_${type}_${Date.now()}`,
+      notes: {
+        type,
+        ...notes
+      }
+    });
+
+    res.json({
+      ok: true,
+      order: {
+        id: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        receipt: order.receipt
+      },
+      key: process.env.RAZORPAY_KEY_ID || 'rzp_test_SIo6l7VT2rKYDr'
+    });
+  } catch (err) {
+    console.error('Razorpay create-order error:', err);
+    captureError(err, { context: 'razorpay-create-order' });
+    res.status(500).json({ error: 'Failed to create payment order' });
+  }
+});
+
+// Verify Razorpay Payment Signature
+app.post('/api/pay/verify', async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ error: 'Missing payment verification fields' });
+    }
+
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+    const generated_signature = crypto
+      .createHmac('sha256', keySecret)
+      .update(razorpay_order_id + '|' + razorpay_payment_id)
+      .digest('hex');
+
+    if (generated_signature !== razorpay_signature) {
+      return res.status(400).json({ ok: false, error: 'Payment verification failed - invalid signature' });
+    }
+
+    res.json({ ok: true, message: 'Payment verified successfully', paymentId: razorpay_payment_id });
+  } catch (err) {
+    console.error('Razorpay verify error:', err);
+    captureError(err, { context: 'razorpay-verify' });
+    res.status(500).json({ error: 'Payment verification error' });
+  }
+});
+
+// Razorpay Membership Payment: Create order + after verify → register member
+app.post('/api/pay/membership', async (req, res) => {
+  try {
+    const { name, mobile, email, project, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    if (!name || !mobile || !email) return res.status(400).json({ error: 'name, mobile & email required' });
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({ error: 'Payment details missing' });
+    }
+
+    // Verify signature
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+    const generated_signature = crypto
+      .createHmac('sha256', keySecret)
+      .update(razorpay_order_id + '|' + razorpay_payment_id)
+      .digest('hex');
+
+    if (generated_signature !== razorpay_signature) {
+      return res.status(400).json({ ok: false, error: 'Payment verification failed' });
+    }
+
+    // Check if user already exists
+    const exists = await User.findOne({ $or: [{ mobile }, { email }] });
+    if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+
+    // Register member
+    const memberId = await nextMemberId();
+    const plain = randPass();
+    const hash = bcrypt.hashSync(plain, 10);
+    const refCode = generateReferralCode(memberId);
+
+    await User.create({
+      member_id: memberId,
+      name,
+      mobile,
+      email,
+      password_hash: hash,
+      role: 'member',
+      membership_active: true,
+      referral_code: refCode,
+      wallet: {}
+    });
+
+    // Record membership fee
+    await MembershipFee.create({
+      txn_id: razorpay_payment_id,
+      member_id: memberId,
+      member_name: name,
+      amount: 500,
+      fee_type: 'joining',
+      payment_mode: 'razorpay',
+      payment_ref: razorpay_order_id,
+      status: 'verified',
+      verified_at: new Date(),
+      notes: `Razorpay payment. Project: ${project || '-'}`
+    });
+
+    addBreadcrumb('payment', 'Membership payment successful', { memberId, paymentId: razorpay_payment_id });
+    res.json({ ok: true, memberId, password: plain, paymentId: razorpay_payment_id });
+  } catch (err) {
+    console.error('Razorpay membership error:', err);
+    captureError(err, { context: 'razorpay-membership' });
+    res.status(500).json({ error: 'Registration failed: ' + err.message });
+  }
+});
+
+// Razorpay Donation Payment: verify + record donation
+app.post('/api/pay/donation', async (req, res) => {
+  try {
+    const { name, mobile, email, pan, amount, memberId: memberIdInput, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    if (!amount || !razorpay_payment_id) return res.status(400).json({ error: 'Payment details required' });
+
+    // Verify signature
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+    const generated_signature = crypto
+      .createHmac('sha256', keySecret)
+      .update(razorpay_order_id + '|' + razorpay_payment_id)
+      .digest('hex');
+
+    if (generated_signature !== razorpay_signature) {
+      return res.status(400).json({ ok: false, error: 'Payment verification failed' });
+    }
+
+    // If member ID provided, find user and award points
+    let user = null;
+    if (memberIdInput) {
+      user = await User.findOne({ member_id: memberIdInput });
+    }
+
+    // Record donation
+    const donationData = {
+      amount: Number(amount),
+      donor_name: name || 'Anonymous',
+      donor_contact: mobile || email || '',
+      source: 'razorpay',
+    };
+
+    if (user) {
+      donationData.member_id = user._id;
+      const pointsRupees = Number(amount) * (DONATION_POINTS_PERCENT / 100);
+      const points = amountToPoints(pointsRupees);
+      donationData.points_earned = points;
+
+      await User.updateOne({ _id: user._id }, {
+        $inc: {
+          'wallet.balance_inr': pointsRupees,
+          'wallet.lifetime_earned_inr': pointsRupees,
+          'wallet.points_balance': points,
+          'wallet.total_points_earned': points,
+          'wallet.points_from_donations': points
+        }
+      });
+
+      await PointsLedger.create({
+        user_id: user._id, points, type: 'donation',
+        description: `₹${amount} donation via Razorpay → ${points} points`
+      });
+    }
+
+    await Donation.create(donationData);
+
+    addBreadcrumb('payment', 'Donation payment successful', { amount, paymentId: razorpay_payment_id });
+    res.json({
+      ok: true,
+      message: `Thank you for your ₹${amount} donation!`,
+      paymentId: razorpay_payment_id,
+      pointsEarned: donationData.points_earned || 0
+    });
+  } catch (err) {
+    console.error('Razorpay donation error:', err);
+    captureError(err, { context: 'razorpay-donation' });
+    res.status(500).json({ error: 'Donation recording failed: ' + err.message });
+  }
 });
 
 // Admin: reset a member's password

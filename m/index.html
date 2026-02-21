@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="description" content="FWF - Empowering women through skills training and livelihood opportunities" />
+  
+  <title>FWF — Skills to Livelihood</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="../manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/logo.png">
+  <link rel="apple-touch-icon" href="../assets/images/logo.png">
+
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Critical CSS -->
+  <link href="../assets/css/mobile.css" rel="stylesheet">
+  
+  <!-- Deferred fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Mukta:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  
+  <style>
+    /* Critical above-the-fold styles */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f766e 100%);
+      position: relative;
+    }
+    
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('../assets/images/bg-madhubani.png') center/cover;
+      opacity: 0.15;
+      z-index: 0;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Loading state */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <img src="../assets/images/logo.png" alt="FWF Logo" width="36" height="36" loading="eager">
+        <span data-i18n="brand">FWF</span>
+      </a>
+      
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation -->
+  <nav class="nav" id="mobileNav">
+    <a href="index.html" data-i18n="nav.home">Home</a>
+    <a href="about.html" data-i18n="nav.about">About</a>
+    <a href="projects.html" data-i18n="nav.projects">Projects</a>
+    <a href="join.html" data-i18n="nav.join">Join</a>
+    <a href="donation.html" data-i18n="nav.donate">Donate</a>
+    <a href="csr.html" data-i18n="nav.csr">CSR</a>
+    <a href="store.html" data-i18n="nav.store">Store</a>
+    <a href="member-login.html" data-i18n="nav.login">Login</a>
+    
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+      <button id="langEN" class="active" data-i18n="lang.en">English</button>
+      <button id="langHI" data-i18n="lang.hi">हिंदी</button>
+    </div>
+    
+    <!-- Desktop Version Link -->
+    <a href="#" id="desktopVersion" style="margin-top: 20px; padding: 14px 16px; background: rgba(255,255,255,0.1); text-align: center; border-radius: 8px; font-size: 14px;">
+      <i class="fas fa-desktop"></i> <span data-i18n="nav.desktop">Desktop Version</span>
+    </a>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="container">
+        <h1 data-i18n="hero.title">Empowering Women Through Skills & Livelihood</h1>
+        <p data-i18n="hero.subtitle">Join India's fastest growing community of skilled women creating their own futures</p>
+        
+        <div class="btn-group">
+          <a href="join.html" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i>
+            <span data-i18n="hero.join">Join Now</span>
+          </a>
+          <a href="donation.html" class="btn btn-accent">
+            <i class="fas fa-heart"></i>
+            <span data-i18n="hero.donate">Donate</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section>
+    <div class="container">
+      <h2 class="section-title" data-i18n="how.title">How It Works</h2>
+      
+      <div class="grid">
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size: 40px; margin-bottom: 12px;">📝</div>
+            <h3 class="card-title" data-i18n="how.step1.title">Register</h3>
+          </div>
+          <div class="card-body">
+            <p data-i18n="how.step1.desc">Fill simple form and join our community</p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size: 40px; margin-bottom: 12px;">📚</div>
+            <h3 class="card-title" data-i18n="how.step2.title">Learn Skills</h3>
+          </div>
+          <div class="card-body">
+            <p data-i18n="how.step2.desc">Get trained in valuable skills for free</p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size: 40px; margin-bottom: 12px;">💼</div>
+            <h3 class="card-title" data-i18n="how.step3.title">Get Projects</h3>
+          </div>
+          <div class="card-body">
+            <p data-i18n="how.step3.desc">Work on real projects and earn income</p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size: 40px; margin-bottom: 12px;">🎯</div>
+            <h3 class="card-title" data-i18n="how.step4.title">Grow</h3>
+          </div>
+          <div class="card-body">
+            <p data-i18n="how.step4.desc">Build your career and become independent</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section style="background: var(--card);">
+    <div class="container">
+      <h2 class="section-title" data-i18n="actions.title">Get Started Today</h2>
+      
+      <div class="card">
+        <h3 style="margin-bottom: 16px;">👩‍🎓 <span data-i18n="actions.member.title">Become a Member</span></h3>
+        <p style="color: var(--muted); margin-bottom: 16px;" data-i18n="actions.member.desc">Join as a member and get access to free training and job opportunities</p>
+        <a href="join.html" class="btn btn-primary btn-block">
+          <span data-i18n="actions.member.btn">Join as Member</span>
+        </a>
+      </div>
+      
+      <div class="card">
+        <h3 style="margin-bottom: 16px;">❤️ <span data-i18n="actions.donate.title">Support Our Cause</span></h3>
+        <p style="color: var(--muted); margin-bottom: 16px;" data-i18n="actions.donate.desc">Help us empower more women with your donation</p>
+        <a href="donation.html" class="btn btn-accent btn-block">
+          <span data-i18n="actions.donate.btn">Make a Donation</span>
+        </a>
+      </div>
+      
+      <div class="card">
+        <h3 style="margin-bottom: 16px;">🤝 <span data-i18n="actions.csr.title">Corporate Partnership</span></h3>
+        <p style="color: var(--muted); margin-bottom: 16px;" data-i18n="actions.csr.desc">Partner with us for CSR initiatives and skill development programs</p>
+        <a href="csr.html" class="btn btn-primary btn-block">
+          <span data-i18n="actions.csr.btn">CSR Partnership</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Preview -->
+  <section>
+    <div class="container">
+      <h2 class="section-title" data-i18n="about.title">Our Mission</h2>
+      
+      <div class="card">
+        <p data-i18n="about.mission">FWF (Foundation for Women's Future) is dedicated to empowering women through skills training and creating sustainable livelihood opportunities. We believe every woman deserves financial independence and the chance to build her own future.</p>
+        <a href="about.html" class="link" data-i18n="about.learn_more">Learn more about us →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p><strong>FWF</strong> - Foundation for Women's Future</p>
+      <p style="margin: 16px 0;">
+        <a href="about.html" data-i18n="footer.about">About</a> • 
+        <a href="projects.html" data-i18n="footer.projects">Projects</a> • 
+        <a href="../privacy.html" data-i18n="footer.privacy">Privacy</a> • 
+        <a href="../terms.html" data-i18n="footer.terms">Terms</a>
+      </p>
+      <p data-i18n="footer.copyright">&copy; 2025 FWF. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts - Deferred for performance -->
+  <script>
+    // Translations
+    const T = {
+      en: {
+        brand: "FWF",
+        nav: {
+          home: "Home",
+          about: "About",
+          projects: "Projects",
+          join: "Join",
+          donate: "Donate",
+          csr: "CSR",
+          store: "Store",
+          login: "Login",
+          desktop: "Desktop Version"
+        },
+        lang: {
+          en: "English",
+          hi: "हिंदी"
+        },
+        hero: {
+          title: "Empowering Women Through Skills & Livelihood",
+          subtitle: "Join India's fastest growing community of skilled women creating their own futures",
+          join: "Join Now",
+          donate: "Donate"
+        },
+        how: {
+          title: "How It Works",
+          step1: {
+            title: "Register",
+            desc: "Fill simple form and join our community"
+          },
+          step2: {
+            title: "Learn Skills",
+            desc: "Get trained in valuable skills for free"
+          },
+          step3: {
+            title: "Get Projects",
+            desc: "Work on real projects and earn income"
+          },
+          step4: {
+            title: "Grow",
+            desc: "Build your career and become independent"
+          }
+        },
+        actions: {
+          title: "Get Started Today",
+          member: {
+            title: "Become a Member",
+            desc: "Join as a member and get access to free training and job opportunities",
+            btn: "Join as Member"
+          },
+          donate: {
+            title: "Support Our Cause",
+            desc: "Help us empower more women with your donation",
+            btn: "Make a Donation"
+          },
+          csr: {
+            title: "Corporate Partnership",
+            desc: "Partner with us for CSR initiatives and skill development programs",
+            btn: "CSR Partnership"
+          }
+        },
+        about: {
+          title: "Our Mission",
+          mission: "FWF (Foundation for Women's Future) is dedicated to empowering women through skills training and creating sustainable livelihood opportunities. We believe every woman deserves financial independence and the chance to build her own future.",
+          learn_more: "Learn more about us →"
+        },
+        footer: {
+          about: "About",
+          projects: "Projects",
+          privacy: "Privacy",
+          terms: "Terms",
+          copyright: "© 2025 FWF. All rights reserved."
+        }
+      },
+      hi: {
+        brand: "FWF",
+        nav: {
+          home: "होम",
+          about: "हमारे बारे में",
+          projects: "प्रोजेक्ट्स",
+          join: "जुड़ें",
+          donate: "दान करें",
+          csr: "CSR",
+          store: "स्टोर",
+          login: "लॉगिन",
+          desktop: "डेस्कटॉप वर्जन"
+        },
+        lang: {
+          en: "English",
+          hi: "हिंदी"
+        },
+        hero: {
+          title: "महिलाओं को कौशल और आजीविका के माध्यम से सशक्त बनाना",
+          subtitle: "भारत के सबसे तेजी से बढ़ते कुशल महिलाओं के समुदाय में शामिल हों जो अपना भविष्य बना रही हैं",
+          join: "अभी जुड़ें",
+          donate: "दान करें"
+        },
+        how: {
+          title: "यह कैसे काम करता है",
+          step1: {
+            title: "रजिस्टर करें",
+            desc: "सरल फॉर्म भरें और हमारे समुदाय में शामिल हों"
+          },
+          step2: {
+            title: "कौशल सीखें",
+            desc: "मुफ्त में मूल्यवान कौशल में प्रशिक्षित हों"
+          },
+          step3: {
+            title: "प्रोजेक्ट प्राप्त करें",
+            desc: "वास्तविक परियोजनाओं पर काम करें और आय अर्जित करें"
+          },
+          step4: {
+            title: "विकास करें",
+            desc: "अपना करियर बनाएं और स्वतंत्र बनें"
+          }
+        },
+        actions: {
+          title: "आज ही शुरू करें",
+          member: {
+            title: "सदस्य बनें",
+            desc: "सदस्य के रूप में जुड़ें और मुफ्त प्रशिक्षण और नौकरी के अवसर प्राप्त करें",
+            btn: "सदस्य के रूप में जुड़ें"
+          },
+          donate: {
+            title: "हमारे उद्देश्य का समर्थन करें",
+            desc: "अपने दान से अधिक महिलाओं को सशक्त बनाने में हमारी मदद करें",
+            btn: "दान करें"
+          },
+          csr: {
+            title: "कॉर्पोरेट साझेदारी",
+            desc: "CSR पहल और कौशल विकास कार्यक्रमों के लिए हमारे साथ साझेदारी करें",
+            btn: "CSR साझेदारी"
+          }
+        },
+        about: {
+          title: "हमारा मिशन",
+          mission: "FWF (फाउंडेशन फॉर विमेन्स फ्यूचर) महिलाओं को कौशल प्रशिक्षण और टिकाऊ आजीविका के अवसर प्रदान करने के लिए समर्पित है। हम मानते हैं कि हर महिला वित्तीय स्वतंत्रता और अपना भविष्य बनाने का अवसर पाने की हकदार है।",
+          learn_more: "हमारे बारे में और जानें →"
+        },
+        footer: {
+          about: "हमारे बारे में",
+          projects: "प्रोजेक्ट्स",
+          privacy: "गोपनीयता",
+          terms: "शर्तें",
+          copyright: "© 2025 FWF. सर्वाधिकार सुरक्षित।"
+        }
+      }
+    };
+
+    // i18n function
+    function setLanguage(lang) {
+      document.documentElement.setAttribute('data-lang', lang);
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const keys = key.split('.');
+        let value = T[lang];
+        for (const k of keys) {
+          value = value?.[k];
+        }
+        if (value) el.textContent = value;
+      });
+      
+      // Update active language button
+      document.querySelectorAll('.lang-switcher button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      if (lang === 'en') {
+        document.getElementById('langEN')?.classList.add('active');
+      } else {
+        document.getElementById('langHI')?.classList.add('active');
+      }
+      
+      // Save preference
+      try {
+        localStorage.setItem('fwf_lang', lang);
+      } catch(e) {}
+    }
+
+    // Mobile navigation toggle
+    document.getElementById('navToggle')?.addEventListener('click', function() {
+      document.getElementById('mobileNav')?.classList.toggle('show');
+    });
+
+    // Close nav when clicking a link
+    document.querySelectorAll('.nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobileNav')?.classList.remove('show');
+      });
+    });
+
+    // Language switcher
+    document.getElementById('langEN')?.addEventListener('click', () => setLanguage('en'));
+    document.getElementById('langHI')?.addEventListener('click', () => setLanguage('hi'));
+
+    // Desktop version link
+    document.getElementById('desktopVersion')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (window.FWF_Mobile) {
+        window.FWF_Mobile.forceDesktop();
+      }
+    });
+
+    // Load saved language preference
+    try {
+      const savedLang = localStorage.getItem('fwf_lang');
+      if (savedLang && (savedLang === 'en' || savedLang === 'hi')) {
+        setLanguage(savedLang);
+      }
+    } catch(e) {}
+
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../service-worker.js').then(
+          registration => console.log('ServiceWorker registered'),
+          err => console.log('ServiceWorker registration failed')
+        );
+      });
+    }
+  </script>
+
+  <!-- FontAwesome (deferred) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>

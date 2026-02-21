@@ -15,6 +15,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   
+  <!-- Razorpay Checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="assets/js/fwf.js"></script>
   
   <style>
@@ -22,6 +24,7 @@
       --ink:#1e293b; --muted:#64748b; --soft:#f1f5f9;
       --success:#22c55e; --error:#ef4444;
       --card:#ffffff; --brd:#e2e8f0;
+      --primary:#6153ff;
     }
     body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#f8fafc;color:var(--ink);padding:20px 0}
     *{box-sizing:border-box}
@@ -38,27 +41,17 @@
     .summary-label{color:#78350f}
     .summary-value{font-weight:700;color:#92400e}
     
-    .payment-methods{margin:24px 0}
-    .payment-option{border:2px solid var(--brd);border-radius:16px;padding:20px;margin-bottom:14px;cursor:pointer;transition:all .2s}
-    .payment-option:hover{border-color:#6153ff;background:#f5f3ff}
-    .payment-option.selected{border-color:#6153ff;background:#f5f3ff;box-shadow:0 0 0 3px rgba(97,83,255,.1)}
-    .payment-option input[type="radio"]{margin-right:12px;width:20px;height:20px}
-    .payment-label{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.1rem}
-    .payment-icon{font-size:1.5rem}
+    .secure-badge{display:flex;align-items:center;gap:10px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px;margin-bottom:24px;color:#166534;font-weight:700}
+    .secure-badge i{font-size:1.5rem;color:#22c55e}
     
-    .upi-details{margin-top:16px;padding:20px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;display:none}
-    .upi-details.show{display:block}
-    .upi-id{font-size:1.2rem;font-weight:800;color:#166534;padding:12px;background:#fff;border-radius:8px;text-align:center;margin:12px 0;border:2px dashed#22c55e}
-    .qr-placeholder{width:200px;height:200px;margin:16px auto;background:#fff;border:2px solid #86efac;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#22c55e;font-weight:700}
+    .razorpay-info{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #c7d2fe;border-radius:16px;padding:20px;margin-bottom:24px;text-align:center}
+    .razorpay-info p{margin:0;font-weight:600;color:#4338ca;font-size:0.95rem}
+    .razorpay-info .methods{display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+    .razorpay-info .method{display:flex;align-items:center;gap:6px;background:#fff;padding:8px 14px;border-radius:10px;font-size:0.9rem;font-weight:700;color:#334155;box-shadow:0 2px 8px rgba(0,0,0,.06)}
     
-    .form-field{margin-bottom:20px}
-    .form-input{width:100%;padding:14px 16px;border:2px solid var(--brd);border-radius:12px;font-size:1rem;font-family:inherit;font-weight:600}
-    .form-input:focus{outline:0;border-color:#6153ff;box-shadow:0 0 0 3px rgba(97,83,255,.1)}
-    .form-label{display:block;margin-bottom:8px;font-weight:700;color:var(--ink)}
-    
-    .btn-submit{width:100%;padding:18px 0;background:#22c55e;color:#fff;font-weight:900;border:none;border-radius:16px;font-size:1.1rem;cursor:pointer;box-shadow:0 10px 26px rgba(34,197,94,.25);transition:all .2s;font-family:inherit}
-    .btn-submit:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px)}
-    .btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+    .btn-pay{width:100%;padding:18px 0;background:linear-gradient(135deg,#6153ff,#8b5cf6);color:#fff;font-weight:900;border:none;border-radius:16px;font-size:1.15rem;cursor:pointer;box-shadow:0 10px 30px rgba(97,83,255,.3);transition:all .2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px}
+    .btn-pay:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 14px 36px rgba(97,83,255,.35)}
+    .btn-pay:disabled{opacity:0.6;cursor:not-allowed}
     
     .message{padding:14px 18px;border-radius:12px;margin-bottom:20px;font-weight:600;display:none}
     .message.success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;display:block}
@@ -77,6 +70,14 @@
     .credentials div{margin:10px 0}
     .credentials strong{color:#166534}
     .btn-primary{display:inline-block;margin-top:20px;padding:14px 32px;background:#6153ff;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;text-decoration:none}
+    
+    .payment-id-box{background:#eff6ff;border:1px solid #93c5fd;border-radius:10px;padding:12px;margin:12px 0;font-size:0.9rem;word-break:break-all}
+    .payment-id-box strong{color:#1d4ed8}
+
+    @media(max-width:560px){
+      .card{padding:24px 16px}
+      .container{padding:0 10px}
+    }
   </style>
 </head>
 <body>
@@ -86,7 +87,7 @@
     </a>
     
     <div class="card">
-      <h2>Complete Payment</h2>
+      <h2><i class="fas fa-shield-alt" style="color:#6153ff"></i> Complete Payment</h2>
       <p class="subtitle">Secure your FWF membership</p>
       
       <div class="summary-box">
@@ -97,60 +98,45 @@
         </div>
         <div class="summary-item">
           <span class="summary-label">Registration Fee:</span>
-          <span class="summary-value">₹200</span>
+          <span class="summary-value">₹500</span>
         </div>
         <div class="summary-item">
           <span class="summary-label">Total Amount:</span>
-          <span class="summary-value">₹200</span>
+          <span class="summary-value">₹500</span>
+        </div>
+      </div>
+      
+      <div class="secure-badge">
+        <i class="fas fa-lock"></i>
+        <div>
+          <div>100% Secure Payment</div>
+          <div style="font-size:0.85rem;font-weight:500;color:#166534;margin-top:2px">Powered by Razorpay — India's most trusted payment gateway</div>
+        </div>
+      </div>
+      
+      <div class="razorpay-info">
+        <p>Pay using any method you prefer</p>
+        <div class="methods">
+          <div class="method"><i class="fas fa-mobile-alt" style="color:#22c55e"></i> UPI</div>
+          <div class="method"><i class="fas fa-credit-card" style="color:#3b82f6"></i> Card</div>
+          <div class="method"><i class="fas fa-university" style="color:#8b5cf6"></i> Net Banking</div>
+          <div class="method"><i class="fas fa-wallet" style="color:#f59e0b"></i> Wallet</div>
         </div>
       </div>
       
       <div id="message" class="message"></div>
       
-      <div class="payment-methods">
-        <h3 style="margin-bottom:16px">Select Payment Method</h3>
-        
-        <label class="payment-option" id="upiOption">
-          <div class="payment-label">
-            <input type="radio" name="payment" value="upi" checked>
-            <span class="payment-icon" style="color:#22c55e">💳</span>
-            <span>UPI Payment</span>
-          </div>
-          <div class="upi-details show" id="upiDetails">
-            <p style="margin:0 0 12px;font-weight:600;color:#166534">Scan QR or Pay to UPI ID:</p>
-            <div class="upi-id">fwf@paytm</div>
-            <div class="qr-placeholder">
-              <div>
-                <i class="fas fa-qrcode" style="font-size:3rem"></i>
-                <p style="margin:8px 0 0;font-size:0.9rem">QR Code</p>
-              </div>
-            </div>
-            <p style="margin:12px 0 0;font-size:0.9rem;color:#166534">After payment, enter Transaction ID below</p>
-          </div>
-        </label>
-        
-        <label class="payment-option" id="bankOption">
-          <div class="payment-label">
-            <input type="radio" name="payment" value="bank">
-            <span class="payment-icon" style="color:#3b82f6">🏦</span>
-            <span>Bank Transfer / NEFT</span>
-          </div>
-        </label>
-      </div>
+      <button class="btn-pay" type="button" id="payBtn">
+        <i class="fas fa-lock"></i> Pay ₹500 Securely
+      </button>
       
-      <form id="paymentForm">
-        <div class="form-field">
-          <label class="form-label">Transaction ID / Reference Number</label>
-          <input class="form-input" name="paymentRef" type="text" placeholder="Enter your payment reference" required>
-        </div>
-        
-        <button class="btn-submit" type="submit" id="submitBtn">
-          <i class="fas fa-check-circle"></i> Complete Membership
-        </button>
-      </form>
+      <p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--muted)">
+        <i class="fas fa-info-circle"></i> You will be redirected to Razorpay's secure payment page
+      </p>
     </div>
   </div>
   
+  <!-- Success Modal -->
   <div class="success-modal" id="successModal">
     <div class="success-content">
       <div class="success-icon">
@@ -162,6 +148,9 @@
         <div><strong>Member ID:</strong> <span id="displayMemberId">Loading...</span></div>
         <div><strong>Password:</strong> <span id="displayPassword">Loading...</span></div>
       </div>
+      <div class="payment-id-box">
+        <strong>Payment ID:</strong> <span id="displayPaymentId"></span>
+      </div>
       <p style="font-size:0.9rem;color:var(--error)">
         <i class="fas fa-exclamation-triangle"></i> Please save these credentials securely
       </p>
@@ -170,7 +159,7 @@
   </div>
 
   <script>
-    // Load saved data
+    // Load saved data from join form
     const savedData = JSON.parse(sessionStorage.getItem('fwfJoinData') || '{}');
     if (!savedData.fullName) {
       FWF_Notify.modal({
@@ -183,93 +172,136 @@
       setTimeout(() => window.location.href = '/join', 3000);
     }
     
-    // Payment method toggle
-    const paymentOptions = document.querySelectorAll('.payment-option');
-    const upiDetails = document.getElementById('upiDetails');
-    
-    paymentOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        const radio = option.querySelector('input[type="radio"]');
-        radio.checked = true;
-        paymentOptions.forEach(opt => opt.classList.remove('selected'));
-        option.classList.add('selected');
-        
-        if (radio.value === 'upi') {
-          upiDetails.classList.add('show');
-        } else {
-          upiDetails.classList.remove('show');
-        }
-      });
-    });
-    
-    // Initialize first option as selected
-    document.getElementById('upiOption').classList.add('selected');
-    
-    // Form submission
-    const form = document.getElementById('paymentForm');
-    const submitBtn = document.getElementById('submitBtn');
+    const payBtn = document.getElementById('payBtn');
     const message = document.getElementById('message');
     const successModal = document.getElementById('successModal');
+    const AMOUNT = 500; // ₹500 membership fee
     
     function showMessage(text, type) {
       message.textContent = text;
       message.className = 'message ' + type;
       message.style.display = 'block';
-      setTimeout(() => {
-        message.style.display = 'none';
-      }, 5000);
+      setTimeout(() => { message.style.display = 'none'; }, 6000);
     }
     
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const paymentRef = form.paymentRef.value.trim();
-      if (!paymentRef) {
-        showMessage('Please enter transaction reference', 'error');
-        return;
-      }
-      
-      // Disable button and show loading
-      submitBtn.disabled = true;
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    payBtn.addEventListener('click', async () => {
+      payBtn.disabled = true;
+      payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Order...';
       
       try {
-        // Prepare final data
-        const finalData = {
-          ...savedData,
-          paymentRef: paymentRef
+        // Step 1: Create Razorpay order on backend
+        const orderRes = await fetch('/api/pay/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: AMOUNT,
+            type: 'membership',
+            notes: { name: savedData.fullName, email: savedData.email }
+          })
+        });
+        const orderData = await orderRes.json();
+        
+        if (!orderData.ok) {
+          showMessage(orderData.error || 'Failed to create order', 'error');
+          payBtn.disabled = false;
+          payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
+          return;
+        }
+        
+        payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
+        
+        // Step 2: Open Razorpay Checkout
+        const options = {
+          key: orderData.key,
+          amount: orderData.order.amount,
+          currency: orderData.order.currency,
+          name: 'FWF - Foundation for Women\'s Future',
+          description: 'Membership Registration Fee (₹500)',
+          image: '/assets/images/logo.png',
+          order_id: orderData.order.id,
+          prefill: {
+            name: savedData.fullName || '',
+            email: savedData.email || '',
+            contact: savedData.mobile || ''
+          },
+          theme: {
+            color: '#6153ff',
+            backdrop_color: 'rgba(15,23,42,0.85)'
+          },
+          handler: async function(response) {
+            // Step 3: Payment successful → verify + register member
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying & Registering...';
+            
+            try {
+              const regRes = await fetch('/api/pay/membership', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: savedData.fullName,
+                  mobile: savedData.mobile,
+                  email: savedData.email,
+                  project: savedData.project || '',
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature
+                })
+              });
+              
+              const regData = await regRes.json();
+              
+              if (regData.ok) {
+                // Also save to MongoDB via /api/join for email records
+                try {
+                  await fetch('/api/join', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      ...savedData,
+                      paymentRef: response.razorpay_payment_id
+                    })
+                  });
+                } catch(e) { console.log('MongoDB record save note:', e.message); }
+                
+                // Show success modal
+                document.getElementById('displayMemberId').textContent = regData.memberId || 'Check email';
+                document.getElementById('displayPassword').textContent = regData.password || 'Check email';
+                document.getElementById('displayPaymentId').textContent = response.razorpay_payment_id;
+                successModal.classList.add('show');
+                sessionStorage.removeItem('fwfJoinData');
+              } else {
+                showMessage(regData.error || 'Registration failed. Contact support with Payment ID: ' + response.razorpay_payment_id, 'error');
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
+              }
+            } catch(err) {
+              showMessage('Network error. Payment was successful! Contact support with Payment ID: ' + response.razorpay_payment_id, 'error');
+              payBtn.disabled = false;
+              payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
+            }
+          },
+          modal: {
+            ondismiss: function() {
+              payBtn.disabled = false;
+              payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
+              showMessage('Payment was cancelled. You can try again.', 'error');
+            }
+          }
         };
         
-        // Submit to API
-        const response = await fetch('/api/join', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(finalData)
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function(response) {
+          showMessage('Payment failed: ' + (response.error.description || 'Unknown error'), 'error');
+          payBtn.disabled = false;
+          payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
         });
+        rzp.open();
         
-        const result = await response.json();
-        
-        if (result.ok) {
-          // Show success modal with credentials
-          document.getElementById('displayMemberId').textContent = result.memberId || 'Check your email';
-          document.getElementById('displayPassword').textContent = result.password || 'Check your email';
-          successModal.classList.add('show');
-          
-          // Clear session storage
-          sessionStorage.removeItem('fwfJoinData');
-        } else {
-          showMessage(result.error || 'Registration failed. Please try again.', 'error');
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showMessage('Network error. Please check your connection and try again.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
+      } catch(err) {
+        console.error('Payment error:', err);
+        showMessage('Error initiating payment. Please try again.', 'error');
+        payBtn.disabled = false;
+        payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
       }
     });
   </script>

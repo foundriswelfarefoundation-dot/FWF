@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <meta name="theme-color" content="#1e3a8a" />
+  <title>Member Login - FWF</title>
+
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../assets/images/logo.png">
+  <link href="../assets/css/mobile.css" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <img src="../assets/images/logo.png" alt="FWF" width="36" height="36">
+        <span>FWF</span>
+      </a>
+      <button class="nav-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <nav class="nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="join.html">Join</a>
+    <a href="donation.html">Donate</a>
+    <a href="projects.html">Projects</a>
+    <a href="member-login.html" class="active">Login</a>
+  </nav>
+
+  <section style="padding: 40px 0;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <img src="../assets/images/logo.png" alt="FWF" style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 20px;">
+        <h1 style="margin: 0 0 8px 0;">Member Login</h1>
+        <p style="color: var(--muted);">Access your dashboard</p>
+      </div>
+
+      <div class="card">
+        <div id="alertBox" class="alert hidden"></div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label>Member ID or Mobile *</label>
+            <input type="text" name="login" required placeholder="FWF-000001 or 10-digit mobile" autofocus>
+          </div>
+
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" name="password" required placeholder="Your password">
+          </div>
+
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+              <input type="checkbox" name="remember" style="width: auto;">
+              <span>Remember me</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+
+          <div style="text-align: center; margin-top: 16px;">
+            <a href="../forgot-password.html" style="color: var(--brand1); font-size: 14px;">
+              Forgot Password?
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <div class="card mt-3">
+        <p class="text-center" style="margin: 0; color: var(--muted);">
+          Don't have an account?
+        </p>
+        <a href="join.html" class="btn btn-secondary btn-block" style="margin-top: 12px;">
+          <i class="fas fa-user-plus"></i> Join Now
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p><strong>FWF</strong> - Foundation for Women's Future</p>
+      <p>&copy; 2025 FWF. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    function showAlert(message, type = 'info') {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.textContent = message;
+      alertBox.className = `alert alert-${type}`;
+      alertBox.classList.remove('hidden');
+      setTimeout(() => alertBox.classList.add('hidden'), 5000);
+    }
+
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+      try {
+        const formData = new FormData(this);
+        const data = {
+          login: formData.get('login'),
+          password: formData.get('password')
+        };
+
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.ok || response.ok) {
+          showAlert('✅ Login successful! Redirecting...', 'success');
+          
+          // Redirect to desktop dashboard (mobile dashboard can be created later)
+          setTimeout(() => {
+            window.location.href = '../member-dashboard.html';
+          }, 1000);
+        } else {
+          throw new Error(result.error || 'Invalid credentials');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showAlert('❌ ' + error.message, 'error');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+      }
+    });
+
+    // Mobile nav toggle
+    document.getElementById('navToggle')?.addEventListener('click', () => {
+      document.getElementById('mobileNav')?.classList.toggle('show');
+    });
+
+    // Check if already logged in
+    fetch('/api/member/me', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          window.location.href = '../member-dashboard.html';
+        }
+      })
+      .catch(() => {});
+  </script>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>

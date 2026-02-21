@@ -1,0 +1,29 @@
+{
+  "name": "FWF - Foundation for Women's Future",
+  "short_name": "FWF",
+  "description": "Skills to Livelihood platform empowering women through education and opportunities",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "social", "nonprofit"],
+  "lang": "en-US",
+  "dir": "auto",
+  "prefer_related_applications": false
+}

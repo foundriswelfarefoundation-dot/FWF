@@ -16,6 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;800&family=Mukta:wght@400;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
+  <!-- Razorpay Checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="assets/js/fwf.js"></script>
 
   <style>
@@ -338,18 +340,19 @@
     </div>
     <div id="donateStep2" style="display:none;">
       <h2 class="payTitle">Complete Payment</h2>
-      <div class="qrBox"><img id="qrToggle" src="/assets/images/QRimg.jpg" alt="FWF UPI QR"></div>
-      <div class="bankList">
-        <div><b>Account number:</b> 9580118412</div><div><b>Account type:</b> Current</div>
-        <div><b>Account holder:</b> FOUNDRIS WELFARE FOUNDATION</div><div><b>UPI ID:</b> fwf10@kotak</div>
-        <div><b>Branch IFSC:</b> KKBK0005355</div>
+      <div style="text-align:center;margin:16px 0">
+        <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin-bottom:16px">
+          <p style="margin:0 0 4px;font-weight:600;color:#4338ca;font-size:0.95rem">Pay securely via Razorpay</p>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-mobile-alt" style="color:#22c55e"></i> UPI</span>
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-credit-card" style="color:#3b82f6"></i> Card</span>
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-university" style="color:#8b5cf6"></i> Net Banking</span>
+          </div>
+        </div>
+        <p style="font-weight:900;font-size:1.4rem;color:#0f172a;margin:12px 0">Amount: ₹<span id="donateAmountDisplay">0</span></p>
       </div>
-      <p class="note">Please make payment and click below.</p>
-      <button id="toggleDone" class="btn-solid"><i class="fa-solid fa-check"></i> I have paid</button>
-      <div class="done-wrap" id="doneWrap">
-        <div class="done-grid"><input type="text" id="txnId" placeholder="Transaction / UTR Number" /><input type="file" id="txnShot" accept="image/*" /></div>
-        <button id="submitDone" class="btn-done">Submit & Finish</button>
-      </div>
+      <button id="razorpayDonateBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay Securely Now</button>
+      <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay</p>
     </div>
   </div>
 </div>
@@ -395,14 +398,19 @@
     </div>
     <div id="memberStep2" style="display:none;">
       <h2 class="payTitle">Complete Payment</h2>
-      <div class="qrBox"><img id="memberQR" src="/assets/images/QRimg.jpg" alt="FWF UPI QR"></div>
-      <div class="bankList"><div><b>UPI ID:</b> fwf10@kotak</div><div><b>Account number:</b> 9580118412</div><div><b>IFSC:</b> KKBK0005355</div></div>
-      <p class="note">Pay ₹500 and click below.</p>
-      <button id="memberPaid" class="btn-solid"><i class="fa-solid fa-check"></i> I have paid</button>
-      <div class="done-wrap" id="memberDone" style="display:none;">
-        <div class="done-grid"><input type="text" id="memberTxn" placeholder="Transaction / UTR Number" /><input type="file" id="memberShot" accept="image/*,application/pdf" placeholder="Upload payment proof" /></div>
-        <button id="memberFinish" class="btn-done">Submit & Get Member ID</button>
+      <div style="text-align:center;margin:16px 0">
+        <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin-bottom:16px">
+          <p style="margin:0 0 4px;font-weight:600;color:#4338ca;font-size:0.95rem">Pay securely via Razorpay</p>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-mobile-alt" style="color:#22c55e"></i> UPI</span>
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-credit-card" style="color:#3b82f6"></i> Card</span>
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-university" style="color:#8b5cf6"></i> Net Banking</span>
+          </div>
+        </div>
+        <p style="font-weight:900;font-size:1.4rem;color:#0f172a;margin:12px 0">Membership Fee: ₹500</p>
       </div>
+      <button id="razorpayMemberBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay ₹500 Securely</button>
+      <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay</p>
     </div>
   </div>
 </div>
@@ -494,10 +502,98 @@
   function resetDonate(){ donateForm.reset(); donateStep2.style.display='none'; document.getElementById('doneWrap').style.display='none'; donateStep1.style.display='block'; document.getElementById('qrToggle').classList.remove('zoomed'); }
 
   document.getElementById('amountChips').addEventListener('click', (e)=>{ const btn=e.target.closest('[data-amount]'); if(!btn) return; const amt=document.querySelector('input[name="amount"]'); amt.value=btn.dataset.amount; amt.dispatchEvent(new Event('input',{bubbles:true})); amt.focus(); });
-  donateForm.addEventListener('submit', (e)=>{ e.preventDefault(); if(!donateForm.checkValidity()){ donateForm.reportValidity(); return; } donateStep1.style.display='none'; donateStep2.style.display='block'; });
-  document.getElementById('qrToggle').addEventListener('click', e=> e.target.classList.toggle('zoomed'));
-  document.getElementById('toggleDone').addEventListener('click', ()=>{ const dw=document.getElementById('doneWrap'); dw.style.display = (dw.style.display==='block') ? 'none':'block'; });
-  document.getElementById('submitDone').addEventListener('click', ()=>{ const txn=document.getElementById('txnId').value.trim(); if(!txn){ FWF_Notify.toast('Please enter the Transaction / UTR Number.', 'warning'); return; } FWF_Notify.toast('Thanks! Your payment details were submitted. We will verify and email the 80G receipt.', 'success', 6000); closeModal(donateModal); resetDonate(); });
+  
+  // Store donate form data for Razorpay flow
+  let donateFormData = {};
+  donateForm.addEventListener('submit', (e)=>{ 
+    e.preventDefault(); 
+    if(!donateForm.checkValidity()){ donateForm.reportValidity(); return; }
+    donateFormData = {
+      amount: donateForm.querySelector('[name="amount"]').value,
+      name: donateForm.querySelector('[name="name"]').value,
+      mobile: donateForm.querySelector('[name="mobile"]').value,
+      email: donateForm.querySelector('[name="email"]').value,
+      pan: donateForm.querySelector('[name="pan"]').value,
+      memberid: donateForm.querySelector('[name="memberid"]').value
+    };
+    document.getElementById('donateAmountDisplay').textContent = donateFormData.amount;
+    donateStep1.style.display='none'; 
+    donateStep2.style.display='block'; 
+  });
+
+  // Razorpay Donate Button
+  document.getElementById('razorpayDonateBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('razorpayDonateBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating Order...';
+    
+    try {
+      const orderRes = await fetch('/api/pay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: Number(donateFormData.amount), type: 'donation', notes: { name: donateFormData.name, email: donateFormData.email } })
+      });
+      const orderData = await orderRes.json();
+      if (!orderData.ok) { FWF_Notify.toast(orderData.error || 'Failed to create order', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; return; }
+      
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now';
+      
+      const options = {
+        key: orderData.key,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'FWF - Foundation for Women\'s Future',
+        description: 'Donation ₹' + donateFormData.amount,
+        image: '/assets/images/logo.png',
+        order_id: orderData.order.id,
+        prefill: { name: donateFormData.name, email: donateFormData.email, contact: donateFormData.mobile },
+        theme: { color: '#ff416c' },
+        handler: async function(response) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording Donation...';
+          try {
+            const res = await fetch('/api/pay/donation', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: donateFormData.name,
+                mobile: donateFormData.mobile,
+                email: donateFormData.email,
+                pan: donateFormData.pan,
+                amount: Number(donateFormData.amount),
+                memberId: donateFormData.memberid,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            const data = await res.json();
+            if (data.ok) {
+              FWF_Notify.modal({
+                title: '🎉 Thank You!',
+                message: `Your donation of ₹${donateFormData.amount} has been received successfully!<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>${data.pointsEarned ? '<br><small style="color:#22c55e">Points earned: ' + data.pointsEarned + '</small>' : ''}`,
+                type: 'success',
+                confirmText: 'OK',
+                onConfirm: () => { closeModal(donateModal); resetDonate(); }
+              });
+            } else {
+              FWF_Notify.toast(data.error || 'Error recording donation', 'error', 5000);
+            }
+          } catch(e) {
+            FWF_Notify.toast('Payment successful but recording failed. Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
+          } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; }
+        },
+        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; } }
+      };
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; });
+      rzp.open();
+    } catch(e) {
+      FWF_Notify.toast('Error: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now';
+    }
+  });
 
   /* MEMBERSHIP (2-step) */
   const memberModal=document.getElementById('memberModal');
@@ -510,66 +606,87 @@
   memberModal.addEventListener('click', (e)=>{ if(e.target===memberModal) closeModal(memberModal); });
 
   memberForm.addEventListener('submit', (e)=>{ e.preventDefault(); if(!memberForm.checkValidity()){ memberForm.reportValidity(); return; } memberStep1.style.display='none'; memberStep2.style.display='block'; });
-  document.getElementById('memberQR').addEventListener('click', e=> e.target.classList.toggle('zoomed'));
-  document.getElementById('memberPaid').addEventListener('click', ()=>{ const box=document.getElementById('memberDone'); box.style.display = (box.style.display==='block') ? 'none':'block'; });
-  
-  document.getElementById('memberFinish').addEventListener('click', async ()=>{ 
-    const txn=document.getElementById('memberTxn').value.trim(); 
-    const fileInput=document.getElementById('memberShot');
-    
-    if(!txn){ alert('Please enter the Transaction / UTR Number.'); return; }
-    if(!fileInput.files[0]){ alert('Please upload payment screenshot/PDF.'); return; }
-    
-    const file = fileInput.files[0];
-    if(file.size > 30*1024*1024){ alert('File size should be less than 30MB.'); return; }
-    
-    const btn = document.getElementById('memberFinish');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading...';
-    
-    // Convert to base64
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const formData = {
-          fullName: memberForm.querySelector('[name="name"]').value.trim(),
-          mobile: memberForm.querySelector('[name="mobile"]').value.trim(),
-          email: memberForm.querySelector('[name="email"]').value.trim(),
-          project: memberForm.querySelector('[name="project"]').value,
-          paymentRef: txn,
-          paymentProof: reader.result // base64 string
-        };
-        
-        const res = await fetch('/api/join', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-        
-        const data = await res.json();
-        
-        if(data.ok){
-          FWF_Notify.modal({
-            title: '🎉 Payment Received!',
-            message: `<strong>Member ID:</strong> ${data.memberId}<br><strong>Password:</strong> <code style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;color:#f5576c">${data.password}</code><br><br><small style="color:#64748b">Credentials have been sent to your email</small>`,
-            type: 'success',
-            confirmText: 'OK, Got it!',
-            onConfirm: () => {
-              closeModal(memberModal);
-              memberForm.reset();
-            }
-          });
-        } else {
-          FWF_Notify.toast(data.error || 'Registration failed. Please try again.', 'error', 5000);
-        }
-      } catch(e) {
-        FWF_Notify.toast('Error: ' + e.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Submit & Get Member ID';
-      }
+
+  // Razorpay Membership Button
+  document.getElementById('razorpayMemberBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('razorpayMemberBtn');
+    const formData = {
+      name: memberForm.querySelector('[name="name"]').value.trim(),
+      mobile: memberForm.querySelector('[name="mobile"]').value.trim(),
+      email: memberForm.querySelector('[name="email"]').value.trim(),
+      project: memberForm.querySelector('[name="project"]').value
     };
-    reader.readAsDataURL(file);
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating Order...';
+    
+    try {
+      const orderRes = await fetch('/api/pay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 500, type: 'membership', notes: { name: formData.name, email: formData.email } })
+      });
+      const orderData = await orderRes.json();
+      if (!orderData.ok) { FWF_Notify.toast(orderData.error || 'Failed to create order', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; return; }
+      
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely';
+      
+      const options = {
+        key: orderData.key,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'FWF - Foundation for Women\'s Future',
+        description: 'Membership Registration Fee (₹500)',
+        image: '/assets/images/logo.png',
+        order_id: orderData.order.id,
+        prefill: { name: formData.name, email: formData.email, contact: formData.mobile },
+        theme: { color: '#6153ff' },
+        handler: async function(response) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Registering...';
+          try {
+            const regRes = await fetch('/api/pay/membership', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: formData.name,
+                mobile: formData.mobile,
+                email: formData.email,
+                project: formData.project,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            const data = await regRes.json();
+            if (data.ok) {
+              // Also save to MongoDB for email
+              try { await fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, paymentRef: response.razorpay_payment_id }) }); } catch(e) {}
+              
+              FWF_Notify.modal({
+                title: '🎉 Payment Received!',
+                message: `<strong>Member ID:</strong> ${data.memberId}<br><strong>Password:</strong> <code style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;color:#f5576c">${data.password}</code><br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}<br>Credentials sent to your email</small>`,
+                type: 'success',
+                confirmText: 'OK, Got it!',
+                onConfirm: () => { closeModal(memberModal); memberForm.reset(); }
+              });
+            } else {
+              FWF_Notify.toast(data.error || 'Registration failed. Contact support with Payment ID: ' + response.razorpay_payment_id, 'error', 6000);
+            }
+          } catch(e) {
+            FWF_Notify.toast('Payment received! Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
+          } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; }
+        },
+        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; } }
+      };
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; });
+      rzp.open();
+    } catch(e) {
+      FWF_Notify.toast('Error: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely';
+    }
   });
 
   /* VOLUNTEER */

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <meta name="theme-color" content="#1e3a8a" />
+  <title>Our Projects - FWF</title>
+
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../assets/images/logo.png">
+  <link href="../assets/css/mobile.css" rel="stylesheet">
+  
+  <style>
+    .project-card {
+      background: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    
+    .project-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    
+    .project-content {
+      padding: 16px;
+    }
+    
+    .project-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--accent);
+      color: white;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .project-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: var(--ink);
+    }
+    
+    .project-desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 12px 0;
+    }
+    
+    .project-stats {
+      display: flex;
+      gap: 16px;
+      margin: 12px 0;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .stat {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--brand1);
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 16px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .filter-chips::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .chip {
+      padding: 8px 16px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      font-size: 14px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .chip.active {
+      background: var(--brand1);
+      color: white;
+      border-color: var(--brand1);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <img src="../assets/images/logo.png" alt="FWF" width="36" height="36">
+        <span>FWF</span>
+      </a>
+      <button class="nav-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <nav class="nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="join.html">Join</a>
+    <a href="donation.html">Donate</a>
+    <a href="projects.html" class="active">Projects</a>
+    <a href="member-login.html">Login</a>
+  </nav>
+
+  <section style="padding: 20px 0;">
+    <div class="container">
+      <h1 class="text-center" style="margin-bottom: 8px;">💼 Our Projects</h1>
+      <p class="text-center" style="color: var(--muted); margin-bottom: 24px;">
+        Creating livelihood opportunities
+      </p>
+
+      <!-- Filters -->
+      <div class="filter-chips">
+        <div class="chip active" onclick="filterProjects('all')">All</div>
+        <div class="chip" onclick="filterProjects('handicraft')">Handicraft</div>
+        <div class="chip" onclick="filterProjects('digital')">Digital</div>
+        <div class="chip" onclick="filterProjects('food')">Food</div>
+        <div class="chip" onclick="filterProjects('textile')">Textile</div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="card mb-3">
+        <div class="project-stats">
+          <div class="stat">
+            <div class="stat-value">250+</div>
+            <div class="stat-label">Active Projects</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">1200+</div>
+            <div class="stat-label">Women Employed</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">₹80L+</div>
+            <div class="stat-label">Income Generated</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects List -->
+      <div id="projectsList">
+        <!-- Project 1 -->
+        <div class="project-card" data-category="handicraft">
+          <div class="project-image" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
+              🎨
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">Handicraft</span>
+            <h3 class="project-title">Madhubani Art</h3>
+            <p class="project-desc">
+              Traditional Madhubani paintings on canvas, paper, and textiles. Women artisans create beautiful handmade artwork.
+            </p>
+            <div class="project-stats">
+              <div class="stat">
+                <div class="stat-value">45</div>
+                <div class="stat-label">Artisans</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">₹3.2L</div>
+                <div class="stat-label">Monthly Income</div>
+              </div>
+            </div>
+            <a href="../project-booklet.html" class="btn btn-primary btn-block">
+              View Details →
+            </a>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card" data-category="digital">
+          <div class="project-image" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
+              💻
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">Digital</span>
+            <h3 class="project-title">Digital Marketing Services</h3>
+            <p class="project-desc">
+              Social media management, content creation, and digital marketing services by trained women professionals.
+            </p>
+            <div class="project-stats">
+              <div class="stat">
+                <div class="stat-value">30</div>
+                <div class="stat-label">Experts</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">₹4.5L</div>
+                <div class="stat-label">Monthly Income</div>
+              </div>
+            </div>
+            <a href="../project-booklet.html" class="btn btn-primary btn-block">
+              View Details →
+            </a>
+          </div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card" data-category="food">
+          <div class="project-image" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
+              🍲
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">Food</span>
+            <h3 class="project-title">Home Food Business</h3>
+            <p class="project-desc">
+              Homemade pickles, snacks, and traditional food items prepared by skilled women entrepreneurs.
+            </p>
+            <div class="project-stats">
+              <div class="stat">
+                <div class="stat-value">60</div>
+                <div class="stat-label">Entrepreneurs</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">₹5.8L</div>
+                <div class="stat-label">Monthly Income</div>
+              </div>
+            </div>
+            <a href="../project-booklet.html" class="btn btn-primary btn-block">
+              View Details →
+            </a>
+          </div>
+        </div>
+
+        <!-- Project 4 -->
+        <div class="project-card" data-category="textile">
+          <div class="project-image" style="background: linear-gradient(135deg, #a8edea, #fed6e3);">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
+              🧵
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">Textile</span>
+            <h3 class="project-title">Garment Manufacturing</h3>
+            <p class="project-desc">
+              Tailoring and garment production unit providing steady employment to women with sewing skills.
+            </p>
+            <div class="project-stats">
+              <div class="stat">
+                <div class="stat-value">80</div>
+                <div class="stat-label">Workers</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">₹6.5L</div>
+                <div class="stat-label">Monthly Income</div>
+              </div>
+            </div>
+            <a href="../project-booklet.html" class="btn btn-primary btn-block">
+              View Details →
+            </a>
+          </div>
+        </div>
+
+        <!-- Project 5 -->
+        <div class="project-card" data-category="handicraft">
+          <div class="project-image" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
+              🪴
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">Handicraft</span>
+            <h3 class="project-title">Handmade Jewelry</h3>
+            <p class="project-desc">
+              Beautiful handcrafted jewelry using traditional techniques and modern designs.
+            </p>
+            <div class="project-stats">
+              <div class="stat">
+                <div class="stat-value">35</div>
+                <div class="stat-label">Artisans</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">₹2.7L</div>
+                <div class="stat-label">Monthly Income</div>
+              </div>
+            </div>
+            <a href="../project-booklet.html" class="btn btn-primary btn-block">
+              View Details →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Card -->
+      <div class="card mt-3" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-align: center;">
+        <h3 style="margin: 0 0 12px 0; color: white;">Want to Join a Project?</h3>
+        <p style="margin: 0 0 16px 0; opacity: 0.9;">
+          Become a member and get access to all projects
+        </p>
+        <a href="join.html" class="btn btn-block" style="background: white; color: #667eea;">
+          <i class="fas fa-user-plus"></i> Join Now
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p><strong>FWF</strong> - Foundation for Women's Future</p>
+      <p>&copy; 2025 FWF. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    function filterProjects(category) {
+      // Update active chip
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Filter projects
+      const projects = document.querySelectorAll('.project-card');
+      projects.forEach(project => {
+        if (category === 'all' || project.dataset.category === category) {
+          project.style.display = 'block';
+        } else {
+          project.style.display = 'none';
+        }
+      });
+    }
+
+    // Mobile nav toggle
+    document.getElementById('navToggle')?.addEventListener('click', () => {
+      document.getElementById('mobileNav')?.classList.toggle('show');
+    });
+  </script>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>

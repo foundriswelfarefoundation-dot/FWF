@@ -499,7 +499,16 @@
   const donateStep1=document.getElementById('donateStep1');
   const donateStep2=document.getElementById('donateStep2');
 
-  function resetDonate(){ donateForm.reset(); donateStep2.style.display='none'; document.getElementById('doneWrap').style.display='none'; donateStep1.style.display='block'; document.getElementById('qrToggle').classList.remove('zoomed'); }
+  function resetDonate(){ 
+    donateForm.reset(); 
+    donateStep2.style.display='none'; 
+    donateStep1.style.display='block';
+    // Safe check for optional elements
+    const doneWrap = document.getElementById('doneWrap');
+    if(doneWrap) doneWrap.style.display='none';
+    const qrToggle = document.getElementById('qrToggle');
+    if(qrToggle) qrToggle.classList.remove('zoomed');
+  }
 
   document.getElementById('amountChips').addEventListener('click', (e)=>{ const btn=e.target.closest('[data-amount]'); if(!btn) return; const amt=document.querySelector('input[name="amount"]'); amt.value=btn.dataset.amount; amt.dispatchEvent(new Event('input',{bubbles:true})); amt.focus(); });
   

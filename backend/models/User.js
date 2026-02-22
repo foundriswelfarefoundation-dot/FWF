@@ -8,6 +8,7 @@ const walletSchema = new mongoose.Schema({
   points_from_donations: { type: Number, default: 0 },
   points_from_referrals: { type: Number, default: 0 },
   points_from_quiz: { type: Number, default: 0 },
+  points_from_social_tasks: { type: Number, default: 0 },
   total_points_earned: { type: Number, default: 0 },
   updated_at: { type: Date, default: Date.now }
 }, { _id: false });

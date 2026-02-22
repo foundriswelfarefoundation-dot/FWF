@@ -5,7 +5,7 @@ const pointsLedgerSchema = new mongoose.Schema({
   points: { type: Number, required: true },
   type: { 
     type: String, 
-    enum: ['donation', 'referral', 'quiz', 'redeem', 'adjustment'], 
+    enum: ['donation', 'referral', 'quiz', 'social_task', 'redeem', 'adjustment'], 
     required: true,
     index: true 
   },

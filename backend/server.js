@@ -20,6 +20,12 @@ import CsrPartner from './models/CsrPartner.js';
 import MembershipFee from './models/MembershipFee.js';
 import Product from './models/Product.js';
 import Order from './models/Order.js';
+import SocialTask from './models/SocialTask.js';
+import TaskCompletion from './models/TaskCompletion.js';
+import SocialPost from './models/SocialPost.js';
+import Quiz from './models/Quiz.js';
+import QuizParticipation from './models/QuizParticipation.js';
+import ReferralClick from './models/ReferralClick.js';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -173,6 +179,25 @@ async function seedData() {
     await User.updateOne({ _id: m._id }, { referral_code: refCode });
   }
   if (membersWithoutRef.length > 0) console.log(`✅ Generated referral codes for ${membersWithoutRef.length} member(s)`);
+
+  // Seed social tasks if not exist
+  const existingTasks = await SocialTask.countDocuments();
+  if (existingTasks === 0) {
+    const socialTasks = [
+      { task_id: 'TASK-01', week_number: 1, title: 'पौधारोपण / Tree Plantation', description: 'एक पौधा लगाएं या किसी पौधे की देखभाल करें। अपने पौधे के साथ सेल्फी लें।', photo_instruction: 'पौधा लगाते हुए या पौधे के साथ फोटो लें', icon: '🌱', points_reward: 10 },
+      { task_id: 'TASK-02', week_number: 2, title: 'स्वच्छता अभियान / Cleanliness Drive', description: 'अपने आस-पास की जगह साफ करें - गली, पार्क, या सार्वजनिक स्थल।', photo_instruction: 'सफाई करते हुए या साफ जगह की before/after फोटो लें', icon: '🧹', points_reward: 10 },
+      { task_id: 'TASK-03', week_number: 3, title: 'भोजन दान / Food Donation', description: 'किसी जरूरतमंद को भोजन या राशन दें। गरीबों, मजदूरों या बेसहारा लोगों की मदद करें।', photo_instruction: 'भोजन देते हुए फोटो लें (चेहरा छुपा सकते हैं)', icon: '🍱', points_reward: 10 },
+      { task_id: 'TASK-04', week_number: 4, title: 'कपड़े वितरण / Clothes Distribution', description: 'पुराने या नए कपड़े जरूरतमंदों को दें। सर्दी/गर्मी के अनुसार कपड़े बांटें।', photo_instruction: 'कपड़े देते हुए या इकट्ठा किए कपड़ों की फोटो लें', icon: '👕', points_reward: 10 },
+      { task_id: 'TASK-05', week_number: 5, title: 'किताबें/स्टेशनरी दान / Books & Stationery', description: 'गरीब बच्चों को किताबें, कॉपी, पेन या स्कूल सामग्री दें।', photo_instruction: 'बच्चों को किताबें/सामग्री देते हुए फोटो लें', icon: '📚', points_reward: 10 },
+      { task_id: 'TASK-06', week_number: 6, title: 'प्लास्टिक-मुक्त / Plastic-Free Drive', description: 'कपड़े का थैला बांटें या प्लास्टिक इकट्ठा करके recycle करें।', photo_instruction: 'कपड़े का थैला या इकट्ठा किए प्लास्टिक की फोटो लें', icon: '♻️', points_reward: 10 },
+      { task_id: 'TASK-07', week_number: 7, title: 'पक्षियों के लिए पानी / Water for Birds', description: 'छत या बालकनी पर पक्षियों के लिए पानी का बर्तन रखें। गर्मी में पक्षियों की मदद करें।', photo_instruction: 'पानी का बर्तन रखते हुए या पक्षियों को पानी पीते हुए फोटो लें', icon: '🐦', points_reward: 10 },
+      { task_id: 'TASK-08', week_number: 8, title: 'रक्तदान / Health Camp / Blood Donation', description: 'रक्तदान करें या किसी health camp में हिस्सा लें। स्वास्थ्य जागरूकता फैलाएं।', photo_instruction: 'रक्तदान या health camp की फोटो लें', icon: '🩸', points_reward: 10 },
+      { task_id: 'TASK-09', week_number: 9, title: 'आवारा जानवरों को खाना / Feed Strays', description: 'सड़क के कुत्तों, बिल्लियों या गायों को खाना-पानी दें।', photo_instruction: 'जानवरों को खाना देते हुए फोटो लें', icon: '🐕', points_reward: 10 },
+      { task_id: 'TASK-10', week_number: 10, title: 'जागरूकता पोस्टर / Wall Awareness', description: 'शिक्षा, स्वच्छता, या सामाजिक जागरूकता का पोस्टर बनाएं और दीवार पर लगाएं।', photo_instruction: 'पोस्टर बनाते हुए या दीवार पर लगा हुआ पोस्टर दिखाएं', icon: '📋', points_reward: 10 }
+    ];
+    await SocialTask.insertMany(socialTasks);
+    console.log('✅ Seeded 10 social tasks');
+  }
 }
 
 // --- Auth middleware ---
@@ -200,13 +225,14 @@ app.get('/', (req, res) => {
     service: 'FWF Backend API',
     status: 'online',
     database: 'MongoDB Atlas',
-    version: '2.0.0',
+    version: '2.1.0',
     timestamp: new Date().toISOString(),
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
-      member: ['/api/member/me', '/api/member/apply-wallet'],
-      admin: ['/api/admin/overview'],
+      member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
+      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats'],
       payment: ['/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
+      referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
     }
   });
@@ -1409,6 +1435,662 @@ app.post('/api/admin/order/:orderId', auth('admin'), async (req, res) => {
   const result = await Order.updateOne({ order_id: req.params.orderId }, update);
   if (result.matchedCount === 0) return res.status(404).json({ error: 'Order not found' });
   res.json({ ok: true, message: 'Order updated' });
+});
+
+// ========================
+// SOCIAL TASKS APIs
+// ========================
+
+// Get current week's task + completion status
+app.get('/api/member/weekly-task', auth('member'), async (req, res) => {
+  try {
+    // Calculate current week (1-10 repeating cycle)
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const weekOfYear = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    const cycleWeek = ((weekOfYear - 1) % 10) + 1; // 1-10 repeating
+    const yearWeek = `${now.getFullYear()}-W${String(weekOfYear).padStart(2, '0')}`;
+
+    const task = await SocialTask.findOne({ week_number: cycleWeek, is_active: true }).lean();
+    if (!task) return res.json({ ok: true, task: null, message: 'इस हफ्ते कोई task नहीं है' });
+
+    // Check if user already completed this week
+    const completion = await TaskCompletion.findOne({ user_id: req.user.uid, year_week: yearWeek }).lean();
+
+    res.json({
+      ok: true,
+      task,
+      cycleWeek,
+      yearWeek,
+      completed: !!completion,
+      completion: completion || null
+    });
+  } catch (err) {
+    captureError(err, { context: 'weekly-task' });
+    res.status(500).json({ error: 'Failed to fetch weekly task' });
+  }
+});
+
+// Get all 10 tasks
+app.get('/api/member/all-tasks', auth('member'), async (req, res) => {
+  try {
+    const tasks = await SocialTask.find({ is_active: true }).sort({ week_number: 1 }).lean();
+    // Get user's completions
+    const completions = await TaskCompletion.find({ user_id: req.user.uid })
+      .sort({ completed_at: -1 }).lean();
+    res.json({ ok: true, tasks, completions });
+  } catch (err) {
+    captureError(err, { context: 'all-tasks' });
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+});
+
+// Complete a task (with photo upload)
+app.post('/api/member/complete-task', auth('member'), async (req, res) => {
+  try {
+    const { task_id, photo_url, latitude, longitude, location_address } = req.body;
+    if (!task_id || !photo_url) return res.status(400).json({ error: 'task_id और photo_url ज़रूरी है' });
+
+    const task = await SocialTask.findOne({ task_id, is_active: true });
+    if (!task) return res.status(404).json({ error: 'Task नहीं मिला' });
+
+    // Calculate year_week
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const weekOfYear = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    const yearWeek = `${now.getFullYear()}-W${String(weekOfYear).padStart(2, '0')}`;
+
+    // Check duplicate
+    const existing = await TaskCompletion.findOne({ user_id: req.user.uid, year_week: yearWeek });
+    if (existing) return res.status(400).json({ error: 'इस हफ्ते का task पहले ही पूरा हो चुका है!' });
+
+    const user = await User.findById(req.user.uid).select('member_id name avatar_url').lean();
+
+    // Create social post automatically
+    const post = await SocialPost.create({
+      user_id: req.user.uid,
+      member_id: user.member_id,
+      user_name: user.name,
+      user_avatar: user.avatar_url,
+      post_type: 'task_completion',
+      content: `✅ ${task.title} — ${task.description}`,
+      images: [photo_url],
+      location: { latitude, longitude, address: location_address },
+      is_auto_generated: true
+    });
+
+    // Create completion record
+    const completion = await TaskCompletion.create({
+      user_id: req.user.uid,
+      member_id: user.member_id,
+      task_id,
+      week_number: task.week_number,
+      year_week: yearWeek,
+      photo_url,
+      latitude,
+      longitude,
+      location_address,
+      points_earned: task.points_reward,
+      social_post_id: post._id
+    });
+
+    // Award points
+    await User.updateOne({ _id: req.user.uid }, {
+      $inc: {
+        'wallet.points_balance': task.points_reward,
+        'wallet.points_from_social_tasks': task.points_reward,
+        'wallet.total_points_earned': task.points_reward
+      },
+      'wallet.updated_at': new Date()
+    });
+
+    await PointsLedger.create({
+      user_id: req.user.uid,
+      points: task.points_reward,
+      type: 'social_task',
+      description: `${task.title} पूरा किया → ${task.points_reward} points`,
+      reference_id: completion._id
+    });
+
+    addBreadcrumb('social-task', 'Task completed', { memberId: user.member_id, taskId: task_id });
+    res.json({
+      ok: true,
+      points: task.points_reward,
+      message: `🎉 बधाई! Task पूरा हुआ — ${task.points_reward} points मिले!`,
+      completion,
+      post
+    });
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ error: 'इस हफ्ते का task पहले ही पूरा हो चुका है!' });
+    captureError(err, { context: 'complete-task' });
+    res.status(500).json({ error: 'Task पूरा करने में error: ' + err.message });
+  }
+});
+
+// Get task completion history
+app.get('/api/member/task-history', auth('member'), async (req, res) => {
+  try {
+    const completions = await TaskCompletion.find({ user_id: req.user.uid })
+      .sort({ completed_at: -1 }).limit(50).lean();
+    const totalPoints = completions.reduce((s, c) => s + (c.points_earned || 0), 0);
+    res.json({ ok: true, completions, totalTasks: completions.length, totalPoints });
+  } catch (err) {
+    captureError(err, { context: 'task-history' });
+    res.status(500).json({ error: 'History fetch failed' });
+  }
+});
+
+// ========================
+// SOCIAL POSTS / FEED APIs
+// ========================
+
+// Get social feed
+app.get('/api/member/feed', auth('member'), async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const posts = await SocialPost.find({ status: 'active' })
+      .sort({ created_at: -1 }).skip(skip).limit(limit).lean();
+
+    const total = await SocialPost.countDocuments({ status: 'active' });
+    res.json({ ok: true, posts, total, page, hasMore: skip + posts.length < total });
+  } catch (err) {
+    captureError(err, { context: 'social-feed' });
+    res.status(500).json({ error: 'Feed load failed' });
+  }
+});
+
+// Create a social post
+app.post('/api/member/create-post', auth('member'), async (req, res) => {
+  try {
+    const { content, images, post_type, location } = req.body;
+    if (!content) return res.status(400).json({ error: 'Post content required' });
+
+    const user = await User.findById(req.user.uid).select('member_id name avatar_url').lean();
+    const post = await SocialPost.create({
+      user_id: req.user.uid,
+      member_id: user.member_id,
+      user_name: user.name,
+      user_avatar: user.avatar_url,
+      post_type: post_type || 'other',
+      content,
+      images: images || [],
+      location: location || {}
+    });
+
+    res.json({ ok: true, post });
+  } catch (err) {
+    captureError(err, { context: 'create-post' });
+    res.status(500).json({ error: 'Post creation failed' });
+  }
+});
+
+// Like/unlike a post
+app.post('/api/member/like-post', auth('member'), async (req, res) => {
+  try {
+    const { postId } = req.body;
+    const post = await SocialPost.findById(postId);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    const userId = new mongoose.Types.ObjectId(req.user.uid);
+    const alreadyLiked = post.likes.some(id => id.equals(userId));
+
+    if (alreadyLiked) {
+      post.likes.pull(userId);
+      post.likes_count = Math.max(0, post.likes_count - 1);
+    } else {
+      post.likes.push(userId);
+      post.likes_count += 1;
+    }
+    await post.save();
+
+    res.json({ ok: true, liked: !alreadyLiked, likes_count: post.likes_count });
+  } catch (err) {
+    captureError(err, { context: 'like-post' });
+    res.status(500).json({ error: 'Like failed' });
+  }
+});
+
+// ========================
+// QUIZ / FUND RAISER APIs
+// ========================
+
+// Get active quizzes
+app.get('/api/member/active-quizzes', auth('member'), async (req, res) => {
+  try {
+    const quizzes = await Quiz.find({ status: { $in: ['upcoming', 'active'] } })
+      .sort({ start_date: 1 })
+      .select('-questions') // Don't send questions yet
+      .lean();
+
+    // Check user's participation for each quiz
+    const participations = await QuizParticipation.find({
+      user_id: req.user.uid,
+      quiz_ref: { $in: quizzes.map(q => q.quiz_id) }
+    }).lean();
+
+    const participationMap = {};
+    participations.forEach(p => { participationMap[p.quiz_ref] = p; });
+
+    const result = quizzes.map(q => ({
+      ...q,
+      enrolled: !!participationMap[q.quiz_id],
+      enrollment: participationMap[q.quiz_id] || null
+    }));
+
+    res.json({ ok: true, quizzes: result });
+  } catch (err) {
+    captureError(err, { context: 'active-quizzes' });
+    res.status(500).json({ error: 'Failed to fetch quizzes' });
+  }
+});
+
+// Enroll in quiz (after Razorpay payment)
+app.post('/api/member/quiz-enroll', auth('member'), async (req, res) => {
+  try {
+    const { quiz_id, razorpay_payment_id, razorpay_order_id, razorpay_signature, referred_by } = req.body;
+    if (!quiz_id || !razorpay_payment_id) return res.status(400).json({ error: 'Quiz ID and payment required' });
+
+    const quiz = await Quiz.findOne({ quiz_id, status: { $in: ['upcoming', 'active'] } });
+    if (!quiz) return res.status(404).json({ error: 'Quiz नहीं मिला या enrollment बंद है' });
+
+    // Verify payment signature
+    if (razorpay_order_id && razorpay_signature) {
+      const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+      const generated = crypto.createHmac('sha256', keySecret)
+        .update(razorpay_order_id + '|' + razorpay_payment_id).digest('hex');
+      if (generated !== razorpay_signature) {
+        return res.status(400).json({ error: 'Payment verification failed' });
+      }
+    }
+
+    // Check duplicate enrollment
+    const existing = await QuizParticipation.findOne({ quiz_id: quiz._id, user_id: req.user.uid });
+    if (existing) return res.status(400).json({ error: 'आप पहले ही enrolled हैं!', enrollment: existing.enrollment_number });
+
+    const user = await User.findById(req.user.uid).select('member_id name').lean();
+
+    // Generate enrollment number: FWF-{quizId}-{5 random digits}
+    const randomDigits = Math.floor(10000 + Math.random() * 90000);
+    const enrollmentNumber = `FWF-${quiz.quiz_id}-${randomDigits}`;
+
+    // Find referrer
+    let referrerId = null;
+    if (referred_by) {
+      const referrer = await User.findOne({ referral_code: referred_by }).select('_id').lean();
+      if (referrer) referrerId = referrer._id;
+    }
+
+    const participation = await QuizParticipation.create({
+      quiz_id: quiz._id,
+      quiz_ref: quiz.quiz_id,
+      user_id: req.user.uid,
+      member_id: user.member_id,
+      name: user.name,
+      enrollment_number: enrollmentNumber,
+      payment_id: razorpay_payment_id,
+      amount_paid: quiz.entry_fee,
+      referred_by: referred_by || null,
+      referrer_id: referrerId
+    });
+
+    // Update quiz stats
+    await Quiz.updateOne({ _id: quiz._id }, {
+      $inc: { total_participants: 1, total_collection: quiz.entry_fee }
+    });
+
+    // Award referral points if referred
+    if (referrerId) {
+      const refPoints = amountToPoints(quiz.entry_fee * (REFERRAL_POINTS_PERCENT / 100));
+      await User.updateOne({ _id: referrerId }, {
+        $inc: {
+          'wallet.points_balance': refPoints,
+          'wallet.points_from_referrals': refPoints,
+          'wallet.total_points_earned': refPoints
+        },
+        'wallet.updated_at': new Date()
+      });
+      await PointsLedger.create({
+        user_id: referrerId, points: refPoints, type: 'referral',
+        description: `Quiz referral — ${user.name} enrolled in ${quiz.title} → ${refPoints} points`
+      });
+      // Record referral click conversion
+      await ReferralClick.updateOne(
+        { referral_code: referred_by, converted: false },
+        { converted: true, converted_user_id: req.user.uid, conversion_type: 'quiz_enrollment', conversion_amount: quiz.entry_fee },
+        { sort: { created_at: -1 } }
+      );
+    }
+
+    // Award quiz participation points (10% of entry fee)
+    const quizPoints = amountToPoints(quiz.entry_fee * (QUIZ_TICKET_POINTS_PERCENT / 100));
+    if (quizPoints > 0) {
+      await User.updateOne({ _id: req.user.uid }, {
+        $inc: {
+          'wallet.points_balance': quizPoints,
+          'wallet.points_from_quiz': quizPoints,
+          'wallet.total_points_earned': quizPoints
+        },
+        'wallet.updated_at': new Date()
+      });
+      await PointsLedger.create({
+        user_id: req.user.uid, points: quizPoints, type: 'quiz',
+        description: `${quiz.title} enrollment → ${quizPoints} points`,
+        reference_id: participation._id
+      });
+    }
+
+    addBreadcrumb('quiz', 'Quiz enrollment', { memberId: user.member_id, quizId: quiz.quiz_id, enrollment: enrollmentNumber });
+    res.json({
+      ok: true,
+      enrollment_number: enrollmentNumber,
+      quiz_title: quiz.title,
+      points_earned: quizPoints,
+      message: `🎉 Enrollment successful! आपका नंबर: ${enrollmentNumber}`
+    });
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ error: 'आप पहले ही इस quiz में enrolled हैं!' });
+    captureError(err, { context: 'quiz-enroll' });
+    res.status(500).json({ error: 'Enrollment failed: ' + err.message });
+  }
+});
+
+// Get quiz questions (only if enrolled and quiz is active)
+app.get('/api/member/quiz-questions/:quizId', auth('member'), async (req, res) => {
+  try {
+    const quiz = await Quiz.findOne({ quiz_id: req.params.quizId, status: 'active' });
+    if (!quiz) return res.status(404).json({ error: 'Quiz active नहीं है' });
+
+    const participation = await QuizParticipation.findOne({ quiz_id: quiz._id, user_id: req.user.uid });
+    if (!participation) return res.status(403).json({ error: 'पहले enroll करें' });
+    if (participation.quiz_submitted) return res.status(400).json({ error: 'Quiz पहले ही submit हो चुका है' });
+
+    // Send questions without correct answers
+    const questions = quiz.questions.map(q => ({
+      q_no: q.q_no,
+      question: q.question,
+      options: q.options
+    }));
+
+    res.json({ ok: true, questions, quizTitle: quiz.title, enrollmentNumber: participation.enrollment_number });
+  } catch (err) {
+    captureError(err, { context: 'quiz-questions' });
+    res.status(500).json({ error: 'Failed to fetch questions' });
+  }
+});
+
+// Submit quiz answers
+app.post('/api/member/quiz-submit', auth('member'), async (req, res) => {
+  try {
+    const { quiz_id, answers } = req.body;
+    if (!quiz_id || !answers) return res.status(400).json({ error: 'quiz_id and answers required' });
+
+    const quiz = await Quiz.findOne({ quiz_id, status: 'active' });
+    if (!quiz) return res.status(404).json({ error: 'Quiz active नहीं है' });
+
+    const participation = await QuizParticipation.findOne({ quiz_id: quiz._id, user_id: req.user.uid });
+    if (!participation) return res.status(403).json({ error: 'पहले enroll करें' });
+    if (participation.quiz_submitted) return res.status(400).json({ error: 'Quiz पहले ही submit हो चुका है' });
+
+    // Score the answers
+    let score = 0;
+    const scoredAnswers = answers.map(ans => {
+      const q = quiz.questions.find(qq => qq.q_no === ans.q_no);
+      const isCorrect = q && q.correct_answer === ans.selected;
+      if (isCorrect) score += (q.points || 1);
+      return { q_no: ans.q_no, selected: ans.selected, is_correct: isCorrect };
+    });
+
+    participation.answers = scoredAnswers;
+    participation.score = score;
+    participation.quiz_submitted = true;
+    participation.submitted_at = new Date();
+    participation.status = 'submitted';
+    await participation.save();
+
+    res.json({
+      ok: true,
+      score,
+      totalQuestions: quiz.questions.length,
+      message: `Quiz submit हो गया! Score: ${score}/${quiz.questions.length}. Result ${quiz.result_date.toLocaleDateString('hi-IN')} को आएगा।`
+    });
+  } catch (err) {
+    captureError(err, { context: 'quiz-submit' });
+    res.status(500).json({ error: 'Quiz submit failed' });
+  }
+});
+
+// Quiz history for user
+app.get('/api/member/quiz-history', auth('member'), async (req, res) => {
+  try {
+    const participations = await QuizParticipation.find({ user_id: req.user.uid })
+      .sort({ created_at: -1 }).lean();
+
+    // Enrich with quiz details
+    for (const p of participations) {
+      const quiz = await Quiz.findById(p.quiz_id).select('title type entry_fee result_date status prizes').lean();
+      if (quiz) p.quiz_details = quiz;
+    }
+
+    res.json({ ok: true, participations });
+  } catch (err) {
+    captureError(err, { context: 'quiz-history' });
+    res.status(500).json({ error: 'History fetch failed' });
+  }
+});
+
+// Quiz results (after result_declared)
+app.get('/api/member/quiz-results/:quizId', auth('member'), async (req, res) => {
+  try {
+    const quiz = await Quiz.findOne({ quiz_id: req.params.quizId, status: 'result_declared' })
+      .select('quiz_id title type winners result_date prizes total_participants total_collection').lean();
+    if (!quiz) return res.status(404).json({ error: 'Results not declared yet' });
+
+    const myEntry = await QuizParticipation.findOne({
+      quiz_ref: req.params.quizId, user_id: req.user.uid
+    }).lean();
+
+    res.json({ ok: true, quiz, myEntry });
+  } catch (err) {
+    captureError(err, { context: 'quiz-results' });
+    res.status(500).json({ error: 'Results fetch failed' });
+  }
+});
+
+// ========================
+// REFERRAL TRACKING APIs
+// ========================
+
+// Track referral link click
+app.post('/api/referral/click', async (req, res) => {
+  try {
+    const { referral_code, link_type, quiz_id } = req.body;
+    if (!referral_code) return res.status(400).json({ error: 'Referral code required' });
+
+    const referrer = await User.findOne({ referral_code }).select('_id').lean();
+    if (!referrer) return res.status(404).json({ error: 'Invalid referral code' });
+
+    await ReferralClick.create({
+      referrer_id: referrer._id,
+      referral_code,
+      link_type: link_type || 'general',
+      quiz_id: quiz_id || null,
+      ip_address: req.ip || req.headers['x-forwarded-for'],
+      user_agent: req.headers['user-agent']
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Click tracking failed' });
+  }
+});
+
+// Get affiliate/referral dashboard data
+app.get('/api/member/affiliate', auth('member'), async (req, res) => {
+  try {
+    const user = await User.findById(req.user.uid).select('referral_code member_id').lean();
+
+    // Click stats
+    const clickStats = await ReferralClick.aggregate([
+      { $match: { referral_code: user.referral_code } },
+      { $group: {
+        _id: null,
+        totalClicks: { $sum: 1 },
+        conversions: { $sum: { $cond: ['$converted', 1, 0] } },
+        quizClicks: { $sum: { $cond: [{ $eq: ['$link_type', 'quiz'] }, 1, 0] } },
+        joinClicks: { $sum: { $cond: [{ $eq: ['$link_type', 'join'] }, 1, 0] } },
+        totalRevenue: { $sum: '$conversion_amount' }
+      }}
+    ]);
+
+    // Referral history
+    const referrals = await Referral.find({ referrer_id: req.user.uid })
+      .sort({ created_at: -1 }).lean();
+    for (const r of referrals) {
+      const referred = await User.findById(r.referred_user_id).select('name member_id').lean();
+      if (referred) { r.referred_name = referred.name; r.referred_member_id = referred.member_id; }
+    }
+
+    // Quiz referral earnings
+    const quizRefEarnings = await PointsLedger.find({
+      user_id: req.user.uid, type: 'referral',
+      description: /Quiz referral/i
+    }).sort({ created_at: -1 }).lean();
+
+    // Recent clicks
+    const recentClicks = await ReferralClick.find({ referral_code: user.referral_code })
+      .sort({ created_at: -1 }).limit(20)
+      .select('link_type converted conversion_type conversion_amount created_at').lean();
+
+    res.json({
+      ok: true,
+      referralCode: user.referral_code,
+      memberId: user.member_id,
+      stats: clickStats[0] || { totalClicks: 0, conversions: 0, quizClicks: 0, joinClicks: 0, totalRevenue: 0 },
+      referrals,
+      quizRefEarnings,
+      recentClicks
+    });
+  } catch (err) {
+    captureError(err, { context: 'affiliate-dashboard' });
+    res.status(500).json({ error: 'Affiliate data fetch failed' });
+  }
+});
+
+// ========================
+// ADMIN QUIZ MANAGEMENT
+// ========================
+
+// Admin: create quiz
+app.post('/api/admin/create-quiz', auth('admin'), async (req, res) => {
+  try {
+    const { quiz_id, title, description, type, entry_fee, questions, start_date, end_date, result_date, prizes } = req.body;
+    if (!quiz_id || !title || !type || !entry_fee) return res.status(400).json({ error: 'Required fields missing' });
+
+    const quiz = await Quiz.create({
+      quiz_id, title, description, type, entry_fee,
+      questions: questions || [],
+      start_date: new Date(start_date),
+      end_date: new Date(end_date),
+      result_date: new Date(result_date),
+      prizes: prizes || {},
+      status: new Date(start_date) <= new Date() ? 'active' : 'upcoming'
+    });
+
+    res.json({ ok: true, quiz });
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ error: 'Quiz ID already exists' });
+    captureError(err, { context: 'admin-create-quiz' });
+    res.status(500).json({ error: 'Quiz creation failed' });
+  }
+});
+
+// Admin: declare quiz results (lucky draw)
+app.post('/api/admin/quiz-draw/:quizId', auth('admin'), async (req, res) => {
+  try {
+    const quiz = await Quiz.findOne({ quiz_id: req.params.quizId });
+    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+    if (quiz.status === 'result_declared') return res.status(400).json({ error: 'Results already declared' });
+
+    // Get all participants who submitted
+    const participants = await QuizParticipation.find({ quiz_id: quiz._id, quiz_submitted: true })
+      .sort({ score: -1 }).lean();
+
+    if (participants.length === 0) return res.status(400).json({ error: 'No submissions yet' });
+
+    // Pick winners (top 3 by score, tie-break random)
+    const winners = [];
+    const prizes = [quiz.prizes.first || 0, quiz.prizes.second || 0, quiz.prizes.third || 0];
+
+    for (let i = 0; i < Math.min(3, participants.length); i++) {
+      const winner = participants[i];
+      winners.push({
+        rank: i + 1,
+        user_id: winner.user_id,
+        member_id: winner.member_id,
+        name: winner.name,
+        enrollment_number: winner.enrollment_number,
+        prize_amount: prizes[i],
+        score: winner.score
+      });
+
+      // Update participation status
+      await QuizParticipation.updateOne({ _id: winner._id }, { status: 'won', prize_won: prizes[i] });
+
+      // Credit prize to wallet
+      if (prizes[i] > 0) {
+        await User.updateOne({ _id: winner.user_id }, {
+          $inc: { 'wallet.balance_inr': prizes[i], 'wallet.lifetime_earned_inr': prizes[i] },
+          'wallet.updated_at': new Date()
+        });
+      }
+    }
+
+    // Mark others as lost
+    const winnerIds = winners.map(w => w.user_id);
+    await QuizParticipation.updateMany(
+      { quiz_id: quiz._id, user_id: { $nin: winnerIds }, quiz_submitted: true },
+      { status: 'lost' }
+    );
+
+    quiz.winners = winners;
+    quiz.status = 'result_declared';
+    await quiz.save();
+
+    res.json({ ok: true, winners, totalParticipants: participants.length });
+  } catch (err) {
+    captureError(err, { context: 'admin-quiz-draw' });
+    res.status(500).json({ error: 'Draw failed: ' + err.message });
+  }
+});
+
+// Admin: get all quizzes
+app.get('/api/admin/quizzes', auth('admin'), async (req, res) => {
+  try {
+    const quizzes = await Quiz.find().sort({ created_at: -1 }).lean();
+    res.json({ ok: true, quizzes });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch quizzes' });
+  }
+});
+
+// Admin: get social task stats
+app.get('/api/admin/social-stats', auth('admin'), async (req, res) => {
+  try {
+    const totalCompletions = await TaskCompletion.countDocuments();
+    const thisWeek = await TaskCompletion.countDocuments({
+      completed_at: { $gte: new Date(Date.now() - 7 * 86400000) }
+    });
+    const activeMembers = await TaskCompletion.distinct('user_id');
+    const recentCompletions = await TaskCompletion.find()
+      .sort({ completed_at: -1 }).limit(20).lean();
+
+    res.json({ ok: true, totalCompletions, thisWeek, activeMembers: activeMembers.length, recentCompletions });
+  } catch (err) {
+    res.status(500).json({ error: 'Stats fetch failed' });
+  }
 });
 
 // Sentry error handler

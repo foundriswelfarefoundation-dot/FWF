@@ -1383,9 +1383,89 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===================== REDEEM POINTS MODAL ===================== -->
+    <!-- ==================== SECTION 4: AFFILIATE / REFERRAL TRACKING ==================== -->
+    <div class="wallet-single-section" style="margin-bottom:24px">
+      <h3 class="wallet-section-header"><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> Affiliate Dashboard</h3>
+      <div class="app-tab-divider"></div>
+
+      <div style="padding:18px 20px 20px">
+        <!-- Affiliate Stats -->
+        <div class="stats-row" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="s-icon s-purple"><i class="fa-solid fa-mouse-pointer"></i></div>
+            <div class="s-label">Total Clicks</div>
+            <div class="s-value" id="affTotalClicks">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+            <div class="s-label">Conversions</div>
+            <div class="s-value" id="affConversions">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-icon s-blue"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="s-label">Quiz Referrals</div>
+            <div class="s-value" id="affQuizClicks">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-icon s-amber"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="s-label">Revenue Generated</div>
+            <div class="s-value" id="affRevenue">₹0</div>
+          </div>
+        </div>
+
+        <!-- Referral Links -->
+        <div class="content-card" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #c4b5fd">
+          <h4 style="margin-bottom:8px;font-size:14px;font-weight:800;color:#5b21b6"><i class="fa-solid fa-link"></i> अपना Referral Link Share करें</h4>
+          <div class="form-group" style="margin-bottom:8px">
+            <label style="font-size:12px;color:#7c3aed">Join Referral Link</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="form-input" id="affJoinLink" readonly style="font-size:11px;background:#fff">
+              <button class="btn btn-sm" onclick="copyAffLink('affJoinLink')" style="background:#7c3aed;color:#fff;white-space:nowrap"><i class="fa-solid fa-copy"></i></button>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label style="font-size:12px;color:#7c3aed">Quiz Referral Link</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="form-input" id="affQuizLink" readonly style="font-size:11px;background:#fff">
+              <button class="btn btn-sm" onclick="copyAffLink('affQuizLink')" style="background:#7c3aed;color:#fff;white-space:nowrap"><i class="fa-solid fa-copy"></i></button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-sm" onclick="shareAffLink('whatsapp')" style="background:#25d366;color:#fff;flex:1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+            <button class="btn btn-sm" onclick="shareAffLink('telegram')" style="background:#0088cc;color:#fff;flex:1"><i class="fa-brands fa-telegram"></i> Telegram</button>
+            <button class="btn btn-sm" onclick="shareAffLink('copy')" style="background:#6366f1;color:#fff;flex:1"><i class="fa-solid fa-share"></i> Share</button>
+          </div>
+        </div>
+
+        <!-- Quiz Referral Earnings -->
+        <div class="content-card" style="margin-top:12px">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-coins"></i> Quiz Referral Earnings</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Description</th><th>Points</th><th>Date</th></tr></thead>
+              <tbody id="affQuizEarningsBody">
+                <tr><td colspan="3" class="empty-state"><p>No quiz referral earnings yet</p></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Click Activity -->
+        <div class="content-card" style="margin-top:12px">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-clock-rotate-left"></i> Recent Click Activity</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Type</th><th>Converted</th><th>Amount</th><th>Date</th></tr></thead>
+              <tbody id="affRecentClicksBody">
+                <tr><td colspan="4" class="empty-state"><p>No click activity yet</p></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal" id="redeemModal">
     <div class="modal-content" style="max-width:600px">
       <div class="modal-header">
@@ -1559,90 +1639,106 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <!-- ===================== EVENTS & ACTIVITIES ===================== -->
   <div class="page" id="page-events">
     <div class="tab-bar">
-      <button class="tab-btn active" data-tab="upcoming-events">Upcoming Events</button>
-      <button class="tab-btn" data-tab="volunteer-tab">Volunteer</button>
-      <button class="tab-btn" data-tab="my-events">My Registrations</button>
+      <button class="tab-btn active" data-tab="social-tasks-tab">📋 सामाजिक कार्य</button>
+      <button class="tab-btn" data-tab="fundraiser-tab">🎯 Fund Raiser Quiz</button>
+      <button class="tab-btn" data-tab="my-activities-tab">📊 मेरी गतिविधि</button>
     </div>
 
-    <div class="tab-content active" id="upcoming-events">
-      <div class="event-card">
-        <div class="event-date">
-          <div class="day">15</div>
-          <div class="month">Mar</div>
+    <!-- SOCIAL TASKS TAB -->
+    <div class="tab-content active" id="social-tasks-tab">
+      <div class="content-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac">
+        <h3 style="color:#166534;margin-bottom:4px"><i class="fa-solid fa-heart"></i> इस हफ्ते का सामाजिक कार्य</h3>
+        <p style="color:#15803d;font-size:13px;margin-bottom:12px">हर हफ्ते एक नया task — फोटो लें, Social Book पर share करें, 10 points कमाएं!</p>
+        <div id="weeklyTaskContainer">
+          <div class="skeleton-loader" style="height:120px;border-radius:12px"></div>
         </div>
-        <div class="event-info" style="flex:1">
-          <h4>Women's Day Skill Festival</h4>
-          <p><i class="fa-solid fa-location-dot"></i> Community Center, Kanpur &bull; 10:00 AM</p>
-        </div>
-        <button class="btn btn-primary btn-sm">Register</button>
       </div>
-      <div class="event-card">
-        <div class="event-date" style="background:linear-gradient(135deg,#22c55e,#059669)">
-          <div class="day">22</div>
-          <div class="month">Mar</div>
+
+      <div class="content-card" style="margin-top:12px">
+        <h3><i class="fa-solid fa-list-check"></i> सभी 10 सामाजिक कार्य</h3>
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">10 हफ्ते, 10 कार्य — cycle repeat होता है</p>
+        <div id="allTasksList">
+          <div class="skeleton-loader" style="height:300px;border-radius:12px"></div>
         </div>
-        <div class="event-info" style="flex:1">
-          <h4>Tree Plantation Drive</h4>
-          <p><i class="fa-solid fa-location-dot"></i> City Park, Lucknow &bull; 7:00 AM</p>
-        </div>
-        <button class="btn btn-primary btn-sm">Register</button>
-      </div>
-      <div class="event-card">
-        <div class="event-date" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-          <div class="day">05</div>
-          <div class="month">Apr</div>
-        </div>
-        <div class="event-info" style="flex:1">
-          <h4>Handicraft Exhibition & Sale</h4>
-          <p><i class="fa-solid fa-location-dot"></i> Town Hall, Varanasi &bull; 11:00 AM</p>
-        </div>
-        <button class="btn btn-primary btn-sm">Register</button>
-      </div>
-      <div class="event-card">
-        <div class="event-date" style="background:linear-gradient(135deg,#ec4899,#be185d)">
-          <div class="day">12</div>
-          <div class="month">Apr</div>
-        </div>
-        <div class="event-info" style="flex:1">
-          <h4>Free Health Camp for Women</h4>
-          <p><i class="fa-solid fa-location-dot"></i> PHC Center, Kanpur &bull; 9:00 AM</p>
-        </div>
-        <button class="btn btn-primary btn-sm">Register</button>
       </div>
     </div>
 
-    <div class="tab-content" id="volunteer-tab">
-      <div class="content-card">
-        <h3><i class="fa-solid fa-hands-helping"></i> Volunteer Opportunities</h3>
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Join as a volunteer and earn extra reward points!</p>
-        <div class="grid-2">
-          <div class="event-card" style="margin-bottom:0">
-            <div class="event-date" style="background:linear-gradient(135deg,#06b6d4,#0891b2);width:44px;height:44px">
-              <div class="day" style="font-size:16px"><i class="fa-solid fa-chalkboard-teacher"></i></div>
-            </div>
-            <div class="event-info">
-              <h4>Teaching Assistant</h4>
-              <p>Help in skill training camps</p>
-            </div>
-          </div>
-          <div class="event-card" style="margin-bottom:0">
-            <div class="event-date" style="background:linear-gradient(135deg,#14b8a6,#0d9488);width:44px;height:44px">
-              <div class="day" style="font-size:16px"><i class="fa-solid fa-hands-holding-child"></i></div>
-            </div>
-            <div class="event-info">
-              <h4>Community Outreach</h4>
-              <p>Door-to-door awareness programs</p>
-            </div>
+    <!-- FUNDRAISER QUIZ TAB -->
+    <div class="tab-content" id="fundraiser-tab">
+      <div class="content-card" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd">
+        <h3 style="color:#1e40af;margin-bottom:4px"><i class="fa-solid fa-trophy"></i> Fund Raiser Quiz — जीतें इनाम!</h3>
+        <p style="color:#1d4ed8;font-size:13px;margin-bottom:6px">Quiz में हिस्सा लें, FWF का mission support करें, और इनाम जीतें!</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <span class="badge" style="background:#dbeafe;color:#1d4ed8;padding:4px 10px;border-radius:20px;font-size:12px">🗓️ Monthly ₹100</span>
+          <span class="badge" style="background:#e0e7ff;color:#4338ca;padding:4px 10px;border-radius:20px;font-size:12px">📅 Half-Yearly ₹500</span>
+          <span class="badge" style="background:#fce7f3;color:#be185d;padding:4px 10px;border-radius:20px;font-size:12px">🎯 Yearly ₹1000</span>
+        </div>
+      </div>
+
+      <div id="activeQuizzesList" style="margin-top:12px">
+        <div class="skeleton-loader" style="height:200px;border-radius:12px"></div>
+      </div>
+
+      <div class="content-card" style="margin-top:12px">
+        <h3><i class="fa-solid fa-share-nodes"></i> अपने दोस्तों को Refer करें</h3>
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">हर quiz enrollment referral पर 50% commission points मिलेंगे!</p>
+        <div class="form-group" style="margin-bottom:8px">
+          <label>आपका Referral Link</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="quizReferralLink" readonly style="font-size:12px">
+            <button class="btn btn-primary btn-sm" onclick="copyQuizReferralLink()" style="white-space:nowrap"><i class="fa-solid fa-copy"></i> Copy</button>
           </div>
         </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-sm" onclick="shareQuizReferral('whatsapp')" style="background:#25d366;color:#fff;flex:1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+          <button class="btn btn-sm" onclick="shareQuizReferral('telegram')" style="background:#0088cc;color:#fff;flex:1"><i class="fa-brands fa-telegram"></i> Telegram</button>
+        </div>
       </div>
     </div>
 
-    <div class="tab-content" id="my-events">
+    <!-- MY ACTIVITIES TAB -->
+    <div class="tab-content" id="my-activities-tab">
       <div class="content-card">
-        <div class="empty-state">
-          <i class="fa-solid fa-calendar-check"></i>
-          <p>No event registrations yet</p>
+        <h3><i class="fa-solid fa-chart-line"></i> मेरी गतिविधि Summary</h3>
+        <div class="grid-2" style="gap:10px;margin-top:12px">
+          <div class="stat-mini" style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:#166534" id="myTasksCompleted">0</div>
+            <div style="font-size:11px;color:#15803d">Tasks पूरे किए</div>
+          </div>
+          <div class="stat-mini" style="background:#eff6ff;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:#1e40af" id="myTaskPoints">0</div>
+            <div style="font-size:11px;color:#1d4ed8">Task Points</div>
+          </div>
+          <div class="stat-mini" style="background:#fef3c7;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:#92400e" id="myQuizCount">0</div>
+            <div style="font-size:11px;color:#b45309">Quiz Participated</div>
+          </div>
+          <div class="stat-mini" style="background:#fce7f3;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;font-weight:700;color:#be185d" id="myQuizWins">0</div>
+            <div style="font-size:11px;color:#db2777">Quiz Wins</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task History -->
+      <div class="content-card" style="margin-top:12px">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> Task History</h3>
+        <div id="taskHistoryList">
+          <div class="empty-state">
+            <i class="fa-solid fa-leaf"></i>
+            <p>अभी तक कोई task पूरा नहीं किया</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz History -->
+      <div class="content-card" style="margin-top:12px">
+        <h3><i class="fa-solid fa-scroll"></i> Quiz History</h3>
+        <div id="quizHistoryList">
+          <div class="empty-state">
+            <i class="fa-solid fa-question-circle"></i>
+            <p>अभी तक किसी quiz में हिस्सा नहीं लिया</p>
+          </div>
         </div>
       </div>
     </div>
@@ -2146,6 +2242,7 @@ function switchPage(page){
   if(page === 'profile') loadProfile();
   if(page === 'marketplace') loadMarketProducts();
   if(page === 'seller') loadSellerData();
+  if(page === 'events') loadEventsPage();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -3618,6 +3715,463 @@ async function submitPost(){
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
   }
 }
+
+/* ============================================
+   EVENTS & ACTIVITIES — SOCIAL TASKS + QUIZ
+   ============================================ */
+let eventsLoaded = false;
+
+async function loadEventsPage(){
+  if(eventsLoaded) return;
+  eventsLoaded = true;
+  try {
+    await Promise.all([loadWeeklyTask(), loadAllTasks(), loadActiveQuizzes(), loadMyActivities()]);
+    setupQuizReferralLinks();
+  } catch(e){ console.error('Events load err:', e); }
+}
+
+// --- WEEKLY TASK ---
+async function loadWeeklyTask(){
+  try {
+    const data = await AUTH.api('/api/member/weekly-task');
+    const container = document.getElementById('weeklyTaskContainer');
+    if(!data.ok || !data.task){
+      container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-check-circle" style="color:var(--success)"></i><p>इस हफ्ते कोई task नहीं है</p></div>';
+      return;
+    }
+    const t = data.task;
+    const completed = data.completed;
+    container.innerHTML = `
+      <div style="background:#fff;border-radius:14px;padding:16px;border:1px solid ${completed?'#86efac':'#fde68a'}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:48px;height:48px;border-radius:50%;background:${completed?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#f59e0b,#d97706)'};display:flex;align-items:center;justify-content:center;font-size:24px">${t.icon}</div>
+          <div style="flex:1">
+            <h4 style="margin:0;font-size:15px;font-weight:800">${t.title}</h4>
+            <p style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">Week ${data.cycleWeek} of 10 • ${t.points_reward} Points</p>
+          </div>
+          ${completed ? '<span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">✅ पूरा हुआ</span>' : ''}
+        </div>
+        <p style="font-size:13px;color:#374151;margin-bottom:8px">${t.description}</p>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:12px">📷 ${t.photo_instruction}</p>
+        ${completed ? `<p style="font-size:12px;color:#16a34a;font-weight:700">🎉 इस हफ्ते का task पूरा! अगले हफ्ते नया task आएगा।</p>` : `
+        <div style="border-top:1px solid #e5e7eb;padding-top:12px">
+          <div class="form-group" style="margin-bottom:8px">
+            <label style="font-size:12px">फोटो अपलोड करें</label>
+            <input type="file" accept="image/*" capture="environment" class="form-input" id="taskPhotoInput" onchange="previewTaskPhoto(this)" style="font-size:12px">
+          </div>
+          <div id="taskPhotoPreview" style="display:none;margin-bottom:8px">
+            <img id="taskPreviewImg" style="max-width:100%;max-height:200px;border-radius:10px;border:2px solid #86efac">
+          </div>
+          <button class="btn btn-success" onclick="submitTaskCompletion('${t.task_id}')" id="submitTaskBtn" style="width:100%">
+            <i class="fa-solid fa-check"></i> Task पूरा करें — ${t.points_reward} Points कमाएं!
+          </button>
+        </div>`}
+      </div>`;
+  } catch(e){
+    document.getElementById('weeklyTaskContainer').innerHTML = '<p style="color:var(--danger);font-size:13px">Task load करने में error हुआ</p>';
+  }
+}
+
+function previewTaskPhoto(input){
+  if(input.files && input.files[0]){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('taskPreviewImg').src = e.target.result;
+      document.getElementById('taskPhotoPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function submitTaskCompletion(taskId){
+  const fileInput = document.getElementById('taskPhotoInput');
+  if(!fileInput.files || !fileInput.files[0]){
+    notify('कृपया फोटो अपलोड करें','error');
+    return;
+  }
+  const btn = document.getElementById('submitTaskBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submit हो रहा है...';
+
+  try {
+    // Convert image to base64
+    const reader = new FileReader();
+    const photoUrl = await new Promise((resolve, reject) => {
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(fileInput.files[0]);
+    });
+
+    // Try to get location
+    let latitude = null, longitude = null, location_address = '';
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+      });
+      latitude = pos.coords.latitude;
+      longitude = pos.coords.longitude;
+    } catch(e){ /* location optional */ }
+
+    const res = await AUTH.api('/api/member/complete-task', {
+      method: 'POST',
+      body: JSON.stringify({ task_id: taskId, photo_url: photoUrl, latitude, longitude, location_address })
+    });
+
+    if(res.ok){
+      notify(res.message || '🎉 Task पूरा हुआ!', 'success');
+      eventsLoaded = false;
+      loadEventsPage();
+      // Refresh wallet data too
+      memberData = null;
+    } else {
+      notify(res.error || 'Error', 'error');
+    }
+  } catch(e){
+    notify(e.message || 'Task submit failed', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Task पूरा करें';
+  }
+}
+
+// --- ALL TASKS LIST ---
+async function loadAllTasks(){
+  try {
+    const data = await AUTH.api('/api/member/all-tasks');
+    const container = document.getElementById('allTasksList');
+    if(!data.ok || !data.tasks?.length){
+      container.innerHTML = '<p style="color:var(--text-muted);font-size:13px">कोई task उपलब्ध नहीं</p>';
+      return;
+    }
+    const completedWeeks = new Set(data.completions?.map(c=>c.week_number) || []);
+    container.innerHTML = data.tasks.map(t => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:${completedWeeks.has(t.week_number)?'#f0fdf4':'var(--bg-1)'};margin-bottom:6px;border:1px solid ${completedWeeks.has(t.week_number)?'#bbf7d0':'transparent'}">
+        <div style="width:36px;height:36px;border-radius:50%;background:${completedWeeks.has(t.week_number)?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#e5e7eb,#d1d5db)'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${t.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700">${t.title}</div>
+          <div style="font-size:11px;color:var(--text-muted)">Week ${t.week_number} • ${t.points_reward} pts</div>
+        </div>
+        ${completedWeeks.has(t.week_number)?'<span style="color:#16a34a;font-size:13px;font-weight:700">✅</span>':'<span style="color:#9ca3af;font-size:12px">⏳</span>'}
+      </div>
+    `).join('');
+  } catch(e){
+    document.getElementById('allTasksList').innerHTML = '<p style="color:var(--danger);font-size:13px">Tasks load error</p>';
+  }
+}
+
+// --- QUIZ SYSTEM ---
+async function loadActiveQuizzes(){
+  try {
+    const data = await AUTH.api('/api/member/active-quizzes');
+    const container = document.getElementById('activeQuizzesList');
+    if(!data.ok || !data.quizzes?.length){
+      container.innerHTML = '<div class="content-card"><div class="empty-state"><i class="fa-solid fa-trophy"></i><p>अभी कोई quiz available नहीं है।<br>जल्दी ही नए quiz आएंगे!</p></div></div>';
+      return;
+    }
+    container.innerHTML = data.quizzes.map(q => {
+      const typeColors = { monthly:'#3b82f6', half_yearly:'#8b5cf6', yearly:'#ec4899' };
+      const typeLabels = { monthly:'Monthly', half_yearly:'Half-Yearly', yearly:'Yearly' };
+      const bgColor = typeColors[q.type] || '#3b82f6';
+      const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN');
+      const endDate = new Date(q.end_date).toLocaleDateString('hi-IN');
+      return `
+        <div class="content-card" style="border-left:4px solid ${bgColor};margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+            <div>
+              <h4 style="margin:0 0 4px;font-size:15px;font-weight:800">${q.title}</h4>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                <span style="background:${bgColor}22;color:${bgColor};padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">${typeLabels[q.type]}</span>
+                <span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">₹${q.entry_fee} Entry</span>
+                <span style="background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">${q.total_participants || 0} Participants</span>
+              </div>
+              ${q.description ? `<p style="font-size:12px;color:var(--text-muted);margin-bottom:6px">${q.description}</p>` : ''}
+              <p style="font-size:11px;color:var(--text-muted)">📅 Last Date: ${endDate} • 🏆 Result: ${resultDate}</p>
+            </div>
+            <div style="text-align:right">
+              ${q.enrolled ? `
+                <div style="background:#dcfce7;color:#166534;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:4px">
+                  ✅ Enrolled<br><span style="font-size:10px">${q.enrollment?.enrollment_number || ''}</span>
+                </div>
+                ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ? `<button class="btn btn-sm btn-primary" onclick="openQuizPlay('${q.quiz_id}')"><i class="fa-solid fa-play"></i> Play Quiz</button>` : ''}
+                ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:var(--success);font-weight:700">Quiz Submitted ✅</span>' : ''}
+              ` : `
+                <button class="btn btn-primary btn-sm" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})">
+                  <i class="fa-solid fa-ticket"></i> Enroll ₹${q.entry_fee}
+                </button>
+              `}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e){
+    document.getElementById('activeQuizzesList').innerHTML = '<p style="color:var(--danger);font-size:13px">Quizzes load error</p>';
+  }
+}
+
+async function enrollInQuiz(quizId, title, fee){
+  if(!confirm(`"${title}" में enroll करें?\nEntry Fee: ₹${fee}\n\nPayment proceed करें?`)) return;
+
+  try {
+    // Create Razorpay order
+    const orderRes = await AUTH.api('/api/pay/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount: fee, receipt: `quiz_${quizId}_${Date.now()}`, notes: { type: 'quiz', quizId } })
+    });
+    if(!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
+
+    // Open Razorpay
+    const options = {
+      key: orderRes.key,
+      amount: orderRes.order.amount,
+      currency: 'INR',
+      name: 'FWF Fund Raiser Quiz',
+      description: title,
+      order_id: orderRes.order.id,
+      handler: async function(response){
+        try {
+          // Get referral code from URL if any
+          const urlParams = new URLSearchParams(window.location.search);
+          const referred_by = urlParams.get('ref') || '';
+
+          const enrollRes = await AUTH.api('/api/member/quiz-enroll', {
+            method: 'POST',
+            body: JSON.stringify({
+              quiz_id: quizId,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              referred_by
+            })
+          });
+          if(enrollRes.ok){
+            notify(enrollRes.message || '🎉 Enrollment successful!', 'success');
+            eventsLoaded = false;
+            loadEventsPage();
+            memberData = null;
+          } else {
+            notify(enrollRes.error || 'Enrollment failed', 'error');
+          }
+        } catch(e){ notify('Enrollment error: ' + e.message, 'error'); }
+      },
+      prefill: {
+        name: memberData?.user?.name || '',
+        contact: memberData?.user?.mobile || '',
+        email: memberData?.user?.email || ''
+      },
+      theme: { color: '#6366f1' }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  } catch(e){
+    notify(e.message || 'Payment failed', 'error');
+  }
+}
+
+async function openQuizPlay(quizId){
+  try {
+    const data = await AUTH.api(`/api/member/quiz-questions/${quizId}`);
+    if(!data.ok){ notify(data.error || 'Quiz load failed','error'); return; }
+
+    const questions = data.questions;
+    let currentQ = 0;
+    const answers = [];
+
+    // Build quiz modal
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.id = 'quizPlayModal';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto">
+        <div class="modal-header" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff">
+          <h3 style="color:#fff"><i class="fa-solid fa-gamepad"></i> ${data.quizTitle}</h3>
+          <span style="font-size:12px;opacity:.8">Enrollment: ${data.enrollmentNumber}</span>
+        </div>
+        <div class="modal-body" id="quizPlayBody"></div>
+        <div class="modal-actions" id="quizPlayActions"></div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    function renderQuestion(){
+      const q = questions[currentQ];
+      document.getElementById('quizPlayBody').innerHTML = `
+        <div style="text-align:center;margin-bottom:12px">
+          <span style="background:#eff6ff;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">
+            Question ${currentQ+1} of ${questions.length}
+          </span>
+        </div>
+        <h4 style="font-size:15px;margin-bottom:16px;line-height:1.5">${q.question}</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${q.options.map((opt,i) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:2px solid ${answers[currentQ]===i?'#6366f1':'#e5e7eb'};cursor:pointer;transition:all .2s;background:${answers[currentQ]===i?'#eff6ff':'#fff'}" onclick="selectQuizAnswer(${currentQ},${i})">
+              <input type="radio" name="q${currentQ}" value="${i}" ${answers[currentQ]===i?'checked':''} style="accent-color:#6366f1">
+              <span style="font-size:14px">${opt}</span>
+            </label>
+          `).join('')}
+        </div>`;
+      document.getElementById('quizPlayActions').innerHTML = `
+        ${currentQ > 0 ? `<button class="btn btn-ghost" onclick="quizPrev()"><i class="fa-solid fa-arrow-left"></i> Previous</button>` : '<span></span>'}
+        ${currentQ < questions.length-1 ? 
+          `<button class="btn btn-primary" onclick="quizNext()">Next <i class="fa-solid fa-arrow-right"></i></button>` :
+          `<button class="btn btn-success" onclick="submitQuizAnswers('${quizId}')"><i class="fa-solid fa-paper-plane"></i> Submit Quiz</button>`}`;
+    }
+
+    window.selectQuizAnswer = (qi, ai) => { answers[qi] = ai; renderQuestion(); };
+    window.quizPrev = () => { if(currentQ > 0){ currentQ--; renderQuestion(); } };
+    window.quizNext = () => { if(currentQ < questions.length-1){ currentQ++; renderQuestion(); } };
+    window.submitQuizAnswers = async (qId) => {
+      const unanswered = questions.filter((_,i) => answers[i] === undefined).length;
+      if(unanswered > 0 && !confirm(`${unanswered} questions unanswered! Submit anyway?`)) return;
+      try {
+        const formattedAnswers = questions.map((q,i) => ({ q_no: q.q_no, selected: answers[i] ?? -1 }));
+        const res = await AUTH.api('/api/member/quiz-submit', {
+          method: 'POST',
+          body: JSON.stringify({ quiz_id: qId, answers: formattedAnswers })
+        });
+        if(res.ok){
+          notify(res.message || 'Quiz submitted!', 'success');
+          document.getElementById('quizPlayModal').remove();
+          eventsLoaded = false;
+          loadEventsPage();
+        } else { notify(res.error, 'error'); }
+      } catch(e){ notify('Submit failed','error'); }
+    };
+
+    renderQuestion();
+  } catch(e){ notify(e.message || 'Quiz load failed','error'); }
+}
+
+// --- MY ACTIVITIES ---
+async function loadMyActivities(){
+  try {
+    const [taskRes, quizRes] = await Promise.all([
+      AUTH.api('/api/member/task-history'),
+      AUTH.api('/api/member/quiz-history')
+    ]);
+
+    // Stats
+    document.getElementById('myTasksCompleted').textContent = taskRes.totalTasks || 0;
+    document.getElementById('myTaskPoints').textContent = taskRes.totalPoints || 0;
+    document.getElementById('myQuizCount').textContent = quizRes.participations?.length || 0;
+    document.getElementById('myQuizWins').textContent = quizRes.participations?.filter(p => p.status === 'won').length || 0;
+
+    // Task history
+    const taskList = document.getElementById('taskHistoryList');
+    if(taskRes.completions?.length){
+      taskList.innerHTML = taskRes.completions.map(c => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--bg-1);margin-bottom:6px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0">✅</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700">Task #${c.week_number}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${fmtDate(c.completed_at)} • +${c.points_earned} pts</div>
+          </div>
+          ${c.photo_url ? `<img src="${c.photo_url}" style="width:36px;height:36px;border-radius:6px;object-fit:cover" onclick="window.open(this.src)">` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Quiz history
+    const quizList = document.getElementById('quizHistoryList');
+    if(quizRes.participations?.length){
+      quizList.innerHTML = quizRes.participations.map(p => {
+        const statusColors = { enrolled:'#3b82f6', submitted:'#f59e0b', won:'#22c55e', lost:'#ef4444' };
+        const statusLabels = { enrolled:'Enrolled', submitted:'Submitted', won:'🏆 Won', lost:'Result Out' };
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:var(--bg-1);margin-bottom:6px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,${statusColors[p.status]||'#6b7280'},${statusColors[p.status]||'#4b5563'});display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0">
+              <i class="fa-solid fa-${p.status==='won'?'trophy':p.status==='submitted'?'check':'ticket'}"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:700">${p.quiz_details?.title || p.quiz_ref}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${p.enrollment_number} • ₹${p.amount_paid}</div>
+            </div>
+            <span style="background:${statusColors[p.status]}22;color:${statusColors[p.status]};padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700">${statusLabels[p.status]}</span>
+          </div>`;
+      }).join('');
+    }
+  } catch(e){ console.error('Activities load err:', e); }
+}
+
+// --- REFERRAL LINKS ---
+function setupQuizReferralLinks(){
+  const refCode = memberData?.user?.referral_code || '';
+  const baseUrl = window.location.origin;
+  const quizRefLink = document.getElementById('quizReferralLink');
+  if(quizRefLink) quizRefLink.value = `${baseUrl}/donation.html?ref=${refCode}#quiz`;
+
+  const affJoinLink = document.getElementById('affJoinLink');
+  if(affJoinLink) affJoinLink.value = `${baseUrl}/donation.html?ref=${refCode}`;
+
+  const affQuizLink = document.getElementById('affQuizLink');
+  if(affQuizLink) affQuizLink.value = `${baseUrl}/donation.html?ref=${refCode}#quiz`;
+}
+
+function copyQuizReferralLink(){
+  const el = document.getElementById('quizReferralLink');
+  if(el){ navigator.clipboard.writeText(el.value); notify('Link copied!','success'); }
+}
+
+function shareQuizReferral(platform){
+  const link = document.getElementById('quizReferralLink')?.value || '';
+  const text = `🎯 FWF Fund Raiser Quiz में हिस्सा लें और इनाम जीतें!\n${link}`;
+  if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+  if(platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+}
+
+function copyAffLink(inputId){
+  const el = document.getElementById(inputId);
+  if(el){ navigator.clipboard.writeText(el.value); notify('Link copied!','success'); }
+}
+
+function shareAffLink(platform){
+  const link = document.getElementById('affJoinLink')?.value || '';
+  const text = `✨ FWF से जुड़ें! महिलाओं का भविष्य बनाएं।\n${link}`;
+  if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+  else if(platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+  else { navigator.clipboard.writeText(link); notify('Link copied!','success'); }
+}
+
+// --- AFFILIATE DASHBOARD ---
+async function loadAffiliateDashboard(){
+  try {
+    const data = await AUTH.api('/api/member/affiliate');
+    if(!data.ok) return;
+
+    const s = data.stats || {};
+    document.getElementById('affTotalClicks').textContent = fmtN(s.totalClicks || 0);
+    document.getElementById('affConversions').textContent = fmtN(s.conversions || 0);
+    document.getElementById('affQuizClicks').textContent = fmtN(s.quizClicks || 0);
+    document.getElementById('affRevenue').textContent = '₹' + fmtN(s.totalRevenue || 0);
+
+    // Quiz referral earnings table
+    const earningsBody = document.getElementById('affQuizEarningsBody');
+    if(data.quizRefEarnings?.length){
+      earningsBody.innerHTML = data.quizRefEarnings.map(e => `<tr>
+        <td style="font-size:12px">${e.description}</td>
+        <td style="font-weight:800;color:var(--success)">+${e.points}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(e.created_at)}</td>
+      </tr>`).join('');
+    }
+
+    // Recent clicks table
+    const clicksBody = document.getElementById('affRecentClicksBody');
+    if(data.recentClicks?.length){
+      clicksBody.innerHTML = data.recentClicks.map(c => `<tr>
+        <td>${statusBadge(c.link_type)}</td>
+        <td>${c.converted ? '<span style="color:var(--success);font-weight:700">✅ Yes</span>' : '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td>${c.conversion_amount ? '₹'+fmtN(c.conversion_amount) : '—'}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(c.created_at)}</td>
+      </tr>`).join('');
+    }
+  } catch(e){ console.error('Affiliate load err:', e); }
+}
+
+// Extend loadWallet to also load affiliate data
+const _originalLoadWallet = loadWallet;
+loadWallet = async function(){
+  await _originalLoadWallet();
+  await loadAffiliateDashboard();
+  setupQuizReferralLinks();
+};
 
 /* ============================================
    LOGOUT

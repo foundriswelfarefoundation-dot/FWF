@@ -1741,9 +1741,9 @@ app.post('/api/member/quiz-enroll', auth('member'), async (req, res) => {
       $inc: { total_participants: 1, total_collection: quiz.entry_fee }
     });
 
-    // Award referral points if referred
+    // Award referral points if referred (10% for quiz referrals)
     if (referrerId) {
-      const refPoints = amountToPoints(quiz.entry_fee * (REFERRAL_POINTS_PERCENT / 100));
+      const refPoints = amountToPoints(quiz.entry_fee * (QUIZ_TICKET_POINTS_PERCENT / 100));
       await User.updateOne({ _id: referrerId }, {
         $inc: {
           'wallet.points_balance': refPoints,

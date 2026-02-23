@@ -18,9 +18,10 @@ export default withSentry(async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey    = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  // .trim() prevents signature mismatch from accidental whitespace/newlines in env vars
+  const cloudName = (process.env.CLOUDINARY_CLOUD_NAME || "").trim();
+  const apiKey    = (process.env.CLOUDINARY_API_KEY    || "").trim();
+  const apiSecret = (process.env.CLOUDINARY_API_SECRET || "").trim();
 
   if (!cloudName || !apiKey || !apiSecret) {
     return res.status(500).json({ ok: false, error: "Cloudinary not configured" });
@@ -29,8 +30,9 @@ export default withSentry(async function handler(req, res) {
   const folder    = "fwf-posts";
   const timestamp = Math.round(Date.now() / 1000);
 
-  // Signature: SHA1 of sorted params string + api_secret (Cloudinary spec)
-  const paramsToSign = `folder=${folder}&timestamp=${timestamp}`;
+  // Cloudinary signature spec: sort params alphabetically, join with &, append secret, SHA-1
+  // folder < timestamp (alphabetical) → correct order
+  const paramsToSign = "folder=" + folder + "&timestamp=" + timestamp;
   const signature    = crypto
     .createHash("sha1")
     .update(paramsToSign + apiSecret)

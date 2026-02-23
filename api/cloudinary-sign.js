@@ -1,5 +1,33 @@
-import crypto from "crypto";
 import { withSentry } from "../lib/sentry.js";
+
+/**
+ * Cloudinary Config Endpoint
+ * ---------------------------
+ * Returns cloud_name and unsigned upload_preset so the browser
+ * can upload directly to Cloudinary without any signature.
+ * (Unsigned preset is created in Cloudinary Dashboard →
+ *  Settings → Upload → Add upload preset → Signing Mode: Unsigned)
+ */
+export default withSentry(async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "Method not allowed" });
+  }
+
+  const cloudName    = (process.env.CLOUDINARY_CLOUD_NAME    || "").trim();
+  const uploadPreset = (process.env.CLOUDINARY_UPLOAD_PRESET || "").trim();
+
+  if (!cloudName || !uploadPreset) {
+    return res.status(500).json({ ok: false, error: "Cloudinary not configured" });
+  }
+
+  return res.status(200).json({
+    ok: true,
+    cloud_name:    cloudName,
+    upload_preset: uploadPreset,
+    folder:        "fwf-posts",
+  });
+});
+
 
 /**
  * Cloudinary Server-Side Signing

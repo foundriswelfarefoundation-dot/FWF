@@ -2433,30 +2433,28 @@ function fileToBase64(file){
   });
 }
 
-// Upload image directly to Cloudinary (browser-side signed upload)
-// API secret never leaves server — /api/cloudinary-sign generates the signature
+// Upload image directly to Cloudinary using unsigned upload preset
+// No signature needed — server only returns cloud_name + upload_preset (not sensitive)
 async function uploadToCloudinary(file){
-  // Step 1: get signature from our serverless function
-  const signRes = await fetch('/api/cloudinary-sign', { method:'POST',
+  // Step 1: get cloud config from our serverless function
+  const cfgRes = await fetch('/api/cloudinary-sign', { method:'POST',
     headers:{'Content-Type':'application/json'}, body:'{}' });
-  const sign = await signRes.json();
-  if(!sign.ok) throw new Error('Could not get upload signature');
+  const cfg = await cfgRes.json();
+  if(!cfg.ok) throw new Error('Could not get upload config');
 
-  // Step 2: browser uploads file DIRECTLY to Cloudinary (bypasses Vercel size limit)
+  // Step 2: browser uploads file DIRECTLY to Cloudinary (unsigned — no signature required)
   const fd = new FormData();
-  fd.append('file', file);
-  fd.append('api_key',   sign.api_key);
-  fd.append('timestamp', sign.timestamp);
-  fd.append('signature', sign.signature);
-  fd.append('folder',    sign.folder);
+  fd.append('file',          file);
+  fd.append('upload_preset', cfg.upload_preset);
+  fd.append('folder',        cfg.folder);
 
   const upRes = await fetch(
-    `https://api.cloudinary.com/v1_1/${sign.cloud_name}/image/upload`,
+    `https://api.cloudinary.com/v1_1/${cfg.cloud_name}/image/upload`,
     { method:'POST', body: fd }
   );
   const up = await upRes.json();
   if(up.error) throw new Error(up.error.message || 'Cloudinary upload failed');
-  return up.secure_url;   // e.g. https://res.cloudinary.com/dm1jowk69/image/upload/...
+  return up.secure_url;
 }
 
 // Load categories for dropdowns

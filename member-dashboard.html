@@ -2434,22 +2434,15 @@ function fileToBase64(file){
 }
 
 // Upload image directly to Cloudinary using unsigned upload preset
-// No signature needed — server only returns cloud_name + upload_preset (not sensitive)
+// cloud_name + upload_preset are public for unsigned uploads (no secret exposed)
 async function uploadToCloudinary(file){
-  // Step 1: get cloud config from our serverless function
-  const cfgRes = await fetch('/api/cloudinary-sign', { method:'POST',
-    headers:{'Content-Type':'application/json'}, body:'{}' });
-  const cfg = await cfgRes.json();
-  if(!cfg.ok) throw new Error('Could not get upload config');
-
-  // Step 2: browser uploads file DIRECTLY to Cloudinary (unsigned — no signature required)
   const fd = new FormData();
   fd.append('file',          file);
-  fd.append('upload_preset', cfg.upload_preset);
-  fd.append('folder',        cfg.folder);
+  fd.append('upload_preset', 'fwf_posts');
+  fd.append('folder',        'fwf-posts');
 
   const upRes = await fetch(
-    `https://api.cloudinary.com/v1_1/${cfg.cloud_name}/image/upload`,
+    'https://api.cloudinary.com/v1_1/dm1jowk69/image/upload',
     { method:'POST', body: fd }
   );
   const up = await upRes.json();

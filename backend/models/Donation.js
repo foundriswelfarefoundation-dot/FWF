@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const donationSchema = new mongoose.Schema({
-  member_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  member_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false, default: null, index: true },
   amount: { type: Number, required: true },
   points_earned: { type: Number, default: 0 },
   donor_name: String,

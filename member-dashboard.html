@@ -1941,9 +1941,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <div id="postImageArea" style="display:none;background:#111;position:relative">
         <!-- Large main image -->
         <div id="postMainPreview" style="width:100%;height:280px;overflow:hidden;position:relative">
-          <img id="postMainImg" src="" style="width:100%;height:280px;object-fit:cover;display:block;transition:opacity .2s" alt="">
+          <img id="postMainImg" src="" style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity .2s" alt="">
           <!-- Gradient overlay at bottom for thumbnail strip readability -->
-          <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,rgba(0,0,0,.6),transparent);pointer-events:none"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,rgba(0,0,0,.65),transparent);pointer-events:none"></div>
         </div>
         <!-- Horizontal thumbnail strip (overlaid on bottom of image) -->
         <div id="postThumbStrip" style="display:none;position:absolute;bottom:8px;left:0;right:0;padding:0 10px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none">
@@ -1964,25 +1964,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <i class="fa-solid fa-camera-retro" style="font-size:32px;color:#075e54;margin-bottom:8px;display:block"></i>
           <div style="font-size:14px;font-weight:700;color:#303030">Add Photos</div>
           <div style="font-size:11px;color:#667781;margin-top:2px">Tap to upload from gallery</div>
-        </div>
-      </div>
-
-      <div style="padding:10px 14px 12px">
-        <!-- Activity Type - compact pill selector -->
-        <div>
-          <div style="font-size:10px;font-weight:700;color:#667781;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Activity Type</div>
-          <div style="display:flex;flex-wrap:wrap;gap:4px" id="postTypePills">
-            <button type="button" class="post-pill" data-value="welfare" onclick="selectPostPill(this)">🤝 Welfare</button>
-            <button type="button" class="post-pill" data-value="training" onclick="selectPostPill(this)">🎓 Training</button>
-            <button type="button" class="post-pill" data-value="health" onclick="selectPostPill(this)">🏥 Health</button>
-            <button type="button" class="post-pill" data-value="plantation" onclick="selectPostPill(this)">🌱 Plantation</button>
-            <button type="button" class="post-pill" data-value="education" onclick="selectPostPill(this)">📚 Education</button>
-            <button type="button" class="post-pill" data-value="donation" onclick="selectPostPill(this)">💝 Donation</button>
-            <button type="button" class="post-pill" data-value="awareness" onclick="selectPostPill(this)">📣 Awareness</button>
-            <button type="button" class="post-pill" data-value="skill" onclick="selectPostPill(this)">💼 Skill Dev</button>
-            <button type="button" class="post-pill" data-value="other" onclick="selectPostPill(this)">✨ Other</button>
-          </div>
-          <input type="hidden" id="postType" value="">
         </div>
       </div>
 
@@ -3714,7 +3695,6 @@ function renderPostImagePreview(){
   if(postImageDataUrls.length === 0){
     area.style.display = 'none';
     prompt.style.display = 'block';
-    if(imgCount) imgCount.style.display = 'none';
     return;
   }
   
@@ -3768,13 +3748,11 @@ function updatePostImageCount(){
 }
 
 async function submitPost(){
-  const postType = document.getElementById('postType').value;
   const description = document.getElementById('postDesc').value.trim();
   const mediaFiles = document.getElementById('postMedia').files;
   
-  if(!postType){ notify('Please select activity type','warning'); return; }
-  if(!description || description.length < 20){ 
-    notify('Please write at least 20 characters about your activity','warning'); 
+  if(!description || description.length < 10){ 
+    notify('Please describe your activity (at least 10 characters)','warning'); 
     return; 
   }
   
@@ -3810,7 +3788,6 @@ async function submitPost(){
     document.getElementById('postDesc').style.height = 'auto';
     document.getElementById('postMedia').value = '';
     document.getElementById('postCharCount').textContent = '0';
-    document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));
     postImageFiles = [];
     postImageDataUrls = [];
     postActiveImageIdx = 0;

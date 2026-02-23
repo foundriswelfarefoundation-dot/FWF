@@ -2433,6 +2433,32 @@ function fileToBase64(file){
   });
 }
 
+// Upload image directly to Cloudinary (browser-side signed upload)
+// API secret never leaves server — /api/cloudinary-sign generates the signature
+async function uploadToCloudinary(file){
+  // Step 1: get signature from our serverless function
+  const signRes = await fetch('/api/cloudinary-sign', { method:'POST',
+    headers:{'Content-Type':'application/json'}, body:'{}' });
+  const sign = await signRes.json();
+  if(!sign.ok) throw new Error('Could not get upload signature');
+
+  // Step 2: browser uploads file DIRECTLY to Cloudinary (bypasses Vercel size limit)
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('api_key',   sign.api_key);
+  fd.append('timestamp', sign.timestamp);
+  fd.append('signature', sign.signature);
+  fd.append('folder',    sign.folder);
+
+  const upRes = await fetch(
+    `https://api.cloudinary.com/v1_1/${sign.cloud_name}/image/upload`,
+    { method:'POST', body: fd }
+  );
+  const up = await upRes.json();
+  if(up.error) throw new Error(up.error.message || 'Cloudinary upload failed');
+  return up.secure_url;   // e.g. https://res.cloudinary.com/dm1jowk69/image/upload/...
+}
+
 // Load categories for dropdowns
 let storeCategories = {};
 
@@ -3761,18 +3787,24 @@ async function submitPost(){
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
   
   try{
-    // Convert images to base64
+    // Upload images to Cloudinary directly from browser (original quality, no size limit)
     const images = [];
     const allFiles = postImageFiles.length > 0 ? postImageFiles : Array.from(mediaFiles);
+    if(allFiles.length > 0){
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span style="font-size:11px;margin-left:4px">Uploading...</span>';
+    }
     for(const f of allFiles){
-      if(f.size > 5*1024*1024){ notify(`${f.name} is too large. Max 5MB per file`,'warning'); continue; }
-      const b64 = await fileToBase64(f);
-      images.push(b64);
+      if(f.size > 15*1024*1024){ notify(`${f.name} is too large (max 15MB)`,'warning'); continue; }
+      const url = await uploadToCloudinary(f);
+      images.push(url);
     }
     
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    
     // TODO: Send to backend API for admin approval
+    // images[] now contains Cloudinary HTTPS URLs (not base64)
     // For now, simulate success
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     closeModal('postModal');
     

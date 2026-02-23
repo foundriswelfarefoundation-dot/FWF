@@ -1938,21 +1938,23 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <div style="flex:1;overflow-y:auto;background:#e5ddd5;background-image:url('data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M0 0h20v20H0z%22 fill=%22%23e5ddd5%22/%3E%3Cpath d=%22M10 3l1 2 2 .3-1.5 1.4.4 2L10 8l-1.9 .7.4-2L7 5.3l2-.3z%22 fill=%22%23d4ccb5%22 opacity=%22.15%22/%3E%3C/svg%3E')">
 
       <!-- IMAGE PREVIEW AREA (WhatsApp-style large preview) -->
-      <div id="postImageArea" style="display:none;background:#000;position:relative">
+      <div id="postImageArea" style="display:none;background:#111;position:relative">
         <!-- Large main image -->
-        <div id="postMainPreview" style="width:100%;max-height:300px;display:flex;align-items:center;justify-content:center;overflow:hidden">
-          <img id="postMainImg" src="" style="width:100%;max-height:300px;object-fit:contain;display:block" alt="">
+        <div id="postMainPreview" style="width:100%;height:280px;overflow:hidden;position:relative">
+          <img id="postMainImg" src="" style="width:100%;height:280px;object-fit:cover;display:block;transition:opacity .2s" alt="">
+          <!-- Gradient overlay at bottom for thumbnail strip readability -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,rgba(0,0,0,.6),transparent);pointer-events:none"></div>
         </div>
-        <!-- Horizontal thumbnail strip -->
-        <div id="postThumbStrip" style="display:none;padding:8px 12px;background:rgba(0,0,0,.7);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        <!-- Horizontal thumbnail strip (overlaid on bottom of image) -->
+        <div id="postThumbStrip" style="display:none;position:absolute;bottom:8px;left:0;right:0;padding:0 10px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none">
         </div>
         <!-- Add more photos button -->
-        <button type="button" onclick="document.getElementById('postMedia').click()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:.2s" onmouseover="this.style.background='rgba(0,0,0,.75)'" onmouseout="this.style.background='rgba(0,0,0,.55)'">
-          <i class="fa-solid fa-plus"></i> Add More
+        <button type="button" onclick="document.getElementById('postMedia').click()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:.2s" onmouseover="this.style.background='rgba(0,0,0,.8)'" onmouseout="this.style.background='rgba(0,0,0,.55)'">
+          <i class="fa-solid fa-plus" style="font-size:9px"></i> Add More
         </button>
         <!-- Photo count badge -->
-        <div id="postPhotoCount" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px">
-          <i class="fa-solid fa-image"></i> <span id="postPhotoNum">0</span>
+        <div id="postPhotoCount" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px">
+          <i class="fa-solid fa-image" style="font-size:10px"></i> <span id="postPhotoNum">0</span>
         </div>
       </div>
 
@@ -1965,11 +1967,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
       </div>
 
-      <div style="padding:0 16px 16px">
-        <!-- Activity Type - pill selector -->
-        <div style="margin-bottom:12px">
-          <div style="font-size:11px;font-weight:700;color:#667781;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:2px">Activity Type</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px" id="postTypePills">
+      <div style="padding:10px 14px 12px">
+        <!-- Activity Type - compact pill selector -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#667781;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Activity Type</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px" id="postTypePills">
             <button type="button" class="post-pill" data-value="welfare" onclick="selectPostPill(this)">🤝 Welfare</button>
             <button type="button" class="post-pill" data-value="training" onclick="selectPostPill(this)">🎓 Training</button>
             <button type="button" class="post-pill" data-value="health" onclick="selectPostPill(this)">🏥 Health</button>
@@ -1982,35 +1984,29 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </div>
           <input type="hidden" id="postType" value="">
         </div>
-
-        <!-- Caption box (WhatsApp style) -->
-        <div style="background:#dcf8c6;border-radius:0 12px 12px 12px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.08);position:relative">
-          <textarea class="form-input" id="postDesc" style="border:none;padding:0;font-size:14px;background:transparent;font-family:inherit;min-height:70px;resize:none;width:100%;outline:none;line-height:1.6;color:#303030" placeholder="Describe your activity...
-
-📍 Where? 👥 Who? 🎯 What? 💚 Impact?"></textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:4px">
-            <span style="font-size:10px;color:#667781" id="postCharCount">0</span>
-          </div>
-        </div>
       </div>
 
     </div>
 
-    <!-- Bottom bar -->
-    <div style="background:#f0f0f0;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-top:1px solid #dfe5e7">
-      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Add Photos">
+    <!-- Bottom bar — WhatsApp-style with inline text input -->
+    <div style="background:#f0f0f0;padding:6px 8px;display:flex;align-items:flex-end;gap:6px;flex-shrink:0;border-top:1px solid #dfe5e7">
+      <!-- Camera -->
+      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Add Photos">
         <i class="fa-solid fa-camera"></i>
       </button>
-      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Attach File">
+      <!-- Paperclip -->
+      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Attach File">
         <i class="fa-solid fa-paperclip"></i>
       </button>
-      
+
       <input type="file" id="postMedia" accept="image/*,video/*" multiple style="display:none" onchange="handlePostImageSelect(event)">
-      
-      <div style="flex:1"></div>
-      
-      <span id="postImageCount" style="display:none;font-size:11px;color:#667781;font-weight:600"><i class="fa-solid fa-image"></i> <span id="postImgNum">0</span> photo(s)</span>
-      
+
+      <!-- WhatsApp-style growing textarea -->
+      <div style="flex:1;background:#fff;border-radius:22px;padding:8px 14px;display:flex;align-items:flex-end;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.1)">
+        <textarea id="postDesc" rows="1" style="flex:1;border:none;outline:none;font-family:inherit;font-size:14px;color:#303030;background:transparent;resize:none;max-height:100px;overflow-y:auto;line-height:1.5;padding:0" placeholder="Describe your activity... 📍 Where? 👥 Who? 🎯 What?" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';document.getElementById('postCharCount').textContent=this.value.length"></textarea>
+        <span style="font-size:9px;color:#aaa;align-self:flex-end;white-space:nowrap" id="postCharCount">0</span>
+      </div>
+
       <!-- Send button -->
       <button type="button" id="submitPostBtn" onclick="submitPost()" style="background:#00a884;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all .2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,168,132,.3)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
         <i class="fa-solid fa-paper-plane"></i>
@@ -2021,7 +2017,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
 <style>
 .post-pill{
-  background:#fff;border:1.5px solid #d1d5db;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:#303030;white-space:nowrap;
+  background:#fff;border:1.5px solid #d1d5db;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;color:#303030;white-space:nowrap;
 }
 .post-pill:hover{background:#f0f0f0}
 .post-pill.active{background:#dcf8c6;border-color:#25d366;color:#075e54;font-weight:700;box-shadow:0 0 0 2px rgba(37,211,102,.15)}
@@ -3663,12 +3659,15 @@ function selectPostPill(btn){
   document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('postType').value = btn.dataset.value;
-  // Update template
+  // Fill template if textarea is empty
   const type = btn.dataset.value;
   const textarea = document.getElementById('postDesc');
   if(type && POST_TEMPLATES[type]){
     if(!textarea.value || textarea.value.includes('📍') || textarea.value.includes('📌') || textarea.value.length < 5){
       textarea.value = POST_TEMPLATES[type];
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+      document.getElementById('postCharCount').textContent = textarea.value.length;
     }
   }
   textarea.focus();
@@ -3711,8 +3710,6 @@ function renderPostImagePreview(){
   const mainImg = document.getElementById('postMainImg');
   const strip = document.getElementById('postThumbStrip');
   const countEl = document.getElementById('postPhotoNum');
-  const imgCount = document.getElementById('postImageCount');
-  const imgNum = document.getElementById('postImgNum');
   
   if(postImageDataUrls.length === 0){
     area.style.display = 'none';
@@ -3733,7 +3730,6 @@ function renderPostImagePreview(){
   
   // Photo count
   countEl.textContent = postImageDataUrls.length;
-  if(imgCount){ imgCount.style.display = 'inline'; imgNum.textContent = postImageDataUrls.length; }
   
   // Thumbnail strip (show if more than 1 photo)
   if(postImageDataUrls.length > 1){
@@ -3811,6 +3807,7 @@ async function submitPost(){
     // Clear form
     document.getElementById('postType').value = '';
     document.getElementById('postDesc').value = '';
+    document.getElementById('postDesc').style.height = 'auto';
     document.getElementById('postMedia').value = '';
     document.getElementById('postCharCount').textContent = '0';
     document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));

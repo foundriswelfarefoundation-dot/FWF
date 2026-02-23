@@ -1577,7 +1577,7 @@ const pageTitles = {
   settings: '<i class="fa-solid fa-gear"></i> Website & Settings'
 };
 
-function switchPage(page){
+function switchPage(page, updateHash = true){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
   const el = document.getElementById('page-' + page);
@@ -1587,18 +1587,38 @@ function switchPage(page){
   document.getElementById('pageTitle').innerHTML = pageTitles[page] || page;
   closeMobile();
 
-  if(page === 'posts')    loadSocialPosts();
-  if(page === 'members') loadMembers();
-  if(page === 'csr') loadCSRPartners();
-  if(page === 'support') loadSupportTickets();
-  if(page === 'payments') loadMembershipFees();
-  if(page === 'points') loadPointsActivity();
-  if(page === 'reports') loadReports();
+  // Update URL hash without reloading
+  if(updateHash) {
+    const hash = page === 'home' ? '#' : '#' + page;
+    history.pushState({ page }, '', location.pathname + (page === 'home' ? '' : hash));
+  }
+
+  if(page === 'posts')       loadSocialPosts();
+  if(page === 'members')     loadMembers();
+  if(page === 'csr')         loadCSRPartners();
+  if(page === 'support')     loadSupportTickets();
+  if(page === 'payments')    loadMembershipFees();
+  if(page === 'points')      loadPointsActivity();
+  if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
   btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+// Handle browser back/forward
+window.addEventListener('popstate', (e) => {
+  const page = (e.state && e.state.page) || (location.hash.slice(1)) || 'home';
+  switchPage(page, false);
+});
+
+// On load, navigate to hash if present
+window.addEventListener('load', () => {
+  const hash = location.hash.slice(1);
+  if(hash && document.getElementById('page-' + hash)) {
+    switchPage(hash, false);
+  }
 });
 
 // Mobile

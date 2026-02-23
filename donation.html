@@ -336,10 +336,38 @@
         <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" required /><label class="fl-label">Phone (10-digit)</label></div>
         <div class="fl-group"><i class="fl-icon fa-regular fa-envelope"></i><input class="fl-input" type="email" name="email" placeholder=" " required /><label class="fl-label">Email</label></div>
         <div class="fl-group"><i class="fl-icon fa-regular fa-id-card"></i><input class="fl-input" name="pan" placeholder=" " maxlength="10" /><label class="fl-label">PAN (for 80G receipt)</label></div>
+        <div class="fl-group"><i class="fl-icon fa-solid fa-location-dot"></i><input class="fl-input" name="address" placeholder=" " /><label class="fl-label">Address (required for ₹50,000+)</label></div>
         <div class="fl-group"><i class="fl-icon fa-solid fa-user-tag"></i><input class="fl-input" name="memberid" placeholder=" " /><label class="fl-label">Member ID (optional)</label></div>
         <button type="submit" class="btn-primary">Next: Payment</button>
       </form>
     </div>
+
+    <!-- OTP Verification Step (shown for donations ≥ ₹50,000) -->
+    <div id="donateStepOtp" style="display:none;">
+      <h2 style="margin:0 0 6px">Identity Verification</h2>
+      <div style="background:linear-gradient(135deg,#fee2e2,#fecaca);border:2px solid #fca5a5;border-radius:14px;padding:14px;margin-bottom:16px;text-align:center">
+        <i class="fa-solid fa-shield-halved" style="color:#dc2626;font-size:26px;display:block;margin-bottom:6px"></i>
+        <p style="margin:0;font-weight:700;color:#7f1d1d;font-size:0.9rem">High-Value Donation Verification</p>
+        <p style="margin:6px 0 0;font-size:0.8rem;color:#991b1b">As per FCRA &amp; Income Tax Act, donations of ₹50,000 or more require OTP identity verification</p>
+      </div>
+      <p style="font-size:0.88rem;color:#475569;margin:0 0 16px;text-align:center">OTP will be sent to <strong id="otpEmailDisplay" style="color:#6366f1"></strong></p>
+      <div id="otpSendSection">
+        <button id="sendOtpBtn" class="btn-primary" style="width:100%"><i class="fa-solid fa-paper-plane"></i> Send OTP to Email</button>
+      </div>
+      <div id="otpVerifySection" style="display:none;margin-top:4px">
+        <div class="fl-group" style="margin-top:12px">
+          <i class="fl-icon fa-solid fa-key"></i>
+          <input class="fl-input" id="otpInput" placeholder=" " maxlength="6" pattern="[0-9]{6}" inputmode="numeric">
+          <label class="fl-label">Enter 6-digit OTP</label>
+        </div>
+        <button id="verifyOtpBtn" class="btn-primary" style="width:100%;margin-top:8px"><i class="fa-solid fa-check-circle"></i> Verify OTP</button>
+        <p style="text-align:center;font-size:0.82rem;color:#94a3b8;margin-top:10px">
+          Didn't receive it? <a href="#" id="resendOtpLink" style="color:var(--accent);font-weight:600">Resend OTP</a>
+        </p>
+      </div>
+      <button id="backToFormBtn" style="background:none;border:none;color:#94a3b8;font-size:0.82rem;margin-top:12px;cursor:pointer;width:100%;text-align:center"><i class="fa-solid fa-arrow-left"></i> Back to form</button>
+    </div>
+
     <div id="donateStep2" style="display:none;">
       <h2 class="payTitle">Complete Payment</h2>
       <div style="text-align:center;margin:16px 0">
@@ -499,12 +527,19 @@
 
   const donateForm=document.getElementById('donateForm');
   const donateStep1=document.getElementById('donateStep1');
+  const donateStepOtp=document.getElementById('donateStepOtp');
   const donateStep2=document.getElementById('donateStep2');
+  const HIGH_VALUE = 50000;
 
   function resetDonate(){ 
     donateForm.reset(); 
-    donateStep2.style.display='none'; 
+    donateStep2.style.display='none';
+    donateStepOtp.style.display='none';
     donateStep1.style.display='block';
+    document.getElementById('otpSendSection').style.display='block';
+    document.getElementById('otpVerifySection').style.display='none';
+    if(document.getElementById('otpInput')) document.getElementById('otpInput').value='';
+    donateFormData = {};
     // Safe check for optional elements
     const doneWrap = document.getElementById('doneWrap');
     if(doneWrap) doneWrap.style.display='none';
@@ -520,16 +555,100 @@
     e.preventDefault(); 
     if(!donateForm.checkValidity()){ donateForm.reportValidity(); return; }
     donateFormData = {
-      amount: donateForm.querySelector('[name="amount"]').value,
-      name: donateForm.querySelector('[name="name"]').value,
-      mobile: donateForm.querySelector('[name="mobile"]').value,
-      email: donateForm.querySelector('[name="email"]').value,
-      pan: donateForm.querySelector('[name="pan"]').value,
-      memberid: donateForm.querySelector('[name="memberid"]').value
+      amount:   donateForm.querySelector('[name="amount"]').value,
+      name:     donateForm.querySelector('[name="name"]').value,
+      mobile:   donateForm.querySelector('[name="mobile"]').value,
+      email:    donateForm.querySelector('[name="email"]').value,
+      pan:      donateForm.querySelector('[name="pan"]').value,
+      address:  donateForm.querySelector('[name="address"]').value,
+      memberid: donateForm.querySelector('[name="memberid"]').value,
+      verified_token: null
     };
     document.getElementById('donateAmountDisplay').textContent = donateFormData.amount;
-    donateStep1.style.display='none'; 
-    donateStep2.style.display='block'; 
+
+    if(Number(donateFormData.amount) >= HIGH_VALUE) {
+      // Require OTP verification
+      document.getElementById('otpEmailDisplay').textContent = donateFormData.email;
+      document.getElementById('otpSendSection').style.display='block';
+      document.getElementById('otpVerifySection').style.display='none';
+      if(document.getElementById('otpInput')) document.getElementById('otpInput').value='';
+      donateStep1.style.display='none';
+      donateStepOtp.style.display='block';
+    } else {
+      donateStep1.style.display='none'; 
+      donateStep2.style.display='block';
+    }
+  });
+
+  // OTP: back to form
+  document.getElementById('backToFormBtn').addEventListener('click', ()=>{
+    donateStepOtp.style.display='none';
+    donateStep1.style.display='block';
+  });
+
+  // OTP: send OTP
+  document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('sendOtpBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...';
+    try {
+      const res = await fetch('/api/donation-otp', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'send', email: donateFormData.email, mobile: donateFormData.mobile, name: donateFormData.name, amount: Number(donateFormData.amount) })
+      });
+      const data = await res.json();
+      if(data.ok) {
+        FWF_Notify.toast('OTP sent to ' + donateFormData.email, 'success');
+        document.getElementById('otpSendSection').style.display='none';
+        document.getElementById('otpVerifySection').style.display='block';
+      } else {
+        FWF_Notify.toast(data.error || 'Failed to send OTP', 'error');
+      }
+    } catch(e) {
+      FWF_Notify.toast('Error sending OTP: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send OTP to Email';
+    }
+  });
+
+  // OTP: resend
+  document.getElementById('resendOtpLink').addEventListener('click', (e)=>{
+    e.preventDefault();
+    document.getElementById('otpSendSection').style.display='block';
+    document.getElementById('otpVerifySection').style.display='none';
+    document.getElementById('sendOtpBtn').click();
+  });
+
+  // OTP: verify
+  document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('verifyOtpBtn');
+    const otp = (document.getElementById('otpInput').value || '').trim();
+    if(otp.length !== 6){ FWF_Notify.toast('Enter 6-digit OTP', 'warning'); return; }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Verifying...';
+    try {
+      const res = await fetch('/api/donation-otp', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'verify', email: donateFormData.email, otp })
+      });
+      const data = await res.json();
+      if(data.ok && data.verified_token) {
+        donateFormData.verified_token = data.verified_token;
+        FWF_Notify.toast('Identity verified! Proceeding to payment.', 'success');
+        donateStepOtp.style.display='none';
+        donateStep2.style.display='block';
+      } else {
+        FWF_Notify.toast(data.error || 'Invalid OTP', 'error');
+      }
+    } catch(e) {
+      FWF_Notify.toast('Error verifying OTP: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verify OTP';
+    }
   });
 
   // Razorpay Donate Button
@@ -571,8 +690,10 @@
                 mobile: donateFormData.mobile,
                 email: donateFormData.email,
                 pan: donateFormData.pan,
+                address: donateFormData.address,
                 amount: Number(donateFormData.amount),
                 memberId: donateFormData.memberid,
+                verified_token: donateFormData.verified_token,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature

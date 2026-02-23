@@ -26,6 +26,7 @@ import SocialPost from './models/SocialPost.js';
 import Quiz from './models/Quiz.js';
 import QuizParticipation from './models/QuizParticipation.js';
 import ReferralClick from './models/ReferralClick.js';
+import DonationOtp from './models/DonationOtp.js';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -172,6 +173,16 @@ async function nextMemberId() {
   }
   const next = (n + 1).toString().padStart(6, '0');
   return `${ORG_PREFIX}-${next}`;
+}
+async function nextDonationId() {
+  const last = await Donation.findOne({ donation_id: { $regex: /^DON-\d{6}$/ } })
+    .sort({ created_at: -1 }).select('donation_id').lean();
+  let n = 0;
+  if (last && last.donation_id) {
+    const m = last.donation_id.match(/(\d{6})$/);
+    if (m) n = parseInt(m[1], 10);
+  }
+  return `DON-${(n + 1).toString().padStart(6, '0')}`;
 }
 function randPass(len = 10) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%';
@@ -481,40 +492,70 @@ app.post('/api/pay/membership', async (req, res) => {
 // Razorpay Donation Payment: verify + record donation
 app.post('/api/pay/donation', async (req, res) => {
   try {
-    const { name, mobile, email, pan, amount, memberId: memberIdInput, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    const {
+      name, mobile, email, pan, address,
+      amount, memberId: memberIdInput,
+      razorpay_payment_id, razorpay_order_id, razorpay_signature,
+      verified_token
+    } = req.body;
     if (!amount || !razorpay_payment_id) return res.status(400).json({ error: 'Payment details required' });
 
-    // Verify signature
+    const numAmount = Number(amount);
+    const kycRequired = numAmount >= 50000;
+
+    // For donations ≥ ₹50,000 — verify OTP token from MongoDB
+    let otpVerified = false;
+    if (kycRequired) {
+      if (!verified_token) {
+        return res.status(400).json({ error: 'OTP verification is required for donations of ₹50,000 or more' });
+      }
+      const otpRecord = await DonationOtp.findOne({
+        verified: true,
+        verified_token,
+        expires_at: { $gt: new Date(Date.now() - 30 * 60 * 1000) } // token valid for 30 mins after verify
+      });
+      if (!otpRecord) {
+        return res.status(400).json({ error: 'OTP verification token is invalid or expired. Please verify again.' });
+      }
+      otpVerified = true;
+    }
+
+    // Verify Razorpay signature
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
     const generated_signature = crypto
       .createHmac('sha256', keySecret)
       .update(razorpay_order_id + '|' + razorpay_payment_id)
       .digest('hex');
-
     if (generated_signature !== razorpay_signature) {
       return res.status(400).json({ ok: false, error: 'Payment verification failed' });
     }
 
-    // If member ID provided, find user and award points
+    // Award points if linked member
     let user = null;
-    if (memberIdInput) {
-      user = await User.findOne({ member_id: memberIdInput });
-    }
+    if (memberIdInput) user = await User.findOne({ member_id: memberIdInput });
 
-    // Record donation
+    const donationId = await nextDonationId();
     const donationData = {
-      amount: Number(amount),
-      donor_name: name || 'Anonymous',
-      donor_contact: mobile || email || '',
-      source: 'razorpay',
+      donation_id:  donationId,
+      amount:       numAmount,
+      donor_name:   name  || 'Anonymous',
+      donor_email:  email || null,
+      donor_mobile: mobile || null,
+      donor_pan:    pan   || null,
+      donor_address: address || null,
+      source:       'razorpay',
+      payment_id:   razorpay_payment_id,
+      order_id:     razorpay_order_id,
+      kyc_required: kycRequired,
+      otp_verified: otpVerified,
+      kyc_status:   kycRequired ? (otpVerified ? 'otp_verified' : 'pending_docs') : 'not_required'
     };
 
     if (user) {
       donationData.member_id = user._id;
-      const pointsRupees = Number(amount) * (DONATION_POINTS_PERCENT / 100);
+      const pointsRupees = numAmount * (DONATION_POINTS_PERCENT / 100);
       const points = amountToPoints(pointsRupees);
       donationData.points_earned = points;
-
       await User.updateOne({ _id: user._id }, {
         $inc: {
           'wallet.balance_inr': pointsRupees,
@@ -524,19 +565,19 @@ app.post('/api/pay/donation', async (req, res) => {
           'wallet.points_from_donations': points
         }
       });
-
       await PointsLedger.create({
         user_id: user._id, points, type: 'donation',
-        description: `₹${amount} donation via Razorpay → ${points} points`
+        description: `₹${numAmount} donation via Razorpay → ${points} points`
       });
     }
 
     await Donation.create(donationData);
+    addBreadcrumb('payment', 'Donation recorded', { donationId, amount: numAmount, kycRequired, otpVerified });
 
-    addBreadcrumb('payment', 'Donation payment successful', { amount, paymentId: razorpay_payment_id });
     res.json({
       ok: true,
-      message: `Thank you for your ₹${amount} donation!`,
+      donationId,
+      message: `Thank you for your ₹${numAmount} donation!`,
       paymentId: razorpay_payment_id,
       pointsEarned: donationData.points_earned || 0
     });
@@ -950,14 +991,85 @@ app.get('/api/admin/search-members', auth('admin'), async (req, res) => {
   res.json({ ok: true, members: mapped });
 });
 
-// Admin: get all donations
+// Admin: get all donations (with stats)
 app.get('/api/admin/donations', auth('admin'), async (req, res) => {
-  const donations = await Donation.find().sort({ created_at: -1 }).limit(50).lean();
-  for (const d of donations) {
-    const u = await User.findById(d.member_id).select('name member_id').lean();
-    if (u) { d.member_name = u.name; d.member_id_display = u.member_id; }
+  try {
+    const { page = 1, limit = 50, search = '', kyc = '' } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // Stats
+    const [totalCount, totalAmt, highValueCount, kycPending] = await Promise.all([
+      Donation.countDocuments(),
+      Donation.aggregate([{ $group: { _id: null, total: { $sum: '$amount' } } }]),
+      Donation.countDocuments({ amount: { $gte: 50000 } }),
+      Donation.countDocuments({ kyc_required: true, kyc_status: { $in: ['pending_docs', 'otp_verified'] } })
+    ]);
+
+    // Query
+    const query = {};
+    if (kyc) query.kyc_status = kyc;
+    if (search) {
+      query.$or = [
+        { donor_name: { $regex: search, $options: 'i' } },
+        { donor_email: { $regex: search, $options: 'i' } },
+        { donor_mobile: { $regex: search, $options: 'i' } },
+        { donor_pan: { $regex: search, $options: 'i' } },
+        { donation_id: { $regex: search, $options: 'i' } },
+        { payment_id: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const donations = await Donation.find(query)
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(Number(limit))
+      .lean();
+
+    // Attach member display ID
+    for (const d of donations) {
+      if (d.member_id) {
+        const u = await User.findById(d.member_id).select('name member_id').lean();
+        if (u) { d.member_name = u.name; d.member_display_id = u.member_id; }
+      }
+    }
+
+    res.json({
+      ok: true,
+      stats: {
+        total:        totalCount,
+        totalAmount:  totalAmt[0]?.total || 0,
+        highValue:    highValueCount,
+        kycPending:   kycPending
+      },
+      donations,
+      total: totalCount
+    });
+  } catch (err) {
+    captureError(err, { context: 'admin-donations' });
+    res.status(500).json({ error: err.message });
   }
-  res.json({ ok: true, donations });
+});
+
+// Admin: get single donation detail (KYC view)
+app.get('/api/admin/donation/:donationId', auth('admin'), async (req, res) => {
+  const d = await Donation.findOne({ donation_id: req.params.donationId }).lean();
+  if (!d) return res.status(404).json({ error: 'Donation not found' });
+  if (d.member_id) {
+    const u = await User.findById(d.member_id).select('name member_id email mobile').lean();
+    if (u) { d.member_name = u.name; d.member_display_id = u.member_id; }
+  }
+  res.json({ ok: true, donation: d });
+});
+
+// Admin: update donation KYC status / admin notes
+app.post('/api/admin/donation-kyc/:donationId', auth('admin'), async (req, res) => {
+  const { kyc_status, receipt_issued, admin_notes } = req.body;
+  const update = {};
+  if (kyc_status)  update.kyc_status = kyc_status;
+  if (admin_notes !== undefined) update.admin_notes = admin_notes;
+  if (receipt_issued !== undefined) update.receipt_issued = !!receipt_issued;
+  await Donation.updateOne({ donation_id: req.params.donationId }, { $set: update });
+  res.json({ ok: true, message: 'Donation updated' });
 });
 
 // Admin: get all referrals

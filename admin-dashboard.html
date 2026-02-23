@@ -587,61 +587,126 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
-  <!-- ===================== PAYMENTS / MEMBERSHIP FEES ===================== -->
+  <!-- ===================== PAYMENTS PAGE (Fees + Donations) ===================== -->
   <div class="page" id="page-payments">
-    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-card">
-        <div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-        <div class="s-label">Total Collected</div>
-        <div class="s-value" id="feeCollected">₹0</div>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="pay-fees-tab">Membership Fees</button>
+      <button class="tab-btn" data-tab="pay-donations-tab">Donations</button>
+    </div>
+
+    <!-- ── Membership Fees Tab ─────────────────────────────────── -->
+    <div class="tab-content active" id="pay-fees-tab">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+          <div class="s-label">Total Collected</div>
+          <div class="s-value" id="feeCollected">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div>
+          <div class="s-label">Pending</div>
+          <div class="s-value" id="feePending">0</div>
+          <div class="s-sub" id="feePendingAmt">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-blue"><i class="fa-solid fa-check-double"></i></div>
+          <div class="s-label">Verified</div>
+          <div class="s-value" id="feeVerified">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-red"><i class="fa-solid fa-xmark"></i></div>
+          <div class="s-label">Rejected</div>
+          <div class="s-value" id="feeRejected">0</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div>
-        <div class="s-label">Pending</div>
-        <div class="s-value" id="feePending">0</div>
-        <div class="s-sub" id="feePendingAmt">₹0</div>
+
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="search-bar">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" id="feeSearch" placeholder="Search by member ID, name, transaction ID...">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
+          <select id="feeFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="verified">Verified</option>
+            <option value="rejected">Rejected</option>
+            <option value="refunded">Refunded</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadMembershipFees()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+          <button class="btn btn-primary" onclick="openModal('addFeeModal')"><i class="fa-solid fa-plus"></i> Add Fee Record</button>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="s-icon s-blue"><i class="fa-solid fa-check-double"></i></div>
-        <div class="s-label">Verified</div>
-        <div class="s-value" id="feeVerified">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-icon s-red"><i class="fa-solid fa-xmark"></i></div>
-        <div class="s-label">Rejected</div>
-        <div class="s-value" id="feeRejected">0</div>
+
+      <div class="content-card">
+        <h3><i class="fa-solid fa-receipt"></i> Membership Fee Transactions</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>TXN ID</th><th>Member</th><th>Amount</th><th>Type</th><th>Payment Mode</th><th>Ref</th><th>Status</th><th>Date</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="feesBody">
+              <tr><td colspan="9" class="empty-state"><p>Loading...</p></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="grid-2" style="margin-bottom:16px">
-      <div class="search-bar">
-        <i class="fa-solid fa-search"></i>
-        <input type="text" id="feeSearch" placeholder="Search by member ID, name, transaction ID...">
+    <!-- ── Donations Tab ─────────────────────────────────────────── -->
+    <div class="tab-content" id="pay-donations-tab">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <div class="s-label">Total Donated</div>
+          <div class="s-value" id="donTotalAmt">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
+          <div class="s-label">Total Donors</div>
+          <div class="s-value" id="donTotalCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-amber"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="s-label">KYC Pending</div>
+          <div class="s-value" id="donKycPending">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-red"><i class="fa-solid fa-gem"></i></div>
+          <div class="s-label">High-Value (≥50k)</div>
+          <div class="s-value" id="donHighValue">0</div>
+        </div>
       </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
-        <select id="feeFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="verified">Verified</option>
-          <option value="rejected">Rejected</option>
-          <option value="refunded">Refunded</option>
-        </select>
-        <button class="btn btn-ghost" onclick="loadMembershipFees()"><i class="fa-solid fa-refresh"></i> Refresh</button>
-        <button class="btn btn-primary" onclick="openModal('addFeeModal')"><i class="fa-solid fa-plus"></i> Add Fee Record</button>
-      </div>
-    </div>
 
-    <div class="content-card">
-      <h3><i class="fa-solid fa-receipt"></i> Membership Fee Transactions</h3>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr>
-            <th>TXN ID</th><th>Member</th><th>Amount</th><th>Type</th><th>Payment Mode</th><th>Ref</th><th>Status</th><th>Date</th><th>Actions</th>
-          </tr></thead>
-          <tbody id="feesBody">
-            <tr><td colspan="9" class="empty-state"><p>Loading...</p></td></tr>
-          </tbody>
-        </table>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="search-bar">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" id="donSearch" placeholder="Search by name, email, mobile, PAN, DON ID...">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
+          <select id="donKycFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
+            <option value="">All KYC</option>
+            <option value="not_required">Not Required</option>
+            <option value="otp_verified">OTP Verified</option>
+            <option value="pending_docs">Pending Docs</option>
+            <option value="doc_verified">Docs Verified</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadDonations()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <h3><i class="fa-solid fa-hand-holding-heart"></i> Donation Transactions</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>DON ID</th><th>Donor</th><th>Amount</th><th>PAN</th><th>KYC</th><th>OTP</th><th>Member</th><th>Payment ID</th><th>Date</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="donationsAdminBody">
+              <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -1460,6 +1525,41 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   </div>
 </div>
 
+<!-- Donation KYC Detail Modal -->
+<div class="modal-overlay hidden" id="donDetailModal">
+  <div class="modal-card" style="max-width:560px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-shield-halved"></i> Donation Details & KYC</h3>
+      <button class="modal-close" onclick="closeModal('donDetailModal')">&times;</button>
+    </div>
+    <div id="donDetailContent">Loading...</div>
+    <div class="form-group" style="margin-top:14px">
+      <label>KYC Status</label>
+      <select class="form-input" id="donDetailKycStatus">
+        <option value="not_required">Not Required</option>
+        <option value="otp_verified">OTP Verified</option>
+        <option value="pending_docs">Pending Documents</option>
+        <option value="doc_verified">Documents Verified ✅</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Receipt Issued</label>
+      <select class="form-input" id="donDetailReceipt">
+        <option value="false">No</option>
+        <option value="true">Yes — 80G Receipt Sent</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Admin Notes</label>
+      <textarea class="form-input" id="donDetailNotes" rows="2" placeholder="Internal notes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('donDetailModal')">Cancel</button>
+      <button class="btn btn-primary" id="donDetailSave"><i class="fa-solid fa-save"></i> Save KYC</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Fee Record Modal -->
 <div class="modal-overlay hidden" id="addFeeModal">
   <div class="modal-card">
@@ -1568,7 +1668,7 @@ const pageTitles = {
   csr: '<i class="fa-solid fa-handshake"></i> CSR Partners',
   posts: '<i class="fa-solid fa-newspaper"></i> Social Posts Approval',
   support: '<i class="fa-solid fa-headset"></i> Support Tickets',
-  payments: '<i class="fa-solid fa-indian-rupee-sign"></i> Membership Fee Payments',
+  payments: '<i class="fa-solid fa-indian-rupee-sign"></i> Payments',
   points: '<i class="fa-solid fa-coins"></i> Points & Activity',
   courses: '<i class="fa-solid fa-graduation-cap"></i> Course Management',
   marketplace: '<i class="fa-solid fa-store"></i> Marketplace Management',
@@ -1597,7 +1697,7 @@ function switchPage(page, updateHash = true){
   if(page === 'members')     loadMembers();
   if(page === 'csr')         loadCSRPartners();
   if(page === 'support')     loadSupportTickets();
-  if(page === 'payments')    loadMembershipFees();
+  if(page === 'payments')    { loadMembershipFees(); loadDonations(); }
   if(page === 'points')      loadPointsActivity();
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
@@ -2002,6 +2102,126 @@ async function quickVerifyFee(txnId){
     loadMembershipFees();
   } catch(e){ notify('Error: ' + (e.message||''), 'error'); }
 }
+
+/* ============================================
+   DONATIONS
+   ============================================ */
+let allDonations = [];
+let currentDonId = null;
+
+async function loadDonations(){
+  const search  = (document.getElementById('donSearch')?.value  || '').trim();
+  const kycFilt = document.getElementById('donKycFilter')?.value || '';
+  try{
+    const params = new URLSearchParams();
+    if(search)  params.set('search', search);
+    if(kycFilt) params.set('kyc', kycFilt);
+    const d = await AUTH.api('/api/admin/donations?' + params.toString());
+    allDonations = d.donations || [];
+    document.getElementById('donTotalAmt').textContent   = '₹' + fmtN(d.stats.totalAmount);
+    document.getElementById('donTotalCount').textContent = fmtN(d.stats.total);
+    document.getElementById('donKycPending').textContent = fmtN(d.stats.kycPending);
+    document.getElementById('donHighValue').textContent  = fmtN(d.stats.highValue);
+    renderDonations(allDonations);
+  } catch(e){
+    document.getElementById('donationsAdminBody').innerHTML = '<tr><td colspan="10" class="empty-state" style="color:var(--danger)"><i class="fa-solid fa-exclamation-triangle"></i><p>Failed to load donations</p></td></tr>';
+    console.error('Donations load error:', e);
+  }
+}
+
+function kycBadge(status, otpVerified){
+  const map = {
+    'not_required': '<span class="badge b-resolved" style="font-size:10px">Not Required</span>',
+    'otp_verified':  '<span class="badge b-active"   style="font-size:10px">OTP ✓</span>',
+    'pending_docs':  '<span class="badge b-progress" style="font-size:10px">Pending Docs</span>',
+    'doc_verified':  '<span class="badge b-active"   style="font-size:10px;background:#059669">Docs ✓</span>'
+  };
+  return map[status] || status;
+}
+
+function renderDonations(list){
+  const tb = document.getElementById('donationsAdminBody');
+  if(!list.length){ tb.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fa-solid fa-hand-holding-heart"></i><p>No donations found</p></td></tr>'; return; }
+  tb.innerHTML = list.map(d => {
+    const isHighValue = d.amount >= 50000;
+    return `<tr>
+      <td><span style="font-weight:800;color:var(--accent);font-size:11px">${d.donation_id||'—'}</span></td>
+      <td>
+        <div style="font-weight:700;font-size:12px">${d.donor_name||'Anonymous'}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${d.donor_email||''}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${d.donor_mobile||''}</div>
+      </td>
+      <td>
+        <span style="font-weight:900;color:#059669">₹${fmtN(d.amount)}</span>
+        ${isHighValue ? '<br><span class="badge b-open" style="font-size:9px">High Value</span>' : ''}
+      </td>
+      <td style="font-size:12px;font-weight:600;color:var(--text-muted)">${d.donor_pan||'—'}</td>
+      <td>${kycBadge(d.kyc_status)}</td>
+      <td style="text-align:center">${d.otp_verified ? '<i class="fa-solid fa-circle-check" style="color:#059669" title="OTP Verified"></i>' : '<i class="fa-solid fa-circle-xmark" style="color:#94a3b8" title="Not OTP Verified"></i>'}</td>
+      <td style="font-size:11px;color:var(--text-muted)">${d.member_display_id||'—'}</td>
+      <td style="font-size:10px;color:var(--text-muted);max-width:120px;overflow:hidden;text-overflow:ellipsis">${d.payment_id||'—'}</td>
+      <td style="color:var(--text-muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td>
+        <button class="btn-icon" title="View KYC Details" onclick="openDonDetail('${d.donation_id}')"><i class="fa-solid fa-eye"></i></button>
+        ${d.receipt_issued ? '<i class="fa-solid fa-file-invoice" style="color:#059669;margin-left:4px" title="80G Receipt Issued"></i>' : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// Search & filter
+document.getElementById('donSearch')?.addEventListener('input', loadDonations);
+document.getElementById('donKycFilter')?.addEventListener('change', loadDonations);
+
+// Open donation KYC detail modal
+async function openDonDetail(donationId){
+  currentDonId = donationId;
+  openModal('donDetailModal');
+  document.getElementById('donDetailContent').innerHTML = '<div style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
+  try{
+    const d = await AUTH.api('/api/admin/donation/' + donationId);
+    const don = d.donation;
+    document.getElementById('donDetailContent').innerHTML = `
+      <div style="background:#f8fafc;border-radius:10px;padding:14px;font-size:13px;line-height:1.8">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+          <div><span style="color:var(--text-muted)">DON ID:</span> <strong>${don.donation_id||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">Amount:</span> <strong style="color:#059669">₹${fmtN(don.amount)}</strong></div>
+          <div><span style="color:var(--text-muted)">Name:</span> <strong>${don.donor_name||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">Email:</span> <strong>${don.donor_email||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">Mobile:</span> <strong>${don.donor_mobile||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">PAN:</span> <strong>${don.donor_pan||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">Address:</span> <strong>${don.donor_address||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">Payment ID:</span> <small style="word-break:break-all">${don.payment_id||'—'}</small></div>
+          <div><span style="color:var(--text-muted)">OTP Verified:</span> <strong>${don.otp_verified ? '✅ Yes' : '❌ No'}</strong></div>
+          <div><span style="color:var(--text-muted)">Member:</span> <strong>${don.member_display_id||'—'}</strong></div>
+          <div><span style="color:var(--text-muted)">Date:</span> <strong>${fmtDate(don.created_at)}</strong></div>
+        </div>
+      </div>`;
+    document.getElementById('donDetailKycStatus').value = don.kyc_status || 'not_required';
+    document.getElementById('donDetailReceipt').value = don.receipt_issued ? 'true' : 'false';
+    document.getElementById('donDetailNotes').value = don.admin_notes || '';
+  } catch(e){
+    document.getElementById('donDetailContent').innerHTML = '<p style="color:var(--danger)">Failed to load donation details</p>';
+  }
+}
+
+document.getElementById('donDetailSave')?.addEventListener('click', async ()=>{
+  if(!currentDonId) return;
+  try{
+    await AUTH.api('/api/admin/donation-kyc/' + currentDonId, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        kyc_status:      document.getElementById('donDetailKycStatus').value,
+        receipt_issued:  document.getElementById('donDetailReceipt').value === 'true',
+        admin_notes:     document.getElementById('donDetailNotes').value.trim()
+      })
+    });
+    notify('Donation KYC updated!', 'success');
+    closeModal('donDetailModal');
+    loadDonations();
+  } catch(e){ notify('Error: ' + (e.message||''), 'error'); }
+});
 
 /* ============================================
    CSR PARTNERS

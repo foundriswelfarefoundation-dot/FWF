@@ -37,7 +37,7 @@ async function handler(req, res) {
     const backendUrl = process.env.BACKEND_URL || "https://fwf-production.up.railway.app";
     console.log(`[reset-password] Updating password for ${memberId} via ${backendUrl}`);
     
-    const internalKey = process.env.INTERNAL_API_KEY || 'fwf-internal-secret-key-change-in-production';
+    const internalKey = process.env.INTERNAL_API_KEY;
     let response;
     try {
       response = await fetch(`${backendUrl}/api/auth/update-password`, {

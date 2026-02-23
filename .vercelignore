@@ -1,0 +1,23 @@
+# Dev/test files — not needed in production
+mobile-test-deploy.html
+mobile-setup-guide.html
+deploy-mobile.bat
+deploy-mobile.sh
+debug.html
+
+# Documentation — not needed on Vercel
+MOBILE_VERSION_README.md
+MOBILE_SETUP_COMPLETE.md
+VERCEL_MOBILE_DEPLOYMENT.md
+README_MOBILE.md
+README_VERCEL.md
+MONGODB_MIGRATION_GUIDE.md
+docs/
+
+# Backend (deployed separately on Railway)
+backend/
+
+# Git helpers
+git-push.bat
+git-push.ps1
+git-push.sh

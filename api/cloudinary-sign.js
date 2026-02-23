@@ -1,33 +1,5 @@
+import crypto from "crypto";
 import { withSentry } from "../lib/sentry.js";
-
-/**
- * Cloudinary Config Endpoint
- * ---------------------------
- * Returns cloud_name and unsigned upload_preset so the browser
- * can upload directly to Cloudinary without any signature.
- * (Unsigned preset is created in Cloudinary Dashboard →
- *  Settings → Upload → Add upload preset → Signing Mode: Unsigned)
- */
-export default withSentry(async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, error: "Method not allowed" });
-  }
-
-  const cloudName    = (process.env.CLOUDINARY_CLOUD_NAME    || "").trim();
-  const uploadPreset = (process.env.CLOUDINARY_UPLOAD_PRESET || "").trim();
-
-  if (!cloudName || !uploadPreset) {
-    return res.status(500).json({ ok: false, error: "Cloudinary not configured" });
-  }
-
-  return res.status(200).json({
-    ok: true,
-    cloud_name:    cloudName,
-    upload_preset: uploadPreset,
-    folder:        "fwf-posts",
-  });
-});
-
 
 /**
  * Cloudinary Server-Side Signing
@@ -46,7 +18,6 @@ export default withSentry(async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  // .trim() prevents signature mismatch from accidental whitespace/newlines in env vars
   const cloudName = (process.env.CLOUDINARY_CLOUD_NAME || "").trim();
   const apiKey    = (process.env.CLOUDINARY_API_KEY    || "").trim();
   const apiSecret = (process.env.CLOUDINARY_API_SECRET || "").trim();
@@ -59,7 +30,6 @@ export default withSentry(async function handler(req, res) {
   const timestamp = Math.round(Date.now() / 1000);
 
   // Cloudinary signature spec: sort params alphabetically, join with &, append secret, SHA-1
-  // folder < timestamp (alphabetical) → correct order
   const paramsToSign = "folder=" + folder + "&timestamp=" + timestamp;
   const signature    = crypto
     .createHash("sha1")

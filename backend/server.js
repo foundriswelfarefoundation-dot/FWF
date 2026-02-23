@@ -38,13 +38,19 @@ const { requestHandler, errorHandler } = initSentry(app);
 app.use(requestHandler);
 
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'change_me_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) { console.error('❌ JWT_SECRET is required'); process.exit(1); }
 const ORG_PREFIX = process.env.ORG_PREFIX || 'FWF';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT === 'production';
 
 // --- Razorpay instance ---
+if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+  console.error('❌ RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are required');
+  process.exit(1);
+}
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_SJWpoxG9WXSnDV',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'bqlAFuAzsblHHl4vq2c1fnSc',
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 // Static site root one level up from backend/
@@ -78,9 +84,49 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
 });
+
+// --- Simple rate limiter (in-memory) ---
+const rateLimitMap = new Map();
+function rateLimit(windowMs, maxRequests) {
+  return (req, res, next) => {
+    const key = req.ip + ':' + req.path;
+    const now = Date.now();
+    const record = rateLimitMap.get(key);
+    if (!record || now - record.start > windowMs) {
+      rateLimitMap.set(key, { start: now, count: 1 });
+      return next();
+    }
+    record.count++;
+    if (record.count > maxRequests) {
+      return res.status(429).json({ error: 'Too many requests. Please wait and try again.' });
+    }
+    next();
+  };
+}
+// Clean up rate limit map every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of rateLimitMap) {
+    if (now - val.start > 300000) rateLimitMap.delete(key);
+  }
+}, 300000);
+
+// --- Internal API middleware ---
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
+if (!INTERNAL_API_KEY) console.warn('⚠️ INTERNAL_API_KEY not set — internal endpoints will reject all requests');
+function internalAuth(req, res, next) {
+  const key = req.headers['x-internal-api-key'];
+  if (key !== INTERNAL_API_KEY) {
+    console.warn(`⚠️ Unauthorized internal API call to ${req.path} from ${req.ip}`);
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  next();
+}
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
@@ -260,48 +306,24 @@ app.get('/', (req, res) => {
   });
 });
 
-// Debug endpoint
-app.get('/api/debug/users', async (req, res) => {
-  try {
-    const users = await User.find().sort({ created_at: -1 }).limit(10)
-      .select('member_id name email mobile role membership_active created_at').lean();
-    const testMember = await User.findOne({ member_id: `${ORG_PREFIX}-TEST-001` })
-      .select('member_id name email role wallet.balance_inr').lean();
-    res.json({
-      ok: true,
-      totalUsers: users.length,
-      users,
-      testMember: testMember || 'Not found - seeding may have failed'
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// Debug endpoints - DISABLED in production
+app.get('/api/debug/users', (req, res) => {
+  if (IS_PRODUCTION) return res.status(404).json({ error: 'Not found' });
+  User.find().sort({ created_at: -1 }).limit(10)
+    .select('member_id name email mobile role membership_active created_at').lean()
+    .then(users => res.json({ ok: true, totalUsers: users.length, users }))
+    .catch(err => res.status(500).json({ error: err.message }));
 });
-
-// Debug endpoint - check specific user password hash
-app.get('/api/debug/user/:memberId', async (req, res) => {
-  try {
-    const u = await User.findOne({ member_id: req.params.memberId })
-      .select('member_id name email password_hash created_at').lean();
-    if (!u) return res.status(404).json({ error: 'Member not found' });
-    res.json({
-      ok: true,
-      memberId: u.member_id,
-      name: u.name,
-      email: u.email,
-      passwordHashPreview: u.password_hash.substring(0, 20) + '...',
-      hashLength: u.password_hash.length,
-      isBcrypt: u.password_hash.startsWith('$2'),
-      createdAt: u.created_at,
-      dbType: 'MongoDB Atlas'
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.get('/api/debug/user/:memberId', (req, res) => {
+  if (IS_PRODUCTION) return res.status(404).json({ error: 'Not found' });
+  User.findOne({ member_id: req.params.memberId })
+    .select('member_id name email created_at').lean()
+    .then(u => u ? res.json({ ok: true, ...u }) : res.status(404).json({ error: 'Not found' }))
+    .catch(err => res.status(500).json({ error: err.message }));
 });
 
 // Simulate join payment
-app.post('/api/pay/simulate-join', async (req, res) => {
+app.post('/api/pay/simulate-join', internalAuth, async (req, res) => {
   const { name, mobile, email } = req.body;
   if (!name || !mobile) return res.status(400).json({ error: 'name & mobile required' });
 
@@ -356,7 +378,7 @@ app.post('/api/pay/create-order', async (req, res) => {
         currency: order.currency,
         receipt: order.receipt
       },
-      key: process.env.RAZORPAY_KEY_ID || 'rzp_live_SJWpoxG9WXSnDV'
+      key: process.env.RAZORPAY_KEY_ID
     });
   } catch (err) {
     console.error('Razorpay create-order error:', err);
@@ -373,7 +395,7 @@ app.post('/api/pay/verify', async (req, res) => {
       return res.status(400).json({ error: 'Missing payment verification fields' });
     }
 
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
     const generated_signature = crypto
       .createHmac('sha256', keySecret)
       .update(razorpay_order_id + '|' + razorpay_payment_id)
@@ -401,7 +423,7 @@ app.post('/api/pay/membership', async (req, res) => {
     }
 
     // Verify signature
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
     const generated_signature = crypto
       .createHmac('sha256', keySecret)
       .update(razorpay_order_id + '|' + razorpay_payment_id)
@@ -463,7 +485,7 @@ app.post('/api/pay/donation', async (req, res) => {
     if (!amount || !razorpay_payment_id) return res.status(400).json({ error: 'Payment details required' });
 
     // Verify signature
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
     const generated_signature = crypto
       .createHmac('sha256', keySecret)
       .update(razorpay_order_id + '|' + razorpay_payment_id)
@@ -526,20 +548,6 @@ app.post('/api/pay/donation', async (req, res) => {
 });
 
 // Admin: reset a member's password
-// Bootstrap: reset admin password using setup secret key (no auth needed)
-app.post('/api/admin/bootstrap-reset', async (req, res) => {
-  const { secret, newPassword } = req.body;
-  const BOOTSTRAP_SECRET = process.env.BOOTSTRAP_SECRET || 'fwf-setup-2024';
-  if (secret !== BOOTSTRAP_SECRET) return res.status(403).json({ error: 'Invalid secret' });
-  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 chars' });
-  const admin = await User.findOne({ role: 'admin' });
-  if (!admin) return res.status(404).json({ error: 'Admin not found' });
-  admin.password_hash = bcrypt.hashSync(newPassword, 10);
-  await admin.save();
-  console.log(`✅ Admin password reset via bootstrap endpoint`);
-  res.json({ ok: true, message: `Admin password updated. Email: ${admin.email}` });
-});
-
 app.post('/api/admin/reset-password', auth('admin'), async (req, res) => {
   const { memberId, newPassword } = req.body;
   if (!memberId || !newPassword) return res.status(400).json({ error: 'memberId & newPassword required' });
@@ -550,7 +558,7 @@ app.post('/api/admin/reset-password', auth('admin'), async (req, res) => {
   res.json({ ok: true, message: `Password reset for ${memberId}` });
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', rateLimit(60000, 5), async (req, res) => {
   const { memberId, password } = req.body;
   if (!memberId || !password) return res.status(400).json({ error: 'Member ID and password are required' });
 
@@ -570,7 +578,7 @@ app.post('/api/auth/login', async (req, res) => {
   res.json({ ok: true, role: u.role });
 });
 
-app.post('/api/admin/login', async (req, res) => {
+app.post('/api/admin/login', rateLimit(60000, 5), async (req, res) => {
   const { username, password } = req.body;
   const u = await User.findOne({ email: username, role: 'admin' });
   if (!u) return res.status(400).json({ error: 'Invalid credentials' });
@@ -584,17 +592,6 @@ app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('token', { httpOnly: true, sameSite: 'none', secure: true });
   res.json({ ok: true });
 });
-
-// --- Internal API middleware ---
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || 'fwf-internal-secret-key-change-in-production';
-function internalAuth(req, res, next) {
-  const key = req.headers['x-internal-api-key'];
-  if (key !== INTERNAL_API_KEY) {
-    console.warn(`⚠️ Unauthorized internal API call to ${req.path} from ${req.ip}`);
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-  next();
-}
 
 // Get user email by member ID — internal only
 app.post('/api/auth/get-user-email', internalAuth, async (req, res) => {
@@ -1735,7 +1732,7 @@ app.post('/api/member/quiz-enroll', auth('member'), async (req, res) => {
 
     // Verify payment signature
     if (razorpay_order_id && razorpay_signature) {
-      const keySecret = process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa';
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
       const generated = crypto.createHmac('sha256', keySecret)
         .update(razorpay_order_id + '|' + razorpay_payment_id).digest('hex');
       if (generated !== razorpay_signature) {

@@ -18,9 +18,13 @@ export default async function handler(req, res) {
     let password = "";
     try {
       const backendUrl = process.env.BACKEND_URL || "https://fwf-production.up.railway.app";
+      const internalKey = process.env.INTERNAL_API_KEY;
       const response = await fetch(`${backendUrl}/api/pay/simulate-join`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(internalKey ? { "x-internal-api-key": internalKey } : {})
+        },
         body: JSON.stringify({ name: finalName, mobile, email })
       });
       const data = await response.json();

@@ -43,8 +43,8 @@ const ORG_PREFIX = process.env.ORG_PREFIX || 'FWF';
 
 // --- Razorpay instance ---
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_SIo6l7VT2rKYDr',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'O9NEk0vm1JGVPjDitOrlECKa',
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_SJWpoxG9WXSnDV',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'bqlAFuAzsblHHl4vq2c1fnSc',
 });
 
 // Static site root one level up from backend/
@@ -334,7 +334,7 @@ app.post('/api/pay/create-order', async (req, res) => {
         currency: order.currency,
         receipt: order.receipt
       },
-      key: process.env.RAZORPAY_KEY_ID || 'rzp_test_SIo6l7VT2rKYDr'
+      key: process.env.RAZORPAY_KEY_ID || 'rzp_live_SJWpoxG9WXSnDV'
     });
   } catch (err) {
     console.error('Razorpay create-order error:', err);

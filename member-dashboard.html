@@ -1929,49 +1929,75 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <button onclick="closeModal('postModal')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0;display:flex;align-items:center"><i class="fa-solid fa-arrow-left"></i></button>
       <div class="feed-avatar" id="postModalAvatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0">M</div>
       <div style="flex:1">
-        <div style="font-size:15px;font-weight:700">New Post</div>
-        <div style="font-size:11px;opacity:.75">visible after admin approval</div>
+        <div style="font-size:15px;font-weight:700">Share Your Impact</div>
+        <div style="font-size:11px;opacity:.75">your story inspires others ✨</div>
       </div>
     </div>
 
-    <!-- Chat area - scrollable -->
-    <div style="flex:1;overflow-y:auto;background:#e5ddd5;padding:16px;background-image:url('data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M0 0h20v20H0z%22 fill=%22%23e5ddd5%22/%3E%3Cpath d=%22M10 3l1 2 2 .3-1.5 1.4.4 2L10 8l-1.9 .7.4-2L7 5.3l2-.3z%22 fill=%22%23d4ccb5%22 opacity=%22.15%22/%3E%3C/svg%3E')">
-      
-      <!-- Activity Type - pill selector -->
-      <div style="margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;color:#667781;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:4px">What did you do?</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px" id="postTypePills">
-          <button type="button" class="post-pill" data-value="welfare" onclick="selectPostPill(this)">🤝 Welfare</button>
-          <button type="button" class="post-pill" data-value="training" onclick="selectPostPill(this)">🎓 Training</button>
-          <button type="button" class="post-pill" data-value="health" onclick="selectPostPill(this)">🏥 Health</button>
-          <button type="button" class="post-pill" data-value="plantation" onclick="selectPostPill(this)">🌱 Plantation</button>
-          <button type="button" class="post-pill" data-value="education" onclick="selectPostPill(this)">📚 Education</button>
-          <button type="button" class="post-pill" data-value="donation" onclick="selectPostPill(this)">💝 Donation</button>
-          <button type="button" class="post-pill" data-value="awareness" onclick="selectPostPill(this)">📣 Awareness</button>
-          <button type="button" class="post-pill" data-value="skill" onclick="selectPostPill(this)">💼 Skill Dev</button>
-          <button type="button" class="post-pill" data-value="other" onclick="selectPostPill(this)">✨ Other</button>
+    <!-- Scrollable body -->
+    <div style="flex:1;overflow-y:auto;background:#e5ddd5;background-image:url('data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M0 0h20v20H0z%22 fill=%22%23e5ddd5%22/%3E%3Cpath d=%22M10 3l1 2 2 .3-1.5 1.4.4 2L10 8l-1.9 .7.4-2L7 5.3l2-.3z%22 fill=%22%23d4ccb5%22 opacity=%22.15%22/%3E%3C/svg%3E')">
+
+      <!-- IMAGE PREVIEW AREA (WhatsApp-style large preview) -->
+      <div id="postImageArea" style="display:none;background:#000;position:relative">
+        <!-- Large main image -->
+        <div id="postMainPreview" style="width:100%;max-height:300px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+          <img id="postMainImg" src="" style="width:100%;max-height:300px;object-fit:contain;display:block" alt="">
         </div>
-        <input type="hidden" id="postType" value="">
+        <!-- Horizontal thumbnail strip -->
+        <div id="postThumbStrip" style="display:none;padding:8px 12px;background:rgba(0,0,0,.7);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        </div>
+        <!-- Add more photos button -->
+        <button type="button" onclick="document.getElementById('postMedia').click()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:.2s" onmouseover="this.style.background='rgba(0,0,0,.75)'" onmouseout="this.style.background='rgba(0,0,0,.55)'">
+          <i class="fa-solid fa-plus"></i> Add More
+        </button>
+        <!-- Photo count badge -->
+        <div id="postPhotoCount" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px">
+          <i class="fa-solid fa-image"></i> <span id="postPhotoNum">0</span>
+        </div>
       </div>
 
-      <!-- Image preview strip -->
-      <div id="postImagePreviewGrid" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <!-- ADD PHOTO PROMPT (shown when no images) -->
+      <div id="postAddPhotoPrompt" style="padding:16px">
+        <div onclick="document.getElementById('postMedia').click()" style="background:rgba(255,255,255,.6);border:2px dashed #b8b8b8;border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#25d366';this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.borderColor='#b8b8b8';this.style.background='rgba(255,255,255,.6)'">
+          <i class="fa-solid fa-camera-retro" style="font-size:32px;color:#075e54;margin-bottom:8px;display:block"></i>
+          <div style="font-size:14px;font-weight:700;color:#303030">Add Photos</div>
+          <div style="font-size:11px;color:#667781;margin-top:2px">Tap to upload from gallery</div>
+        </div>
+      </div>
 
-      <!-- Story bubble -->
-      <div style="background:#dcf8c6;border-radius:0 12px 12px 12px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.08);margin-bottom:8px;position:relative">
-        <textarea class="form-input" id="postDesc" style="border:none;padding:0;font-size:14px;background:transparent;font-family:inherit;min-height:80px;resize:none;width:100%;outline:none;line-height:1.5;color:#303030" placeholder="Share your story here... 
+      <div style="padding:0 16px 16px">
+        <!-- Activity Type - pill selector -->
+        <div style="margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;color:#667781;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:2px">Activity Type</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px" id="postTypePills">
+            <button type="button" class="post-pill" data-value="welfare" onclick="selectPostPill(this)">🤝 Welfare</button>
+            <button type="button" class="post-pill" data-value="training" onclick="selectPostPill(this)">🎓 Training</button>
+            <button type="button" class="post-pill" data-value="health" onclick="selectPostPill(this)">🏥 Health</button>
+            <button type="button" class="post-pill" data-value="plantation" onclick="selectPostPill(this)">🌱 Plantation</button>
+            <button type="button" class="post-pill" data-value="education" onclick="selectPostPill(this)">📚 Education</button>
+            <button type="button" class="post-pill" data-value="donation" onclick="selectPostPill(this)">💝 Donation</button>
+            <button type="button" class="post-pill" data-value="awareness" onclick="selectPostPill(this)">📣 Awareness</button>
+            <button type="button" class="post-pill" data-value="skill" onclick="selectPostPill(this)">💼 Skill Dev</button>
+            <button type="button" class="post-pill" data-value="other" onclick="selectPostPill(this)">✨ Other</button>
+          </div>
+          <input type="hidden" id="postType" value="">
+        </div>
+
+        <!-- Caption box (WhatsApp style) -->
+        <div style="background:#dcf8c6;border-radius:0 12px 12px 12px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.08);position:relative">
+          <textarea class="form-input" id="postDesc" style="border:none;padding:0;font-size:14px;background:transparent;font-family:inherit;min-height:70px;resize:none;width:100%;outline:none;line-height:1.6;color:#303030" placeholder="Describe your activity...
 
 📍 Where? 👥 Who? 🎯 What? 💚 Impact?"></textarea>
-        <div style="display:flex;justify-content:flex-end;margin-top:4px">
-          <span style="font-size:10px;color:#667781" id="postCharCount">0</span>
+          <div style="display:flex;justify-content:flex-end;margin-top:4px">
+            <span style="font-size:10px;color:#667781" id="postCharCount">0</span>
+          </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Bottom bar - WhatsApp style -->
+    <!-- Bottom bar -->
     <div style="background:#f0f0f0;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-top:1px solid #dfe5e7">
-      <!-- Attach photos -->
       <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='none'" title="Add Photos">
         <i class="fa-solid fa-camera"></i>
       </button>
@@ -1981,13 +2007,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       
       <input type="file" id="postMedia" accept="image/*,video/*" multiple style="display:none" onchange="handlePostImageSelect(event)">
       
-      <!-- Spacer -->
       <div style="flex:1"></div>
       
-      <!-- Image count badge -->
       <span id="postImageCount" style="display:none;font-size:11px;color:#667781;font-weight:600"><i class="fa-solid fa-image"></i> <span id="postImgNum">0</span> photo(s)</span>
       
-      <!-- Send button - WhatsApp green circle -->
+      <!-- Send button -->
       <button type="button" id="submitPostBtn" onclick="submitPost()" style="background:#00a884;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all .2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,168,132,.3)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
         <i class="fa-solid fa-paper-plane"></i>
       </button>
@@ -2001,6 +2025,20 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 }
 .post-pill:hover{background:#f0f0f0}
 .post-pill.active{background:#dcf8c6;border-color:#25d366;color:#075e54;font-weight:700;box-shadow:0 0 0 2px rgba(37,211,102,.15)}
+#postThumbStrip::-webkit-scrollbar{display:none}
+#postThumbStrip .thumb-item{
+  display:inline-block;width:56px;height:56px;border-radius:8px;overflow:hidden;
+  margin-right:8px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;
+  position:relative;flex-shrink:0;vertical-align:middle;
+}
+#postThumbStrip .thumb-item.active{border-color:#25d366}
+#postThumbStrip .thumb-item img{width:100%;height:100%;object-fit:cover;display:block}
+#postThumbStrip .thumb-item .thumb-remove{
+  position:absolute;top:1px;right:1px;width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;
+}
+#postThumbStrip .thumb-item .thumb-remove:hover{background:rgba(220,38,38,.9)}
 </style>
 
 <!-- Add Product Modal (Rich Flipkart/Amazon style) -->
@@ -3558,128 +3596,62 @@ document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
 
 // Post templates for each activity type
 const POST_TEMPLATES = {
-  welfare: `📍 Location: [Enter location]
-👥 Participants: [Number of people]
-🎯 Activity: [What you did]
-💚 Impact: [How many benefited]
-✨ Outcome: [Positive results]
-
-Example:
-📍 Location: Village School, Kanpur
-👥 Participants: 50 women
-🎯 Activity: Free tailoring workshop
-💚 Impact: 30 women got jobs
-✨ Outcome: Average earning ₹15,000/month`,
+  welfare: `📍 Location:
+👥 Participants:
+🎯 Activity:
+💚 Impact:
+✨ Outcome:`,
   
-  training: `🎓 Course: [Training name]
-📍 Location: [Venue]
-👥 Participants: [Number]
-📚 Topics Covered: [List skills taught]
-✅ Certification: [Yes/No and details]
-💼 Placement Rate: [% got jobs]
-
-Example:
-🎓 Course: Digital Marketing
-📍 Location: FWF Center, Delhi
-👥 Participants: 25 girls
-📚 Topics: Social Media, SEO, Content
-✅ Certification: Yes - Google Certified
-💼 Placement Rate: 80% placed`,
+  training: `🎓 Course:
+📍 Location:
+👥 Participants:
+📚 Topics Covered:
+✅ Certification:
+💼 Placement Rate:`,
   
-  health: `🏥 Camp Type: [Medical/Health Check/Vaccination]
-📍 Location: [Camp venue]
-👥 Beneficiaries: [Number of people]
-💊 Services: [Medical services provided]
-🎯 Impact: [People screened/treated]
-
-Example:
-🏥 Camp Type: Free Health Checkup
-📍 Location: Slum Area, Mumbai
-👥 Beneficiaries: 150 women
-💊 Services: BP check, Eye exam, Gynec consultation
-🎯 Impact: 45 referred for further treatment`,
+  health: `🏥 Camp Type:
+📍 Location:
+👥 Beneficiaries:
+💊 Services:
+🎯 Impact:`,
   
-  plantation: `🌱 Trees Planted: [Number]
-📍 Location: [Area/City]
-👥 Volunteers: [Number of people]
-🌍 Area Covered: [Acres/sq meters]
-🌿 Species: [Types of trees]
-🎯 Sustainability: [Care plan]
-
-Example:
-🌱 Trees Planted: 500 mango & neem
-📍 Location: Dry land, Jaipur
-👥 Volunteers: 100 women
-🌍 Area Covered: 2 acres
-🌿 Species: Mango, Neem, Amla
-🎯 Sustainability: Monthly watering schedule in place`,
+  plantation: `🌱 Trees Planted:
+📍 Location:
+👥 Volunteers:
+🌍 Area Covered:
+🌿 Species:`,
   
-  education: `📚 Program: [Education initiative]
-👥 Students: [Number]
-📍 Location: [School/center]
-📖 Subjects: [Subjects covered]
-🎯 Results: [Impact on performance]
-✨ Success Story: [Best performer story]
-
-Example:
-📚 Program: Free Tuition Center
-👥 Students: 40 underprivileged girls
-📍 Location: Community Center, Indore
-📖 Subjects: Maths, Science, English
-🎯 Results: 35 students improved grades
-✨ Success Story: Priya scored 92% (was 45% before)`,
+  education: `📚 Program:
+👥 Students:
+📍 Location:
+📖 Subjects:
+🎯 Results:`,
   
-  donation: `💝 Items Collected: [What donated]
-📊 Quantity: [Amount]
-👥 Donors: [Number of people]
-📍 Location: [Collection point]
-🎁 Beneficiaries: [Who received]
-😊 Gratitude: [Feedback from beneficiaries]
-
-Example:
-💝 Items: Clothes, books, toys
-📊 Quantity: 200 items
-👥 Donors: 50 families
-📍 Location: FWF Office, Bangalore
-🎁 Beneficiaries: 30 children in orphanage
-😊 Gratitude: Children are so happy! Many said it's their best gift`,
+  donation: `💝 Items Collected:
+📊 Quantity:
+👥 Donors:
+📍 Location:
+🎁 Beneficiaries:`,
   
-  awareness: `📣 Campaign: [Topic]
-🎯 Message: [Main message]
-👥 Reached: [Number of people]
-📍 Location: [Area]
-📊 Methods: [Awareness methods used]
-💡 Impact: [Behavioral changes noted]
-
-Example:
-📣 Campaign: Period Poverty Awareness
-🎯 Message: Menstruation is natural, not a taboo
-👥 Reached: 200 girls
-📍 Location: 3 schools in UP
-📊 Methods: Interactive sessions, videos, Q&A
-💡 Impact: Girls now openly discuss periods`,
+  awareness: `📣 Campaign:
+🎯 Message:
+👥 Reached:
+📍 Location:
+📊 Methods:
+💡 Impact:`,
   
-  skill: `💼 Skill: [Skill name]
-👥 Trained: [Number]
-⏱️ Duration: [Hours/weeks]
-📍 Location: [Location]
-🏆 Certification: [Type of certification]
-🎯 Employability: [Job placement details]
-
-Example:
-💼 Skill: Basic Accounting
-👥 Trained: 30 women
-⏱️ Duration: 6 weeks
-📍 Location: FWF Training Center
-🏆 Certification: Ministry of Skill Certified
-🎯 Employability: 50% already hired by local shops`,
+  skill: `💼 Skill:
+👥 Trained:
+⏱️ Duration:
+📍 Location:
+🏆 Certification:
+🎯 Employability:`,
   
-  other: `📌 Activity: [What was done]
-📍 Location: [Location]
-👥 Involved: [Number of people]
-🎯 Goal: [Objective]
-✅ Completed: [Outcome]
-💫 Special: [Something special about it]`
+  other: `📌 Activity:
+📍 Location:
+👥 Involved:
+🎯 Goal:
+✅ Completed:`
 };
 
 // (pill selector replaces updateTemplate - moved below)
@@ -3711,59 +3683,92 @@ function selectPostPill(btn){
   }
 })();
 
-// Handle image file selection and show preview
-let postImageFiles = []; // track files separately
+// Handle image file selection and show preview (WhatsApp-style)
+let postImageFiles = [];
+let postImageDataUrls = [];
+let postActiveImageIdx = 0;
+
 function handlePostImageSelect(e){
   const files = Array.from(e.target.files || []);
-  const previewGrid = document.getElementById('postImagePreviewGrid');
-  
   for(const file of files){
-    if(file.size > 5 * 1024 * 1024){
-      notify(`${file.name} is too large (max 5MB)`,'warning');
-      continue;
-    }
+    if(postImageFiles.length >= 10){ notify('Max 10 photos allowed','warning'); break; }
+    if(file.size > 5 * 1024 * 1024){ notify(`${file.name} is too large (max 5MB)`,'warning'); continue; }
     postImageFiles.push(file);
-    
     const reader = new FileReader();
     reader.onload = (event) => {
-      const preview = document.createElement('div');
-      preview.style.cssText = 'position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)';
-      
-      const img = document.createElement('img');
-      img.src = event.target.result;
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover';
-      
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.style.cssText = 'position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px';
-      removeBtn.innerHTML = '&times;';
-      const idx = postImageFiles.length - 1;
-      removeBtn.onclick = (ev) => {
-        ev.preventDefault();
-        preview.remove();
-        postImageFiles.splice(idx, 1);
-        updatePostImageCount();
-      };
-      
-      preview.appendChild(img);
-      preview.appendChild(removeBtn);
-      previewGrid.appendChild(preview);
-      updatePostImageCount();
+      postImageDataUrls.push(event.target.result);
+      renderPostImagePreview();
     };
     reader.readAsDataURL(file);
   }
+  // Reset file input so same file can be re-selected
+  e.target.value = '';
+}
+
+function renderPostImagePreview(){
+  const area = document.getElementById('postImageArea');
+  const prompt = document.getElementById('postAddPhotoPrompt');
+  const mainImg = document.getElementById('postMainImg');
+  const strip = document.getElementById('postThumbStrip');
+  const countEl = document.getElementById('postPhotoNum');
+  const imgCount = document.getElementById('postImageCount');
+  const imgNum = document.getElementById('postImgNum');
+  
+  if(postImageDataUrls.length === 0){
+    area.style.display = 'none';
+    prompt.style.display = 'block';
+    if(imgCount) imgCount.style.display = 'none';
+    return;
+  }
+  
+  area.style.display = 'block';
+  prompt.style.display = 'none';
+  
+  // Clamp active index
+  if(postActiveImageIdx >= postImageDataUrls.length) postActiveImageIdx = postImageDataUrls.length - 1;
+  if(postActiveImageIdx < 0) postActiveImageIdx = 0;
+  
+  // Main large image
+  mainImg.src = postImageDataUrls[postActiveImageIdx];
+  
+  // Photo count
+  countEl.textContent = postImageDataUrls.length;
+  if(imgCount){ imgCount.style.display = 'inline'; imgNum.textContent = postImageDataUrls.length; }
+  
+  // Thumbnail strip (show if more than 1 photo)
+  if(postImageDataUrls.length > 1){
+    strip.style.display = 'block';
+    strip.innerHTML = postImageDataUrls.map((url, i) => `
+      <span class="thumb-item ${i === postActiveImageIdx ? 'active' : ''}" onclick="selectPostThumb(${i})">
+        <img src="${url}" alt="">
+        <button type="button" class="thumb-remove" onclick="event.stopPropagation();removePostImage(${i})">&times;</button>
+      </span>
+    `).join('');
+    // Scroll active thumb into view
+    setTimeout(() => {
+      const activeThumb = strip.querySelector('.thumb-item.active');
+      if(activeThumb) activeThumb.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    }, 50);
+  } else {
+    strip.style.display = 'none';
+    strip.innerHTML = '';
+  }
+}
+
+function selectPostThumb(idx){
+  postActiveImageIdx = idx;
+  renderPostImagePreview();
+}
+
+function removePostImage(idx){
+  postImageFiles.splice(idx, 1);
+  postImageDataUrls.splice(idx, 1);
+  renderPostImagePreview();
 }
 
 function updatePostImageCount(){
-  const countEl = document.getElementById('postImageCount');
-  const numEl = document.getElementById('postImgNum');
-  const n = document.getElementById('postImagePreviewGrid').children.length;
-  if(n > 0){
-    countEl.style.display = 'inline';
-    numEl.textContent = n;
-  } else {
-    countEl.style.display = 'none';
-  }
+  // Legacy compat - now handled by renderPostImagePreview
+  renderPostImagePreview();
 }
 
 async function submitPost(){
@@ -3807,11 +3812,12 @@ async function submitPost(){
     document.getElementById('postType').value = '';
     document.getElementById('postDesc').value = '';
     document.getElementById('postMedia').value = '';
-    document.getElementById('postImagePreviewGrid').innerHTML = '';
     document.getElementById('postCharCount').textContent = '0';
     document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));
     postImageFiles = [];
-    updatePostImageCount();
+    postImageDataUrls = [];
+    postActiveImageIdx = 0;
+    renderPostImagePreview();
     
   } catch(e){
     notify(e.message || 'Failed to submit post','error');

@@ -504,6 +504,20 @@ app.post('/api/pay/donation', async (req, res) => {
 });
 
 // Admin: reset a member's password
+// Bootstrap: reset admin password using setup secret key (no auth needed)
+app.post('/api/admin/bootstrap-reset', async (req, res) => {
+  const { secret, newPassword } = req.body;
+  const BOOTSTRAP_SECRET = process.env.BOOTSTRAP_SECRET || 'fwf-setup-2024';
+  if (secret !== BOOTSTRAP_SECRET) return res.status(403).json({ error: 'Invalid secret' });
+  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 chars' });
+  const admin = await User.findOne({ role: 'admin' });
+  if (!admin) return res.status(404).json({ error: 'Admin not found' });
+  admin.password_hash = bcrypt.hashSync(newPassword, 10);
+  await admin.save();
+  console.log(`✅ Admin password reset via bootstrap endpoint`);
+  res.json({ ok: true, message: `Admin password updated. Email: ${admin.email}` });
+});
+
 app.post('/api/admin/reset-password', auth('admin'), async (req, res) => {
   const { memberId, newPassword } = req.body;
   if (!memberId || !newPassword) return res.status(400).json({ error: 'memberId & newPassword required' });

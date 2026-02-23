@@ -310,7 +310,7 @@ app.get('/', (req, res) => {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
       admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
-      payment: ['/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
+      payment: ['/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
     }
@@ -364,6 +364,44 @@ app.post('/api/pay/simulate-join', internalAuth, async (req, res) => {
 // ═══════════════════════════════════════════════════════
 // RAZORPAY PAYMENT GATEWAY
 // ═══════════════════════════════════════════════════════
+
+// Create Razorpay Subscription (monthly ₹500 — UPI AutoPay mandate)
+app.post('/api/pay/create-subscription', async (req, res) => {
+  try {
+    // Get or create a monthly plan (cache plan_id in env or DB)
+    let planId = process.env.RAZORPAY_PLAN_ID;
+    if (!planId) {
+      // Create a new plan on-the-fly and ideally persist it
+      const plan = await razorpay.plans.create({
+        period: 'monthly',
+        interval: 1,
+        item: { name: 'FWF Monthly Membership', amount: 50000, currency: 'INR', description: 'Foundation for Women\'s Future — monthly membership fee' },
+        notes: { org: 'FWF' }
+      });
+      planId = plan.id;
+      console.log('✅ Razorpay plan created:', planId, '— set RAZORPAY_PLAN_ID in .env to reuse');
+    }
+
+    const { name, email, mobile } = req.body || {};
+    const subscription = await razorpay.subscriptions.create({
+      plan_id:        planId,
+      total_count:    120,       // 10 years max, member can cancel
+      quantity:       1,
+      customer_notify: 1,
+      notes: { name: name || '', email: email || '', mobile: mobile || '', org: 'FWF' }
+    });
+
+    res.json({
+      ok: true,
+      subscription_id: subscription.id,
+      key: process.env.RAZORPAY_KEY_ID
+    });
+  } catch (err) {
+    console.error('Razorpay create-subscription error:', err);
+    captureError(err, { context: 'razorpay-create-subscription' });
+    res.status(500).json({ error: 'Failed to create subscription: ' + (err.error?.description || err.message) });
+  }
+});
 
 // Create Razorpay Order
 app.post('/api/pay/create-order', async (req, res) => {
@@ -427,18 +465,27 @@ app.post('/api/pay/verify', async (req, res) => {
 // Razorpay Membership Payment: Create order + after verify → register member
 app.post('/api/pay/membership', async (req, res) => {
   try {
-    const { name, mobile, email, project, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    const { name, mobile, email, project,
+            razorpay_payment_id, razorpay_order_id, razorpay_subscription_id, razorpay_signature } = req.body;
     if (!name || !mobile || !email) return res.status(400).json({ error: 'name, mobile & email required' });
-    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      return res.status(400).json({ error: 'Payment details missing' });
-    }
+    if (!razorpay_payment_id || !razorpay_signature) return res.status(400).json({ error: 'Payment details missing' });
 
-    // Verify signature
+    // Verify signature — subscription flow uses payment_id|subscription_id, order flow uses order_id|payment_id
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    const generated_signature = crypto
-      .createHmac('sha256', keySecret)
-      .update(razorpay_order_id + '|' + razorpay_payment_id)
-      .digest('hex');
+    let generated_signature;
+    if (razorpay_subscription_id) {
+      generated_signature = crypto
+        .createHmac('sha256', keySecret)
+        .update(razorpay_payment_id + '|' + razorpay_subscription_id)
+        .digest('hex');
+    } else if (razorpay_order_id) {
+      generated_signature = crypto
+        .createHmac('sha256', keySecret)
+        .update(razorpay_order_id + '|' + razorpay_payment_id)
+        .digest('hex');
+    } else {
+      return res.status(400).json({ error: 'Missing order_id or subscription_id' });
+    }
 
     if (generated_signature !== razorpay_signature) {
       return res.status(400).json({ ok: false, error: 'Payment verification failed' });
@@ -463,25 +510,27 @@ app.post('/api/pay/membership', async (req, res) => {
       role: 'member',
       membership_active: true,
       referral_code: refCode,
-      wallet: {}
+      wallet: {},
+      razorpay_subscription_id: razorpay_subscription_id || null,
+      subscription_status: razorpay_subscription_id ? 'active' : 'pending'
     });
 
     // Record membership fee
     await MembershipFee.create({
-      txn_id: razorpay_payment_id,
-      member_id: memberId,
+      txn_id:      razorpay_payment_id,
+      member_id:   memberId,
       member_name: name,
-      amount: 500,
-      fee_type: 'joining',
+      amount:      500,
+      fee_type:    'joining',
       payment_mode: 'razorpay',
-      payment_ref: razorpay_order_id,
-      status: 'verified',
+      payment_ref:  razorpay_subscription_id || razorpay_order_id || '',
+      status:      'verified',
       verified_at: new Date(),
-      notes: `Razorpay payment. Project: ${project || '-'}`
+      notes:       `Razorpay${razorpay_subscription_id ? ' subscription autopay' : ' order'} | Project: ${project || '-'}`
     });
 
-    addBreadcrumb('payment', 'Membership payment successful', { memberId, paymentId: razorpay_payment_id });
-    res.json({ ok: true, memberId, password: plain, paymentId: razorpay_payment_id });
+    addBreadcrumb('payment', 'Membership payment successful', { memberId, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id });
+    res.json({ ok: true, memberId, password: plain, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id });
   } catch (err) {
     console.error('Razorpay membership error:', err);
     captureError(err, { context: 'razorpay-membership' });

@@ -43,7 +43,11 @@ const userSchema = new mongoose.Schema({
   
   // Embedded member project (1-to-1 relationship)
   member_project: memberProjectSchema,
-  
+
+  // Razorpay subscription for monthly auto-debit
+  razorpay_subscription_id: { type: String, sparse: true, index: true },
+  subscription_status:       { type: String, enum: ['active','halted','cancelled','completed','pending'], default: 'pending' },
+
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 }, { 

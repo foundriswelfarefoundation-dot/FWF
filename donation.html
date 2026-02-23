@@ -247,7 +247,7 @@
           <li><i class="fa-solid fa-check"></i> Direct impact tracking</li>
           <li><i class="fa-solid fa-check"></i> UPI / Bank transfer</li>
         </ul>
-        <a class="cta-button" href="#donateModal" id="openDonate2"><i class="fa-solid fa-heart"></i> Donate Now</a>
+        <button class="cta-button" id="openDonate2"><i class="fa-solid fa-heart"></i> Donate Now</button>
       </div>
       <div class="content-right"><div class="illustration"><i class="fa-solid fa-hand-holding-heart"></i></div></div>
     </div>
@@ -429,18 +429,21 @@
     <div id="memberStep2" style="display:none;">
       <h2 class="payTitle">Complete Payment</h2>
       <div style="text-align:center;margin:16px 0">
-        <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin-bottom:16px">
-          <p style="margin:0 0 4px;font-weight:600;color:#4338ca;font-size:0.95rem">Pay securely via Razorpay</p>
-          <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap">
-            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-mobile-alt" style="color:#22c55e"></i> UPI</span>
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:14px;padding:16px;margin-bottom:14px">
+          <p style="margin:0 0 2px;font-weight:700;color:#15803d;font-size:0.95rem"><i class="fa-solid fa-rotate" style="margin-right:6px"></i>Monthly Auto-Debit (UPI AutoPay)</p>
+          <p style="margin:0;font-size:0.8rem;color:#166534">Your first payment of ₹500 will be charged now.<br>A UPI AutoPay mandate will be set up for monthly auto-debit.</p>
+        </div>
+        <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #c7d2fe;border-radius:14px;padding:12px;margin-bottom:14px">
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-mobile-alt" style="color:#22c55e"></i> UPI AutoPay</span>
             <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-credit-card" style="color:#3b82f6"></i> Card</span>
             <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-university" style="color:#8b5cf6"></i> Net Banking</span>
           </div>
         </div>
-        <p style="font-weight:900;font-size:1.4rem;color:#0f172a;margin:12px 0">Membership Fee: ₹500</p>
+        <p style="font-weight:900;font-size:1.4rem;color:#0f172a;margin:8px 0">Membership Fee: ₹<span style="color:#15803d">500</span>/month</p>
       </div>
-      <button id="razorpayMemberBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay ₹500 Securely</button>
-      <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay</p>
+      <button id="razorpayMemberBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay ₹500 &amp; Enable AutoPay</button>
+      <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay &nbsp;|&nbsp; <i class="fa-solid fa-rotate"></i> Auto-renews monthly</p>
     </div>
   </div>
 </div>
@@ -739,38 +742,41 @@
 
   memberForm.addEventListener('submit', (e)=>{ e.preventDefault(); if(!memberForm.checkValidity()){ memberForm.reportValidity(); return; } memberStep1.style.display='none'; memberStep2.style.display='block'; });
 
-  // Razorpay Membership Button
+  // Razorpay Membership Button — Subscription / UPI AutoPay
   document.getElementById('razorpayMemberBtn').addEventListener('click', async () => {
     const btn = document.getElementById('razorpayMemberBtn');
     const formData = {
-      name: memberForm.querySelector('[name="name"]').value.trim(),
-      mobile: memberForm.querySelector('[name="mobile"]').value.trim(),
-      email: memberForm.querySelector('[name="email"]').value.trim(),
+      name:    memberForm.querySelector('[name="name"]').value.trim(),
+      mobile:  memberForm.querySelector('[name="mobile"]').value.trim(),
+      email:   memberForm.querySelector('[name="email"]').value.trim(),
       project: memberForm.querySelector('[name="project"]').value
     };
-    
+    const BTN_LABEL = '<i class="fa-solid fa-lock"></i> Pay ₹500 &amp; Enable AutoPay';
+
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating Order...';
-    
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Setting up subscription...';
+
     try {
-      const orderRes = await fetch('/api/pay/create-order', {
+      // Create a Razorpay subscription (plan + autopay mandate)
+      const subRes = await fetch('/api/pay/create-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 500, type: 'membership', notes: { name: formData.name, email: formData.email } })
+        body: JSON.stringify({ name: formData.name, email: formData.email, mobile: formData.mobile })
       });
-      const orderData = await orderRes.json();
-      if (!orderData.ok) { FWF_Notify.toast(orderData.error || 'Failed to create order', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; return; }
-      
-      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely';
-      
+      const subData = await subRes.json();
+      if (!subData.ok) {
+        FWF_Notify.toast(subData.error || 'Failed to create subscription', 'error');
+        btn.disabled = false; btn.innerHTML = BTN_LABEL; return;
+      }
+
+      btn.innerHTML = BTN_LABEL;
+
       const options = {
-        key: orderData.key,
-        amount: orderData.order.amount,
-        currency: orderData.order.currency,
-        name: 'FWF - Foundation for Women\'s Future',
-        description: 'Membership Registration Fee (₹500)',
+        key: subData.key,
+        subscription_id: subData.subscription_id,
+        name: "FWF - Foundation for Women's Future",
+        description: 'Monthly Membership ₹500/month',
         image: '/assets/images/logo.png',
-        order_id: orderData.order.id,
         prefill: { name: formData.name, email: formData.email, contact: formData.mobile },
         theme: { color: '#6153ff' },
         handler: async function(response) {
@@ -781,43 +787,45 @@
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                name: formData.name,
-                mobile: formData.mobile,
-                email: formData.email,
+                name:    formData.name,
+                mobile:  formData.mobile,
+                email:   formData.email,
                 project: formData.project,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature
+                razorpay_payment_id:      response.razorpay_payment_id,
+                razorpay_subscription_id: response.razorpay_subscription_id,
+                razorpay_signature:       response.razorpay_signature
               })
             });
             const data = await regRes.json();
             if (data.ok) {
-              // Also save to MongoDB for email
-              try { await fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, paymentRef: response.razorpay_payment_id }) }); } catch(e) {}
-              
+              // Save to MongoDB for welcome email
+              try {
+                await fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, paymentRef: response.razorpay_payment_id }) });
+              } catch(e) {}
               FWF_Notify.modal({
-                title: '🎉 Payment Received!',
-                message: `<strong>Member ID:</strong> ${data.memberId}<br><strong>Password:</strong> <code style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;color:#f5576c">${data.password}</code><br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}<br>Credentials sent to your email</small>`,
+                title: '🎉 Welcome to FWF!',
+                message: `<strong>Member ID:</strong> ${data.memberId}<br><strong>Password:</strong> <code style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;color:#f5576c">${data.password}</code><br><br><div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-top:8px;font-size:0.85rem;color:#166534"><i class="fa-solid fa-rotate"></i> <strong>UPI AutoPay activated</strong> — ₹500 will auto-debit monthly</div><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}<br>Credentials sent to your email</small>`,
                 type: 'success',
                 confirmText: 'OK, Got it!',
                 onConfirm: () => { closeModal(memberModal); memberForm.reset(); }
               });
             } else {
-              FWF_Notify.toast(data.error || 'Registration failed. Contact support with Payment ID: ' + response.razorpay_payment_id, 'error', 6000);
+              FWF_Notify.toast(data.error || 'Registration failed. Contact support with ID: ' + response.razorpay_payment_id, 'error', 6000);
             }
           } catch(e) {
             FWF_Notify.toast('Payment received! Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
-          } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; }
+          } finally { btn.disabled = false; btn.innerHTML = BTN_LABEL; }
         },
-        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; } }
+        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = BTN_LABEL; } }
       };
       const rzp = new Razorpay(options);
-      rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely'; });
+      rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = BTN_LABEL; });
       rzp.open();
     } catch(e) {
       FWF_Notify.toast('Error: ' + e.message, 'error');
       btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹500 Securely';
+      btn.innerHTML = BTN_LABEL;
     }
   });
 

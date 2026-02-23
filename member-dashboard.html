@@ -3791,10 +3791,11 @@ async function submitPost(){
     
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
     
-    // TODO: Send to backend API for admin approval
-    // images[] now contains Cloudinary HTTPS URLs (not base64)
-    // For now, simulate success
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Submit to backend — saved as 'pending' until admin approves
+    await AUTH.api('/api/member/create-post', {
+      method: 'POST',
+      body: { content: description, images, post_type: 'other' }
+    });
     
     closeModal('postModal');
     

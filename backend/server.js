@@ -230,7 +230,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats'],
+      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -1617,7 +1617,8 @@ app.post('/api/member/create-post', auth('member'), async (req, res) => {
       post_type: post_type || 'other',
       content,
       images: images || [],
-      location: location || {}
+      location: location || {},
+      status: 'pending'  // requires admin approval before appearing in feed
     });
 
     res.json({ ok: true, post });
@@ -2077,6 +2078,57 @@ app.get('/api/admin/quizzes', auth('admin'), async (req, res) => {
 });
 
 // Admin: get social task stats
+// ========================
+// ADMIN SOCIAL POST ROUTES
+// ========================
+
+// Get all social posts (filter by status)
+app.get('/api/admin/social-posts', auth('admin'), async (req, res) => {
+  try {
+    const status = req.query.status || 'pending';
+    const query = status === 'all' ? {} : { status };
+    const posts = await SocialPost.find(query)
+      .sort({ created_at: -1 }).limit(100).lean();
+    const pending = await SocialPost.countDocuments({ status: 'pending' });
+    res.json({ ok: true, posts, pending });
+  } catch (err) {
+    captureError(err, { context: 'admin-social-posts' });
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+});
+
+// Approve a social post
+app.post('/api/admin/social-posts/:id/approve', auth('admin'), async (req, res) => {
+  try {
+    const post = await SocialPost.findByIdAndUpdate(
+      req.params.id,
+      { status: 'active' },
+      { new: true }
+    );
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.json({ ok: true, post });
+  } catch (err) {
+    captureError(err, { context: 'approve-post' });
+    res.status(500).json({ error: 'Approve failed' });
+  }
+});
+
+// Reject / remove a social post
+app.post('/api/admin/social-posts/:id/reject', auth('admin'), async (req, res) => {
+  try {
+    const post = await SocialPost.findByIdAndUpdate(
+      req.params.id,
+      { status: 'removed' },
+      { new: true }
+    );
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.json({ ok: true, post });
+  } catch (err) {
+    captureError(err, { context: 'reject-post' });
+    res.status(500).json({ error: 'Reject failed' });
+  }
+});
+
 app.get('/api/admin/social-stats', auth('admin'), async (req, res) => {
   try {
     const totalCompletions = await TaskCompletion.countDocuments();

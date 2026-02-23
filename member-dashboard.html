@@ -3656,7 +3656,6 @@ const POST_TEMPLATES = {
 function selectPostPill(btn){
   document.querySelectorAll('.post-pill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('postType').value = btn.dataset.value;
   // Fill template if textarea is empty
   const type = btn.dataset.value;
   const textarea = document.getElementById('postDesc');
@@ -3806,7 +3805,6 @@ async function submitPost(){
     }
     
     // Clear form
-    document.getElementById('postType').value = '';
     document.getElementById('postDesc').value = '';
     document.getElementById('postDesc').style.height = 'auto';
     document.getElementById('postMedia').value = '';

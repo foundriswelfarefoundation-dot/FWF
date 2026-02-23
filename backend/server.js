@@ -51,10 +51,25 @@ const razorpay = new Razorpay({
 const siteRoot = path.resolve(__dirname, '..');
 
 // CORS configuration
+const ALWAYS_ALLOWED = [
+  'https://www.fwfindia.org',
+  'https://fwfindia.org',
+  'https://fwf-alpha.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+const extraOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [];
+const allowedOrigins = [...new Set([...ALWAYS_ALLOWED, ...extraOrigins])];
+
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:3000', 'http://localhost:5173', 'https://www.fwfindia.org'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
   credentials: true
 }));
 
@@ -130,20 +145,27 @@ function amountToPoints(amountInr) {
 
 // Seed admin if not exists
 async function seedData() {
+  const ADMIN_EMAIL = process.env.ADMIN_USER || 'admin@fwf';
+  const ADMIN_PASS_VAL = process.env.ADMIN_PASS || 'Admin@12345';
   const findAdmin = await User.findOne({ role: 'admin' });
   if (!findAdmin) {
-    const hash = bcrypt.hashSync(process.env.ADMIN_PASS || 'Admin@12345', 10);
+    const hash = bcrypt.hashSync(ADMIN_PASS_VAL, 10);
     const memberId = `${ORG_PREFIX}-ADMIN-001`;
     await User.create({
       member_id: memberId,
       name: 'FWF Admin',
-      email: process.env.ADMIN_USER || 'admin@fwf',
+      email: ADMIN_EMAIL,
       password_hash: hash,
       role: 'admin',
       membership_active: true,
       wallet: {}
     });
-    console.log(`✅ Admin created -> user: ${process.env.ADMIN_USER || 'admin@fwf'} | pass: ${process.env.ADMIN_PASS || 'Admin@12345'}`);
+    console.log(`✅ Admin created -> user: ${ADMIN_EMAIL} | pass: ${ADMIN_PASS_VAL}`);
+  } else {
+    // Always sync admin email + password from env vars on every server start
+    const hash = bcrypt.hashSync(ADMIN_PASS_VAL, 10);
+    await User.updateOne({ role: 'admin' }, { email: ADMIN_EMAIL, password_hash: hash });
+    console.log(`✅ Admin credentials synced from env -> user: ${ADMIN_EMAIL}`);
   }
 
   // Seed test member if not exists

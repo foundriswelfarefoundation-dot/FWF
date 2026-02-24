@@ -2000,32 +2000,20 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <!-- ===================== EVENTS & ACTIVITIES ===================== -->
   <div class="page" id="page-events">
 
-    <!-- ═══════ HERO: THIS WEEK'S SOCIAL TASK ═══════ -->
-    <div id="weeklyTaskHero" style="position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#065f46,#047857,#059669);padding:28px 24px 24px;margin-bottom:20px;color:#fff;min-height:180px">
-      <div style="position:absolute;top:0;right:0;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%);pointer-events:none"></div>
-      <div style="position:absolute;bottom:-30px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none"></div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="background:rgba(255,255,255,.2);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px">🌿 SOCIAL WORK</span>
-        <span id="weekBadge" style="background:rgba(255,255,255,.15);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600">Week —</span>
-      </div>
-      <h2 style="margin:10px 0 6px;font-size:22px;font-weight:900;line-height:1.3" id="heroTaskTitle">इस हफ्ते का सामाजिक कार्य</h2>
-      <p style="font-size:13px;opacity:.85;margin:0 0 14px;line-height:1.5" id="heroTaskDesc">Loading...</p>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap" id="heroTaskMeta">
-        <span style="background:rgba(255,255,255,.15);padding:5px 12px;border-radius:10px;font-size:12px;font-weight:700">⭐ 10 Points</span>
-        <span style="font-size:12px;opacity:.7">📷 Upload proof → earn points</span>
-      </div>
-      <div id="heroTaskAction" style="margin-top:16px"></div>
+    <!-- ═══════ SOCIAL WORK — MOTIVATIONAL HEADER ═══════ -->
+    <div style="text-align:center;padding:24px 16px 8px">
+      <div style="font-size:40px;margin-bottom:4px">🙏</div>
+      <h2 style="font-size:20px;font-weight:900;margin:0 0 6px;color:var(--text-primary);line-height:1.3">बदलाव आप से शुरू होता है!</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.5">एक छोटा सा कदम — समाज के लिए बड़ा बदलाव। आज ही कोई नेक काम करें और Selfie share करें!</p>
     </div>
 
-    <!-- ═══════ ALL 10 TASKS CAROUSEL ═══════ -->
-    <div style="margin-bottom:24px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="font-size:15px;font-weight:800;margin:0"><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> All Social Tasks <span style="font-size:12px;color:var(--text-muted);font-weight:500">(10 Week Cycle)</span></h3>
-      </div>
-      <div id="allTasksCarousel" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch">
-        <div class="skeleton-loader" style="min-width:160px;height:100px;border-radius:14px;flex-shrink:0"></div>
-        <div class="skeleton-loader" style="min-width:160px;height:100px;border-radius:14px;flex-shrink:0"></div>
-        <div class="skeleton-loader" style="min-width:160px;height:100px;border-radius:14px;flex-shrink:0"></div>
+    <!-- ═══════ SOCIAL TASKS GRID ═══════ -->
+    <div style="margin:16px 0 24px">
+      <div id="socialTasksGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px">
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
       </div>
     </div>
 
@@ -2064,8 +2052,8 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <i class="fa-solid fa-share-nodes" style="color:#fff;font-size:18px"></i>
         </div>
         <div style="flex:1;min-width:200px">
-          <h4 style="margin:0 0 2px;font-size:14px;font-weight:800;color:#92400e">Refer & Earn Points</h4>
-          <p style="margin:0;font-size:12px;color:#b45309">Quiz enrollment referral पर 10% commission points!</p>
+          <h4 style="margin:0 0 2px;font-size:14px;font-weight:800;color:#92400e">Refer & Earn</h4>
+          <p style="margin:0;font-size:12px;color:#b45309">Quiz referral पर 10% commission!</p>
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
@@ -2078,7 +2066,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- ═══════ MY ACTIVITY SUMMARY ═══════ -->
+    <!-- ═══════ MY ACTIVITY (compact) ═══════ -->
     <div style="margin-bottom:20px">
       <h3 style="font-size:15px;font-weight:800;margin:0 0 12px"><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> My Activity</h3>
       <div class="stats-row" style="margin-bottom:14px">
@@ -2086,11 +2074,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
           <div class="s-label">Tasks Done</div>
           <div class="s-value" id="myTasksCompleted">0</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">
-          <div class="s-icon s-blue"><i class="fa-solid fa-star"></i></div>
-          <div class="s-label">Task Points</div>
-          <div class="s-value" id="myTaskPoints">0</div>
         </div>
         <div class="stat-card" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
           <div class="s-icon s-amber"><i class="fa-solid fa-gamepad"></i></div>
@@ -2104,7 +2087,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
       </div>
 
-      <!-- Expandable history -->
       <details style="background:#fff;border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
         <summary style="padding:14px 16px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px">
           <i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> View Task & Quiz History
@@ -2122,6 +2104,43 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </details>
     </div>
 
+  </div>
+
+  <!-- ═══════ SOCIAL TASK POPUP MODAL ═══════ -->
+  <div class="modal" id="socialTaskModal">
+    <div class="modal-content" style="max-width:440px;border-radius:20px;overflow:hidden">
+      <div id="taskModalHeader" style="padding:20px 20px 14px;color:#fff;position:relative">
+        <div style="position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent);pointer-events:none"></div>
+        <button onclick="closeModal('socialTaskModal')" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">&times;</button>
+        <div style="font-size:36px;margin-bottom:6px" id="taskModalIcon">🌱</div>
+        <h3 style="color:#fff;margin:0 0 4px;font-size:18px;font-weight:900" id="taskModalTitle">Task Title</h3>
+      </div>
+      <div style="padding:16px 20px 20px">
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 12px" id="taskModalDesc">Task description...</p>
+        <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <i class="fa-solid fa-camera" style="color:var(--accent)"></i>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary)">📸 How to participate</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5" id="taskModalInstruction">Photo instruction...</p>
+        </div>
+
+        <!-- Selfie section -->
+        <div style="border:2px dashed #e5e7eb;border-radius:14px;padding:14px;text-align:center;margin-bottom:14px" id="taskSelfieArea">
+          <div id="taskSelfiePreview" style="display:none;margin-bottom:10px">
+            <img id="taskSelfieImg" style="max-width:100%;max-height:200px;border-radius:12px">
+          </div>
+          <label style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#E87722,#ff9a3c);color:#fff;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px">
+            <i class="fa-solid fa-camera"></i> Selfie लें / Photo चुनें
+            <input type="file" accept="image/*" capture="user" id="taskSelfieInput" onchange="previewTaskSelfie(this)" style="display:none">
+          </label>
+        </div>
+
+        <button class="btn" id="taskSelfieSubmitBtn" onclick="submitTaskSelfie()" style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px" disabled>
+          <i class="fa-solid fa-paper-plane"></i> Selfie Share करें — Social Book पर Post होगा!
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ===================== HELP & SUPPORT ===================== -->
@@ -4347,164 +4366,169 @@ async function submitPost(){
    ============================================ */
 let eventsLoaded = false;
 let allQuizzesCache = []; // for tier filtering
+let currentTaskData = null; // for popup
 
 async function loadEventsPage(){
   if(eventsLoaded) return;
   eventsLoaded = true;
   try {
-    await Promise.all([loadWeeklyTask(), loadAllTasks(), loadActiveQuizzes(), loadMyActivities()]);
+    await Promise.all([loadSocialTasksGrid(), loadActiveQuizzes(), loadMyActivities()]);
     setupQuizReferralLinks();
   } catch(e){ console.error('Events load err:', e); }
 }
 
-// --- WEEKLY TASK HERO ---
-async function loadWeeklyTask(){
-  const hero = document.getElementById('weeklyTaskHero');
+// --- SOCIAL TASKS GRID ---
+const taskGradients = [
+  'linear-gradient(135deg,#065f46,#059669)', // green
+  'linear-gradient(135deg,#1e40af,#3b82f6)', // blue
+  'linear-gradient(135deg,#92400e,#d97706)', // amber
+  'linear-gradient(135deg,#7c2d12,#ea580c)', // orange
+  'linear-gradient(135deg,#581c87,#9333ea)', // purple
+  'linear-gradient(135deg,#155e75,#06b6d4)', // cyan
+  'linear-gradient(135deg,#9f1239,#f43f5e)', // rose
+  'linear-gradient(135deg,#1e3a5f,#3b82f6)', // navy
+  'linear-gradient(135deg,#064e3b,#10b981)', // emerald
+  'linear-gradient(135deg,#78350f,#f59e0b)', // gold
+];
+
+async function loadSocialTasksGrid(){
   try {
-    const data = await AUTH.api('/api/member/weekly-task');
-    if(!data.ok || !data.task){
-      hero.innerHTML = '<div style="text-align:center;padding:30px 0"><div style="font-size:40px;margin-bottom:8px">🌟</div><h3 style="color:#fff;margin:0">इस हफ्ते कोई task नहीं है</h3><p style="color:rgba(255,255,255,.7);font-size:13px">जल्दी ही नया task आएगा!</p></div>';
+    const data = await AUTH.api('/api/member/all-tasks');
+    const grid = document.getElementById('socialTasksGrid');
+    if(!data.ok || !data.tasks?.length){
+      grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">कोई task उपलब्ध नहीं</p>';
       return;
     }
-    const t = data.task;
-    const completed = data.completed;
+    const completedIds = new Set(data.completions?.map(c => c.task_id || `TASK-0${c.week_number}`) || []);
 
-    // Update hero badge
-    document.getElementById('weekBadge').textContent = `Week ${data.cycleWeek} of 10`;
-    document.getElementById('heroTaskTitle').innerHTML = `${t.icon} ${t.title}`;
-    document.getElementById('heroTaskDesc').textContent = t.description;
-    document.getElementById('heroTaskMeta').innerHTML = `
-      <span style="background:rgba(255,255,255,.15);padding:5px 12px;border-radius:10px;font-size:12px;font-weight:700">⭐ ${t.points_reward} Points</span>
-      <span style="font-size:12px;opacity:.7">📷 ${t.photo_instruction}</span>`;
-
-    // Hero gradient based on completion
-    if(completed){
-      hero.style.background = 'linear-gradient(135deg,#14532d,#166534,#15803d)';
-      document.getElementById('heroTaskAction').innerHTML = `
-        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px">
-          <span style="font-size:24px">🎉</span>
+    grid.innerHTML = data.tasks.map((t, i) => {
+      const done = completedIds.has(t.task_id);
+      const grad = taskGradients[i % taskGradients.length];
+      return `
+        <div onclick="openTaskPopup(${i})" style="cursor:pointer;border-radius:18px;overflow:hidden;position:relative;background:${grad};padding:18px 14px 14px;color:#fff;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(0,0,0,.08)" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='none'">
+          <div style="position:absolute;top:0;right:0;width:70px;height:70px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent);pointer-events:none"></div>
+          ${done ? '<div style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,.25);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">✅</div>' : ''}
+          <div style="font-size:32px;margin-bottom:8px">${t.icon}</div>
           <div>
-            <div style="font-weight:800;font-size:14px">Task Complete!</div>
-            <div style="font-size:12px;opacity:.8">अगले हफ्ते नया task आएगा</div>
+            <div style="font-size:12px;font-weight:800;line-height:1.35;margin-bottom:4px">${t.title}</div>
+            <div style="font-size:10px;opacity:.75;line-height:1.3">${t.description.substring(0,50)}...</div>
           </div>
         </div>`;
-    } else {
-      document.getElementById('heroTaskAction').innerHTML = `
-        <div style="background:rgba(255,255,255,.12);border-radius:14px;padding:14px">
-          <div style="margin-bottom:10px">
-            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);display:block;margin-bottom:6px"><i class="fa-solid fa-camera"></i> फोटो अपलोड करें</label>
-            <input type="file" accept="image/*" capture="environment" class="form-input" id="taskPhotoInput" onchange="previewTaskPhoto(this)" style="font-size:12px;background:rgba(255,255,255,.95);color:#333;border:none;border-radius:10px">
-          </div>
-          <div id="taskPhotoPreview" style="display:none;margin-bottom:10px">
-            <img id="taskPreviewImg" style="max-width:100%;max-height:160px;border-radius:10px;border:2px solid rgba(255,255,255,.3)">
-          </div>
-          <button class="btn" onclick="submitTaskCompletion('${t.task_id}')" id="submitTaskBtn" style="width:100%;background:#fff;color:#065f46;font-weight:800;border-radius:10px;padding:10px">
-            <i class="fa-solid fa-check"></i> Task पूरा करें — ${t.points_reward} Points कमाएं!
-          </button>
-        </div>`;
-    }
+    }).join('');
+
+    // Store for popup use
+    window._socialTasks = data.tasks;
+    window._socialCompletedIds = completedIds;
   } catch(e){
-    hero.innerHTML = '<p style="color:rgba(255,255,255,.8);font-size:13px;text-align:center;padding:20px">Task load करने में error हुआ</p>';
+    document.getElementById('socialTasksGrid').innerHTML = '<p style="color:var(--danger);font-size:13px">Tasks load error</p>';
   }
 }
 
-function previewTaskPhoto(input){
+function openTaskPopup(idx){
+  const t = window._socialTasks[idx];
+  if(!t) return;
+  currentTaskData = t;
+  const grad = taskGradients[idx % taskGradients.length];
+  const done = window._socialCompletedIds?.has(t.task_id);
+
+  document.getElementById('taskModalHeader').style.background = grad;
+  document.getElementById('taskModalIcon').textContent = t.icon;
+  document.getElementById('taskModalTitle').textContent = t.title;
+  document.getElementById('taskModalDesc').textContent = t.description;
+  document.getElementById('taskModalInstruction').textContent = t.photo_instruction;
+
+  // Reset selfie
+  document.getElementById('taskSelfiePreview').style.display = 'none';
+  document.getElementById('taskSelfieInput').value = '';
+  const submitBtn = document.getElementById('taskSelfieSubmitBtn');
+  submitBtn.disabled = true;
+
+  if(done){
+    document.getElementById('taskSelfieArea').innerHTML = `
+      <div style="padding:16px;text-align:center">
+        <div style="font-size:40px;margin-bottom:6px">🎉</div>
+        <div style="font-weight:800;font-size:14px;color:#166534">आपने यह कार्य पूरा कर दिया!</div>
+      </div>`;
+    submitBtn.style.display = 'none';
+  } else {
+    document.getElementById('taskSelfieArea').innerHTML = `
+      <div id="taskSelfiePreview" style="display:none;margin-bottom:10px">
+        <img id="taskSelfieImg" style="max-width:100%;max-height:200px;border-radius:12px">
+      </div>
+      <label style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#E87722,#ff9a3c);color:#fff;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px">
+        <i class="fa-solid fa-camera"></i> Selfie लें / Photo चुनें
+        <input type="file" accept="image/*" capture="user" id="taskSelfieInput" onchange="previewTaskSelfie(this)" style="display:none">
+      </label>`;
+    submitBtn.style.display = 'flex';
+    submitBtn.disabled = true;
+  }
+
+  openModal('socialTaskModal');
+}
+
+function previewTaskSelfie(input){
   if(input.files && input.files[0]){
     const reader = new FileReader();
     reader.onload = (e) => {
-      document.getElementById('taskPreviewImg').src = e.target.result;
-      document.getElementById('taskPhotoPreview').style.display = 'block';
+      let preview = document.getElementById('taskSelfiePreview');
+      let img = document.getElementById('taskSelfieImg');
+      if(!preview || !img){
+        // Re-query after DOM rebuild
+        const area = document.getElementById('taskSelfieArea');
+        preview = area.querySelector('#taskSelfiePreview');
+        img = area.querySelector('#taskSelfieImg');
+      }
+      if(img) img.src = e.target.result;
+      if(preview) preview.style.display = 'block';
+      document.getElementById('taskSelfieSubmitBtn').disabled = false;
     };
     reader.readAsDataURL(input.files[0]);
   }
 }
 
-async function submitTaskCompletion(taskId){
-  const fileInput = document.getElementById('taskPhotoInput');
-  if(!fileInput.files || !fileInput.files[0]){
-    notify('कृपया फोटो अपलोड करें','error');
-    return;
-  }
-  const btn = document.getElementById('submitTaskBtn');
+async function submitTaskSelfie(){
+  const fileInput = document.getElementById('taskSelfieInput');
+  if(!fileInput?.files?.length){ notify('कृपया Selfie/Photo लें','error'); return; }
+  if(!currentTaskData){ notify('Task data not found','error'); return; }
+
+  const btn = document.getElementById('taskSelfieSubmitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submit हो रहा है...';
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
 
   try {
-    // Convert image to base64
-    const reader = new FileReader();
-    const photoUrl = await new Promise((resolve, reject) => {
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(fileInput.files[0]);
-    });
+    // 1. Upload to Cloudinary
+    const imgUrl = await uploadToCloudinary(fileInput.files[0]);
 
-    // Try to get location
-    let latitude = null, longitude = null, location_address = '';
+    // 2. Complete the task via existing API
+    let latitude = null, longitude = null;
     try {
       const pos = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
       });
       latitude = pos.coords.latitude;
       longitude = pos.coords.longitude;
-    } catch(e){ /* location optional */ }
+    } catch(e){ /* optional */ }
 
-    const res = await AUTH.api('/api/member/complete-task', {
+    const taskRes = await AUTH.api('/api/member/complete-task', {
       method: 'POST',
-      body: { task_id: taskId, photo_url: photoUrl, latitude, longitude, location_address }
+      body: { task_id: currentTaskData.task_id, photo_url: imgUrl, latitude, longitude, location_address: '' }
     });
+    // Note: backend auto-creates a Social Book post on task completion
 
-    if(res.ok){
-      notify(res.message || '🎉 Task पूरा हुआ!', 'success');
-      eventsLoaded = false;
-      loadEventsPage();
-      // Refresh wallet data too
-      memberData = null;
+    closeModal('socialTaskModal');
+    if(taskRes.ok){
+      notify('🎉 बहुत अच्छे! Selfie Social Book पर share हो गई!', 'success');
     } else {
-      notify(res.error || 'Error', 'error');
+      notify(taskRes.error || 'Error submitting task', 'error');
     }
+    eventsLoaded = false;
+    loadEventsPage();
+    memberData = null;
   } catch(e){
-    notify(e.message || 'Task submit failed', 'error');
+    notify(e.message || 'Submit failed', 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-check"></i> Task पूरा करें';
-  }
-}
-
-// --- ALL TASKS CAROUSEL ---
-async function loadAllTasks(){
-  try {
-    const data = await AUTH.api('/api/member/all-tasks');
-    const container = document.getElementById('allTasksCarousel');
-    if(!data.ok || !data.tasks?.length){
-      container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:12px">कोई task उपलब्ध नहीं</p>';
-      return;
-    }
-    const completedWeeks = new Set(data.completions?.map(c=>c.week_number) || []);
-    // Get current cycle week for highlighting
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const weekOfYear = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
-    const currentCycleWeek = ((weekOfYear - 1) % 10) + 1;
-
-    container.innerHTML = data.tasks.map(t => {
-      const done = completedWeeks.has(t.week_number);
-      const isCurrent = t.week_number === currentCycleWeek;
-      const bgGrad = done ? 'linear-gradient(135deg,#f0fdf4,#dcfce7)' : isCurrent ? 'linear-gradient(135deg,#fef3c7,#fde68a)' : 'linear-gradient(135deg,var(--bg-1),var(--bg-2,#f3f4f6))';
-      const borderColor = done ? '#86efac' : isCurrent ? '#fbbf24' : 'var(--card-border)';
-      return `
-        <div style="min-width:150px;max-width:170px;flex-shrink:0;scroll-snap-align:start;background:${bgGrad};border:1.5px solid ${borderColor};border-radius:14px;padding:14px 12px;position:relative">
-          ${isCurrent ? '<div style="position:absolute;top:-1px;right:12px;background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:0 0 6px 6px;letter-spacing:.3px">THIS WEEK</div>' : ''}
-          <div style="text-align:center;margin-bottom:8px">
-            <div style="width:40px;height:40px;border-radius:50%;background:${done?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#e5e7eb,#d1d5db)'};display:inline-flex;align-items:center;justify-content:center;font-size:20px">
-              ${done ? '✅' : t.icon}
-            </div>
-          </div>
-          <div style="font-size:11px;font-weight:800;text-align:center;line-height:1.3;margin-bottom:4px;color:${done?'#166534':'var(--text-primary)'}">${t.title}</div>
-          <div style="font-size:10px;color:${done?'#15803d':'var(--text-muted)'};text-align:center">Week ${t.week_number} • ${t.points_reward} pts</div>
-        </div>`;
-    }).join('');
-  } catch(e){
-    document.getElementById('allTasksCarousel').innerHTML = '<p style="color:var(--danger);font-size:13px">Tasks load error</p>';
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Selfie Share करें — Social Book पर Post होगा!';
   }
 }
 
@@ -4790,7 +4814,6 @@ async function loadMyActivities(){
 
     // Stats
     document.getElementById('myTasksCompleted').textContent = taskRes.totalTasks || 0;
-    document.getElementById('myTaskPoints').textContent = taskRes.totalPoints || 0;
     document.getElementById('myQuizCount').textContent = quizRes.participations?.length || 0;
     document.getElementById('myQuizWins').textContent = quizRes.participations?.filter(p => p.status === 'won').length || 0;
 
@@ -4802,7 +4825,7 @@ async function loadMyActivities(){
           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0">✅</div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:700">Task #${c.week_number}</div>
-            <div style="font-size:11px;color:var(--text-muted)">${fmtDate(c.completed_at)} • +${c.points_earned} pts</div>
+            <div style="font-size:11px;color:var(--text-muted)">${fmtDate(c.completed_at)}</div>
           </div>
           ${c.photo_url ? `<img src="${c.photo_url}" style="width:36px;height:36px;border-radius:6px;object-fit:cover" onclick="window.open(this.src)">` : ''}
         </div>

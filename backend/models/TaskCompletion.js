@@ -5,7 +5,7 @@ const taskCompletionSchema = new mongoose.Schema({
   member_id: { type: String, required: true },
   task_id: { type: String, required: true },
   week_number: { type: Number, required: true },
-  year_week: { type: String, required: true }, // e.g. "2026-W08" to prevent duplicates
+  year_week: { type: String }, // legacy field, kept for backward compat
   photo_url: { type: String, required: true },
   photo_timestamp: { type: Date, default: Date.now },
   latitude: { type: Number },
@@ -19,8 +19,8 @@ const taskCompletionSchema = new mongoose.Schema({
   timestamps: { createdAt: 'completed_at', updatedAt: false }
 });
 
-// Prevent duplicate task completion per user per week
-taskCompletionSchema.index({ user_id: 1, year_week: 1 }, { unique: true });
+// Prevent duplicate — one completion per user per task
+taskCompletionSchema.index({ user_id: 1, task_id: 1 }, { unique: true });
 taskCompletionSchema.index({ completed_at: -1 });
 taskCompletionSchema.index({ member_id: 1 });
 

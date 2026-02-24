@@ -262,6 +262,13 @@ async function seedData() {
 
   // Seed social tasks if not exist
   const existingTasks = await SocialTask.countDocuments();
+
+  // Drop old unique index if it exists (migrated from per-week to per-task completion)
+  try {
+    await TaskCompletion.collection.dropIndex('user_id_1_year_week_1');
+    console.log('✅ Dropped old year_week unique index');
+  } catch(e) { /* index doesn't exist, ok */ }
+
   if (existingTasks === 0) {
     const socialTasks = [
       { task_id: 'TASK-01', week_number: 1, title: 'पौधारोपण / Tree Plantation', description: 'एक पौधा लगाएं या किसी पौधे की देखभाल करें। अपने पौधे के साथ सेल्फी लें।', photo_instruction: 'पौधा लगाते हुए या पौधे के साथ फोटो लें', icon: '🌱', points_reward: 10 },
@@ -277,6 +284,140 @@ async function seedData() {
     ];
     await SocialTask.insertMany(socialTasks);
     console.log('✅ Seeded 10 social tasks');
+  }
+
+  // Seed sample quizzes if not exist
+  const existingQuizzes = await Quiz.countDocuments();
+  if (existingQuizzes === 0) {
+    const now = new Date();
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0); // last day of current month
+    const halfYearEnd = new Date(now.getFullYear(), now.getMonth() + 6, 0);
+    const yearEnd = new Date(now.getFullYear(), 11, 31);
+
+    const sampleQuizzes = [
+      {
+        quiz_id: `M${String(now.getFullYear()).slice(2)}${String(now.getMonth()+1).padStart(2,'0')}`,
+        title: 'Monthly GK Challenge',
+        description: 'सामान्य ज्ञान का मासिक quiz — जीतें इनाम!',
+        type: 'monthly',
+        game_type: 'mcq',
+        entry_fee: 100,
+        start_date: now,
+        end_date: monthEnd,
+        result_date: new Date(monthEnd.getTime() + 3*86400000),
+        status: 'active',
+        prizes: { first: 5000, second: 2000, third: 1000 },
+        questions: [
+          { q_no: 1, question: 'भारत की राजधानी क्या है?', options: ['मुंबई', 'दिल्ली', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 },
+          { q_no: 2, question: 'गंगा नदी कहाँ से निकलती है?', options: ['गंगोत्री', 'यमुनोत्री', 'केदारनाथ', 'बद्रीनाथ'], correct_answer: 0, points: 1 },
+          { q_no: 3, question: 'भारत का सबसे बड़ा राज्य कौन सा है?', options: ['मध्य प्रदेश', 'उत्तर प्रदेश', 'राजस्थान', 'महाराष्ट्र'], correct_answer: 2, points: 1 },
+          { q_no: 4, question: 'हमारे राष्ट्रीय ध्वज में कितने रंग हैं?', options: ['2', '3', '4', '5'], correct_answer: 1, points: 1 },
+          { q_no: 5, question: 'भारत के पहले राष्ट्रपति कौन थे?', options: ['महात्मा गांधी', 'जवाहरलाल नेहरू', 'डॉ. राजेंद्र प्रसाद', 'सरदार पटेल'], correct_answer: 2, points: 1 },
+          { q_no: 6, question: 'TAJ MAHAL किसने बनवाया था?', options: ['अकबर', 'शाहजहाँ', 'जहाँगीर', 'औरंगज़ेब'], correct_answer: 1, points: 1 },
+          { q_no: 7, question: 'भारत का राष्ट्रीय खेल कौन सा है?', options: ['क्रिकेट', 'कबड्डी', 'हॉकी', 'फुटबॉल'], correct_answer: 2, points: 1 },
+          { q_no: 8, question: 'सूरज किस दिशा में उगता है?', options: ['पश्चिम', 'उत्तर', 'दक्षिण', 'पूर्व'], correct_answer: 3, points: 1 },
+          { q_no: 9, question: '1 किलोमीटर में कितने मीटर होते हैं?', options: ['100', '500', '1000', '10000'], correct_answer: 2, points: 1 },
+          { q_no: 10, question: 'भारत का सबसे लंबा नदी पुल कौन सा है?', options: ['हावड़ा ब्रिज', 'भूपेन हजारिका सेतु', 'महात्मा गांधी सेतु', 'राजीव गांधी सेतु'], correct_answer: 1, points: 1 }
+        ]
+      },
+      {
+        quiz_id: `M${String(now.getFullYear()).slice(2)}${String(now.getMonth()+1).padStart(2,'0')}-TF`,
+        title: 'True or False — मज़ेदार तथ्य',
+        description: 'सही या गलत बताओ — interesting facts quiz!',
+        type: 'monthly',
+        game_type: 'true_false',
+        entry_fee: 100,
+        start_date: now,
+        end_date: monthEnd,
+        result_date: new Date(monthEnd.getTime() + 3*86400000),
+        status: 'active',
+        prizes: { first: 5000, second: 2000, third: 1000 },
+        questions: [
+          { q_no: 1, question: 'चाँद पर पानी मिला है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
+          { q_no: 2, question: 'शहद कभी खराब नहीं होता।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
+          { q_no: 3, question: 'ऑक्टोपस के 10 दिल होते हैं।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 },
+          { q_no: 4, question: 'भारत में सबसे ज़्यादा बोली जाने वाली भाषा हिंदी है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
+          { q_no: 5, question: 'सूर्य एक तारा है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
+          { q_no: 6, question: 'माउंट एवरेस्ट भारत में है।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 },
+          { q_no: 7, question: 'इंसानी शरीर में 206 हड्डियाँ होती हैं।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
+          { q_no: 8, question: 'बिजली की खोज थॉमस एडिसन ने की।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 }
+        ]
+      },
+      {
+        quiz_id: `H${String(now.getFullYear()).slice(2)}01`,
+        title: 'Half-Yearly Mega Quiz',
+        description: '6 महीने का बड़ा quiz — बड़ा इनाम जीतने का मौका!',
+        type: 'half_yearly',
+        game_type: 'general',
+        entry_fee: 500,
+        start_date: now,
+        end_date: halfYearEnd,
+        result_date: new Date(halfYearEnd.getTime() + 5*86400000),
+        status: 'active',
+        prizes: { first: 25000, second: 10000, third: 5000 },
+        questions: [
+          { q_no: 1, question: 'विश्व का सबसे बड़ा महासागर कौन सा है?', options: ['अटलांटिक', 'हिंद महासागर', 'प्रशांत महासागर', 'आर्कटिक'], correct_answer: 2, points: 1 },
+          { q_no: 2, question: 'भारतीय संविधान कब लागू हुआ?', options: ['15 Aug 1947', '26 Jan 1950', '2 Oct 1949', '26 Nov 1949'], correct_answer: 1, points: 1 },
+          { q_no: 3, question: 'पृथ्वी सूर्य का चक्कर कितने दिन में लगाती है?', options: ['365', '360', '366', '364'], correct_answer: 0, points: 1 },
+          { q_no: 4, question: 'विश्व का सबसे ऊँचा पर्वत शिखर कौन सा है?', options: ['K2', 'कंचनजंगा', 'माउंट एवरेस्ट', 'मकालू'], correct_answer: 2, points: 1 },
+          { q_no: 5, question: 'RBI का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 },
+          { q_no: 6, question: 'भारत में कुल कितने राज्य हैं (2024)?', options: ['28', '29', '30', '31'], correct_answer: 0, points: 1 },
+          { q_no: 7, question: 'चंद्रयान-3 किस साल लॉन्च हुआ?', options: ['2021', '2022', '2023', '2024'], correct_answer: 2, points: 1 },
+          { q_no: 8, question: 'DNA का पूरा नाम क्या है?', options: ['Di Nucleic Acid', 'Deoxyribo Nucleic Acid', 'Data Nucleic Acid', 'Dual Nucleic Acid'], correct_answer: 1, points: 1 },
+          { q_no: 9, question: 'भारत का सबसे बड़ा बांध कौन सा है?', options: ['भाखड़ा नांगल', 'हीराकुंड', 'टिहरी', 'सरदार सरोवर'], correct_answer: 2, points: 1 },
+          { q_no: 10, question: 'IPL का पहला सीज़न कब हुआ?', options: ['2007', '2008', '2009', '2010'], correct_answer: 1, points: 1 }
+        ]
+      },
+      {
+        quiz_id: `Y${String(now.getFullYear()).slice(2)}01`,
+        title: 'Yearly Grand Championship',
+        description: '🏆 साल का सबसे बड़ा quiz — Grand Prize ₹1 लाख!',
+        type: 'yearly',
+        game_type: 'mcq',
+        entry_fee: 1000,
+        start_date: now,
+        end_date: yearEnd,
+        result_date: new Date(yearEnd.getTime() + 7*86400000),
+        status: 'active',
+        prizes: { first: 100000, second: 50000, third: 25000 },
+        questions: [
+          { q_no: 1, question: 'भारत रत्न पुरस्कार कब शुरू हुआ?', options: ['1950', '1952', '1954', '1956'], correct_answer: 2, points: 1 },
+          { q_no: 2, question: 'ISRO का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'बेंगलुरु', 'हैदराबाद'], correct_answer: 2, points: 1 },
+          { q_no: 3, question: 'भारतीय रुपये का चिह्न (₹) किसने डिज़ाइन किया?', options: ['डी. उदय कुमार', 'रघुराम राजन', 'अमर्त्य सेन', 'ए.पी.जे. अब्दुल कलाम'], correct_answer: 0, points: 1 },
+          { q_no: 4, question: 'विश्व का सबसे बड़ा देश (क्षेत्रफल) कौन सा है?', options: ['चीन', 'अमेरिका', 'कनाडा', 'रूस'], correct_answer: 3, points: 1 },
+          { q_no: 5, question: 'पहला कंप्यूटर वायरस कौन सा था?', options: ['ILOVEYOU', 'Creeper', 'Brain', 'MyDoom'], correct_answer: 1, points: 1 },
+          { q_no: 6, question: 'UN Security Council में कितने स्थायी सदस्य हैं?', options: ['3', '4', '5', '6'], correct_answer: 2, points: 1 },
+          { q_no: 7, question: 'ओलंपिक खेल कितने साल में होते हैं?', options: ['2', '3', '4', '5'], correct_answer: 2, points: 1 },
+          { q_no: 8, question: 'भारतीय रेलवे की स्थापना कब हुई?', options: ['1843', '1853', '1863', '1873'], correct_answer: 1, points: 1 },
+          { q_no: 9, question: 'विश्व स्वास्थ्य संगठन (WHO) का मुख्यालय कहाँ है?', options: ['न्यूयॉर्क', 'जिनेवा', 'लंदन', 'पेरिस'], correct_answer: 1, points: 1 },
+          { q_no: 10, question: 'MangalyaanAan (Mars Orbiter) भारत ने कब लॉन्च किया?', options: ['2012', '2013', '2014', '2015'], correct_answer: 1, points: 1 },
+          { q_no: 11, question: 'भारत में सबसे लंबी नदी कौन सी है?', options: ['यमुना', 'गोदावरी', 'गंगा', 'नर्मदा'], correct_answer: 2, points: 1 },
+          { q_no: 12, question: 'LED का फ़ुल फ़ॉर्म क्या है?', options: ['Light Energy Diode', 'Light Emitting Diode', 'Laser Emitting Device', 'Low Energy Display'], correct_answer: 1, points: 1 }
+        ]
+      },
+      {
+        quiz_id: `M${String(now.getFullYear()).slice(2)}${String(now.getMonth()+1).padStart(2,'0')}-SP`,
+        title: 'Speed Round — 60 Seconds!',
+        description: '⚡ तेज़ सोचो, तेज़ जवाब दो! Speed quiz challenge.',
+        type: 'monthly',
+        game_type: 'speed',
+        entry_fee: 100,
+        start_date: now,
+        end_date: monthEnd,
+        result_date: new Date(monthEnd.getTime() + 3*86400000),
+        status: 'active',
+        prizes: { first: 3000, second: 1500, third: 500 },
+        questions: [
+          { q_no: 1, question: 'H2O क्या है?', options: ['ऑक्सीजन', 'पानी', 'हाइड्रोजन', 'नमक'], correct_answer: 1, points: 1 },
+          { q_no: 2, question: '7 × 8 = ?', options: ['54', '56', '58', '64'], correct_answer: 1, points: 1 },
+          { q_no: 3, question: 'भारत की मुद्रा क्या है?', options: ['डॉलर', 'रुपया', 'यूरो', 'पौंड'], correct_answer: 1, points: 1 },
+          { q_no: 4, question: 'Rainbow में कितने रंग होते हैं?', options: ['5', '6', '7', '8'], correct_answer: 2, points: 1 },
+          { q_no: 5, question: 'पानी का boiling point?', options: ['50°C', '100°C', '150°C', '200°C'], correct_answer: 1, points: 1 }
+        ]
+      }
+    ];
+    await Quiz.insertMany(sampleQuizzes);
+    console.log('✅ Seeded 5 sample quizzes');
   }
 }
 
@@ -1863,9 +2004,9 @@ app.post('/api/member/complete-task', auth('member'), async (req, res) => {
     const weekOfYear = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
     const yearWeek = `${now.getFullYear()}-W${String(weekOfYear).padStart(2, '0')}`;
 
-    // Check duplicate
-    const existing = await TaskCompletion.findOne({ user_id: req.user.uid, year_week: yearWeek });
-    if (existing) return res.status(400).json({ error: 'इस हफ्ते का task पहले ही पूरा हो चुका है!' });
+    // Check if already completed this specific task
+    const existing = await TaskCompletion.findOne({ user_id: req.user.uid, task_id });
+    if (existing) return res.status(400).json({ error: 'यह task पहले ही पूरा हो चुका है!' });
 
     const user = await User.findById(req.user.uid).select('member_id name avatar_url').lean();
 
@@ -1924,7 +2065,7 @@ app.post('/api/member/complete-task', auth('member'), async (req, res) => {
       post
     });
   } catch (err) {
-    if (err.code === 11000) return res.status(400).json({ error: 'इस हफ्ते का task पहले ही पूरा हो चुका है!' });
+    if (err.code === 11000) return res.status(400).json({ error: 'यह task पहले ही पूरा हो चुका है!' });
     captureError(err, { context: 'complete-task' });
     res.status(500).json({ error: 'Task पूरा करने में error: ' + err.message });
   }
@@ -2350,11 +2491,11 @@ app.get('/api/member/affiliate', auth('member'), async (req, res) => {
 // Admin: create quiz
 app.post('/api/admin/create-quiz', auth('admin'), async (req, res) => {
   try {
-    const { quiz_id, title, description, type, entry_fee, questions, start_date, end_date, result_date, prizes } = req.body;
+    const { quiz_id, title, description, type, game_type, entry_fee, questions, start_date, end_date, result_date, prizes } = req.body;
     if (!quiz_id || !title || !type || !entry_fee) return res.status(400).json({ error: 'Required fields missing' });
 
     const quiz = await Quiz.create({
-      quiz_id, title, description, type, entry_fee,
+      quiz_id, title, description, type, game_type: game_type || 'mcq', entry_fee,
       questions: questions || [],
       start_date: new Date(start_date),
       end_date: new Date(end_date),

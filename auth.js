@@ -8,8 +8,10 @@ window.AUTH = {
       credentials: 'include'
     });
     if(!res.ok){
-      const err = await res.json().catch(()=>({error:'Error'}));
-      throw new Error(err.error||'Request failed');
+      const err = await res.json().catch(()=>({error:'Request failed'}));
+      const e = new Error(err.error||'Request failed');
+      e.status = res.status;
+      throw e;
     }
     return res.json();
   }

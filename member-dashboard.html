@@ -3169,8 +3169,12 @@ async function loadDashboard(){
     populateProfile(data);
 
   } catch(e){
-    notify('Session expired. Redirecting...', 'error');
-    setTimeout(() => location.href = '/login', 2000);
+    if(e.status === 401 || e.status === 403){
+      notify('Session expired. Redirecting to login...', 'error');
+      setTimeout(() => location.href = '/login', 2000);
+    } else {
+      notify('Failed to load dashboard: ' + (e.message || 'Server error. Please refresh.'), 'error');
+    }
   }
 }
 

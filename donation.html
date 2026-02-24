@@ -737,6 +737,7 @@
       email:    donateForm.querySelector('[name="email"]').value,
       pan:      panInput ? panInput.value : '',
       address:  addressInput ? addressInput.value : '',
+      want80g:  want80G ? want80G.checked : false,
       verified_token: null
     };
     document.getElementById('donateAmountDisplay').textContent = donateFormData.amount;
@@ -867,7 +868,7 @@
                 pan: donateFormData.pan,
                 address: donateFormData.address,
                 amount: Number(donateFormData.amount),
-                memberId: donateFormData.memberid,
+                want80g: donateFormData.want80g,
                 verified_token: donateFormData.verified_token,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
@@ -878,7 +879,7 @@
             if (data.ok) {
               FWF_Notify.modal({
                 title: '🎉 Thank You!',
-                message: `Your donation of ₹${donateFormData.amount} has been received successfully!<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>${data.pointsEarned ? '<br><small style="color:#22c55e">Points earned: ' + data.pointsEarned + '</small>' : ''}`,
+                message: `Your donation of ₹${donateFormData.amount} has been received successfully!${data.receipt80GSent ? '<br><br><span style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block">📄 80G Receipt sent to <strong>' + donateFormData.email + '</strong></span>' : (donateFormData.want80g ? '<br><br><small style="color:#ef4444">80G receipt could not be sent — our team will follow up.</small>' : '')}<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>${data.pointsEarned ? '<br><small style="color:#22c55e">Points earned: ' + data.pointsEarned + '</small>' : ''}`,
                 type: 'success',
                 confirmText: 'OK',
                 onConfirm: () => { closeModal(donateModal); resetDonate(); }

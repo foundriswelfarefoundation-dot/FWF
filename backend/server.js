@@ -27,6 +27,7 @@ import Quiz from './models/Quiz.js';
 import QuizParticipation from './models/QuizParticipation.js';
 import ReferralClick from './models/ReferralClick.js';
 import DonationOtp from './models/DonationOtp.js';
+import { send80GReceipt } from './lib/mailer.js';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -544,6 +545,7 @@ app.post('/api/pay/donation', async (req, res) => {
     const {
       name, mobile, email, pan, address,
       amount, memberId: memberIdInput,
+      want80g,
       razorpay_payment_id, razorpay_order_id, razorpay_signature,
       verified_token
     } = req.body;
@@ -623,12 +625,35 @@ app.post('/api/pay/donation', async (req, res) => {
     await Donation.create(donationData);
     addBreadcrumb('payment', 'Donation recorded', { donationId, amount: numAmount, kycRequired, otpVerified });
 
+    // Send 80G receipt email if donor opted in and has PAN + email
+    let receipt80GSent = false;
+    if (want80g && email && pan) {
+      try {
+        await send80GReceipt({
+          donationId,
+          name: name || 'Donor',
+          email,
+          pan,
+          address: address || '',
+          amount: numAmount,
+          paymentId: razorpay_payment_id,
+          date: new Date()
+        });
+        receipt80GSent = true;
+        addBreadcrumb('email', '80G receipt sent', { donationId, email });
+      } catch (mailErr) {
+        console.error('80G receipt email failed:', mailErr.message);
+        captureError(mailErr, { context: '80g-receipt-email', donationId });
+      }
+    }
+
     res.json({
       ok: true,
       donationId,
       message: `Thank you for your ₹${numAmount} donation!`,
       paymentId: razorpay_payment_id,
-      pointsEarned: donationData.points_earned || 0
+      pointsEarned: donationData.points_earned || 0,
+      receipt80GSent
     });
   } catch (err) {
     console.error('Razorpay donation error:', err);

@@ -913,7 +913,23 @@
   document.getElementById('closeMember').addEventListener('click', ()=> closeModal(memberModal));
   memberModal.addEventListener('click', (e)=>{ if(e.target===memberModal) closeModal(memberModal); });
 
-  memberForm.addEventListener('submit', (e)=>{ e.preventDefault(); if(!memberForm.checkValidity()){ memberForm.reportValidity(); return; } memberStep1.style.display='none'; memberStep2.style.display='block'; });
+  memberForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!memberForm.checkValidity()){ memberForm.reportValidity(); return; }
+    const submitBtn = memberForm.querySelector('button[type="submit"]');
+    const origLabel = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Checking...';
+    try {
+      const m = memberForm.querySelector('[name="mobile"]').value.trim();
+      const em = memberForm.querySelector('[name="email"]').value.trim();
+      const chk = await fetch('/api/pay/check-member', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({mobile:m, email:em}) });
+      const chkData = await chk.json();
+      if(!chkData.ok){ FWF_Notify.toast(chkData.error || 'This mobile/email is already registered. Please login.', 'error', 5000); return; }
+      memberStep1.style.display='none'; memberStep2.style.display='block';
+    } catch(err){ FWF_Notify.toast('Could not verify. Please try again.', 'error'); }
+    finally { submitBtn.disabled = false; submitBtn.innerHTML = origLabel; }
+  });
 
   // Razorpay Membership Button — Subscription / UPI AutoPay
   document.getElementById('razorpayMemberBtn').addEventListener('click', async () => {
@@ -976,21 +992,27 @@
                 await fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, paymentRef: response.razorpay_payment_id }) });
               } catch(e) {}
+              // Close modal + reset to step 1 immediately
+              closeModal(memberModal);
+              memberStep2.style.display='none'; memberStep1.style.display='block';
+              memberForm.reset();
               FWF_Notify.modal({
                 title: '🎉 Welcome to FWF!',
                 message: `<strong>Member ID:</strong> ${data.memberId}<br><strong>Password:</strong> <code style="background:#f1f5f9;padding:4px 8px;border-radius:6px;font-weight:700;color:#f5576c">${data.password}</code><br><br><div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-top:8px;font-size:0.85rem;color:#166534"><i class="fa-solid fa-rotate"></i> <strong>UPI AutoPay activated</strong> — ₹500 will auto-debit monthly</div><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}<br>Credentials sent to your email</small>`,
                 type: 'success',
-                confirmText: 'OK, Got it!',
-                onConfirm: () => { closeModal(memberModal); memberForm.reset(); }
+                confirmText: 'Login to Dashboard',
+                onConfirm: () => { window.location.href = '/login'; }
               });
             } else {
               FWF_Notify.toast(data.error || 'Registration failed. Contact support with ID: ' + response.razorpay_payment_id, 'error', 6000);
+              // Go back to form step so user can correct details
+              memberStep2.style.display='none'; memberStep1.style.display='block';
             }
           } catch(e) {
             FWF_Notify.toast('Payment received! Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
           } finally { btn.disabled = false; btn.innerHTML = BTN_LABEL; }
         },
-        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = BTN_LABEL; } }
+        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = BTN_LABEL; memberStep2.style.display='none'; memberStep1.style.display='block'; } }
       };
       const rzp = new Razorpay(options);
       rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = BTN_LABEL; });

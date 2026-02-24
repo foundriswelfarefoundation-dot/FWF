@@ -311,7 +311,7 @@ app.get('/', (req, res) => {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
       admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
-      payment: ['/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
+      payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
     }
@@ -366,9 +366,32 @@ app.post('/api/pay/simulate-join', internalAuth, async (req, res) => {
 // RAZORPAY PAYMENT GATEWAY
 // ═══════════════════════════════════════════════════════
 
+// Quick pre-check: is mobile/email already registered?
+app.post('/api/pay/check-member', async (req, res) => {
+  const { mobile, email } = req.body || {};
+  if (!mobile && !email) return res.status(400).json({ error: 'mobile or email required' });
+  const orCond = [];
+  if (mobile) orCond.push({ mobile });
+  if (email) orCond.push({ email });
+  const exists = await User.findOne({ $or: orCond }).select('_id').lean();
+  if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+  res.json({ ok: true });
+});
+
 // Create Razorpay Subscription (monthly ₹500 — UPI AutoPay mandate)
 app.post('/api/pay/create-subscription', async (req, res) => {
   try {
+    const { name, email, mobile } = req.body || {};
+
+    // Pre-check: reject if mobile/email already registered (before any payment)
+    if (mobile || email) {
+      const orCond = [];
+      if (mobile) orCond.push({ mobile });
+      if (email) orCond.push({ email });
+      const exists = await User.findOne({ $or: orCond });
+      if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+    }
+
     // Get or create a monthly plan (cache plan_id in env or DB)
     let planId = process.env.RAZORPAY_PLAN_ID;
     if (!planId) {
@@ -383,7 +406,6 @@ app.post('/api/pay/create-subscription', async (req, res) => {
       console.log('✅ Razorpay plan created:', planId, '— set RAZORPAY_PLAN_ID in .env to reuse');
     }
 
-    const { name, email, mobile } = req.body || {};
     const subscription = await razorpay.subscriptions.create({
       plan_id:        planId,
       total_count:    120,       // 10 years max, member can cancel

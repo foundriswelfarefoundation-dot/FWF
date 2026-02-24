@@ -186,10 +186,25 @@
     
     payBtn.addEventListener('click', async () => {
       payBtn.disabled = true;
-      payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Order...';
+      payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
       
       try {
+        // Step 0: Pre-check if mobile/email already registered (before any payment)
+        const checkRes = await fetch('/api/pay/check-member', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile: savedData.mobile, email: savedData.email })
+        });
+        const checkData = await checkRes.json();
+        if (!checkData.ok) {
+          showMessage(checkData.error || 'This mobile/email is already registered. Please login instead.', 'error');
+          payBtn.disabled = false;
+          payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹500 Securely';
+          return;
+        }
+
         // Step 1: Create Razorpay order on backend
+        payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Order...';
         const orderRes = await fetch('/api/pay/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -263,10 +278,11 @@
                   });
                 } catch(e) { console.log('MongoDB record save note:', e.message); }
                 
-                // Show success modal
+                // Show success modal and hide payment card
                 document.getElementById('displayMemberId').textContent = regData.memberId || 'Check email';
                 document.getElementById('displayPassword').textContent = regData.password || 'Check email';
                 document.getElementById('displayPaymentId').textContent = response.razorpay_payment_id;
+                document.querySelector('.card').style.display = 'none';
                 successModal.classList.add('show');
                 sessionStorage.removeItem('fwfJoinData');
               } else {

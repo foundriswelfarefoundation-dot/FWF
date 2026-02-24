@@ -362,27 +362,73 @@
 
 <!-- Donation modal -->
 <div id="donateModal" class="modal">
-  <div class="modalCard">
-    <button id="closeDonateModal" class="modalClose"><i class="fa fa-times"></i></button>
+  <div class="modalCard" style="max-width:480px;padding:0;overflow:hidden;border-radius:22px">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#ff416c,#ff4f81);padding:22px 24px 18px;position:relative">
+      <button id="closeDonateModal" class="modalClose" style="top:14px;right:14px;color:#fff;opacity:.85"><i class="fa fa-times"></i></button>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="background:rgba(255,255,255,.18);border-radius:14px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:22px">❤️</div>
+        <div>
+          <h2 style="margin:0;color:#fff;font-size:1.2rem;font-weight:900">Make a Donation</h2>
+          <p style="margin:2px 0 0;color:rgba(255,255,255,.8);font-size:0.8rem">100% secure · 80G receipt available</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:22px 24px 24px">
     <div id="donateStep1">
-      <h2 style="margin:0 0 6px">Donation Details</h2>
-      <p class="subtle">Fill details below to receive 80G receipt</p>
       <form id="donateForm" autocomplete="off" novalidate>
-        <div class="fl-group"><span class="rupee-chip">₹</span><input class="fl-input amount" type="number" min="1" step="1" name="amount" placeholder=" " required /><label class="fl-label">Amount</label></div>
-        <div class="amount-chips" id="amountChips">
+
+        <!-- Amount -->
+        <p style="font-size:0.78rem;font-weight:800;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px">Select or Enter Amount</p>
+        <div class="amount-chips" id="amountChips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
           <button type="button" class="amount-chip" data-amount="200">₹200</button>
           <button type="button" class="amount-chip" data-amount="500">₹500</button>
           <button type="button" class="amount-chip" data-amount="1000">₹1,000</button>
           <button type="button" class="amount-chip" data-amount="2500">₹2,500</button>
           <button type="button" class="amount-chip" data-amount="5000">₹5,000</button>
         </div>
+        <div class="fl-group"><span class="rupee-chip">₹</span><input class="fl-input amount" id="donateAmountInput" type="number" min="1" step="1" name="amount" placeholder=" " required /><label class="fl-label">Custom Amount</label></div>
+
+        <!-- Divider -->
+        <div style="border-top:1px solid #f1f5f9;margin:14px 0 16px"></div>
+
+        <!-- Personal details -->
+        <p style="font-size:0.78rem;font-weight:800;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin:0 0 12px">Your Details</p>
         <div class="fl-group"><i class="fl-icon fa-regular fa-user"></i><input class="fl-input" name="name" placeholder=" " required /><label class="fl-label">Full Name</label></div>
         <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" required /><label class="fl-label">Phone (10-digit)</label></div>
         <div class="fl-group"><i class="fl-icon fa-regular fa-envelope"></i><input class="fl-input" type="email" name="email" placeholder=" " required /><label class="fl-label">Email</label></div>
-        <div class="fl-group"><i class="fl-icon fa-regular fa-id-card"></i><input class="fl-input" name="pan" placeholder=" " maxlength="10" /><label class="fl-label">PAN (for 80G receipt)</label></div>
-        <div class="fl-group"><i class="fl-icon fa-solid fa-location-dot"></i><input class="fl-input" name="address" placeholder=" " /><label class="fl-label">Address (required for ₹50,000+)</label></div>
-        <div class="fl-group"><i class="fl-icon fa-solid fa-user-tag"></i><input class="fl-input" name="memberid" placeholder=" " /><label class="fl-label">Member ID (optional)</label></div>
-        <button type="submit" class="btn-primary">Next: Payment</button>
+
+        <!-- 80G Checkbox -->
+        <label id="toggle80G" style="display:flex;align-items:center;gap:10px;cursor:pointer;background:#f8faff;border:1.5px solid #dbe3f7;border-radius:12px;padding:12px 14px;margin-bottom:12px;transition:.2s">
+          <div style="position:relative;flex-shrink:0">
+            <input type="checkbox" id="want80G" style="opacity:0;position:absolute;width:0;height:0">
+            <div id="checkBox80G" style="width:22px;height:22px;border-radius:6px;border:2px solid #c7d0e4;background:#fff;display:flex;align-items:center;justify-content:center;transition:.2s">
+              <i class="fa-solid fa-check" style="font-size:12px;color:#fff;display:none" id="checkIcon80G"></i>
+            </div>
+          </div>
+          <div>
+            <p style="margin:0;font-size:0.88rem;font-weight:800;color:#1e293b">I want 80G Tax Receipt</p>
+            <p style="margin:0;font-size:0.75rem;color:#64748b">PAN card required for income tax exemption</p>
+          </div>
+          <span style="margin-left:auto;background:#fee2e2;color:#dc2626;font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:20px">Save Tax</span>
+        </label>
+
+        <!-- PAN field (hidden by default, shown on 80G tick or amount>=50000) -->
+        <div id="panField" style="display:none">
+          <div class="fl-group"><i class="fl-icon fa-regular fa-id-card"></i><input class="fl-input" name="pan" id="panInput" placeholder=" " maxlength="10" style="text-transform:uppercase" /><label class="fl-label">PAN Number</label></div>
+        </div>
+
+        <!-- Address field (hidden by default, shown when amount>=50000) -->
+        <div id="addressField" style="display:none">
+          <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:10px 13px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start">
+            <i class="fa-solid fa-triangle-exclamation" style="color:#ea580c;margin-top:2px;flex-shrink:0"></i>
+            <p style="margin:0;font-size:0.78rem;color:#9a3412">As per Income Tax Act, address is <strong>mandatory</strong> for donations of ₹50,000 or more.</p>
+          </div>
+          <div class="fl-group"><i class="fl-icon fa-solid fa-location-dot"></i><input class="fl-input" name="address" id="addressInput" placeholder=" " /><label class="fl-label">Full Address</label></div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#ff416c,#ff4f81);margin-top:4px"><i class="fa-solid fa-arrow-right"></i> Next: Payment</button>
       </form>
     </div>
 
@@ -428,6 +474,7 @@
       <button id="razorpayDonateBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay Securely Now</button>
       <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay</p>
     </div>
+    </div><!-- /padding wrapper -->
   </div>
 </div>
 
@@ -607,6 +654,17 @@
     document.getElementById('otpVerifySection').style.display='none';
     if(document.getElementById('otpInput')) document.getElementById('otpInput').value='';
     donateFormData = {};
+    // Reset 80G checkbox & conditional fields
+    want80G.checked = false;
+    set80GVisual(false);
+    panField.style.display = 'none';
+    addressField.style.display = 'none';
+    addressField.dataset.forced = '0';
+    addressInput.required = false;
+    panInput.required = false;
+    panInput.value = '';
+    addressInput.value = '';
+    document.querySelectorAll('.amount-chip').forEach(c => c.classList.remove('active'));
     // Safe check for optional elements
     const doneWrap = document.getElementById('doneWrap');
     if(doneWrap) doneWrap.style.display='none';
@@ -615,7 +673,58 @@
   }
 
   document.getElementById('amountChips').addEventListener('click', (e)=>{ const btn=e.target.closest('[data-amount]'); if(!btn) return; const amt=document.querySelector('input[name="amount"]'); amt.value=btn.dataset.amount; amt.dispatchEvent(new Event('input',{bubbles:true})); amt.focus(); });
-  
+
+  // 80G checkbox toggle
+  const want80G = document.getElementById('want80G');
+  const checkBox80G = document.getElementById('checkBox80G');
+  const checkIcon80G = document.getElementById('checkIcon80G');
+  const panField = document.getElementById('panField');
+  const addressField = document.getElementById('addressField');
+  const addressInput = document.getElementById('addressInput');
+  const panInput = document.getElementById('panInput');
+
+  function set80GVisual(checked){
+    checkBox80G.style.background = checked ? '#6153ff' : '#fff';
+    checkBox80G.style.borderColor = checked ? '#6153ff' : '#c7d0e4';
+    checkIcon80G.style.display = checked ? 'block' : 'none';
+  }
+
+  document.getElementById('toggle80G').addEventListener('click', ()=>{
+    // Don't toggle if forced by high amount
+    if(addressField.dataset.forced === '1') return;
+    want80G.checked = !want80G.checked;
+    set80GVisual(want80G.checked);
+    panField.style.display = want80G.checked ? 'block' : 'none';
+    if(!want80G.checked) panInput.value = '';
+  });
+
+  // Show/hide conditional fields on amount change
+  document.getElementById('donateAmountInput').addEventListener('input', function(){
+    const amt = Number(this.value);
+    if(amt >= 50000){
+      // Force show both PAN + address + check the 80G box
+      panField.style.display = 'block';
+      addressField.style.display = 'block';
+      addressField.dataset.forced = '1';
+      addressInput.required = true;
+      panInput.required = true;
+      want80G.checked = true;
+      set80GVisual(true);
+    } else {
+      // Restore normal state
+      addressField.style.display = 'none';
+      addressField.dataset.forced = '0';
+      addressInput.required = false;
+      panInput.required = false;
+      // Keep PAN visible if user had ticked 80G manually
+      if(!want80G.checked){
+        panField.style.display = 'none';
+      }
+    }
+    // Update active chip highlight
+    document.querySelectorAll('.amount-chip').forEach(c => c.classList.toggle('active', Number(c.dataset.amount) === amt));
+  });
+
   // Store donate form data for Razorpay flow
   let donateFormData = {};
   donateForm.addEventListener('submit', (e)=>{ 
@@ -626,9 +735,8 @@
       name:     donateForm.querySelector('[name="name"]').value,
       mobile:   donateForm.querySelector('[name="mobile"]').value,
       email:    donateForm.querySelector('[name="email"]').value,
-      pan:      donateForm.querySelector('[name="pan"]').value,
-      address:  donateForm.querySelector('[name="address"]').value,
-      memberid: donateForm.querySelector('[name="memberid"]').value,
+      pan:      panInput ? panInput.value : '',
+      address:  addressInput ? addressInput.value : '',
       verified_token: null
     };
     document.getElementById('donateAmountDisplay').textContent = donateFormData.amount;

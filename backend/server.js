@@ -466,7 +466,7 @@ app.post('/api/pay/verify', async (req, res) => {
 // Razorpay Membership Payment: Create order + after verify → register member
 app.post('/api/pay/membership', async (req, res) => {
   try {
-    const { name, mobile, email, project,
+    const { name, mobile, email, project, referrerCode,
             razorpay_payment_id, razorpay_order_id, razorpay_subscription_id, razorpay_signature } = req.body;
     if (!name || !mobile || !email) return res.status(400).json({ error: 'name, mobile & email required' });
     if (!razorpay_payment_id || !razorpay_signature) return res.status(400).json({ error: 'Payment details missing' });
@@ -530,8 +530,49 @@ app.post('/api/pay/membership', async (req, res) => {
       notes:       `Razorpay${razorpay_subscription_id ? ' subscription autopay' : ' order'} | Project: ${project || '-'}`
     });
 
+    // Auto-register referral and credit referrer if referrerCode provided
+    let referralPoints = 0;
+    if (referrerCode) {
+      try {
+        const referrer = await User.findOne({ referral_code: referrerCode }).select('_id wallet');
+        const newUser  = await User.findOne({ member_id: memberId }).select('_id');
+        if (referrer && newUser) {
+          const REFERRAL_PCT = REFERRAL_POINTS_PERCENT || 50; // % of payment as points
+          const pointsRupees = 500 * (REFERRAL_PCT / 100);
+          const points = amountToPoints(pointsRupees);
+          referralPoints = points;
+
+          await Referral.create({
+            referrer_id:      referrer._id,
+            referred_user_id: newUser._id,
+            status:           'active',
+            payment_amount:   500,
+            referral_points:  points,
+            activated_at:     new Date()
+          });
+          await User.updateOne({ _id: referrer._id }, {
+            $inc: {
+              'wallet.points_balance':        points,
+              'wallet.points_from_referrals': points,
+              'wallet.total_points_earned':   points
+            },
+            'wallet.updated_at': new Date()
+          });
+          await PointsLedger.create({
+            user_id:     referrer._id,
+            points,
+            type:        'referral',
+            description: `Referral: ${memberId} paid ₹500 → ${points} points`
+          });
+          await User.updateOne({ _id: newUser._id }, { referred_by: referrer._id });
+        }
+      } catch (refErr) {
+        console.error('Referral credit error (non-fatal):', refErr.message);
+      }
+    }
+
     addBreadcrumb('payment', 'Membership payment successful', { memberId, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id });
-    res.json({ ok: true, memberId, password: plain, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id });
+    res.json({ ok: true, memberId, password: plain, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id, referralPoints });
   } catch (err) {
     console.error('Razorpay membership error:', err);
     captureError(err, { context: 'razorpay-membership' });

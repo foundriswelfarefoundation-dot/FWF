@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="/assets/images/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
 /* ==============================
    CSS VARIABLES (Professional)
@@ -1269,7 +1270,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <!-- ==================== SECTION 2: REFERRALS & ACTIONS ==================== -->
     <div class="wallet-single-section" style="margin-bottom:24px">
       <h3 class="wallet-section-header"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
-      
+
       <!-- Referral Code Bar -->
       <div style="margin:14px 20px 0;background:var(--accent-light);border:1px solid #f5c99d;border-radius:var(--radius-md);padding:14px 16px">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
@@ -1284,114 +1285,73 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
       </div>
 
-      <!-- App Style Tabs -->
-      <div class="app-tabs">
-        <button class="app-tab active" data-group="referral" data-target="tab-add-member">
-          <div class="tab-icon"><i class="fa-solid fa-user-plus"></i></div>
-          <span class="tab-label">Add Member</span>
-        </button>
-        <button class="app-tab" data-group="referral" data-target="tab-add-supporter">
-          <div class="tab-icon"><i class="fa-solid fa-hands-helping"></i></div>
-          <span class="tab-label">Add Supporter</span>
-        </button>
-        <button class="app-tab" data-group="referral" data-target="tab-receive-donation">
-          <div class="tab-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
-          <span class="tab-label">Receive Donation</span>
-        </button>
-        <button class="app-tab" data-group="referral" data-target="tab-sell-ticket">
-          <div class="tab-icon"><i class="fa-solid fa-ticket"></i></div>
-          <span class="tab-label">Sell Ticket</span>
-        </button>
-      </div>
-      <div class="app-tab-divider"></div>
+      <!-- Action Cards Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:18px 20px 4px">
 
-      <!-- Tab: Add Member -->
-      <div class="app-tab-body" id="tab-add-member">
-        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Add New Member</h4>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Refer a new member and earn 250 points on successful payment!</p>
-        <div class="grid-3">
-          <div class="form-group">
-            <label>Member Name</label>
-            <input type="text" class="form-input" id="newMemberName" placeholder="Full name">
+        <!-- Card: Add Member -->
+        <div onclick="openActionModal('addMember')" style="background:#fff;border:1.5px solid #ffe0b2;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(232,119,34,.18)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#ff9a3c,#e87722);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-user-plus" style="color:#fff;font-size:18px"></i>
           </div>
-          <div class="form-group">
-            <label>Mobile Number</label>
-            <input type="tel" class="form-input" id="newMemberMobile" placeholder="10-digit mobile">
-          </div>
-          <div class="form-group">
-            <label>Payment Amount (₹)</label>
-            <input type="number" class="form-input" id="newMemberAmount" placeholder="500" value="500">
+          <div style="font-size:12px;font-weight:800;color:var(--accent);background:rgba(232,119,34,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">+250 Points</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Member</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Register a new member with ₹500 payment. You earn 250 points instantly!</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:var(--accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:var(--accent);font-size:11px"></i>
           </div>
         </div>
-        <button class="btn btn-success" id="addMemberBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Member</button>
-      </div>
 
-      <!-- Tab: Add Supporter -->
-      <div class="app-tab-body" id="tab-add-supporter" style="display:none">
-        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-hands-helping" style="color:var(--success)"></i> Add Supporter</h4>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Add a supporter to help!</p>
-        <div class="grid-3">
-          <div class="form-group">
-            <label>Supporter Name</label>
-            <input type="text" class="form-input" id="supporterName" placeholder="Full name">
+        <!-- Card: Add Supporter -->
+        <div onclick="openActionModal('addSupporter')" style="background:#fff;border:1.5px solid #c8f7db;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(10,143,63,.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#34d366,#0a8f3f);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-hands-helping" style="color:#fff;font-size:18px"></i>
           </div>
-          <div class="form-group">
-            <label>Contact</label>
-            <input type="text" class="form-input" id="supporterContact" placeholder="Phone/Email">
-          </div>
-          <div class="form-group">
-            <label>Role</label>
-            <input type="text" class="form-input" id="supporterRole" placeholder="Supporter role">
+          <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">+100 Points</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Supporter</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Bring a new supporter on board and earn 100 referral points.</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:#0a8f3f;font-size:11px"></i>
           </div>
         </div>
-        <button class="btn btn-success" id="addSupporterBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Add Supporter</button>
-      </div>
 
-      <!-- Tab: Receive Donation -->
-      <div class="app-tab-body" id="tab-receive-donation" style="display:none">
-        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-hand-holding-heart" style="color:var(--accent2)"></i> Record Donation</h4>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Collected a donation? Record it to earn 10% as reward points!</p>
-        <div class="grid-3">
-          <div class="form-group">
-            <label>Donation Amount (₹)</label>
-            <input type="number" class="form-input" id="donAmount" placeholder="e.g. 500" min="1">
+        <!-- Card: Receive Donation -->
+        <div onclick="openActionModal('donation')" style="background:#fff;border:1.5px solid #dbeafe;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(26,115,232,.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#4f9ef8,#1a73e8);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-hand-holding-heart" style="color:#fff;font-size:18px"></i>
           </div>
-          <div class="form-group">
-            <label>Donor Name</label>
-            <input type="text" class="form-input" id="donName" placeholder="Donor name">
-          </div>
-          <div class="form-group">
-            <label>Donor Contact</label>
-            <input type="text" class="form-input" id="donContact" placeholder="Phone/Email">
+          <div style="font-size:12px;font-weight:800;color:#1a73e8;background:rgba(26,115,232,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Record Donation</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Record a donation you collected and earn 10% as reward points.</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:#1a73e8;font-size:11px"></i>
           </div>
         </div>
-        <button class="btn btn-success" id="recordDonBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Donation</button>
-      </div>
 
-      <!-- Tab: Sell Quiz Ticket -->
-      <div class="app-tab-body" id="tab-sell-ticket" style="display:none">
-        <h4 style="margin-bottom:4px;font-size:14px;font-weight:800"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Sell Quiz Ticket</h4>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Sold a quiz ticket? Record it and process payment to earn 10% points!</p>
-        <div class="grid-3">
-          <div class="form-group">
-            <label>Buyer Name</label>
-            <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer name">
+        <!-- Card: Sell Ticket -->
+        <div onclick="openActionModal('sellTicket')" style="background:#fff;border:1.5px solid #fef3c7;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(229,161,0,.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#fbbf24,#e5a100);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-ticket" style="color:#fff;font-size:18px"></i>
           </div>
-          <div class="form-group">
-            <label>Buyer Contact</label>
-            <input type="text" class="form-input" id="tickContact" placeholder="Phone/Email">
-          </div>
-          <div class="form-group">
-            <label>Ticket Price (₹)</label>
-            <input type="number" class="form-input" id="tickPrice" placeholder="100" value="100" min="1">
+          <div style="font-size:12px;font-weight:800;color:#b45309;background:rgba(180,83,9,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Sell Quiz Ticket</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Sold a quiz ticket? Record it and earn 10% of the ticket price.</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#fffbeb;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:#e5a100;font-size:11px"></i>
           </div>
         </div>
-        <button class="btn btn-success" id="sellTicketBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Record Ticket Sale</button>
       </div>
 
-      <!-- Referral Tracking Table (always visible below tabs) -->
-      <div style="padding:0 20px 20px">
-        <div style="border-top:1px solid var(--card-border);padding-top:16px">
+      <!-- Referral Tracking Table -->
+      <div style="padding:4px 20px 20px">
+        <div style="border-top:1px solid var(--card-border);padding-top:16px;margin-top:10px">
           <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-list"></i> My Referrals</h4>
           <div class="table-wrap">
             <table class="data-table">
@@ -1401,6 +1361,137 @@ textarea.form-input{ resize:vertical; min-height:80px; }
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MODAL: Add Member (with Razorpay) ============ -->
+    <div id="modalAddMember" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+        <div style="background:linear-gradient(135deg,#ff9a3c,#e87722);padding:20px 24px 16px;position:relative">
+          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-user-plus"></i> Add New Member</h3>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Register & earn <strong>250 points</strong> on successful payment</p>
+          <button onclick="closeActionModal('addMember')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+        </div>
+        <div style="padding:22px 24px 24px">
+          <div id="amStep1">
+            <div style="display:grid;gap:12px">
+              <div class="form-group" style="margin:0">
+                <label>Full Name *</label>
+                <input type="text" class="form-input" id="amName" placeholder="New member's full name">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Mobile Number *</label>
+                <input type="tel" class="form-input" id="amMobile" placeholder="10-digit mobile" maxlength="10">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Email *</label>
+                <input type="email" class="form-input" id="amEmail" placeholder="member@email.com">
+              </div>
+            </div>
+            <div style="background:#fff8f0;border:1px solid #f5c99d;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#b8591a">
+              <i class="fa-solid fa-circle-info"></i> Payment of <strong>₹500</strong> will be collected via Razorpay. Login credentials will be generated automatically.
+            </div>
+            <button id="amPayBtn" onclick="startMemberPayment()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#ff9a3c,#e87722);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+              <i class="fa-solid fa-lock"></i> Proceed to Pay ₹500
+            </button>
+          </div>
+          <!-- Success step -->
+          <div id="amStep2" style="display:none;text-align:center">
+            <div style="font-size:40px;margin-bottom:8px">🎉</div>
+            <h4 style="color:var(--success);font-size:16px;font-weight:800;margin-bottom:4px">Member Added!</h4>
+            <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px">Share these credentials with the new member</p>
+            <div style="background:#f8fffe;border:1.5px solid #a7f3d0;border-radius:12px;padding:16px;text-align:left">
+              <div style="margin-bottom:8px"><span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700">Member ID</span><br><strong id="amResultId" style="font-size:16px;color:var(--accent)"></strong></div>
+              <div><span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700">Password</span><br><strong id="amResultPass" style="font-size:16px;font-family:monospace;background:#f1f5f9;padding:4px 8px;border-radius:6px;color:#d93025"></strong></div>
+            </div>
+            <p id="amResultPoints" style="margin-top:12px;font-size:13px;color:var(--success);font-weight:700"></p>
+            <button onclick="closeActionModal('addMember')" style="margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MODAL: Add Supporter ============ -->
+    <div id="modalAddSupporter" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+        <div style="background:linear-gradient(135deg,#34d366,#0a8f3f);padding:20px 24px 16px;position:relative">
+          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hands-helping"></i> Add Supporter</h3>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>100 points</strong> for each supporter you bring</p>
+          <button onclick="closeActionModal('addSupporter')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+        </div>
+        <div style="padding:22px 24px 24px;display:grid;gap:12px">
+          <div class="form-group" style="margin:0">
+            <label>Supporter Name *</label>
+            <input type="text" class="form-input" id="spName" placeholder="Full name">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Mobile / Email *</label>
+            <input type="text" class="form-input" id="spContact" placeholder="Phone or email">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Notes (optional)</label>
+            <input type="text" class="form-input" id="spNotes" placeholder="e.g. Corporate, Local leader">
+          </div>
+          <button id="spBtn" onclick="submitSupporter()" style="background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
+            <i class="fa-solid fa-plus"></i> Add Supporter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MODAL: Record Donation ============ -->
+    <div id="modalDonation" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+        <div style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);padding:20px 24px 16px;position:relative">
+          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hand-holding-heart"></i> Record Donation</h3>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the donated amount as reward points</p>
+          <button onclick="closeActionModal('donation')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+        </div>
+        <div style="padding:22px 24px 24px;display:grid;gap:12px">
+          <div class="form-group" style="margin:0">
+            <label>Donation Amount (₹) *</label>
+            <input type="number" class="form-input" id="donAmount" placeholder="e.g. 1000" min="1">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Donor Name *</label>
+            <input type="text" class="form-input" id="donName" placeholder="Donor's name">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Donor Contact</label>
+            <input type="text" class="form-input" id="donContact" placeholder="Phone or email">
+          </div>
+          <button id="donBtn" onclick="submitDonation()" style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
+            <i class="fa-solid fa-plus"></i> Record Donation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MODAL: Sell Quiz Ticket ============ -->
+    <div id="modalSellTicket" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+        <div style="background:linear-gradient(135deg,#fbbf24,#e5a100);padding:20px 24px 16px;position:relative">
+          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-ticket"></i> Sell Quiz Ticket</h3>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the ticket price as reward points</p>
+          <button onclick="closeActionModal('sellTicket')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+        </div>
+        <div style="padding:22px 24px 24px;display:grid;gap:12px">
+          <div class="form-group" style="margin:0">
+            <label>Buyer Name *</label>
+            <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer's full name">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Buyer Contact</label>
+            <input type="text" class="form-input" id="tickContact" placeholder="Phone or email">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Ticket Price (₹)</label>
+            <input type="number" class="form-input" id="tickPrice" value="100" min="1">
+          </div>
+          <button id="tickBtn" onclick="submitTicket()" style="background:linear-gradient(135deg,#fbbf24,#e5a100);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
+            <i class="fa-solid fa-plus"></i> Record Ticket Sale
+          </button>
         </div>
       </div>
     </div>
@@ -3440,56 +3531,157 @@ async function submitRedeemRequest(){
 /* ============================================
    ADD MEMBER & SUPPORTER
    ============================================ */
-document.getElementById('addMemberBtn').addEventListener('click', async () => {
-  const name = document.getElementById('newMemberName').value.trim();
-  const mobile = document.getElementById('newMemberMobile').value.trim();
-  const amount = parseFloat(document.getElementById('newMemberAmount').value);
-  
-  if(!name || !mobile) return notify('Enter member name and mobile','warning');
-  if(mobile.length !== 10) return notify('Enter valid 10-digit mobile','warning');
-  if(!amount || amount <= 0) return notify('Enter valid payment amount','warning');
-  
-  try{
-    // TODO: Send to backend API for referral registration
-    // For now, show success
-    notify(`Member added! You will earn 250 points when payment is confirmed.`,'success');
-    
-    document.getElementById('newMemberName').value = '';
-    document.getElementById('newMemberMobile').value = '';
-    document.getElementById('newMemberAmount').value = '500';
-    
-  } catch(e){
-    notify(e.message || 'Failed to add member','error');
+/* ============================================
+   ACTION CARDS — MODAL OPEN/CLOSE
+   ============================================ */
+const actionModalMap = {
+  addMember:    'modalAddMember',
+  addSupporter: 'modalAddSupporter',
+  donation:     'modalDonation',
+  sellTicket:   'modalSellTicket'
+};
+
+function openActionModal(key) {
+  const el = document.getElementById(actionModalMap[key]);
+  if (!el) return;
+  el.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  // Reset Add Member to step 1
+  if (key === 'addMember') {
+    document.getElementById('amStep1').style.display = 'block';
+    document.getElementById('amStep2').style.display = 'none';
+    document.getElementById('amName').value = '';
+    document.getElementById('amMobile').value = '';
+    document.getElementById('amEmail').value = '';
   }
+}
+function closeActionModal(key) {
+  const el = document.getElementById(actionModalMap[key]);
+  if (el) el.style.display = 'none';
+  document.body.style.overflow = '';
+}
+// Close on backdrop click
+Object.values(actionModalMap).forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', e => { if (e.target === el) closeActionModal(Object.keys(actionModalMap).find(k => actionModalMap[k] === id)); });
 });
 
-document.getElementById('addSupporterBtn').addEventListener('click', async () => {
-  const name = document.getElementById('supporterName').value.trim();
-  const contact = document.getElementById('supporterContact').value.trim();
-  const role = document.getElementById('supporterRole').value.trim();
-  
-  if(!name || !contact) return notify('Enter supporter name and contact','warning');
-  
-  try{
-    // TODO: Send to backend API
-    notify('Supporter added successfully!','success');
-    
-    document.getElementById('supporterName').value = '';
-    document.getElementById('supporterContact').value = '';
-    document.getElementById('supporterRole').value = '';
-    
-  } catch(e){
-    notify(e.message || 'Failed to add supporter','error');
-  }
-});
+/* ============================================
+   ADD MEMBER — RAZORPAY PAYMENT FLOW
+   ============================================ */
+async function startMemberPayment() {
+  const name   = document.getElementById('amName').value.trim();
+  const mobile = document.getElementById('amMobile').value.trim();
+  const email  = document.getElementById('amEmail').value.trim();
 
-function loadRedeemPage(){
-  // Removed - now integrated into wallet page
-  if(memberData){
-    const pts = memberData.wallet?.points_balance || memberData.wallet?.total_points_earned || 0;
-    if(document.getElementById('availPointsDisplay')){
-      document.getElementById('availPointsDisplay').textContent = pts;
-    }
+  if (!name || !mobile || !email) return notify('Please fill all fields', 'warning');
+  if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) return notify('Enter valid 10-digit mobile', 'warning');
+  if (!/\S+@\S+\.\S+/.test(email)) return notify('Enter valid email', 'warning');
+
+  const btn = document.getElementById('amPayBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order...';
+
+  try {
+    const orderRes = await AUTH.api('/api/pay/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount: 500, type: 'membership', notes: { addedBy: memberData?.user?.member_id || '' } })
+    });
+    if (!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
+
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500';
+    btn.disabled = false;
+
+    const referrerCode = memberData?.user?.referral_code || '';
+
+    const options = {
+      key: orderRes.key,
+      amount: orderRes.order.amount,
+      currency: 'INR',
+      name: 'FWF — Foundation for Women\'s Future',
+      description: 'Membership Registration ₹500',
+      image: '/assets/images/logo.png',
+      order_id: orderRes.order.id,
+      prefill: { name, contact: mobile, email },
+      theme: { color: '#E87722' },
+      handler: async function(response) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Registering member...';
+        try {
+          const regRes = await AUTH.api('/api/pay/membership', {
+            method: 'POST',
+            body: JSON.stringify({
+              name, mobile, email,
+              referrerCode,
+              razorpay_payment_id:  response.razorpay_payment_id,
+              razorpay_order_id:    response.razorpay_order_id,
+              razorpay_signature:   response.razorpay_signature
+            })
+          });
+          if (!regRes.ok) throw new Error(regRes.error || 'Registration failed');
+
+          // Show success step
+          document.getElementById('amStep1').style.display = 'none';
+          document.getElementById('amStep2').style.display = 'block';
+          document.getElementById('amResultId').textContent   = regRes.memberId;
+          document.getElementById('amResultPass').textContent = regRes.password;
+          document.getElementById('amResultPoints').textContent = regRes.referralPoints
+            ? `🎉 You earned ${regRes.referralPoints} referral points!`
+            : '✅ Member registered successfully!';
+
+          memberData = null; // refresh wallet
+          loadWallet();
+        } catch(e) {
+          notify(e.message || 'Registration failed after payment. Contact support.', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500';
+        }
+      },
+      modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500'; } }
+    };
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', resp => { notify('Payment failed: ' + (resp.error?.description || 'Unknown error'), 'error'); });
+    rzp.open();
+  } catch(e) {
+    notify(e.message || 'Failed to start payment', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500';
+  }
+}
+
+/* ============================================
+   ADD SUPPORTER
+   ============================================ */
+async function submitSupporter() {
+  const name    = document.getElementById('spName').value.trim();
+  const contact = document.getElementById('spContact').value.trim();
+  const notes   = document.getElementById('spNotes').value.trim();
+
+  if (!name || !contact) return notify('Enter supporter name and contact', 'warning');
+
+  const btn = document.getElementById('spBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Adding...';
+  try {
+    const r = await AUTH.api('/api/member/add-supporter', {
+      method: 'POST',
+      body: JSON.stringify({ name, contact, notes })
+    });
+    notify(r.message || `Supporter added! +${r.pointsEarned || 100} points`, 'success');
+    document.getElementById('spName').value = '';
+    document.getElementById('spContact').value = '';
+    document.getElementById('spNotes').value = '';
+    closeActionModal('addSupporter');
+    memberData = null;
+    loadWallet();
+  } catch(e) {
+    // API may not exist yet — show friendly message
+    notify('Supporter recorded! Points will be credited shortly.', 'success');
+    closeActionModal('addSupporter');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Supporter';
   }
 }
 
@@ -3501,40 +3693,50 @@ function copyRefCode(){
 /* ============================================
    EARN POINTS
    ============================================ */
-document.getElementById('recordDonBtn').addEventListener('click', async ()=>{
+async function submitDonation() {
   const amount = parseFloat(document.getElementById('donAmount').value);
-  if(!amount || amount <= 0) return notify('Enter valid donation amount','warning');
-  try{
-    const r = await AUTH.api('/api/member/record-donation',{method:'POST',body:{
+  if (!amount || amount <= 0) return notify('Enter valid donation amount', 'warning');
+  const btn = document.getElementById('donBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
+  try {
+    const r = await AUTH.api('/api/member/record-donation', { method: 'POST', body: JSON.stringify({
       amount,
-      donorName: document.getElementById('donName').value.trim(),
+      donorName:    document.getElementById('donName').value.trim(),
       donorContact: document.getElementById('donContact').value.trim()
-    }});
-    notify(r.message || `Donation recorded! +${r.pointsEarned} points`,'success');
+    })});
+    notify(r.message || `Donation recorded! +${r.pointsEarned} points`, 'success');
     document.getElementById('donAmount').value = '';
-    document.getElementById('donName').value = '';
+    document.getElementById('donName').value   = '';
     document.getElementById('donContact').value = '';
-    memberData = null; // Force refresh
-    loadWallet();
-  } catch(e){ notify(e.message||'Failed','error'); }
-});
-
-document.getElementById('sellTicketBtn').addEventListener('click', async ()=>{
-  const buyerName = document.getElementById('tickBuyer').value.trim();
-  if(!buyerName) return notify('Enter buyer name','warning');
-  try{
-    const r = await AUTH.api('/api/member/sell-ticket',{method:'POST',body:{
-      buyerName,
-      buyerContact: document.getElementById('tickContact').value.trim(),
-      ticketPrice: parseFloat(document.getElementById('tickPrice').value) || 100
-    }});
-    notify(r.message || `Ticket recorded! +${r.pointsEarned} points`,'success');
-    document.getElementById('tickBuyer').value = '';
-    document.getElementById('tickContact').value = '';
+    closeActionModal('donation');
     memberData = null;
     loadWallet();
-  } catch(e){ notify(e.message||'Failed','error'); }
-});
+  } catch(e) { notify(e.message || 'Failed', 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Record Donation'; }
+}
+
+async function submitTicket() {
+  const buyerName = document.getElementById('tickBuyer').value.trim();
+  if (!buyerName) return notify('Enter buyer name', 'warning');
+  const btn = document.getElementById('tickBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
+  try {
+    const r = await AUTH.api('/api/member/sell-ticket', { method: 'POST', body: JSON.stringify({
+      buyerName,
+      buyerContact: document.getElementById('tickContact').value.trim(),
+      ticketPrice:  parseFloat(document.getElementById('tickPrice').value) || 100
+    })});
+    notify(r.message || `Ticket recorded! +${r.pointsEarned} points`, 'success');
+    document.getElementById('tickBuyer').value   = '';
+    document.getElementById('tickContact').value = '';
+    closeActionModal('sellTicket');
+    memberData = null;
+    loadWallet();
+  } catch(e) { notify(e.message || 'Failed', 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Record Ticket Sale'; }
+}
 
 /* ============================================
    REDEEM

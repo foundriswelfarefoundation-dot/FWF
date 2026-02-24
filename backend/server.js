@@ -874,9 +874,28 @@ app.get('/api/member/me', auth('member'), async (req, res) => {
     .sort({ created_at: -1 }).limit(10)
     .select('points type description created_at').lean();
 
+  // Membership fees
+  const membershipFees = await MembershipFee.find({ user_id: req.user.uid })
+    .sort({ created_at: -1 }).limit(10)
+    .select('txn_id amount fee_type status created_at').lean();
+
+  // Referrals list (with referred user details)
+  const referralsRaw = await Referral.find({ referrer_id: req.user.uid })
+    .sort({ created_at: -1 }).limit(20)
+    .populate('referred_user_id', 'name member_id')
+    .lean();
+  const referrals = referralsRaw.map(r => ({
+    referred_name: r.referred_user_id?.name || '—',
+    referred_member_id: r.referred_user_id?.member_id || '—',
+    amount: r.payment_amount || 0,
+    points_earned: r.referral_points || 0,
+    status: r.status,
+    created_at: r.created_at
+  }));
+
   const pointInfo = { pointValue: POINT_VALUE, donationPercent: DONATION_POINTS_PERCENT, referralPercent: REFERRAL_POINTS_PERCENT, quizPercent: QUIZ_TICKET_POINTS_PERCENT, ticketPrice: QUIZ_TICKET_PRICE };
 
-  res.json({ user: u, wallet: w, project: p, referralStats, recentDonations, quizStats, recentPoints, pointInfo });
+  res.json({ user: u, wallet: w, project: p, referralStats, recentDonations, quizStats, recentPoints, membershipFees, referrals, pointInfo });
 });
 
 // Mark first login as done

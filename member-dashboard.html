@@ -948,6 +948,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <button class="nav-item" data-page="wallet">
       <i class="fa-solid fa-wallet"></i> Wallet
     </button>
+    <button class="nav-item" data-page="referral">
+      <i class="fa-solid fa-user-plus"></i> Referral & Earn
+    </button>
 
     <div class="nav-divider">Marketplace</div>
     <button class="nav-item" data-page="marketplace">
@@ -1354,20 +1357,20 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="s-value" id="walletBalance">₹0</div>
       </div>
       <div class="stat-card">
-        <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
-        <div class="s-label">Total Referrals</div>
-        <div class="s-value" id="walletReferrals">0</div>
+        <div class="s-icon s-amber"><i class="fa-solid fa-arrow-up"></i></div>
+        <div class="s-label">Total Earned</div>
+        <div class="s-value" id="walletTotalEarned">0</div>
       </div>
       <div class="stat-card">
-        <div class="s-icon s-amber"><i class="fa-solid fa-hand-holding-heart"></i></div>
-        <div class="s-label">Donations Earned</div>
-        <div class="s-value" id="walletDonations">₹0</div>
+        <div class="s-icon s-blue"><i class="fa-solid fa-arrow-down"></i></div>
+        <div class="s-label">Redeemed</div>
+        <div class="s-value" id="walletRedeemed">0</div>
       </div>
     </div>
 
-    <!-- ==================== SECTION 1: MY ACTIVITY ==================== -->
+    <!-- ==================== SECTION 1: PAYMENTS ==================== -->
     <div class="wallet-single-section" style="margin-bottom:24px">
-      <h3 class="wallet-section-header"><i class="fa-solid fa-list" style="color:var(--accent)"></i> My Activity</h3>
+      <h3 class="wallet-section-header"><i class="fa-solid fa-credit-card" style="color:var(--accent)"></i> Payments</h3>
       
       <!-- App Style Tabs -->
       <div class="app-tabs">
@@ -1377,7 +1380,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </button>
         <button class="app-tab" data-group="activity" data-target="tab-donations">
           <div class="tab-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
-          <span class="tab-label">My Donations</span>
+          <span class="tab-label">Donations</span>
         </button>
       </div>
       <div class="app-tab-divider"></div>
@@ -1409,6 +1412,178 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
+    <!-- ==================== SECTION 3: POINTS ==================== -->
+    <div class="wallet-single-section" id="section-points">
+      <h3 class="wallet-section-header" style="padding-bottom:18px"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
+      <div class="app-tab-divider"></div>
+      <div style="padding:18px 20px 20px">
+      
+      <!-- Points Breakdown -->
+      <div class="stats-row" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
+          <div class="s-label">Total Points</div>
+          <div class="s-value" id="wPoints">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-green"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <div class="s-label">From Donations</div>
+          <div class="s-value" id="wDonPts">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
+          <div class="s-label">From Referrals</div>
+          <div class="s-value" id="wRefPts">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-amber"><i class="fa-solid fa-ticket"></i></div>
+          <div class="s-label">From Quiz Tickets</div>
+          <div class="s-value" id="wQuizPts">0</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Redeem Action Card -->
+        <div class="content-card" style="background:var(--accent);color:#fff;border:none">
+          <div style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;padding:18px">
+            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px">
+              <i class="fa-solid fa-gift"></i>
+            </div>
+            <h4 style="margin:0;font-size:17px;font-weight:800">Redeem Points</h4>
+            <p style="font-size:12px;opacity:.9;margin:0">Convert your points to support social causes and make a difference</p>
+            <button class="btn" onclick="openRedeemModal()" style="background:#fff;color:var(--accent);font-weight:700;margin-top:6px">
+              <i class="fa-solid fa-arrow-right"></i> Start Redeeming
+            </button>
+          </div>
+        </div>
+
+        <!-- Points Summary -->
+        <div class="content-card">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-chart-pie"></i> Points Summary</h4>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> Donations</span>
+              <span style="font-weight:900;color:var(--success)" id="pointsDonSummary">0 pts</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-user-plus" style="color:var(--info)"></i> Referrals</span>
+              <span style="font-weight:900;color:var(--info)" id="pointsRefSummary">0 pts</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Quiz Tickets</span>
+              <span style="font-weight:900;color:var(--warning)" id="pointsQuizSummary">0 pts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Points History -->
+      <div class="content-card" style="margin-top:16px">
+        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-clock-rotate-left"></i> Points History</h4>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Type</th><th>Points</th><th>Description</th><th>Date</th></tr></thead>
+            <tbody id="pointsHistoryBody">
+              <tr><td colspan="4" class="empty-state"><p>No points earned yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal" id="redeemModal">
+    <div class="modal-content" style="max-width:600px">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gift"></i> Redeem Points for Social Cause</h3>
+        <button class="modal-close" onclick="closeModal('redeemModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--accent-soft);padding:14px;border-radius:10px;margin-bottom:16px;text-align:center">
+          <div style="font-size:12px;color:var(--text-muted);font-weight:700">Available Points</div>
+          <div style="font-size:32px;font-weight:900;color:var(--accent)" id="availPointsDisplay">0</div>
+        </div>
+
+        <div class="form-group">
+          <label>Points to Redeem</label>
+          <input type="number" class="form-input" id="redeemPointsInput" placeholder="Enter points" min="1">
+        </div>
+
+        <div class="form-group">
+          <label>Social Cause</label>
+          <select class="form-input" id="socialCauseSelect">
+            <option value="">Select a cause</option>
+            <option value="Scholarship">Scholarship Program</option>
+            <option value="Tree Plantation">Tree Plantation Drive</option>
+            <option value="Food Distribution">Food Distribution</option>
+            <option value="Health Camp">Health Camp Support</option>
+            <option value="Women Empowerment">Women Empowerment Fund</option>
+            <option value="Clean Water">Clean Water Initiative</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Payment Method</label>
+          <div style="display:flex;gap:16px;margin-top:8px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="radio" name="paymentMethod" value="bank" id="bankRadio" checked>
+              <span>Bank Account</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="radio" name="paymentMethod" value="upi" id="upiRadio">
+              <span>UPI</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Bank Details Section -->
+        <div id="bankDetailsSection">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Account Number</label>
+              <input type="text" class="form-input" id="accNumber1" placeholder="Account number">
+            </div>
+            <div class="form-group">
+              <label>Confirm Account Number</label>
+              <input type="text" class="form-input" id="accNumber2" placeholder="Re-enter account">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>IFSC Code</label>
+              <input type="text" class="form-input" id="ifscCode" placeholder="IFSC code">
+            </div>
+            <div class="form-group">
+              <label>Bank Name</label>
+              <input type="text" class="form-input" id="bankName" placeholder="Bank name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Account Holder Name</label>
+            <input type="text" class="form-input" id="accHolder" placeholder="As per bank records">
+          </div>
+        </div>
+
+        <!-- UPI Section -->
+        <div id="upiDetailsSection" style="display:none">
+          <div class="form-group">
+            <label>UPI ID</label>
+            <input type="text" class="form-input" id="upiId" placeholder="yourname@paytm">
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('redeemModal')">Cancel</button>
+        <button class="btn btn-success" id="submitRedeemBtn" onclick="submitRedeemRequest()"><i class="fa-solid fa-check"></i> Submit Request</button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ===================== REFERRAL & EARN ===================== -->
+  <div class="page" id="page-referral">
     <!-- ==================== SECTION 2: REFERRALS & ACTIONS ==================== -->
     <div class="wallet-single-section" style="margin-bottom:24px">
       <h3 class="wallet-section-header"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
@@ -1656,85 +1831,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- ==================== SECTION 3: POINTS ==================== -->
-    <div class="wallet-single-section" id="section-points">
-      <h3 class="wallet-section-header" style="padding-bottom:18px"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
-      <div class="app-tab-divider"></div>
-      <div style="padding:18px 20px 20px">
-      
-      <!-- Points Breakdown -->
-      <div class="stats-row" style="margin-bottom:20px">
-        <div class="stat-card">
-          <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
-          <div class="s-label">Total Points</div>
-          <div class="s-value" id="wPoints">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-icon s-green"><i class="fa-solid fa-hand-holding-heart"></i></div>
-          <div class="s-label">From Donations</div>
-          <div class="s-value" id="wDonPts">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
-          <div class="s-label">From Referrals</div>
-          <div class="s-value" id="wRefPts">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-icon s-amber"><i class="fa-solid fa-ticket"></i></div>
-          <div class="s-label">From Quiz Tickets</div>
-          <div class="s-value" id="wQuizPts">0</div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <!-- Redeem Action Card -->
-        <div class="content-card" style="background:var(--accent);color:#fff;border:none">
-          <div style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;padding:18px">
-            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px">
-              <i class="fa-solid fa-gift"></i>
-            </div>
-            <h4 style="margin:0;font-size:17px;font-weight:800">Redeem Points</h4>
-            <p style="font-size:12px;opacity:.9;margin:0">Convert your points to support social causes and make a difference</p>
-            <button class="btn" onclick="openRedeemModal()" style="background:#fff;color:var(--accent);font-weight:700;margin-top:6px">
-              <i class="fa-solid fa-arrow-right"></i> Start Redeeming
-            </button>
-          </div>
-        </div>
-
-        <!-- Points Summary -->
-        <div class="content-card">
-          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-chart-pie"></i> Points Summary</h4>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
-              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> Donations</span>
-              <span style="font-weight:900;color:var(--success)" id="pointsDonSummary">0 pts</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
-              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-user-plus" style="color:var(--info)"></i> Referrals</span>
-              <span style="font-weight:900;color:var(--info)" id="pointsRefSummary">0 pts</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
-              <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Quiz Tickets</span>
-              <span style="font-weight:900;color:var(--warning)" id="pointsQuizSummary">0 pts</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Points History -->
-      <div class="content-card" style="margin-top:16px">
-        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-clock-rotate-left"></i> Points History</h4>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Type</th><th>Points</th><th>Description</th><th>Date</th></tr></thead>
-            <tbody id="pointsHistoryBody">
-              <tr><td colspan="4" class="empty-state"><p>No points earned yet</p></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      </div>
-    </div>
 
     <!-- ==================== SECTION 4: AFFILIATE / REFERRAL TRACKING ==================== -->
     <div class="wallet-single-section" style="margin-bottom:24px">
@@ -1817,93 +1913,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
       </div>
     </div>
-  </div>
-  <div class="modal" id="redeemModal">
-    <div class="modal-content" style="max-width:600px">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-gift"></i> Redeem Points for Social Cause</h3>
-        <button class="modal-close" onclick="closeModal('redeemModal')">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div style="background:var(--accent-soft);padding:14px;border-radius:10px;margin-bottom:16px;text-align:center">
-          <div style="font-size:12px;color:var(--text-muted);font-weight:700">Available Points</div>
-          <div style="font-size:32px;font-weight:900;color:var(--accent)" id="availPointsDisplay">0</div>
-        </div>
-
-        <div class="form-group">
-          <label>Points to Redeem</label>
-          <input type="number" class="form-input" id="redeemPointsInput" placeholder="Enter points" min="1">
-        </div>
-
-        <div class="form-group">
-          <label>Social Cause</label>
-          <select class="form-input" id="socialCauseSelect">
-            <option value="">Select a cause</option>
-            <option value="Scholarship">Scholarship Program</option>
-            <option value="Tree Plantation">Tree Plantation Drive</option>
-            <option value="Food Distribution">Food Distribution</option>
-            <option value="Health Camp">Health Camp Support</option>
-            <option value="Women Empowerment">Women Empowerment Fund</option>
-            <option value="Clean Water">Clean Water Initiative</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Payment Method</label>
-          <div style="display:flex;gap:16px;margin-top:8px">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-              <input type="radio" name="paymentMethod" value="bank" id="bankRadio" checked>
-              <span>Bank Account</span>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-              <input type="radio" name="paymentMethod" value="upi" id="upiRadio">
-              <span>UPI</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Bank Details Section -->
-        <div id="bankDetailsSection">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Account Number</label>
-              <input type="text" class="form-input" id="accNumber1" placeholder="Account number">
-            </div>
-            <div class="form-group">
-              <label>Confirm Account Number</label>
-              <input type="text" class="form-input" id="accNumber2" placeholder="Re-enter account">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>IFSC Code</label>
-              <input type="text" class="form-input" id="ifscCode" placeholder="IFSC code">
-            </div>
-            <div class="form-group">
-              <label>Bank Name</label>
-              <input type="text" class="form-input" id="bankName" placeholder="Bank name">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Account Holder Name</label>
-            <input type="text" class="form-input" id="accHolder" placeholder="As per bank records">
-          </div>
-        </div>
-
-        <!-- UPI Section -->
-        <div id="upiDetailsSection" style="display:none">
-          <div class="form-group">
-            <label>UPI ID</label>
-            <input type="text" class="form-input" id="upiId" placeholder="yourname@paytm">
-          </div>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="closeModal('redeemModal')">Cancel</button>
-        <button class="btn btn-success" id="submitRedeemBtn" onclick="submitRedeemRequest()"><i class="fa-solid fa-check"></i> Submit Request</button>
-      </div>
-    </div>
-
   </div>
 
   <!-- ===================== MARKETPLACE ===================== -->
@@ -2175,7 +2184,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <div class="nav-row">
     <button class="bnav active" data-page="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
     <button class="bnav" data-page="wallet"><i class="fa-solid fa-wallet"></i><span>Wallet</span></button>
-    <button class="bnav" data-page="feed"><i class="fa-solid fa-newspaper"></i><span>Feed</span></button>
+    <button class="bnav" data-page="referral"><i class="fa-solid fa-user-plus"></i><span>Referral</span></button>
     <button class="bnav" data-page="training"><i class="fa-solid fa-graduation-cap"></i><span>Learn</span></button>
     <button class="bnav" data-page="profile"><i class="fa-solid fa-user"></i><span>Profile</span></button>
   </div>
@@ -2598,6 +2607,7 @@ const pageTitles = {
   feed: '<i class="fa-solid fa-book-open"></i> Social Book',
   training: '<i class="fa-solid fa-graduation-cap"></i> Training & Courses',
   wallet: '<i class="fa-solid fa-wallet"></i> Wallet',
+  referral: '<i class="fa-solid fa-user-plus"></i> Referral & Earn',
   marketplace: '<i class="fa-solid fa-store"></i> Marketplace',
   seller: '<i class="fa-solid fa-boxes-stacked"></i> Seller Panel',
   events: '<i class="fa-solid fa-calendar-days"></i> Events & Activities',
@@ -2626,6 +2636,7 @@ function switchPage(page, updateHash = true){
 
   // Lazy load data
   if(page === 'wallet')      loadWallet();
+  if(page === 'referral')    loadReferral();
   if(page === 'support')     loadMyTickets();
   if(page === 'profile')     loadProfile();
   if(page === 'marketplace') loadMarketProducts();
@@ -2653,6 +2664,7 @@ window.addEventListener('load', () => {
   const pathMap = {
     '/member/profile':  'profile',
     '/member/wallet':   'wallet',
+    '/member/referral': 'referral',
     '/member/post':     'feed',
     '/member/store':    'marketplace',
     '/member/training': 'training',
@@ -3495,24 +3507,22 @@ async function loadWallet(){
     const w = data.wallet || {};
 
     // Overview stats
-    document.getElementById('walletTotalPoints').textContent = fmtN(w.points_balance || w.total_points_earned);
-    document.getElementById('walletBalance').textContent = '₹' + fmtN(w.balance_inr);
-    document.getElementById('walletReferrals').textContent = fmtN(data.referralStats?.total || 0);
-    document.getElementById('walletDonations').textContent = '₹' + fmtN(data.recentDonations?.reduce((s,d)=>s+(d.amount||0),0) || 0);
+    const totalPts = w.points_balance || w.total_points_earned || 0;
+    document.getElementById('walletTotalPoints').textContent = fmtN(totalPts);
+    document.getElementById('walletBalance').textContent = '₹' + fmtN(w.balance_inr || 0);
+    document.getElementById('walletTotalEarned').textContent = fmtN(w.total_points_earned || 0);
+    document.getElementById('walletRedeemed').textContent = fmtN((w.total_points_earned || 0) - (w.points_balance || 0));
 
     // Points section stats
-    document.getElementById('wPoints').textContent = fmtN(w.points_balance || w.total_points_earned);
+    document.getElementById('wPoints').textContent = fmtN(totalPts);
     document.getElementById('wDonPts').textContent = fmtN(w.points_from_donations);
     document.getElementById('wRefPts').textContent = fmtN(w.points_from_referrals);
     document.getElementById('wQuizPts').textContent = fmtN(w.points_from_quiz);
 
-    // Points summary (new)
+    // Points summary
     document.getElementById('pointsDonSummary').textContent = fmtN(w.points_from_donations) + ' pts';
     document.getElementById('pointsRefSummary').textContent = fmtN(w.points_from_referrals) + ' pts';
     document.getElementById('pointsQuizSummary').textContent = fmtN(w.points_from_quiz) + ' pts';
-
-    // Referral code
-    document.getElementById('refCode').value = data.user?.referral_code || 'N/A';
 
     // Points history
     const pts = data.recentPoints || [];
@@ -3526,7 +3536,19 @@ async function loadWallet(){
       </tr>`).join('');
     }
 
-    // Load donations
+    // Membership fees
+    const fees = data.membershipFees || [];
+    const feeBody = document.getElementById('membershipFeesBody');
+    if(fees.length){
+      feeBody.innerHTML = fees.map(f => `<tr>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(f.created_at)}</td>
+        <td style="font-weight:800">₹${fmtN(f.amount)}</td>
+        <td>${statusBadge(f.status)}</td>
+        <td style="font-size:12px">${f.txn_id || '—'}</td>
+      </tr>`).join('');
+    }
+
+    // Donations
     const dons = data.recentDonations || [];
     const donBody = document.getElementById('myDonationsBody');
     if(dons.length){
@@ -3538,7 +3560,21 @@ async function loadWallet(){
       </tr>`).join('');
     }
 
-    // Load referrals
+  } catch(e){ notify('Failed to load wallet','error'); }
+}
+
+/* ============================================
+   REFERRAL & EARN
+   ============================================ */
+async function loadReferral(){
+  try{
+    const data = memberData || await AUTH.api('/api/member/me');
+    memberData = data;
+
+    // Referral code
+    document.getElementById('refCode').value = data.user?.referral_code || 'N/A';
+
+    // Referrals table
     const refs = data.referrals || [];
     const refBody = document.getElementById('referralsBody');
     if(refs.length){
@@ -3552,11 +3588,13 @@ async function loadWallet(){
       </tr>`).join('');
     }
 
-    // Load quiz tickets
-    const quiz = data.quizStats || {};
-    // TODO: Load actual quiz ticket sales when backend API is ready
+    // Setup affiliate links
+    setupQuizReferralLinks();
 
-  } catch(e){ notify('Failed to load wallet','error'); }
+    // Load affiliate dashboard
+    await loadAffiliateDashboard();
+
+  } catch(e){ notify('Failed to load referral data','error'); }
 }
 
 /* ============================================
@@ -3777,7 +3815,7 @@ async function startMemberPayment() {
   try {
     const orderRes = await AUTH.api('/api/pay/create-order', {
       method: 'POST',
-      body: JSON.stringify({ amount: 500, type: 'membership', notes: { addedBy: memberData?.user?.member_id || '' } })
+      body: { amount: 500, type: 'membership', notes: { addedBy: memberData?.user?.member_id || '' } }
     });
     if (!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
 
@@ -3802,13 +3840,13 @@ async function startMemberPayment() {
         try {
           const regRes = await AUTH.api('/api/pay/membership', {
             method: 'POST',
-            body: JSON.stringify({
+            body: {
               name, mobile, email,
               referrerCode,
               razorpay_payment_id:  response.razorpay_payment_id,
               razorpay_order_id:    response.razorpay_order_id,
               razorpay_signature:   response.razorpay_signature
-            })
+            }
           });
           if (!regRes.ok) throw new Error(regRes.error || 'Registration failed');
 
@@ -3861,7 +3899,7 @@ async function startSupporterPayment() {
     // Create Razorpay order
     const order = await AUTH.api('/api/pay/create-order', {
       method: 'POST',
-      body: { amount_inr: amount, receipt: 'supporter_' + Date.now() }
+      body: { amount, type: 'supporter', notes: { supporter: name } }
     });
 
     const options = {
@@ -3927,11 +3965,11 @@ async function submitDonation() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
   try {
-    const r = await AUTH.api('/api/member/record-donation', { method: 'POST', body: JSON.stringify({
+    const r = await AUTH.api('/api/member/record-donation', { method: 'POST', body: {
       amount,
       donorName:    document.getElementById('donName').value.trim(),
       donorContact: document.getElementById('donContact').value.trim()
-    })});
+    }});
     notify(r.message || `Donation recorded! +${r.pointsEarned} points`, 'success');
     document.getElementById('donAmount').value = '';
     document.getElementById('donName').value   = '';
@@ -3950,11 +3988,11 @@ async function submitTicket() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
   try {
-    const r = await AUTH.api('/api/member/sell-ticket', { method: 'POST', body: JSON.stringify({
+    const r = await AUTH.api('/api/member/sell-ticket', { method: 'POST', body: {
       buyerName,
       buyerContact: document.getElementById('tickContact').value.trim(),
       ticketPrice:  parseFloat(document.getElementById('tickPrice').value) || 100
-    })});
+    }});
     notify(r.message || `Ticket recorded! +${r.pointsEarned} points`, 'success');
     document.getElementById('tickBuyer').value   = '';
     document.getElementById('tickContact').value = '';
@@ -4733,14 +4771,6 @@ async function loadAffiliateDashboard(){
     }
   } catch(e){ console.error('Affiliate load err:', e); }
 }
-
-// Extend loadWallet to also load affiliate data
-const _originalLoadWallet = loadWallet;
-loadWallet = async function(){
-  await _originalLoadWallet();
-  await loadAffiliateDashboard();
-  setupQuizReferralLinks();
-};
 
 /* ============================================
    LOGOUT

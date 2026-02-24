@@ -1,27 +1,43 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/donation",          "destination": "/membership",        "permanent": true },
+    { "source": "/join",              "destination": "/register",          "permanent": true },
+    { "source": "/member-login",      "destination": "/login",             "permanent": true },
+    { "source": "/admin-login",       "destination": "/admin/login",       "permanent": true },
+    { "source": "/member-dashboard",  "destination": "/member/dashboard",  "permanent": true },
+    { "source": "/admin-dashboard",   "destination": "/admin/dashboard",   "permanent": true }
+  ],
   "rewrites": [
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/join", "destination": "/join.html" },
-    { "source": "/projects", "destination": "/projects.html" },
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/csr", "destination": "/csr.html" },
-    { "source": "/donation", "destination": "/donation.html" },
-    { "source": "/member-login", "destination": "/member-login.html" },
-    { "source": "/admin-login", "destination": "/admin-login.html" },
-    { "source": "/member-dashboard", "destination": "/member-dashboard.html" },
-    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" },
-    { "source": "/csr-login", "destination": "/csr-login.html" },
-    { "source": "/csr-dashboard", "destination": "/csr-dashboard.html" },
-    { "source": "/store", "destination": "/store.html" },
-    { "source": "/m/:page", "destination": "/m/:page.html" },
-    { "source": "/api/store/:path*", "destination": "https://fwf-production.up.railway.app/api/store/:path*" },
-    { "source": "/api/auth/:path*", "destination": "https://fwf-production.up.railway.app/api/auth/:path*" },
-    { "source": "/api/member/:path*", "destination": "https://fwf-production.up.railway.app/api/member/:path*" },
-    { "source": "/api/admin/:path*", "destination": "https://fwf-production.up.railway.app/api/admin/:path*" },
-    { "source": "/api/pay/:path*", "destination": "https://fwf-production.up.railway.app/api/pay/:path*" },
-    { "source": "/api/referral/:path*", "destination": "https://fwf-production.up.railway.app/api/referral/:path*" }
+    { "source": "/terms",                  "destination": "/terms.html" },
+    { "source": "/privacy",                "destination": "/privacy.html" },
+    { "source": "/about",                  "destination": "/about.html" },
+    { "source": "/contact",               "destination": "/contact.html" },
+    { "source": "/csr",                    "destination": "/csr.html" },
+    { "source": "/membership",             "destination": "/donation.html" },
+    { "source": "/register",               "destination": "/join.html" },
+    { "source": "/skill-development",      "destination": "/skill-development.html" },
+    { "source": "/projects",               "destination": "/projects.html" },
+    { "source": "/projects/:slug",         "destination": "/projects/:slug.html" },
+    { "source": "/login",                  "destination": "/member-login.html" },
+    { "source": "/admin/login",            "destination": "/admin-login.html" },
+    { "source": "/member/dashboard",       "destination": "/member-dashboard.html" },
+    { "source": "/member/profile",         "destination": "/member-dashboard.html" },
+    { "source": "/member/post",            "destination": "/member-dashboard.html" },
+    { "source": "/member/wallet",          "destination": "/member-dashboard.html" },
+    { "source": "/admin/dashboard",        "destination": "/admin-dashboard.html" },
+    { "source": "/admin/members",          "destination": "/admin-dashboard.html" },
+    { "source": "/admin/projects",         "destination": "/admin-dashboard.html" },
+    { "source": "/csr-login",             "destination": "/csr-login.html" },
+    { "source": "/csr-dashboard",         "destination": "/csr-dashboard.html" },
+    { "source": "/store",                  "destination": "/store.html" },
+    { "source": "/m/:page",               "destination": "/m/:page.html" },
+    { "source": "/api/store/:path*",      "destination": "https://fwf-production.up.railway.app/api/store/:path*" },
+    { "source": "/api/auth/:path*",       "destination": "https://fwf-production.up.railway.app/api/auth/:path*" },
+    { "source": "/api/member/:path*",     "destination": "https://fwf-production.up.railway.app/api/member/:path*" },
+    { "source": "/api/admin/:path*",      "destination": "https://fwf-production.up.railway.app/api/admin/:path*" },
+    { "source": "/api/pay/:path*",        "destination": "https://fwf-production.up.railway.app/api/pay/:path*" },
+    { "source": "/api/referral/:path*",   "destination": "https://fwf-production.up.railway.app/api/referral/:path*" }
   ],
   "headers": [
     {
@@ -33,6 +49,20 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
         { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=3600" }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]
     },
     {

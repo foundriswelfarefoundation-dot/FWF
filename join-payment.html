@@ -154,7 +154,7 @@
       <p style="font-size:0.9rem;color:var(--error)">
         <i class="fas fa-exclamation-triangle"></i> Please save these credentials securely
       </p>
-      <a href="/member-login" class="btn-primary">Login to Dashboard</a>
+      <a href="/login" class="btn-primary">Login to Dashboard</a>
     </div>
   </div>
 
@@ -167,9 +167,9 @@
         message: 'Your session has expired. Please fill the form again to continue.',
         type: 'warning',
         confirmText: 'Go to Form',
-        onConfirm: () => { window.location.href = '/join'; }
+        onConfirm: () => { window.location.href = '/register'; }
       });
-      setTimeout(() => window.location.href = '/join', 3000);
+      setTimeout(() => window.location.href = '/register', 3000);
     }
     
     const payBtn = document.getElementById('payBtn');

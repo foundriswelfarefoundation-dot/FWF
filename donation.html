@@ -2,8 +2,52 @@
 <html lang="en" data-lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="canonical" href="https://www.fwfindia.org/donation" />
-  <meta property="og:url" content="https://www.fwfindia.org/donation" />
+  <link rel="canonical" href="https://www.fwfindia.org/membership" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta property="og:url" content="https://www.fwfindia.org/membership" />
+  <title>Join FWF | Membership, Donate & Supporter — Foundation for Women's Future</title>
+  <meta name="description" content="Join FWF as a member (₹500/month) to access skill training, projects & livelihood support. Donate, support, or partner with us to empower women across India." />
+  <meta name="keywords" content="FWF membership, donate NGO India, women empowerment donation, join FWF, supporter India, 80G tax receipt, UPI donate India" />
+  <meta name="author" content="Foundris Welfare Foundation" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="FWF India" />
+  <meta property="og:title" content="Join FWF | ₹500/month Membership & Donation" />
+  <meta property="og:description" content="Become an FWF member at ₹500/month. Donate for 80G receipt. Support women's skill development & livelihood programs." />
+  <meta property="og:image" content="https://www.fwfindia.org/assets/images/logo.png" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Join FWF | Membership & Donation" />
+  <meta name="twitter:description" content="Support women empowerment through FWF membership or donation. 80G receipts available." />
+  <meta name="twitter:image" content="https://www.fwfindia.org/assets/images/logo.png" />
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "url": "https://www.fwfindia.org/membership",
+        "name": "Join FWF | Membership, Donation & Supporter",
+        "description": "Join FWF as a member at ₹500/month, donate for 80G receipt, or support us to empower women across India.",
+        "breadcrumb": {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.fwfindia.org/" },
+            { "@type": "ListItem", "position": 2, "name": "Membership", "item": "https://www.fwfindia.org/membership" }
+          ]
+        }
+      },
+      {
+        "@type": "DonateAction",
+        "name": "Donate to FWF",
+        "description": "Support women empowerment through FWF. 80G tax receipt provided for donations above ₹500.",
+        "url": "https://www.fwfindia.org/membership",
+        "recipient": { "@type": "NGO", "name": "Foundris Welfare Foundation", "url": "https://www.fwfindia.org" }
+      }
+    ]
+  }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FWF — Donate, Join & Create Impact</title>
 
@@ -128,7 +172,7 @@
     .cta-button:hover{ transform: translateY(-2px) scale(1.03); background: rgba(255,255,255,0.26) }
     .donate{ background:linear-gradient(135deg, var(--pink), var(--pink2)) }
     .rojgar{ background:linear-gradient(135deg, #667eea, #764ba2) }
-    .volunteer{ background:linear-gradient(135deg, #56ab2f, #a8e6cf) }
+    .supporter{ background:linear-gradient(135deg, #56ab2f, #a8e6cf) }
     .csr{ background:linear-gradient(135deg, #8360c3, #2ebf91) }
     @media (max-width:980px){ .featureSection .section-content{ grid-template-columns:1fr } .content-right{ order:-1 } .tabsWrap{ top:66px } }
 
@@ -231,7 +275,7 @@
     <div class="tabs">
       <button class="tabBtn active" data-target="#donate">Donate</button>
       <button class="tabBtn" data-target="#rojgar">Rojgar (Membership)</button>
-      <button class="tabBtn" data-target="#volunteer">Volunteer</button>
+      <button class="tabBtn" data-target="#supporter">Supporter</button>
       <button class="tabBtn" data-target="#csr">CSR Tie-up</button>
     </div>
   </div>
@@ -270,18 +314,18 @@
     </div>
   </section>
 
-  <!-- Volunteer -->
-  <section class="featureSection volunteer" id="volunteer">
+  <!-- Supporter -->
+  <section class="featureSection supporter" id="supporter">
     <div class="section-content">
       <div class="content-left">
-        <h2 class="section-title">Volunteer Program</h2>
+        <h2 class="section-title">Supporter Program</h2>
         <p class="section-description">Teach, mentor & help set up micro-business.</p>
         <ul class="features-list">
           <li><i class="fa-solid fa-check"></i> Flexible time</li>
           <li><i class="fa-solid fa-check"></i> Teach real skills</li>
           <li><i class="fa-solid fa-check"></i> Community reach</li>
         </ul>
-        <button class="cta-button" id="openVolunteer2"><i class="fa-solid fa-hands-helping"></i> Sign Up</button>
+        <button class="cta-button" id="openSupporter2"><i class="fa-solid fa-hands-helping"></i> Sign Up</button>
       </div>
       <div class="content-right"><div class="illustration"><i class="fa-solid fa-people-group"></i></div></div>
     </div>
@@ -420,7 +464,7 @@
         <button class="btn-primary" type="submit">Proceed to Payment</button>
         <p style="text-align:center; margin-top:16px; font-size:14px; color:#64748b;">
           Already a member? 
-          <a href="/member-login" style="color:#6366f1; font-weight:700; text-decoration:none; transition:color .2s;">
+          <a href="/login" style="color:#6366f1; font-weight:700; text-decoration:none; transition:color .2s;">
             Login to Dashboard
           </a>
         </p>
@@ -448,13 +492,13 @@
   </div>
 </div>
 
-<!-- Volunteer -->
-<div id="volModal" class="modal">
+<!-- Supporter -->
+<div id="supModal" class="modal">
   <div class="modalCard">
-    <button class="modalClose" id="closeVol"><i class="fa fa-times"></i></button>
-    <h2 style="margin:0 0 8px">Volunteer Sign Up</h2>
-    <p class="subtle">Tell us how you’d like to help</p>
-    <form id="volForm" autocomplete="off" novalidate>
+    <button class="modalClose" id="closeSupporter"><i class="fa fa-times"></i></button>
+    <h2 style="margin:0 0 8px">Supporter Sign Up</h2>
+    <p class="subtle">Tell us how you'd like to help</p>
+    <form id="supForm" autocomplete="off" novalidate>
       <div class="fl-group"><i class="fl-icon fa-regular fa-user"></i><input class="fl-input" name="name" placeholder=" " required><label class="fl-label">Full Name</label></div>
       <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" required><label class="fl-label">Phone</label></div>
       <div class="fl-group"><i class="fl-icon fa-regular fa-envelope"></i><input class="fl-input" type="email" name="email" placeholder=" " required><label class="fl-label">Email</label></div>
@@ -514,7 +558,7 @@
     });
   });
 
-  const sections = ['#donate','#rojgar','#volunteer','#csr'].map(s=>document.querySelector(s));
+  const sections = ['#donate','#rojgar','#supporter','#csr'].map(s=>document.querySelector(s));
   const spy = new IntersectionObserver((entries)=>{ entries.forEach(entry=>{ if(entry.isIntersecting){ const id = '#'+entry.target.id; tabBtns.forEach(b=> b.classList.toggle('active', b.dataset.target===id)); } }); }, { rootMargin:'-55% 0px -40% 0px', threshold:0 });
   sections.forEach(s=>s && spy.observe(s));
 
@@ -829,12 +873,12 @@
     }
   });
 
-  /* VOLUNTEER */
-  const volModal=document.getElementById('volModal');
-  document.getElementById('openVolunteer2').addEventListener('click', ()=>{ resetForm(document.getElementById('volForm')); openModal(volModal); });
-  document.getElementById('closeVol').addEventListener('click', ()=> closeModal(volModal));
-  volModal.addEventListener('click', (e)=>{ if(e.target===volModal) closeModal(volModal); });
-  document.getElementById('volForm').addEventListener('submit', (e)=>{ e.preventDefault(); const f=e.target; if(!f.checkValidity()){ f.reportValidity(); return; } FWF_Notify.toast('Thanks! Your volunteer request has been sent to our support team and a thank-you email is on its way to you.', 'success', 6000); closeModal(volModal); });
+  /* SUPPORTER */
+  const supModal=document.getElementById('supModal');
+  document.getElementById('openSupporter2').addEventListener('click', ()=>{ resetForm(document.getElementById('supForm')); openModal(supModal); });
+  document.getElementById('closeSupporter').addEventListener('click', ()=> closeModal(supModal));
+  supModal.addEventListener('click', (e)=>{ if(e.target===supModal) closeModal(supModal); });
+  document.getElementById('supForm').addEventListener('submit', (e)=>{ e.preventDefault(); const f=e.target; if(!f.checkValidity()){ f.reportValidity(); return; } FWF_Notify.toast('Thanks! Your support request has been sent to our support team and a thank-you email is on its way to you.', 'success', 6000); closeModal(supModal); });
 
   /* PARTNER */
   const partnerModal=document.getElementById('partnerModal');

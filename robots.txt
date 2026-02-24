@@ -1,0 +1,35 @@
+User-agent: *
+Allow: /
+
+# Public pages — allow all crawlers
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /projects
+Allow: /projects/
+Allow: /membership
+Allow: /register
+Allow: /skill-development
+Allow: /csr
+Allow: /terms
+Allow: /privacy
+Allow: /sitemap.xml
+
+# Private pages — block all crawlers
+Disallow: /admin/
+Disallow: /member/
+Disallow: /admin-dashboard
+Disallow: /member-dashboard
+Disallow: /admin-login
+Disallow: /member-login
+Disallow: /login
+Disallow: /csr-login
+Disallow: /csr-dashboard
+Disallow: /store
+Disallow: /m/
+Disallow: /api/
+Disallow: /debug.html
+Disallow: /mobile-test-deploy.html
+
+# Sitemap location
+Sitemap: https://www.fwfindia.org/sitemap.xml

@@ -31,7 +31,7 @@
 document.getElementById('loginBtn').onclick = async ()=>{
   try{
     await AUTH.api('/api/admin/login',{method:'POST', body:{username:document.getElementById('user').value.trim(), password:document.getElementById('pwd').value.trim()}});
-    location.href = 'admin-dashboard.html';
+    location.href = '/admin/dashboard';
   }catch(e){ FWF_Notify.toast(e.message || 'Login failed', 'error'); }
 };
 </script>

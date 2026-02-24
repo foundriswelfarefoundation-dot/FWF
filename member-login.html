@@ -365,7 +365,7 @@ body::before{
   <div class="divider">New to FWF?</div>
 
   <div class="signup-link">
-    <a href="https://www.fwfindia.org/donation#donateModal"><i class="fa-solid fa-user-plus"></i> Join & Get Member ID</a>
+    <a href="/register"><i class="fa-solid fa-user-plus"></i> Join &amp; Get Member ID</a>
   </div>
 </div>
 
@@ -672,8 +672,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
     btnText.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
     setTimeout(() => {
-      if(res.role==='admin') location.href = '/admin-dashboard';
-      else location.href = '/member-dashboard';
+      if(res.role==='admin') location.href = '/admin/dashboard';
+      else location.href = '/member/dashboard';
     }, 500);
   }catch(e){ 
     btnText.innerHTML = '<i class="fa-solid fa-xmark"></i> Login Failed';

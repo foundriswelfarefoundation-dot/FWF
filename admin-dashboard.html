@@ -1713,11 +1713,23 @@ window.addEventListener('popstate', (e) => {
   switchPage(page, false);
 });
 
-// On load, navigate to hash if present
+// On load — path-based routing takes precedence over hash
 window.addEventListener('load', () => {
-  const hash = location.hash.slice(1);
-  if(hash && document.getElementById('page-' + hash)) {
-    switchPage(hash, false);
+  const pathMap = {
+    '/admin/members':    'members',
+    '/admin/projects':   'reports',
+    '/admin/payments':   'payments',
+    '/admin/posts':      'posts',
+    '/admin/csr':        'csr',
+    '/admin/support':    'support',
+    '/admin/points':     'points',
+    '/admin/store':      'marketplace',
+  };
+  const pathPage = pathMap[location.pathname];
+  const hashPage = location.hash.slice(1);
+  const target = pathPage || hashPage;
+  if(target && document.getElementById('page-' + target)) {
+    switchPage(target, false);
   }
 });
 

@@ -392,26 +392,110 @@ textarea.form-input{ resize:vertical; min-height:80px; }
    RESPONSIVE
    ============================== */
 @media(max-width:1100px){
-  .stats-row{ grid-template-columns:repeat(2,1fr); }
+  .stats-row{ grid-template-columns:repeat(2,1fr) !important; }
   .grid-3{ grid-template-columns:1fr 1fr; }
 }
 @media(max-width:900px){
   .sidebar{ transform:translateX(-100%); }
   .sidebar.open{ transform:translateX(0); }
-  .main{ margin-left:0; padding:16px; padding-top:60px; }
+  .main{ margin-left:0; padding:16px; padding-top:60px; padding-bottom:76px; }
   .mobile-toggle{ display:grid; place-items:center; }
   .mobile-overlay.show{ display:block; }
 }
 @media(max-width:640px){
-  .stats-row{ grid-template-columns:1fr; }
+  .stats-row{ grid-template-columns:1fr 1fr !important; }
   .grid-2,.grid-3{ grid-template-columns:1fr; }
   .form-row{ flex-direction:column; }
   .form-row .form-group{ min-width:100%; }
-  .topbar{ flex-direction:column; align-items:flex-start; }
-  .topbar h1{ font-size:20px; }
-  .tab-bar{ overflow-x:auto; }
+  .topbar{ flex-direction:column; align-items:flex-start; gap:8px; }
+  .topbar h1{ font-size:18px; }
+  .tab-bar{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .main{ padding:12px 10px; padding-top:56px; padding-bottom:76px; }
 }
-.table-wrap{ overflow-x:auto; }
+
+/* ==============================
+   MOBILE APP ENHANCEMENTS (≤480px)
+   ============================== */
+@media(max-width:480px){
+  .main{ padding:8px; padding-top:52px; padding-bottom:72px; }
+  .mobile-toggle{ top:8px; left:8px; width:36px; height:36px; font-size:14px; border-radius:8px; }
+
+  /* Topbar compact */
+  .topbar{ margin-bottom:14px; gap:6px; }
+  .topbar h1{ font-size:16px; letter-spacing:-.3px; }
+  .admin-badge{ font-size:10px; padding:4px 10px; }
+
+  /* Stat cards compact */
+  .stats-row{ gap:8px !important; margin-bottom:14px; }
+  .stat-card{ padding:14px; border-radius:12px; }
+  .stat-card .s-icon{ width:34px; height:34px; font-size:14px; margin-bottom:8px; border-radius:8px; }
+  .stat-card .s-value{ font-size:18px; }
+  .stat-card .s-label{ font-size:10px; }
+  .stat-card .s-change{ font-size:10px; }
+
+  /* Content cards */
+  .content-card{ border-radius:14px; padding:14px; margin-bottom:14px; }
+  .content-card h3{ font-size:15px; }
+
+  /* Tables compact */
+  .data-table th,.data-table td{ padding:8px 6px; font-size:11px; }
+  .data-table th{ font-size:9px; }
+  .badge{ font-size:9px; padding:3px 8px; }
+
+  /* Forms compact */
+  .form-input{ padding:10px 12px; font-size:13px; border-radius:10px; }
+  .form-group label{ font-size:12px; }
+
+  /* Buttons */
+  .btn{ padding:10px 14px; font-size:12px; border-radius:10px; }
+  .btn.btn-sm{ padding:6px 10px; font-size:10px; }
+
+  /* Search bar */
+  .search-bar{ border-radius:10px; }
+  .search-bar input{ padding:10px 12px; font-size:13px; }
+
+  /* Tab bar compact */
+  .tab-bar{ gap:0; margin-bottom:12px; }
+  .tab-btn{ padding:8px 10px; font-size:11px; }
+
+  /* Modals — bottom sheet on mobile */
+  .modal-overlay{ padding:8px !important; }
+  .modal-card{ max-width:100% !important; border-radius:16px !important; padding:18px; max-height:92vh; }
+  .detail-header{ flex-direction:column; text-align:center; gap:10px; }
+  .detail-meta{ justify-content:center; }
+
+  /* Inline flex buttons — wrap on mobile */
+  div[style*="display:flex"][style*="justify-content:flex-end"]{ flex-wrap:wrap; }
+}
+
+/* ==============================
+   MOBILE BOTTOM NAV BAR
+   ============================== */
+.mobile-bottom-nav{
+  display:none;
+  position:fixed; bottom:0; left:0; right:0; z-index:200;
+  background:var(--sidebar-bg); border-top:1px solid rgba(255,255,255,.06);
+  box-shadow:0 -2px 16px rgba(0,0,0,.3);
+  padding:4px 0; padding-bottom:max(4px, env(safe-area-inset-bottom));
+}
+.mobile-bottom-nav .nav-row{
+  display:flex; justify-content:space-around; align-items:center;
+}
+.mobile-bottom-nav .bnav{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:6px 4px; border:none; background:none;
+  font-family:inherit; font-size:9px; font-weight:700;
+  color:var(--sidebar-text); opacity:.5; cursor:pointer; transition:.15s;
+  min-width:0; flex:1;
+}
+.mobile-bottom-nav .bnav i{ font-size:17px; transition:.15s; }
+.mobile-bottom-nav .bnav.active{ opacity:1; color:#818cf8; }
+.mobile-bottom-nav .bnav.active i{ transform:scale(1.1); }
+@media(max-width:900px){
+  .mobile-bottom-nav{ display:block; }
+}
+
+.table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   </style>
 </head>
 <body>
@@ -1368,6 +1452,17 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
 </main>
 
+<!-- ======== MOBILE BOTTOM NAV ======== -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <div class="nav-row">
+    <button class="bnav active" data-page="home"><i class="fa-solid fa-chart-pie"></i><span>Home</span></button>
+    <button class="bnav" data-page="members"><i class="fa-solid fa-users"></i><span>Members</span></button>
+    <button class="bnav" data-page="payments"><i class="fa-solid fa-indian-rupee-sign"></i><span>Payments</span></button>
+    <button class="bnav" data-page="support"><i class="fa-solid fa-headset"></i><span>Support</span></button>
+    <button class="bnav" data-page="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
+  </div>
+</nav>
+
 <!-- ======== MODALS ======== -->
 
 <!-- Reset Password Modal -->
@@ -1687,6 +1782,11 @@ function switchPage(page, updateHash = true){
   document.getElementById('pageTitle').innerHTML = pageTitles[page] || page;
   closeMobile();
 
+  // Sync bottom nav
+  document.querySelectorAll('.mobile-bottom-nav .bnav').forEach(b => b.classList.remove('active'));
+  const bnav = document.querySelector('.mobile-bottom-nav .bnav[data-page="'+page+'"]');
+  if(bnav) bnav.classList.add('active');
+
   // Update URL hash without reloading
   if(updateHash) {
     const hash = page === 'home' ? '#' : '#' + page;
@@ -1704,6 +1804,11 @@ function switchPage(page, updateHash = true){
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+// Bottom nav clicks
+document.querySelectorAll('.mobile-bottom-nav .bnav').forEach(btn => {
   btn.addEventListener('click', () => switchPage(btn.dataset.page));
 });
 

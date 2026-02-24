@@ -749,7 +749,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 @media(max-width:900px){
   .sidebar{ transform:translateX(-100%); }
   .sidebar.open{ transform:translateX(0); }
-  .main{ margin-left:0; padding:16px; padding-top:68px; }
+  .main{ margin-left:0; padding:16px; padding-top:68px; padding-bottom:80px; }
   .top-header{ left:0; }
   .mobile-toggle{ display:grid; place-items:center; z-index:200; }
   .mobile-overlay.show{ display:block; }
@@ -759,15 +759,157 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   .grid-2,.grid-3{ grid-template-columns:1fr; }
   .form-row{ flex-direction:column; }
   .account-actions{ flex-wrap:wrap; }
-  .account-action-btn{ min-width:33%; }
+  .account-action-btn{ min-width:33%; flex:1 1 40%; }
   .account-balance .amount{ font-size:26px; }
   .profile-header{ flex-direction:column; text-align:center; }
   .profile-meta{ justify-content:center; }
-  .tab-bar{ overflow-x:auto; }
+  .tab-bar{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .top-header{ padding:0 14px; }
   .top-header h1{ font-size:14px; }
+  .main{ padding:12px 10px; padding-top:64px; padding-bottom:80px; }
+  .home-cards-grid{ grid-template-columns:1fr !important; }
+
+  /* Stack account overview cards */
+  .account-overview-header{ padding:12px 16px; }
+  .account-overview-header h3{ font-size:12px; }
+  .account-overview-body{ padding:16px; }
+  .account-subtitle{ font-size:11px; flex-wrap:wrap; }
 }
-.table-wrap{ overflow-x:auto; }
+
+/* ==============================
+   MOBILE APP ENHANCEMENTS (≤480px)
+   ============================== */
+@media(max-width:480px){
+  body{ background:var(--bg-1); }
+  .main{ padding:8px; padding-top:60px; padding-bottom:76px; }
+  .top-header{ height:50px; padding:0 12px; }
+  .top-header h1{ font-size:13px; gap:6px; }
+  .top-header h1 i{ font-size:13px; }
+  .top-header-right{ gap:8px; }
+  .member-badge{ padding:4px 10px; font-size:10px; gap:4px; }
+  .top-header .btn-header{ padding:4px 10px; font-size:10px; }
+  .mobile-toggle{ top:8px; left:8px; width:36px; height:36px; font-size:14px; }
+
+  /* Stat cards compact */
+  .stats-row{ grid-template-columns:1fr 1fr; gap:8px; }
+  .stat-card{ padding:14px; border-radius:12px; }
+  .stat-card .s-icon{ width:34px; height:34px; font-size:15px; margin-bottom:8px; border-radius:8px; }
+  .stat-card .s-value{ font-size:20px; }
+  .stat-card .s-label{ font-size:10px; }
+
+  /* Content cards */
+  .content-card{ border-radius:14px; padding:16px; margin-bottom:14px; }
+  .content-card h3{ font-size:15px; }
+
+  /* Account overview (home cards) */
+  .account-overview{ border-radius:14px; margin-bottom:14px; }
+  .account-overview-header{ padding:10px 14px; }
+  .account-overview-header h3{ font-size:11px; }
+  .account-overview-body{ padding:14px; }
+  .account-balance .amount{ font-size:24px; }
+  .account-subtitle{ font-size:10px; line-height:1.7; }
+  .account-actions{ margin:0 -14px -14px; }
+  .account-action-btn{ padding:12px 6px; font-size:10px; gap:4px; }
+  .account-action-btn i{ font-size:16px; }
+
+  /* Wallet sections */
+  .wallet-single-section{ border-radius:14px; margin-bottom:14px; }
+  .wallet-section-header{ font-size:14px; padding:14px 14px 0; }
+  .wallet-section-header i{ font-size:15px; }
+  .app-tabs{ padding:10px 10px 0; }
+  .app-tab{ padding:8px 4px 10px; }
+  .app-tab .tab-icon{ width:30px; height:30px; font-size:12px; }
+  .app-tab .tab-label{ font-size:8px; }
+  .app-tab-body{ padding:14px 12px; }
+
+  /* Data tables */
+  .data-table th,.data-table td{ padding:8px 6px; font-size:11px; }
+  .data-table th{ font-size:9px; }
+
+  /* Forms */
+  .form-input{ padding:10px 12px; font-size:13px; border-radius:10px; }
+  .form-group label{ font-size:12px; }
+
+  /* Buttons */
+  .btn{ padding:10px 16px; font-size:12px; border-radius:10px; }
+
+  /* Profile */
+  .profile-avatar{ width:56px; height:56px; font-size:22px; }
+  .profile-name{ font-size:18px; }
+
+  /* Feed cards */
+  .feed-card{ padding:14px; border-radius:12px; }
+  .feed-avatar{ width:34px; height:34px; font-size:12px; }
+  .feed-name{ font-size:13px; }
+  .feed-body{ font-size:13px; }
+
+  /* Course cards */
+  .course-thumb{ height:100px; }
+
+  /* Product cards */
+  .product-thumb{ height:120px; }
+
+  /* Redeem cards */
+  .redeem-icon{ width:44px; height:44px; font-size:20px; }
+
+  /* Tab bar compact */
+  .tab-bar{ gap:0; }
+  .tab-btn{ padding:8px 10px; font-size:11px; }
+
+  /* Action cards grid — 2 columns on phone */
+  .action-cards-grid{ grid-template-columns:1fr 1fr !important; gap:10px !important; padding:12px 12px 4px !important; }
+  .action-cards-grid > div{ padding:14px !important; border-radius:12px !important; }
+  .action-cards-grid > div h4{ font-size:13px !important; }
+  .action-cards-grid > div p{ font-size:10px !important; line-height:1.4 !important; }
+  .action-cards-grid > div > div:first-child{ width:38px !important; height:38px !important; border-radius:10px !important; margin-bottom:8px !important; }
+  .action-cards-grid > div > div:first-child i{ font-size:15px !important; }
+
+  /* Referral code bar compact */
+  .wallet-single-section > div[style*="margin:14px"]{ margin:10px 12px 0 !important; padding:10px 12px !important; }
+
+  /* Modals — full screen bottom sheet on mobile */
+  .modal{ padding:0; }
+  .modal-content{ max-width:100%; border-radius:16px 16px 0 0; max-height:92vh; margin-top:auto; }
+  .modal-header{ padding:16px 18px 14px; }
+  .modal-header h3{ font-size:16px; }
+  .modal-body{ padding:16px 18px; }
+  .modal-actions{ padding:14px 18px; }
+  .modal-overlay{ padding:0; }
+  .modal-card{ max-width:100%; border-radius:16px 16px 0 0; padding:20px; max-height:92vh; margin-top:auto; }
+
+  /* Action modals (Razorpay, Supporter, Donation, Ticket) — bottom sheet */
+  [id^="modal"]{ padding:8px !important; }
+  [id^="modal"] > div{ max-width:100% !important; border-radius:16px !important; max-height:94vh; overflow-y:auto; }
+}
+
+/* ==============================
+   MOBILE BOTTOM NAV BAR
+   ============================== */
+.mobile-bottom-nav{
+  display:none;
+  position:fixed; bottom:0; left:0; right:0; z-index:200;
+  background:#fff; border-top:1px solid var(--card-border);
+  box-shadow:0 -2px 10px rgba(0,0,0,.06);
+  padding:4px 0; padding-bottom:max(4px, env(safe-area-inset-bottom));
+}
+.mobile-bottom-nav .nav-row{
+  display:flex; justify-content:space-around; align-items:center;
+}
+.mobile-bottom-nav .bnav{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:6px 8px; border:none; background:none;
+  font-family:inherit; font-size:9px; font-weight:700;
+  color:var(--text-muted); cursor:pointer; transition:.15s;
+  min-width:0; flex:1;
+}
+.mobile-bottom-nav .bnav i{ font-size:18px; transition:.15s; }
+.mobile-bottom-nav .bnav.active{ color:var(--accent); }
+.mobile-bottom-nav .bnav.active i{ transform:scale(1.1); }
+@media(max-width:900px){
+  .mobile-bottom-nav{ display:block; }
+}
+
+.table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   </style>
 </head>
 <body>
@@ -858,7 +1000,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
 
     <!-- ACCOUNT OVERVIEW — ICICI-style -->
-    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:22px">
+    <div class="home-cards-grid" style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:22px">
       <!-- Left: Balance Card -->
       <div class="account-overview">
         <div class="account-overview-header">
@@ -1286,7 +1428,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
 
       <!-- Action Cards Grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:18px 20px 4px">
+      <div class="action-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:18px 20px 4px">
 
         <!-- Card: Add Member -->
         <div onclick="openActionModal('addMember')" style="background:#fff;border:1.5px solid #ffe0b2;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
@@ -2028,6 +2170,17 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
 </main>
 
+<!-- ======== MOBILE BOTTOM NAV ======== -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <div class="nav-row">
+    <button class="bnav active" data-page="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button class="bnav" data-page="wallet"><i class="fa-solid fa-wallet"></i><span>Wallet</span></button>
+    <button class="bnav" data-page="feed"><i class="fa-solid fa-newspaper"></i><span>Feed</span></button>
+    <button class="bnav" data-page="training"><i class="fa-solid fa-graduation-cap"></i><span>Learn</span></button>
+    <button class="bnav" data-page="profile"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+  </div>
+</nav>
+
 <!-- ======== MODALS ======== -->
 
 <!-- New Post Modal - WhatsApp Style -->
@@ -2461,6 +2614,11 @@ function switchPage(page, updateHash = true){
   document.getElementById('pageTitle').innerHTML = pageTitles[page] || page;
   closeMobile();
 
+  // Sync bottom nav
+  document.querySelectorAll('.mobile-bottom-nav .bnav').forEach(b => b.classList.remove('active'));
+  const bnav = document.querySelector('.mobile-bottom-nav .bnav[data-page="'+page+'"]');
+  if(bnav) bnav.classList.add('active');
+
   // Update URL hash without reloading
   if(updateHash) {
     history.pushState({ page }, '', location.pathname + (page === 'home' ? '' : '#' + page));
@@ -2476,6 +2634,11 @@ function switchPage(page, updateHash = true){
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+// Bottom nav clicks
+document.querySelectorAll('.mobile-bottom-nav .bnav').forEach(btn => {
   btn.addEventListener('click', () => switchPage(btn.dataset.page));
 });
 

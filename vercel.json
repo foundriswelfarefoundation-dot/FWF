@@ -1,12 +1,5 @@
 {
   "cleanUrls": true,
-  "redirects": [
-    { "source": "/join",              "destination": "/register",          "permanent": true },
-    { "source": "/member-login",      "destination": "/login",             "permanent": true },
-    { "source": "/admin-login",       "destination": "/admin/login",       "permanent": true },
-    { "source": "/member-dashboard",  "destination": "/member/dashboard",  "permanent": true },
-    { "source": "/admin-dashboard",   "destination": "/admin/dashboard",   "permanent": true }
-  ],
   "rewrites": [
     { "source": "/terms",                  "destination": "/terms-conditions.html" },
     { "source": "/privacy",                "destination": "/privacy-policy.html" },

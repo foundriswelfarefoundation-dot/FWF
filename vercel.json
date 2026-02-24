@@ -1,7 +1,6 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/donation",          "destination": "/membership",        "permanent": true },
     { "source": "/join",              "destination": "/register",          "permanent": true },
     { "source": "/member-login",      "destination": "/login",             "permanent": true },
     { "source": "/admin-login",       "destination": "/admin/login",       "permanent": true },
@@ -9,11 +8,12 @@
     { "source": "/admin-dashboard",   "destination": "/admin/dashboard",   "permanent": true }
   ],
   "rewrites": [
-    { "source": "/terms",                  "destination": "/terms.html" },
-    { "source": "/privacy",                "destination": "/privacy.html" },
+    { "source": "/terms",                  "destination": "/terms-conditions.html" },
+    { "source": "/privacy",                "destination": "/privacy-policy.html" },
     { "source": "/about",                  "destination": "/about.html" },
     { "source": "/contact",               "destination": "/contact.html" },
     { "source": "/csr",                    "destination": "/csr.html" },
+    { "source": "/donation",               "destination": "/donation.html" },
     { "source": "/membership",             "destination": "/donation.html" },
     { "source": "/register",               "destination": "/join.html" },
     { "source": "/skill-development",      "destination": "/skill-development.html" },

@@ -1310,7 +1310,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <div style="width:46px;height:46px;background:linear-gradient(135deg,#34d366,#0a8f3f);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
             <i class="fa-solid fa-hands-helping" style="color:#fff;font-size:18px"></i>
           </div>
-          <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">+100 Points</div>
+          <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
           <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Supporter</h4>
           <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Bring a new supporter on board and earn 100 referral points.</p>
           <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center">
@@ -1412,30 +1412,48 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- ============ MODAL: Add Supporter ============ -->
+    <!-- ============ MODAL: Add Supporter (with Razorpay) ============ -->
     <div id="modalAddSupporter" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
-      <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
         <div style="background:linear-gradient(135deg,#34d366,#0a8f3f);padding:20px 24px 16px;position:relative">
           <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hands-helping"></i> Add Supporter</h3>
-          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>100 points</strong> for each supporter you bring</p>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10% back</strong> of the supporter's joining amount as points!</p>
           <button onclick="closeActionModal('addSupporter')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
         </div>
-        <div style="padding:22px 24px 24px;display:grid;gap:12px">
-          <div class="form-group" style="margin:0">
-            <label>Supporter Name *</label>
-            <input type="text" class="form-input" id="spName" placeholder="Full name">
+        <div style="padding:22px 24px 24px">
+          <div id="spStep1">
+            <div style="display:grid;gap:12px">
+              <div class="form-group" style="margin:0">
+                <label>Supporter Name *</label>
+                <input type="text" class="form-input" id="spName" placeholder="Full name">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Mobile / Email *</label>
+                <input type="text" class="form-input" id="spContact" placeholder="Phone or email">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Joining Amount (₹) *</label>
+                <input type="number" class="form-input" id="spAmount" placeholder="e.g. 500" min="1" value="500">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Notes (optional)</label>
+                <input type="text" class="form-input" id="spNotes" placeholder="e.g. Corporate, Local leader">
+              </div>
+            </div>
+            <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#166534">
+              <i class="fa-solid fa-circle-info"></i> You earn <strong>10%</strong> of the supporter's payment as reward points. e.g. ₹500 → <strong>5 points</strong>.
+            </div>
+            <button id="spPayBtn" onclick="startSupporterPayment()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+              <i class="fa-solid fa-lock"></i> Proceed to Payment
+            </button>
           </div>
-          <div class="form-group" style="margin:0">
-            <label>Mobile / Email *</label>
-            <input type="text" class="form-input" id="spContact" placeholder="Phone or email">
+          <!-- Success step -->
+          <div id="spStep2" style="display:none;text-align:center">
+            <div style="font-size:40px;margin-bottom:8px">🎉</div>
+            <h4 style="color:var(--success);font-size:16px;font-weight:800;margin-bottom:4px">Supporter Added!</h4>
+            <p id="spResultPoints" style="color:var(--text-muted);font-size:13px;margin-bottom:16px"></p>
+            <button onclick="closeActionModal('addSupporter')" style="background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
           </div>
-          <div class="form-group" style="margin:0">
-            <label>Notes (optional)</label>
-            <input type="text" class="form-input" id="spNotes" placeholder="e.g. Corporate, Local leader">
-          </div>
-          <button id="spBtn" onclick="submitSupporter()" style="background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
-            <i class="fa-solid fa-plus"></i> Add Supporter
-          </button>
         </div>
       </div>
     </div>
@@ -3554,6 +3572,17 @@ function openActionModal(key) {
     document.getElementById('amMobile').value = '';
     document.getElementById('amEmail').value = '';
   }
+  // Reset Add Supporter to step 1
+  if (key === 'addSupporter') {
+    document.getElementById('spStep1').style.display = 'block';
+    document.getElementById('spStep2').style.display = 'none';
+    document.getElementById('spName').value = '';
+    document.getElementById('spContact').value = '';
+    document.getElementById('spAmount').value = '500';
+    document.getElementById('spNotes').value = '';
+    const btn = document.getElementById('spPayBtn');
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment'; }
+  }
 }
 function closeActionModal(key) {
   const el = document.getElementById(actionModalMap[key]);
@@ -3651,37 +3680,72 @@ async function startMemberPayment() {
 }
 
 /* ============================================
-   ADD SUPPORTER
+   ADD SUPPORTER (Razorpay payment + 10% points)
    ============================================ */
-async function submitSupporter() {
+async function startSupporterPayment() {
   const name    = document.getElementById('spName').value.trim();
   const contact = document.getElementById('spContact').value.trim();
+  const amount  = parseFloat(document.getElementById('spAmount').value);
   const notes   = document.getElementById('spNotes').value.trim();
 
-  if (!name || !contact) return notify('Enter supporter name and contact', 'warning');
+  if (!name || !contact)        return notify('Enter supporter name and contact', 'warning');
+  if (!amount || amount < 1)    return notify('Enter a valid joining amount', 'warning');
 
-  const btn = document.getElementById('spBtn');
+  const btn = document.getElementById('spPayBtn');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Adding...';
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order...';
   try {
-    const r = await AUTH.api('/api/member/add-supporter', {
+    // Create Razorpay order
+    const order = await AUTH.api('/api/pay/create-order', {
       method: 'POST',
-      body: JSON.stringify({ name, contact, notes })
+      body: { amount_inr: amount, receipt: 'supporter_' + Date.now() }
     });
-    notify(r.message || `Supporter added! +${r.pointsEarned || 100} points`, 'success');
-    document.getElementById('spName').value = '';
-    document.getElementById('spContact').value = '';
-    document.getElementById('spNotes').value = '';
-    closeActionModal('addSupporter');
-    memberData = null;
-    loadWallet();
+
+    const options = {
+      key:         order.key,
+      amount:      order.order.amount,
+      currency:    order.order.currency,
+      name:        'FWF — Supporter Joining',
+      description: `Supporter: ${name}`,
+      order_id:    order.order.id,
+      handler: async function(resp) {
+        try {
+          const result = await AUTH.api('/api/pay/supporter', {
+            method: 'POST',
+            body: {
+              supporterName:    name,
+              supporterContact: contact,
+              supporterNotes:   notes,
+              amount,
+              razorpay_payment_id: resp.razorpay_payment_id,
+              razorpay_order_id:   resp.razorpay_order_id,
+              razorpay_signature:  resp.razorpay_signature
+            }
+          });
+          document.getElementById('spResultPoints').textContent =
+            result.message || `Supporter added! You earned ${result.pointsEarned} points.`;
+          document.getElementById('spStep1').style.display = 'none';
+          document.getElementById('spStep2').style.display = 'block';
+          memberData = null;
+          loadWallet();
+        } catch(e) {
+          notify('Payment received but failed to record — contact support: ' + e.message, 'warning');
+        }
+      },
+      prefill:  { name: memberData?.name || '', contact: contact },
+      theme:    { color: '#0a8f3f' },
+      modal:    { ondismiss: () => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment';
+      }}
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
   } catch(e) {
-    // API may not exist yet — show friendly message
-    notify('Supporter recorded! Points will be credited shortly.', 'success');
-    closeActionModal('addSupporter');
+    notify('Could not initiate payment: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Supporter';
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment';
   }
 }
 

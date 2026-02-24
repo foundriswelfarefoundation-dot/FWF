@@ -703,6 +703,68 @@ app.post('/api/pay/donation', async (req, res) => {
   }
 });
 
+// Razorpay Supporter Payment: verify + credit 10% points to referring member
+app.post('/api/pay/supporter', auth('member'), async (req, res) => {
+  try {
+    const {
+      supporterName, supporterContact, supporterNotes,
+      amount,
+      razorpay_payment_id, razorpay_order_id, razorpay_signature
+    } = req.body;
+    if (!amount || !razorpay_payment_id) return res.status(400).json({ error: 'Payment details required' });
+
+    const numAmount = Number(amount);
+
+    // Verify Razorpay signature
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const generated_signature = crypto
+      .createHmac('sha256', keySecret)
+      .update(razorpay_order_id + '|' + razorpay_payment_id)
+      .digest('hex');
+    if (generated_signature !== razorpay_signature) {
+      return res.status(400).json({ ok: false, error: 'Payment verification failed' });
+    }
+
+    // Credit 10% of supporter amount as points to the member
+    const pointsRupees = numAmount * (DONATION_POINTS_PERCENT / 100);
+    const points = amountToPoints(pointsRupees);
+
+    await User.updateOne({ _id: req.user.uid }, {
+      $inc: {
+        'wallet.points_balance':        points,
+        'wallet.points_from_donations': points,
+        'wallet.total_points_earned':   points
+      },
+      'wallet.updated_at': new Date()
+    });
+
+    await PointsLedger.create({
+      user_id: req.user.uid, points, type: 'supporter',
+      description: `₹${numAmount} supporter joined via ${req.user.memberId} → ${points} points`
+    });
+
+    // Record as donation for tracking
+    await Donation.create({
+      member_id:    req.user.uid,
+      amount:       numAmount,
+      points_earned: points,
+      donor_name:   supporterName || null,
+      donor_contact: supporterContact || null,
+      source:       'supporter',
+      payment_id:   razorpay_payment_id,
+      order_id:     razorpay_order_id,
+      kyc_status:   'not_required'
+    });
+
+    addBreadcrumb('payment', 'Supporter payment recorded', { memberId: req.user.memberId, amount: numAmount, points });
+    res.json({ ok: true, points, pointsEarned: points, message: `Supporter added! You earned ${points} points (10% of ₹${numAmount}).` });
+  } catch (err) {
+    console.error('Supporter payment error:', err);
+    captureError(err, { context: 'supporter-payment' });
+    res.status(500).json({ error: 'Supporter payment recording failed: ' + err.message });
+  }
+});
+
 // Admin: reset a member's password
 app.post('/api/admin/reset-password', auth('admin'), async (req, res) => {
   const { memberId, newPassword } = req.body;

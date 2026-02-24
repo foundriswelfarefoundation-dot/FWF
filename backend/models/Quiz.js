@@ -9,6 +9,11 @@ const quizSchema = new mongoose.Schema({
     enum: ['monthly', 'half_yearly', 'yearly'],
     required: true
   },
+  game_type: {
+    type: String,
+    enum: ['mcq', 'true_false', 'picture', 'speed', 'puzzle', 'general'],
+    default: 'mcq'
+  },
   entry_fee: { type: Number, required: true }, // 100 / 500 / 1000
   prize_pool: { type: Number, default: 0 },
   questions: [{

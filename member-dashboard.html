@@ -1999,110 +1999,129 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== EVENTS & ACTIVITIES ===================== -->
   <div class="page" id="page-events">
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="social-tasks-tab">📋 सामाजिक कार्य</button>
-      <button class="tab-btn" data-tab="fundraiser-tab">🎯 Fund Raiser Quiz</button>
-      <button class="tab-btn" data-tab="my-activities-tab">📊 मेरी गतिविधि</button>
+
+    <!-- ═══════ HERO: THIS WEEK'S SOCIAL TASK ═══════ -->
+    <div id="weeklyTaskHero" style="position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#065f46,#047857,#059669);padding:28px 24px 24px;margin-bottom:20px;color:#fff;min-height:180px">
+      <div style="position:absolute;top:0;right:0;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-30px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="background:rgba(255,255,255,.2);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px">🌿 SOCIAL WORK</span>
+        <span id="weekBadge" style="background:rgba(255,255,255,.15);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600">Week —</span>
+      </div>
+      <h2 style="margin:10px 0 6px;font-size:22px;font-weight:900;line-height:1.3" id="heroTaskTitle">इस हफ्ते का सामाजिक कार्य</h2>
+      <p style="font-size:13px;opacity:.85;margin:0 0 14px;line-height:1.5" id="heroTaskDesc">Loading...</p>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap" id="heroTaskMeta">
+        <span style="background:rgba(255,255,255,.15);padding:5px 12px;border-radius:10px;font-size:12px;font-weight:700">⭐ 10 Points</span>
+        <span style="font-size:12px;opacity:.7">📷 Upload proof → earn points</span>
+      </div>
+      <div id="heroTaskAction" style="margin-top:16px"></div>
     </div>
 
-    <!-- SOCIAL TASKS TAB -->
-    <div class="tab-content active" id="social-tasks-tab">
-      <div class="content-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac">
-        <h3 style="color:#166534;margin-bottom:4px"><i class="fa-solid fa-heart"></i> इस हफ्ते का सामाजिक कार्य</h3>
-        <p style="color:#15803d;font-size:13px;margin-bottom:12px">हर हफ्ते एक नया task — फोटो लें, Social Book पर share करें, 10 points कमाएं!</p>
-        <div id="weeklyTaskContainer">
-          <div class="skeleton-loader" style="height:120px;border-radius:12px"></div>
-        </div>
+    <!-- ═══════ ALL 10 TASKS CAROUSEL ═══════ -->
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="font-size:15px;font-weight:800;margin:0"><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> All Social Tasks <span style="font-size:12px;color:var(--text-muted);font-weight:500">(10 Week Cycle)</span></h3>
       </div>
-
-      <div class="content-card" style="margin-top:12px">
-        <h3><i class="fa-solid fa-list-check"></i> सभी 10 सामाजिक कार्य</h3>
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">10 हफ्ते, 10 कार्य — cycle repeat होता है</p>
-        <div id="allTasksList">
-          <div class="skeleton-loader" style="height:300px;border-radius:12px"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FUNDRAISER QUIZ TAB -->
-    <div class="tab-content" id="fundraiser-tab">
-      <div class="content-card" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd">
-        <h3 style="color:#1e40af;margin-bottom:4px"><i class="fa-solid fa-trophy"></i> Fund Raiser Quiz — जीतें इनाम!</h3>
-        <p style="color:#1d4ed8;font-size:13px;margin-bottom:6px">Quiz में हिस्सा लें, FWF का mission support करें, और इनाम जीतें!</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <span class="badge" style="background:#dbeafe;color:#1d4ed8;padding:4px 10px;border-radius:20px;font-size:12px">🗓️ Monthly ₹100</span>
-          <span class="badge" style="background:#e0e7ff;color:#4338ca;padding:4px 10px;border-radius:20px;font-size:12px">📅 Half-Yearly ₹500</span>
-          <span class="badge" style="background:#fce7f3;color:#be185d;padding:4px 10px;border-radius:20px;font-size:12px">🎯 Yearly ₹1000</span>
-        </div>
-      </div>
-
-      <div id="activeQuizzesList" style="margin-top:12px">
-        <div class="skeleton-loader" style="height:200px;border-radius:12px"></div>
-      </div>
-
-      <div class="content-card" style="margin-top:12px">
-        <h3><i class="fa-solid fa-share-nodes"></i> अपने दोस्तों को Refer करें</h3>
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">हर quiz enrollment referral पर 10% commission points मिलेंगे!</p>
-        <div class="form-group" style="margin-bottom:8px">
-          <label>आपका Referral Link</label>
-          <div style="display:flex;gap:8px">
-            <input type="text" class="form-input" id="quizReferralLink" readonly style="font-size:12px">
-            <button class="btn btn-primary btn-sm" onclick="copyQuizReferralLink()" style="white-space:nowrap"><i class="fa-solid fa-copy"></i> Copy</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn btn-sm" onclick="shareQuizReferral('whatsapp')" style="background:#25d366;color:#fff;flex:1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-          <button class="btn btn-sm" onclick="shareQuizReferral('telegram')" style="background:#0088cc;color:#fff;flex:1"><i class="fa-brands fa-telegram"></i> Telegram</button>
-        </div>
+      <div id="allTasksCarousel" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch">
+        <div class="skeleton-loader" style="min-width:160px;height:100px;border-radius:14px;flex-shrink:0"></div>
+        <div class="skeleton-loader" style="min-width:160px;height:100px;border-radius:14px;flex-shrink:0"></div>
+        <div class="skeleton-loader" style="min-width:160px;height:100px;border-radius:14px;flex-shrink:0"></div>
       </div>
     </div>
 
-    <!-- MY ACTIVITIES TAB -->
-    <div class="tab-content" id="my-activities-tab">
-      <div class="content-card">
-        <h3><i class="fa-solid fa-chart-line"></i> मेरी गतिविधि Summary</h3>
-        <div class="grid-2" style="gap:10px;margin-top:12px">
-          <div class="stat-mini" style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:24px;font-weight:700;color:#166534" id="myTasksCompleted">0</div>
-            <div style="font-size:11px;color:#15803d">Tasks पूरे किए</div>
-          </div>
-          <div class="stat-mini" style="background:#eff6ff;border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:24px;font-weight:700;color:#1e40af" id="myTaskPoints">0</div>
-            <div style="font-size:11px;color:#1d4ed8">Task Points</div>
-          </div>
-          <div class="stat-mini" style="background:#fef3c7;border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:24px;font-weight:700;color:#92400e" id="myQuizCount">0</div>
-            <div style="font-size:11px;color:#b45309">Quiz Participated</div>
-          </div>
-          <div class="stat-mini" style="background:#fce7f3;border-radius:10px;padding:12px;text-align:center">
-            <div style="font-size:24px;font-weight:700;color:#be185d" id="myQuizWins">0</div>
-            <div style="font-size:11px;color:#db2777">Quiz Wins</div>
-          </div>
-        </div>
+    <!-- ═══════ FUND RAISER GAMES ═══════ -->
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="font-size:15px;font-weight:800;margin:0"><i class="fa-solid fa-trophy" style="color:#e5a100"></i> Fund Raiser Games</h3>
       </div>
 
-      <!-- Task History -->
-      <div class="content-card" style="margin-top:12px">
-        <h3><i class="fa-solid fa-clock-rotate-left"></i> Task History</h3>
-        <div id="taskHistoryList">
-          <div class="empty-state">
-            <i class="fa-solid fa-leaf"></i>
-            <p>अभी तक कोई task पूरा नहीं किया</p>
-          </div>
-        </div>
+      <!-- Game Type Chips -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+        <button class="game-chip active" data-tier="all" onclick="filterQuizTier('all')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🎯 All Games</button>
+        <button class="game-chip" data-tier="monthly" onclick="filterQuizTier('monthly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #3b82f6;background:transparent;color:#3b82f6;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🗓️ Monthly ₹100</button>
+        <button class="game-chip" data-tier="half_yearly" onclick="filterQuizTier('half_yearly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #8b5cf6;background:transparent;color:#8b5cf6;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">📅 Half-Yearly ₹500</button>
+        <button class="game-chip" data-tier="yearly" onclick="filterQuizTier('yearly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #e11d48;background:transparent;color:#e11d48;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🏆 Yearly ₹1000</button>
       </div>
 
-      <!-- Quiz History -->
-      <div class="content-card" style="margin-top:12px">
-        <h3><i class="fa-solid fa-scroll"></i> Quiz History</h3>
-        <div id="quizHistoryList">
-          <div class="empty-state">
-            <i class="fa-solid fa-question-circle"></i>
-            <p>अभी तक किसी quiz में हिस्सा नहीं लिया</p>
-          </div>
-        </div>
+      <!-- Quiz Cards Container -->
+      <div id="quizGamesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+        <div class="skeleton-loader" style="height:220px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:220px;border-radius:16px"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="quizEmptyState" style="display:none;text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:12px">🎮</div>
+        <h4 style="color:var(--text-muted);font-weight:700;margin-bottom:6px">कोई game अभी available नहीं है</h4>
+        <p style="font-size:13px;color:var(--text-muted)">जल्दी ही नए fund raiser games आएंगे!</p>
       </div>
     </div>
+
+    <!-- ═══════ REFERRAL BANNER ═══════ -->
+    <div style="background:linear-gradient(135deg,#FFF4EB,#FFE8D6);border:1.5px solid #f5c99d;border-radius:16px;padding:18px 20px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#ff9a3c,#e87722);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fa-solid fa-share-nodes" style="color:#fff;font-size:18px"></i>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <h4 style="margin:0 0 2px;font-size:14px;font-weight:800;color:#92400e">Refer & Earn Points</h4>
+          <p style="margin:0;font-size:12px;color:#b45309">Quiz enrollment referral पर 10% commission points!</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <input type="text" class="form-input" id="quizReferralLink" readonly style="font-size:11px;background:#fff;flex:1;padding:8px 10px">
+        <button class="btn btn-sm" onclick="copyQuizReferralLink()" style="background:var(--accent);color:#fff;white-space:nowrap"><i class="fa-solid fa-copy"></i> Copy</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-sm" onclick="shareQuizReferral('whatsapp')" style="background:#25d366;color:#fff;flex:1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+        <button class="btn btn-sm" onclick="shareQuizReferral('telegram')" style="background:#0088cc;color:#fff;flex:1"><i class="fa-brands fa-telegram"></i> Telegram</button>
+      </div>
+    </div>
+
+    <!-- ═══════ MY ACTIVITY SUMMARY ═══════ -->
+    <div style="margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:800;margin:0 0 12px"><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> My Activity</h3>
+      <div class="stats-row" style="margin-bottom:14px">
+        <div class="stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
+          <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="s-label">Tasks Done</div>
+          <div class="s-value" id="myTasksCompleted">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">
+          <div class="s-icon s-blue"><i class="fa-solid fa-star"></i></div>
+          <div class="s-label">Task Points</div>
+          <div class="s-value" id="myTaskPoints">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+          <div class="s-icon s-amber"><i class="fa-solid fa-gamepad"></i></div>
+          <div class="s-label">Quizzes Played</div>
+          <div class="s-value" id="myQuizCount">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">
+          <div class="s-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)"><i class="fa-solid fa-trophy"></i></div>
+          <div class="s-label">Quiz Wins</div>
+          <div class="s-value" id="myQuizWins">0</div>
+        </div>
+      </div>
+
+      <!-- Expandable history -->
+      <details style="background:#fff;border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
+        <summary style="padding:14px 16px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> View Task & Quiz History
+        </summary>
+        <div style="padding:0 16px 16px">
+          <h4 style="font-size:13px;font-weight:700;margin:8px 0">📋 Task History</h4>
+          <div id="taskHistoryList">
+            <p style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px 0">अभी तक कोई task पूरा नहीं किया</p>
+          </div>
+          <h4 style="font-size:13px;font-weight:700;margin:14px 0 8px">🎮 Quiz History</h4>
+          <div id="quizHistoryList">
+            <p style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px 0">अभी तक किसी quiz में हिस्सा नहीं लिया</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
 
   <!-- ===================== HELP & SUPPORT ===================== -->
@@ -4324,9 +4343,10 @@ async function submitPost(){
 }
 
 /* ============================================
-   EVENTS & ACTIVITIES — SOCIAL TASKS + QUIZ
+   EVENTS & ACTIVITIES — UNIFIED PAGE
    ============================================ */
 let eventsLoaded = false;
+let allQuizzesCache = []; // for tier filtering
 
 async function loadEventsPage(){
   if(eventsLoaded) return;
@@ -4337,45 +4357,54 @@ async function loadEventsPage(){
   } catch(e){ console.error('Events load err:', e); }
 }
 
-// --- WEEKLY TASK ---
+// --- WEEKLY TASK HERO ---
 async function loadWeeklyTask(){
+  const hero = document.getElementById('weeklyTaskHero');
   try {
     const data = await AUTH.api('/api/member/weekly-task');
-    const container = document.getElementById('weeklyTaskContainer');
     if(!data.ok || !data.task){
-      container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-check-circle" style="color:var(--success)"></i><p>इस हफ्ते कोई task नहीं है</p></div>';
+      hero.innerHTML = '<div style="text-align:center;padding:30px 0"><div style="font-size:40px;margin-bottom:8px">🌟</div><h3 style="color:#fff;margin:0">इस हफ्ते कोई task नहीं है</h3><p style="color:rgba(255,255,255,.7);font-size:13px">जल्दी ही नया task आएगा!</p></div>';
       return;
     }
     const t = data.task;
     const completed = data.completed;
-    container.innerHTML = `
-      <div style="background:#fff;border-radius:14px;padding:16px;border:1px solid ${completed?'#86efac':'#fde68a'}">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-          <div style="width:48px;height:48px;border-radius:50%;background:${completed?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#f59e0b,#d97706)'};display:flex;align-items:center;justify-content:center;font-size:24px">${t.icon}</div>
-          <div style="flex:1">
-            <h4 style="margin:0;font-size:15px;font-weight:800">${t.title}</h4>
-            <p style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">Week ${data.cycleWeek} of 10 • ${t.points_reward} Points</p>
+
+    // Update hero badge
+    document.getElementById('weekBadge').textContent = `Week ${data.cycleWeek} of 10`;
+    document.getElementById('heroTaskTitle').innerHTML = `${t.icon} ${t.title}`;
+    document.getElementById('heroTaskDesc').textContent = t.description;
+    document.getElementById('heroTaskMeta').innerHTML = `
+      <span style="background:rgba(255,255,255,.15);padding:5px 12px;border-radius:10px;font-size:12px;font-weight:700">⭐ ${t.points_reward} Points</span>
+      <span style="font-size:12px;opacity:.7">📷 ${t.photo_instruction}</span>`;
+
+    // Hero gradient based on completion
+    if(completed){
+      hero.style.background = 'linear-gradient(135deg,#14532d,#166534,#15803d)';
+      document.getElementById('heroTaskAction').innerHTML = `
+        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px">🎉</span>
+          <div>
+            <div style="font-weight:800;font-size:14px">Task Complete!</div>
+            <div style="font-size:12px;opacity:.8">अगले हफ्ते नया task आएगा</div>
           </div>
-          ${completed ? '<span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">✅ पूरा हुआ</span>' : ''}
-        </div>
-        <p style="font-size:13px;color:#374151;margin-bottom:8px">${t.description}</p>
-        <p style="font-size:12px;color:#6b7280;margin-bottom:12px">📷 ${t.photo_instruction}</p>
-        ${completed ? `<p style="font-size:12px;color:#16a34a;font-weight:700">🎉 इस हफ्ते का task पूरा! अगले हफ्ते नया task आएगा।</p>` : `
-        <div style="border-top:1px solid #e5e7eb;padding-top:12px">
-          <div class="form-group" style="margin-bottom:8px">
-            <label style="font-size:12px">फोटो अपलोड करें</label>
-            <input type="file" accept="image/*" capture="environment" class="form-input" id="taskPhotoInput" onchange="previewTaskPhoto(this)" style="font-size:12px">
+        </div>`;
+    } else {
+      document.getElementById('heroTaskAction').innerHTML = `
+        <div style="background:rgba(255,255,255,.12);border-radius:14px;padding:14px">
+          <div style="margin-bottom:10px">
+            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);display:block;margin-bottom:6px"><i class="fa-solid fa-camera"></i> फोटो अपलोड करें</label>
+            <input type="file" accept="image/*" capture="environment" class="form-input" id="taskPhotoInput" onchange="previewTaskPhoto(this)" style="font-size:12px;background:rgba(255,255,255,.95);color:#333;border:none;border-radius:10px">
           </div>
-          <div id="taskPhotoPreview" style="display:none;margin-bottom:8px">
-            <img id="taskPreviewImg" style="max-width:100%;max-height:200px;border-radius:10px;border:2px solid #86efac">
+          <div id="taskPhotoPreview" style="display:none;margin-bottom:10px">
+            <img id="taskPreviewImg" style="max-width:100%;max-height:160px;border-radius:10px;border:2px solid rgba(255,255,255,.3)">
           </div>
-          <button class="btn btn-success" onclick="submitTaskCompletion('${t.task_id}')" id="submitTaskBtn" style="width:100%">
+          <button class="btn" onclick="submitTaskCompletion('${t.task_id}')" id="submitTaskBtn" style="width:100%;background:#fff;color:#065f46;font-weight:800;border-radius:10px;padding:10px">
             <i class="fa-solid fa-check"></i> Task पूरा करें — ${t.points_reward} Points कमाएं!
           </button>
-        </div>`}
-      </div>`;
+        </div>`;
+    }
   } catch(e){
-    document.getElementById('weeklyTaskContainer').innerHTML = '<p style="color:var(--danger);font-size:13px">Task load करने में error हुआ</p>';
+    hero.innerHTML = '<p style="color:rgba(255,255,255,.8);font-size:13px;text-align:center;padding:20px">Task load करने में error हुआ</p>';
   }
 }
 
@@ -4421,7 +4450,7 @@ async function submitTaskCompletion(taskId){
 
     const res = await AUTH.api('/api/member/complete-task', {
       method: 'POST',
-      body: JSON.stringify({ task_id: taskId, photo_url: photoUrl, latitude, longitude, location_address })
+      body: { task_id: taskId, photo_url: photoUrl, latitude, longitude, location_address }
     });
 
     if(res.ok){
@@ -4441,78 +4470,169 @@ async function submitTaskCompletion(taskId){
   }
 }
 
-// --- ALL TASKS LIST ---
+// --- ALL TASKS CAROUSEL ---
 async function loadAllTasks(){
   try {
     const data = await AUTH.api('/api/member/all-tasks');
-    const container = document.getElementById('allTasksList');
+    const container = document.getElementById('allTasksCarousel');
     if(!data.ok || !data.tasks?.length){
-      container.innerHTML = '<p style="color:var(--text-muted);font-size:13px">कोई task उपलब्ध नहीं</p>';
+      container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:12px">कोई task उपलब्ध नहीं</p>';
       return;
     }
     const completedWeeks = new Set(data.completions?.map(c=>c.week_number) || []);
-    container.innerHTML = data.tasks.map(t => `
-      <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:${completedWeeks.has(t.week_number)?'#f0fdf4':'var(--bg-1)'};margin-bottom:6px;border:1px solid ${completedWeeks.has(t.week_number)?'#bbf7d0':'transparent'}">
-        <div style="width:36px;height:36px;border-radius:50%;background:${completedWeeks.has(t.week_number)?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#e5e7eb,#d1d5db)'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${t.icon}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700">${t.title}</div>
-          <div style="font-size:11px;color:var(--text-muted)">Week ${t.week_number} • ${t.points_reward} pts</div>
-        </div>
-        ${completedWeeks.has(t.week_number)?'<span style="color:#16a34a;font-size:13px;font-weight:700">✅</span>':'<span style="color:#9ca3af;font-size:12px">⏳</span>'}
-      </div>
-    `).join('');
-  } catch(e){
-    document.getElementById('allTasksList').innerHTML = '<p style="color:var(--danger);font-size:13px">Tasks load error</p>';
-  }
-}
+    // Get current cycle week for highlighting
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const weekOfYear = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    const currentCycleWeek = ((weekOfYear - 1) % 10) + 1;
 
-// --- QUIZ SYSTEM ---
-async function loadActiveQuizzes(){
-  try {
-    const data = await AUTH.api('/api/member/active-quizzes');
-    const container = document.getElementById('activeQuizzesList');
-    if(!data.ok || !data.quizzes?.length){
-      container.innerHTML = '<div class="content-card"><div class="empty-state"><i class="fa-solid fa-trophy"></i><p>अभी कोई quiz available नहीं है।<br>जल्दी ही नए quiz आएंगे!</p></div></div>';
-      return;
-    }
-    container.innerHTML = data.quizzes.map(q => {
-      const typeColors = { monthly:'#1a73e8', half_yearly:'#E87722', yearly:'#c2185b' };
-      const typeLabels = { monthly:'Monthly', half_yearly:'Half-Yearly', yearly:'Yearly' };
-      const bgColor = typeColors[q.type] || '#3b82f6';
-      const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN');
-      const endDate = new Date(q.end_date).toLocaleDateString('hi-IN');
+    container.innerHTML = data.tasks.map(t => {
+      const done = completedWeeks.has(t.week_number);
+      const isCurrent = t.week_number === currentCycleWeek;
+      const bgGrad = done ? 'linear-gradient(135deg,#f0fdf4,#dcfce7)' : isCurrent ? 'linear-gradient(135deg,#fef3c7,#fde68a)' : 'linear-gradient(135deg,var(--bg-1),var(--bg-2,#f3f4f6))';
+      const borderColor = done ? '#86efac' : isCurrent ? '#fbbf24' : 'var(--card-border)';
       return `
-        <div class="content-card" style="border-left:4px solid ${bgColor};margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
-            <div>
-              <h4 style="margin:0 0 4px;font-size:15px;font-weight:800">${q.title}</h4>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-                <span style="background:${bgColor}22;color:${bgColor};padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">${typeLabels[q.type]}</span>
-                <span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">₹${q.entry_fee} Entry</span>
-                <span style="background:#f0fdf4;color:#166534;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">${q.total_participants || 0} Participants</span>
-              </div>
-              ${q.description ? `<p style="font-size:12px;color:var(--text-muted);margin-bottom:6px">${q.description}</p>` : ''}
-              <p style="font-size:11px;color:var(--text-muted)">📅 Last Date: ${endDate} • 🏆 Result: ${resultDate}</p>
-            </div>
-            <div style="text-align:right">
-              ${q.enrolled ? `
-                <div style="background:#dcfce7;color:#166534;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:4px">
-                  ✅ Enrolled<br><span style="font-size:10px">${q.enrollment?.enrollment_number || ''}</span>
-                </div>
-                ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ? `<button class="btn btn-sm btn-primary" onclick="openQuizPlay('${q.quiz_id}')"><i class="fa-solid fa-play"></i> Play Quiz</button>` : ''}
-                ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:var(--success);font-weight:700">Quiz Submitted ✅</span>' : ''}
-              ` : `
-                <button class="btn btn-primary btn-sm" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})">
-                  <i class="fa-solid fa-ticket"></i> Enroll ₹${q.entry_fee}
-                </button>
-              `}
+        <div style="min-width:150px;max-width:170px;flex-shrink:0;scroll-snap-align:start;background:${bgGrad};border:1.5px solid ${borderColor};border-radius:14px;padding:14px 12px;position:relative">
+          ${isCurrent ? '<div style="position:absolute;top:-1px;right:12px;background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:0 0 6px 6px;letter-spacing:.3px">THIS WEEK</div>' : ''}
+          <div style="text-align:center;margin-bottom:8px">
+            <div style="width:40px;height:40px;border-radius:50%;background:${done?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#e5e7eb,#d1d5db)'};display:inline-flex;align-items:center;justify-content:center;font-size:20px">
+              ${done ? '✅' : t.icon}
             </div>
           </div>
+          <div style="font-size:11px;font-weight:800;text-align:center;line-height:1.3;margin-bottom:4px;color:${done?'#166534':'var(--text-primary)'}">${t.title}</div>
+          <div style="font-size:10px;color:${done?'#15803d':'var(--text-muted)'};text-align:center">Week ${t.week_number} • ${t.points_reward} pts</div>
         </div>`;
     }).join('');
   } catch(e){
-    document.getElementById('activeQuizzesList').innerHTML = '<p style="color:var(--danger);font-size:13px">Quizzes load error</p>';
+    document.getElementById('allTasksCarousel').innerHTML = '<p style="color:var(--danger);font-size:13px">Tasks load error</p>';
   }
+}
+
+// --- QUIZ GAMES (Modern Cards + Tier Filter) ---
+const tierConfig = {
+  monthly:     { color:'#3b82f6', gradient:'linear-gradient(135deg,#3b82f6,#2563eb)', label:'Monthly', emoji:'🗓️', fee:100 },
+  half_yearly: { color:'#8b5cf6', gradient:'linear-gradient(135deg,#8b5cf6,#7c3aed)', label:'Half-Yearly', emoji:'📅', fee:500 },
+  yearly:      { color:'#e11d48', gradient:'linear-gradient(135deg,#e11d48,#be123c)', label:'Yearly', emoji:'🏆', fee:1000 }
+};
+const gameTypeIcons = {
+  mcq:         { icon:'fa-solid fa-list-check', label:'MCQ Quiz', color:'#3b82f6' },
+  true_false:  { icon:'fa-solid fa-check-double', label:'True / False', color:'#10b981' },
+  picture:     { icon:'fa-solid fa-image', label:'Picture Quiz', color:'#f59e0b' },
+  speed:       { icon:'fa-solid fa-bolt', label:'Speed Round', color:'#ef4444' },
+  puzzle:      { icon:'fa-solid fa-puzzle-piece', label:'Puzzle', color:'#8b5cf6' },
+  general:     { icon:'fa-solid fa-brain', label:'GK Quiz', color:'#06b6d4' }
+};
+
+async function loadActiveQuizzes(){
+  try {
+    const data = await AUTH.api('/api/member/active-quizzes');
+    const grid = document.getElementById('quizGamesGrid');
+    const empty = document.getElementById('quizEmptyState');
+
+    if(!data.ok || !data.quizzes?.length){
+      grid.style.display = 'none';
+      empty.style.display = 'block';
+      allQuizzesCache = [];
+      return;
+    }
+    allQuizzesCache = data.quizzes;
+    renderQuizCards(allQuizzesCache);
+  } catch(e){
+    document.getElementById('quizGamesGrid').innerHTML = '<p style="color:var(--danger);font-size:13px;text-align:center;padding:20px">Games load error</p>';
+  }
+}
+
+function renderQuizCards(quizzes){
+  const grid = document.getElementById('quizGamesGrid');
+  const empty = document.getElementById('quizEmptyState');
+
+  if(!quizzes.length){
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+
+  grid.innerHTML = quizzes.map(q => {
+    const tc = tierConfig[q.type] || tierConfig.monthly;
+    const gt = gameTypeIcons[q.game_type] || gameTypeIcons.mcq;
+    const endDate = new Date(q.end_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short'});
+    const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
+    const participants = q.total_participants || 0;
+    const prizePool = q.prize_pool || (q.entry_fee * participants * 0.7);
+
+    return `
+      <div class="quiz-game-card" data-tier="${q.type}" style="position:relative;border-radius:18px;overflow:hidden;background:#fff;border:1.5px solid ${tc.color}22;box-shadow:0 4px 20px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s">
+        <!-- Card Header -->
+        <div style="background:${tc.gradient};padding:16px 18px 14px;color:#fff;position:relative">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:800;letter-spacing:.5px">${tc.emoji} ${tc.label.toUpperCase()}</span>
+            <span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:700"><i class="${gt.icon}"></i> ${gt.label}</span>
+          </div>
+          <h4 style="margin:6px 0 4px;font-size:16px;font-weight:900;line-height:1.3;color:#fff">${q.title}</h4>
+          ${q.description ? `<p style="font-size:11px;opacity:.85;margin:0;line-height:1.4">${q.description.substring(0,80)}${q.description.length>80?'...':''}</p>` : ''}
+        </div>
+
+        <!-- Card Body -->
+        <div style="padding:14px 18px 16px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+            <div style="flex:1;min-width:70px;background:${tc.color}08;border-radius:10px;padding:8px 10px;text-align:center">
+              <div style="font-size:16px;font-weight:900;color:${tc.color}">₹${q.entry_fee}</div>
+              <div style="font-size:9px;color:var(--text-muted);font-weight:600">ENTRY FEE</div>
+            </div>
+            <div style="flex:1;min-width:70px;background:#fef3c708;border:1px solid #fde68a;border-radius:10px;padding:8px 10px;text-align:center">
+              <div style="font-size:16px;font-weight:900;color:#92400e">${participants}</div>
+              <div style="font-size:9px;color:var(--text-muted);font-weight:600">PLAYERS</div>
+            </div>
+            <div style="flex:1;min-width:70px;background:#f0fdf408;border:1px solid #bbf7d0;border-radius:10px;padding:8px 10px;text-align:center">
+              <div style="font-size:16px;font-weight:900;color:#166534">₹${prizePool > 0 ? prizePool.toLocaleString() : '—'}</div>
+              <div style="font-size:9px;color:var(--text-muted);font-weight:600">PRIZE POOL</div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);margin-bottom:12px">
+            <span>📅 Last: ${endDate}</span>
+            <span>🏆 Result: ${resultDate}</span>
+          </div>
+
+          ${q.enrolled ? `
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <div>
+                <div style="color:#166534;font-weight:800;font-size:13px">✅ Enrolled</div>
+                <div style="color:#15803d;font-size:10px">${q.enrollment?.enrollment_number || ''}</div>
+              </div>
+              ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ? 
+                `<button class="btn btn-sm" onclick="openQuizPlay('${q.quiz_id}')" style="background:${tc.gradient};color:#fff;font-weight:700;border:none"><i class="fa-solid fa-play"></i> Play</button>` : ''}
+              ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:#166534;font-weight:700">Submitted ✅</span>' : ''}
+            </div>
+          ` : `
+            <button class="btn" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})" style="width:100%;background:${tc.gradient};color:#fff;font-weight:800;border:none;border-radius:12px;padding:11px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px">
+              <i class="fa-solid fa-ticket"></i> Enroll — ₹${q.entry_fee}
+            </button>
+          `}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterQuizTier(tier){
+  // Update chip styles
+  document.querySelectorAll('.game-chip').forEach(chip => {
+    const isActive = chip.dataset.tier === tier;
+    chip.classList.toggle('active', isActive);
+    if(isActive){
+      chip.style.background = chip.dataset.tier === 'all' ? 'var(--accent)' : (tierConfig[chip.dataset.tier]?.color || 'var(--accent)');
+      chip.style.color = '#fff';
+    } else {
+      chip.style.background = 'transparent';
+      chip.style.color = chip.dataset.tier === 'all' ? 'var(--accent)' : (tierConfig[chip.dataset.tier]?.color || 'var(--accent)');
+    }
+  });
+  // Filter and render
+  const filtered = tier === 'all' ? allQuizzesCache : allQuizzesCache.filter(q => q.type === tier);
+  renderQuizCards(filtered);
 }
 
 async function enrollInQuiz(quizId, title, fee){
@@ -4522,7 +4642,7 @@ async function enrollInQuiz(quizId, title, fee){
     // Create Razorpay order
     const orderRes = await AUTH.api('/api/pay/create-order', {
       method: 'POST',
-      body: JSON.stringify({ amount: fee, receipt: `quiz_${quizId}_${Date.now()}`, notes: { type: 'quiz', quizId } })
+      body: { amount: fee, receipt: `quiz_${quizId}_${Date.now()}`, notes: { type: 'quiz', quizId } }
     });
     if(!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
 
@@ -4542,13 +4662,13 @@ async function enrollInQuiz(quizId, title, fee){
 
           const enrollRes = await AUTH.api('/api/member/quiz-enroll', {
             method: 'POST',
-            body: JSON.stringify({
+            body: {
               quiz_id: quizId,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
               referred_by
-            })
+            }
           });
           if(enrollRes.ok){
             notify(enrollRes.message || '🎉 Enrollment successful!', 'success');
@@ -4583,6 +4703,9 @@ async function openQuizPlay(quizId){
     let currentQ = 0;
     const answers = [];
 
+    const gameType = data.gameType || 'mcq';
+    const gtInfo = gameTypeIcons[gameType] || gameTypeIcons.mcq;
+
     // Build quiz modal
     const modal = document.createElement('div');
     modal.className = 'modal show';
@@ -4590,8 +4713,11 @@ async function openQuizPlay(quizId){
     modal.innerHTML = `
       <div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto">
         <div class="modal-header" style="background:var(--accent);color:#fff">
-          <h3 style="color:#fff"><i class="fa-solid fa-gamepad"></i> ${data.quizTitle}</h3>
-          <span style="font-size:12px;opacity:.8">Enrollment: ${data.enrollmentNumber}</span>
+          <h3 style="color:#fff"><i class="${gtInfo.icon}"></i> ${data.quizTitle}</h3>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+            <span style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700">${gtInfo.label}</span>
+            <span style="font-size:11px;opacity:.8">${data.enrollmentNumber}</span>
+          </div>
         </div>
         <div class="modal-body" id="quizPlayBody"></div>
         <div class="modal-actions" id="quizPlayActions"></div>
@@ -4600,18 +4726,25 @@ async function openQuizPlay(quizId){
 
     function renderQuestion(){
       const q = questions[currentQ];
+      const isTrueFalse = gameType === 'true_false';
+      const isPicture = gameType === 'picture';
+      const isSpeed = gameType === 'speed';
+
       document.getElementById('quizPlayBody').innerHTML = `
-        <div style="text-align:center;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <span style="background:#eff6ff;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">
-            Question ${currentQ+1} of ${questions.length}
+            Q ${currentQ+1}/${questions.length}
           </span>
+          ${isSpeed ? `<span style="background:#fef2f2;color:#ef4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700"><i class="fa-solid fa-bolt"></i> Speed Round</span>` : ''}
+          ${isPicture ? `<span style="background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700"><i class="fa-solid fa-image"></i> Picture Quiz</span>` : ''}
         </div>
         <h4 style="font-size:15px;margin-bottom:16px;line-height:1.5">${q.question}</h4>
-        <div style="display:flex;flex-direction:column;gap:8px">
+        ${isPicture && q.image_url ? `<img src="${q.image_url}" style="max-width:100%;max-height:200px;border-radius:12px;margin-bottom:12px;border:2px solid #e5e7eb">` : ''}
+        <div style="display:${isTrueFalse ? 'grid;grid-template-columns:1fr 1fr;' : 'flex;flex-direction:column;'}gap:8px">
           ${q.options.map((opt,i) => `
-            <label style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:2px solid ${answers[currentQ]===i?'#E87722':'#e5e7eb'};cursor:pointer;transition:all .2s;background:${answers[currentQ]===i?'#FFF4EB':'#fff'}" onclick="selectQuizAnswer(${currentQ},${i})">
-              <input type="radio" name="q${currentQ}" value="${i}" ${answers[currentQ]===i?'checked':''} style="accent-color:#E87722">
-              <span style="font-size:14px">${opt}</span>
+            <label style="display:flex;align-items:center;${isTrueFalse ? 'justify-content:center;' : ''}gap:10px;padding:${isTrueFalse ? '16px' : '12px'};border-radius:${isTrueFalse ? '14px' : '10px'};border:2px solid ${answers[currentQ]===i?'#E87722':'#e5e7eb'};cursor:pointer;transition:all .2s;background:${answers[currentQ]===i?'#FFF4EB':'#fff'};${isTrueFalse ? 'font-size:16px;font-weight:800;' : ''}" onclick="selectQuizAnswer(${currentQ},${i})">
+              ${!isTrueFalse ? `<input type="radio" name="q${currentQ}" value="${i}" ${answers[currentQ]===i?'checked':''} style="accent-color:#E87722">` : ''}
+              <span style="font-size:${isTrueFalse ? '15px' : '14px'}">${isTrueFalse ? (i===0 ? '✅ ' : '❌ ') : ''}${opt}</span>
             </label>
           `).join('')}
         </div>`;
@@ -4632,7 +4765,7 @@ async function openQuizPlay(quizId){
         const formattedAnswers = questions.map((q,i) => ({ q_no: q.q_no, selected: answers[i] ?? -1 }));
         const res = await AUTH.api('/api/member/quiz-submit', {
           method: 'POST',
-          body: JSON.stringify({ quiz_id: qId, answers: formattedAnswers })
+          body: { quiz_id: qId, answers: formattedAnswers }
         });
         if(res.ok){
           notify(res.message || 'Quiz submitted!', 'success');

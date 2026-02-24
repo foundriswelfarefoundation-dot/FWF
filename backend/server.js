@@ -2178,7 +2178,7 @@ app.get('/api/member/quiz-questions/:quizId', auth('member'), async (req, res) =
       options: q.options
     }));
 
-    res.json({ ok: true, questions, quizTitle: quiz.title, enrollmentNumber: participation.enrollment_number });
+    res.json({ ok: true, questions, quizTitle: quiz.title, gameType: quiz.game_type || 'mcq', enrollmentNumber: participation.enrollment_number });
   } catch (err) {
     captureError(err, { context: 'quiz-questions' });
     res.status(500).json({ error: 'Failed to fetch questions' });

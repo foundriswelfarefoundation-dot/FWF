@@ -2000,6 +2000,28 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <!-- ===================== EVENTS & ACTIVITIES ===================== -->
   <div class="page" id="page-events">
 
+    <!-- ═══════ MY ACTIVITY (compact) ═══════ -->
+    <div style="margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:800;margin:0 0 12px"><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> My Activity</h3>
+      <div class="stats-row" style="margin-bottom:0">
+        <div class="stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
+          <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="s-label">Tasks Done</div>
+          <div class="s-value" id="myTasksCompleted">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+          <div class="s-icon s-amber"><i class="fa-solid fa-gamepad"></i></div>
+          <div class="s-label">Quizzes Played</div>
+          <div class="s-value" id="myQuizCount">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">
+          <div class="s-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)"><i class="fa-solid fa-trophy"></i></div>
+          <div class="s-label">Quiz Wins</div>
+          <div class="s-value" id="myQuizWins">0</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══════ SOCIAL WORK — MOTIVATIONAL HEADER ═══════ -->
     <div style="text-align:center;padding:24px 16px 8px">
       <div style="font-size:40px;margin-bottom:4px">🙏</div>
@@ -2045,51 +2067,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- ═══════ REFERRAL BANNER ═══════ -->
-    <div style="background:linear-gradient(135deg,#FFF4EB,#FFE8D6);border:1.5px solid #f5c99d;border-radius:16px;padding:18px 20px;margin-bottom:24px">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="width:44px;height:44px;background:linear-gradient(135deg,#ff9a3c,#e87722);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fa-solid fa-share-nodes" style="color:#fff;font-size:18px"></i>
-        </div>
-        <div style="flex:1;min-width:200px">
-          <h4 style="margin:0 0 2px;font-size:14px;font-weight:800;color:#92400e">Refer & Earn</h4>
-          <p style="margin:0;font-size:12px;color:#b45309">Quiz referral पर 10% commission!</p>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
-        <input type="text" class="form-input" id="quizReferralLink" readonly style="font-size:11px;background:#fff;flex:1;padding:8px 10px">
-        <button class="btn btn-sm" onclick="copyQuizReferralLink()" style="background:var(--accent);color:#fff;white-space:nowrap"><i class="fa-solid fa-copy"></i> Copy</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-sm" onclick="shareQuizReferral('whatsapp')" style="background:#25d366;color:#fff;flex:1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-        <button class="btn btn-sm" onclick="shareQuizReferral('telegram')" style="background:#0088cc;color:#fff;flex:1"><i class="fa-brands fa-telegram"></i> Telegram</button>
-      </div>
-    </div>
-
-    <!-- ═══════ MY ACTIVITY (compact) ═══════ -->
+    <!-- ═══════ VIEW TASK & QUIZ HISTORY ═══════ -->
     <div style="margin-bottom:20px">
-      <h3 style="font-size:15px;font-weight:800;margin:0 0 12px"><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> My Activity</h3>
-      <div class="stats-row" style="margin-bottom:14px">
-        <div class="stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
-          <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
-          <div class="s-label">Tasks Done</div>
-          <div class="s-value" id="myTasksCompleted">0</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
-          <div class="s-icon s-amber"><i class="fa-solid fa-gamepad"></i></div>
-          <div class="s-label">Quizzes Played</div>
-          <div class="s-value" id="myQuizCount">0</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">
-          <div class="s-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)"><i class="fa-solid fa-trophy"></i></div>
-          <div class="s-label">Quiz Wins</div>
-          <div class="s-value" id="myQuizWins">0</div>
-        </div>
-      </div>
-
       <details style="background:#fff;border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
         <summary style="padding:14px 16px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px">
-          <i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> View Task & Quiz History
+          <i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> View Task & Quiz Result
         </summary>
         <div style="padding:0 16px 16px">
           <h4 style="font-size:13px;font-weight:700;margin:8px 0">📋 Task History</h4>

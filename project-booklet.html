@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="hi">
 <head>
   <meta charset="UTF-8"/>
@@ -447,28 +447,29 @@
       transform: rotate(90deg);
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
+      body { padding: 0; align-items: flex-start; }
       .booklet {
         max-width: 100%;
-        min-height: 500px;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
       }
-
       .page {
-        padding: 40px 24px;
+        padding: 20px 16px 80px;
+        min-height: 100vh;
+        position: relative;
+        overflow-y: auto;
       }
-
-      .cover-title {
-        font-size: 40px;
-      }
-
-      .cover-icon {
-        font-size: 60px;
-      }
-
-      .page-title {
-        font-size: 28px !important;
-      }
+      .cover { padding: 40px 20px 80px; min-height: 100vh; }
+      .cover-title { font-size: 36px; }
+      .cover-icon { font-size: 56px; }
+      .page-title { font-size: 24px !important; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .unit-meta { gap: 10px; }
+      .nav-controls { bottom: 16px; right: 16px; }
+      .page-counter { bottom: 16px; left: 16px; font-size: 12px; }
     }
   </style>
 </head>
@@ -551,60 +552,320 @@
 
   <script>
     let currentPage = 0;
-    let totalPages = 3; // Cover + Summary + Index (units added dynamically)
+    let totalPages = 3;
     let projectData = null;
     let allPages = [];
 
-    // Sample data (will be replaced with URL params or API)
-    const SAMPLE_PROJECT = {
-      key: "suraksha",
-      name: "Suraksha",
-      subtitle: "Health & hygiene products for safer communities.",
-      icon: "fa-shield-heart",
-      impacts: ["Employment", "Women Empowerment", "Health"],
-      description: "Suraksha empowers communities by creating dignified livelihoods through the production of essential health and hygiene products. Each unit is designed to be profitable while addressing critical public health needs.",
-      units: [
-        {
-          name: "MediSan Liquids Unit",
-          space: "~260 sqft",
-          workers: "4 workers",
-          profit: "₹60k–90k/m",
-          setup: "₹1,50,000",
-          working: "₹40,000",
-          upfront: "₹17,500",
-          products: [{name: "Handwash (gel/foam)"}, {name: "Antiseptic liquid"}, {name: "Hand rub (70% IPA)"}, {name: "Disinfectant surface spray"}],
-          description: "Complete liquid hygiene product manufacturing unit focusing on handwashes, sanitizers, and disinfectants.",
-          machines: ["Mixing tanks", "Filling machines", "Labeling equipment", "Storage tanks"],
-          requirements: ["Clean water supply", "Ventilation", "Storage racks", "Quality testing kit"]
-        },
-        {
-          name: "FreshWipe Converting Unit",
-          space: "~240 sqft",
-          workers: "4 workers",
-          profit: "₹50k–75k/m",
-          setup: "₹1,20,000",
-          working: "₹30,000",
-          upfront: "₹15,000",
-          products: [{name: "Wet wipes (single/multi)"}, {name: "Floor/Surface wipes"}, {name: "Tissue folding"}],
-          description: "Wipes and tissue product manufacturing and packaging unit.",
-          machines: ["Wipe cutting machine", "Folding machine", "Packaging unit"],
-          requirements: ["Climate control", "Clean room area", "Raw material storage"]
-        }
-      ],
-      costs: {
-        setup: "₹1.2–1.8L",
-        working: "₹0.30–0.50L",
-        upfront: "₹10k–25k"
+    /* ═══════ ALL 11 FWF PROJECTS ═══════ */
+    const ALL_PROJECTS = {
+
+      "suraksha": {
+        key:"suraksha", name:"Suraksha", icon:"fa-shield-heart",
+        subtitle:"Health & hygiene products for safer communities.",
+        coverGradient:"linear-gradient(135deg,#22c55e,#16a34a)",
+        impacts:["Employment","Women Empowerment","Health"],
+        description:"Suraksha empowers communities by creating dignified livelihoods through the production of essential health and hygiene products. Each unit is designed to be profitable while addressing critical public health needs.",
+        costs:{setup:"₹1.2–1.8L", working:"₹0.30–0.50L", upfront:"₹10k–25k"},
+        units:[
+          {name:"MediSan Liquids Unit", space:"~260 sqft", workers:"4 workers", profit:"₹60k–90k/m", setup:"₹1,50,000", working:"₹40,000", upfront:"₹17,500",
+           products:["Handwash (gel/foam)","Antiseptic liquid","Hand rub (70% IPA)","Disinfectant surface spray"]},
+          {name:"FreshWipe Converting Unit", space:"~240 sqft", workers:"4 workers", profit:"₹40k–65k/m", setup:"₹1,20,000", working:"₹30,000", upfront:"₹15,000",
+           products:["Hygiene wet wipes","Alcohol wipes","Surface wipes (multipurpose)"]},
+          {name:"MedBand Unit", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹90,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Crepe bandage 75/100mm","Elastic bandage","Bandage clips"]},
+          {name:"SteriGauze Pack Unit", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹80,000", working:"₹20,000", upfront:"₹10,000",
+           products:["Gauze rolls","Non-woven dressing pads"]},
+          {name:"PPE Lite Pack Unit", space:"~200 sqft", workers:"3 workers", profit:"₹25k–38k/m", setup:"₹85,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Bouffant caps","Shoe covers"]},
+          {name:"FirstAid & ClinicKit Unit", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹80,000", working:"₹20,000", upfront:"₹10,000",
+           products:["First-aid kits","Clinic starter kits"]},
+          {name:"VectorGuard Repellent Unit", space:"~240 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹1,10,000", working:"₹28,000", upfront:"₹14,000",
+           products:["Mosquito cream/gel","Roll-on repellent","Patches"]},
+          {name:"HomeShield Net & Mesh Unit", space:"~260 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹95,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Bed nets","Window/door mesh kits","Velcro installer kit"]}
+        ]
+      },
+
+      "swachh-bharat": {
+        key:"swachh-bharat", name:"Swachh Bharat", icon:"fa-soap",
+        subtitle:"Home & surface care units for cleaner cities.",
+        coverGradient:"linear-gradient(135deg,#3b82f6,#1d4ed8)",
+        impacts:["Employment","Sustainability"],
+        description:"Swachh Bharat creates livelihood opportunities through manufacturing affordable home and surface care products, contributing to cleaner cities while giving women a steady income.",
+        costs:{setup:"₹1.0–1.8L", working:"₹0.25–0.45L", upfront:"₹10k–20k"},
+        units:[
+          {name:"HomeCare Liquids Blend–Fill", space:"~280 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹1,40,000", working:"₹35,000", upfront:"₹15,000",
+           products:["Floor/phenyl cleaner","Glass cleaner","Toilet cleaner","Multi-surface cleaner"]},
+          {name:"Dishwash & Kitchen Care", space:"~240 sqft", workers:"3 workers", profit:"₹30k–50k/m", setup:"₹1,00,000", working:"₹25,000", upfront:"₹12,500",
+           products:["Dishwash gel","Steel polish","Descaler"]},
+          {name:"Laundry Care", space:"~280 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹1,40,000", working:"₹35,000", upfront:"₹15,000",
+           products:["Liquid detergent","Fabric conditioner","Stain remover"]},
+          {name:"SoftSheet Tissue Converting", space:"~300 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹1,20,000", working:"₹30,000", upfront:"₹13,000",
+           products:["Kitchen towels","Toilet tissue","Facial tissue"]},
+          {name:"ScrubCraft Scrub & Scour", space:"~200 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹85,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Scrub pads","Metal/nylon scourers"]},
+          {name:"CleanTools Assembly", space:"~220 sqft", workers:"3 workers", profit:"₹25k–38k/m", setup:"₹85,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Mops","Wipers","Caddies"]},
+          {name:"AromaShield Block & Gel", space:"~220 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹1,05,000", working:"₹26,000", upfront:"₹13,000",
+           products:["Toilet blocks","Gel air fresheners"]},
+          {name:"EcoBag Seal (Garbage Bags)", space:"~240 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹95,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Garbage bag rolls (S/M/L)"]}
+        ]
+      },
+
+      "happy-meal": {
+        key:"happy-meal", name:"Happy Meal", icon:"fa-bowl-food",
+        subtitle:"Safe & value-added foods made locally.",
+        coverGradient:"linear-gradient(135deg,#f59e0b,#d97706)",
+        impacts:["Nutrition","Local Economy","Employment"],
+        description:"Happy Meal creates employment through local food processing, enabling women to produce high-quality packaged foods, spices, and ready-to-cook products for households and institutions.",
+        costs:{setup:"₹1.3–1.8L", working:"₹0.25–0.45L", upfront:"₹12k–25k"},
+        units:[
+          {name:"SpiceCrafter Masala", space:"~260 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹1,40,000", working:"₹35,000", upfront:"₹17,500",
+           products:["Single spices","Blends (garam/chaat/etc.)"]},
+          {name:"MixMaster RTC", space:"~280 sqft", workers:"4 workers", profit:"₹55k–85k/m", setup:"₹1,55,000", working:"₹38,000", upfront:"₹19,000",
+           products:["Dosa/Idli mix","Upma mix","Dhokla mix"]},
+          {name:"StaplePack", space:"~240 sqft", workers:"3 workers", profit:"₹28k–40k/m", setup:"₹1,00,000", working:"₹25,000", upfront:"₹12,500",
+           products:["Atta","Sooji","Rice flour"]},
+          {name:"Roast & Sweet", space:"~260 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹1,40,000", working:"₹35,000", upfront:"₹17,500",
+           products:["Roasted nuts/peanuts","Khakhra","Chikki/Ladoo"]},
+          {name:"PulseGrain Branding", space:"~220 sqft", workers:"3 workers", profit:"₹25k–38k/m", setup:"₹90,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Dals","Rice & millets"]},
+          {name:"Dry Chutney & Condiments", space:"~220 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹1,05,000", working:"₹26,000", upfront:"₹13,000",
+           products:["Garlic/Peanut/Coconut powders","Podi","Pickle premix"]},
+          {name:"Tea/Coffee & Herbal (dry)", space:"~240 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹1,10,000", working:"₹28,000", upfront:"₹14,000",
+           products:["Tea premix/bags","Lemonade/Jaljeera sachets"]},
+          {name:"Cloud Kitchen (dry base ops)", space:"~300 sqft", workers:"4 workers", profit:"₹60k–90k/m", setup:"₹1,55,000", working:"₹38,000", upfront:"₹19,000",
+           products:["Dry gravy bases","Marinade/seasoning kits"]}
+        ]
+      },
+
+      "green-energy": {
+        key:"green-energy", name:"Green Energy", icon:"fa-solar-panel",
+        subtitle:"Affordable clean-tech assembly & services.",
+        coverGradient:"linear-gradient(135deg,#eab308,#ca8a04)",
+        impacts:["Green Energy","Employment","Innovation"],
+        description:"Green Energy units assemble and service affordable solar and LED products, enabling women entrepreneurs to participate in India's clean energy revolution while building sustainable businesses.",
+        costs:{setup:"₹2.4–6.0L", working:"₹0.60–1.50L", upfront:"₹25k–60k"},
+        units:[
+          {name:"BrightLite LED Assembly", space:"~260 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹2,50,000", working:"₹70,000", upfront:"₹35,000",
+           products:["LED bulb","Batten/tube","Panel light"]},
+          {name:"Solar Study Lamp & Lantern", space:"~260 sqft", workers:"4 workers", profit:"₹40k–65k/m", setup:"₹2,40,000", working:"₹65,000", upfront:"₹33,000",
+           products:["Study lamp","Solar lantern"]},
+          {name:"Solar Home Lighting Kit", space:"~300 sqft", workers:"4 workers", profit:"₹60k–95k/m", setup:"₹3,50,000", working:"₹90,000", upfront:"₹45,000",
+           products:["Controller","LED lamps","Battery pack"]},
+          {name:"Street-Light Head & Battery-Swap", space:"~320 sqft", workers:"4 workers", profit:"₹70k–1.1L/m", setup:"₹4,50,000", working:"₹1,10,000", upfront:"₹55,000",
+           products:["Street-light heads","Battery swap service"]},
+          {name:"Portable Power & DC-UPS", space:"~220 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹2,00,000", working:"₹55,000", upfront:"₹28,000",
+           products:["Router UPS","USB/DC chargers"]},
+          {name:"E-Cycle Conversion & Service", space:"~400 sqft", workers:"5 workers", profit:"₹80k–1.2L/m", setup:"₹5,50,000", working:"₹1,30,000", upfront:"₹65,000",
+           products:["Hub-motor kits","Install/AMC"]},
+          {name:"Solar Components & Wiring Kits", space:"~220 sqft", workers:"3 workers", profit:"₹30k–45k/m", setup:"₹1,80,000", working:"₹50,000", upfront:"₹25,000",
+           products:["MC4 leads","Combiner boxes"]},
+          {name:"O&M Cleaning & AMC", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹1,70,000", working:"₹45,000", upfront:"₹23,000",
+           products:["Panel cleaning","Testing/repairs"]}
+        ]
+      },
+
+      "diy-crafts": {
+        key:"diy-crafts", name:"DIY Crafts", icon:"fa-gem",
+        subtitle:"Creative & custom products with strong margins.",
+        coverGradient:"linear-gradient(135deg,#ec4899,#be185d)",
+        impacts:["Women Empowerment","Skill Building"],
+        description:"DIY Crafts unlocks the creative potential of women artisans by producing handmade, customised products — from jute bags to jewellery and festive hampers — with excellent profit margins.",
+        costs:{setup:"₹0.9–1.3L", working:"₹0.15–0.30L", upfront:"₹8k–15k"},
+        units:[
+          {name:"Jute & Canvas Bags Studio", space:"~260 sqft", workers:"4 workers", profit:"₹30k–48k/m", setup:"₹1,10,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Tote/Sling/Drawstring","Custom print/branding"]},
+          {name:"Jewellery Assembly & Carding", space:"~200 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹80,000", working:"₹16,000", upfront:"₹8,000",
+           products:["Beaded/oxidized sets"]},
+          {name:"PaperCraft & Stationery", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹85,000", working:"₹17,000", upfront:"₹8,500",
+           products:["Cards","Gift boxes","Notepads"]},
+          {name:"Macramé & Home Décor", space:"~220 sqft", workers:"3 workers", profit:"₹22k–34k/m", setup:"₹80,000", working:"₹16,000", upfront:"₹8,000",
+           products:["Wall hangings","Plant hangers"]},
+          {name:"Personalised Print-on-Demand", space:"~260 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹1,15,000", working:"₹23,000", upfront:"₹11,500",
+           products:["Mugs","T-shirts","Cushions"]},
+          {name:"Festive Hampers & Gifting", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹95,000", working:"₹19,000", upfront:"₹9,500",
+           products:["Torans","Gift hampers"]},
+          {name:"Eco & Upcycled Craft", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹90,000", working:"₹18,000", upfront:"₹9,000",
+           products:["Denim upcycle","Chindi rugs"]},
+          {name:"Candles & Bath Craft", space:"~220 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,00,000", working:"₹20,000", upfront:"₹10,000",
+           products:["Soy/Beeswax candles","Bath salts"]}
+        ]
+      },
+
+      "swachh-jal": {
+        key:"swachh-jal", name:"Swachh Jal", icon:"fa-droplet",
+        subtitle:"Water purification & services for safe drinking.",
+        coverGradient:"linear-gradient(135deg,#06b6d4,#0e7490)",
+        impacts:["Health","Sustainability"],
+        description:"Swachh Jal builds livelihoods around water safety — assembling purifiers, testing kits, and providing installation & maintenance services — while ensuring safe drinking water for communities.",
+        costs:{setup:"₹1.7–6.0L", working:"₹0.50–1.50L", upfront:"₹20k–50k"},
+        units:[
+          {name:"PureFlow Gravity & UF", space:"~260 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹1,80,000", working:"₹50,000", upfront:"₹25,000",
+           products:["Gravity purifiers","UF purifiers"]},
+          {name:"ROPro Assembly & QA", space:"~300 sqft", workers:"5 workers", profit:"₹60k–95k/m", setup:"₹3,50,000", working:"₹90,000", upfront:"₹45,000",
+           products:["RO/UV/UF wall-mounts"]},
+          {name:"CartroPack Cartridges & Spares", space:"~220 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹1,40,000", working:"₹38,000", upfront:"₹19,000",
+           products:["PP/GAC/CTO cartridges","Housings"]},
+          {name:"MediaMix Filtration Repack", space:"~220 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,20,000", working:"₹32,000", upfront:"₹16,000",
+           products:["Carbon","Resin","Iron-removal media"]},
+          {name:"AquaTest QA & Field Kits", space:"~200 sqft", workers:"3 workers", profit:"₹22k–34k/m", setup:"₹90,000", working:"₹24,000", upfront:"₹12,000",
+           products:["TDS/pH/Hardness kits"]},
+          {name:"TankCare Cleaning & Disinfection", space:"~220 sqft", workers:"3 workers", profit:"₹30k–45k/m", setup:"₹1,10,000", working:"₹30,000", upfront:"₹15,000",
+           products:["Tank cleaning service"]},
+          {name:"HydroServe Install & AMC", space:"~220 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,15,000", working:"₹32,000", upfront:"₹16,000",
+           products:["Install packs","AMC bundles"]},
+          {name:"RainWise Harvest & Greywater", space:"~260 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹1,50,000", working:"₹40,000", upfront:"₹20,000",
+           products:["First-flush kits","Filters","Reuse kits"]}
+        ]
+      },
+
+      "samman": {
+        key:"samman", name:"Samman", icon:"fa-shirt",
+        subtitle:"Apparel manufacturing for steady livelihoods.",
+        coverGradient:"linear-gradient(135deg,#8b5cf6,#6d28d9)",
+        impacts:["Employment","Women Empowerment"],
+        description:"Samman creates dignified employment through garment and apparel manufacturing — from basic stitching units to institutional workwear and footwear assembly — providing steady year-round income.",
+        costs:{setup:"₹1.6–2.7L", working:"₹0.30–0.60L", upfront:"₹15k–30k"},
+        units:[
+          {name:"Women's Basics Stitching", space:"~260 sqft", workers:"4 workers", profit:"₹28k–45k/m", setup:"₹1,65,000", working:"₹38,000", upfront:"₹19,000",
+           products:["Petticoat","Maxi","Simple blouse"]},
+          {name:"Men's/Unisex Knits", space:"~280 sqft", workers:"4 workers", profit:"₹40k–65k/m", setup:"₹2,00,000", working:"₹45,000", upfront:"₹22,500",
+           products:["T-shirts","Track pants","Shorts"]},
+          {name:"Innerwear Stitching", space:"~240 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,70,000", working:"₹40,000", upfront:"₹20,000",
+           products:["Briefs/Trunks","Camisoles"]},
+          {name:"Kids & School Uniform", space:"~300 sqft", workers:"4 workers", profit:"₹40k–65k/m", setup:"₹2,00,000", working:"₹45,000", upfront:"₹22,500",
+           products:["Shirts/Pants/Skirts","House-T"]},
+          {name:"Workwear & Institutional", space:"~300 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹2,20,000", working:"₹50,000", upfront:"₹25,000",
+           products:["Housekeeping","Security","Aprons/Caps"]},
+          {name:"Footwear Assembly", space:"~300 sqft", workers:"4 workers", profit:"₹55k–85k/m", setup:"₹2,50,000", working:"₹55,000", upfront:"₹27,500",
+           products:["EVA/PU sandals","School sandals"]},
+          {name:"Accessories & Small Goods", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹1,40,000", working:"₹32,000", upfront:"₹16,000",
+           products:["Scrunchies","Belts","Cloth bags"]},
+          {name:"Branding & Finishing", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹1,50,000", working:"₹35,000", upfront:"₹17,500",
+           products:["Labels","Ironing","QC & Packing"]}
+        ]
+      },
+
+      "sweet-home": {
+        key:"sweet-home", name:"Sweet Home", icon:"fa-house-chimney",
+        subtitle:"Home utility products — stitched & assembled.",
+        coverGradient:"linear-gradient(135deg,#f97316,#ea580c)",
+        impacts:["Employment","Local Economy"],
+        description:"Sweet Home units produce essential home textiles and utility products — from bedsheets to curtains and storage solutions — creating steady employment while meeting everyday household needs.",
+        costs:{setup:"₹1.1–2.2L", working:"₹0.25–0.50L", upfront:"₹10k–22k"},
+        units:[
+          {name:"Bed & Bath Linen", space:"~280 sqft", workers:"4 workers", profit:"₹40k–60k/m", setup:"₹1,65,000", working:"₹38,000", upfront:"₹19,000",
+           products:["Bedsheets","Pillow covers","Towel branding"]},
+          {name:"Kitchen & Dining Textiles", space:"~240 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,30,000", working:"₹30,000", upfront:"₹15,000",
+           products:["Tablecloths","Runners","Aprons/Mitts"]},
+          {name:"Curtains & Soft Furnishings", space:"~300 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹1,50,000", working:"₹35,000", upfront:"₹17,500",
+           products:["Curtains","Cushion/Bolster covers"]},
+          {name:"Storage & Organizers", space:"~240 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,25,000", working:"₹28,000", upfront:"₹14,000",
+           products:["Collapsible boxes","Under-bed bags","Wardrobe hangers"]},
+          {name:"Floor & Mats", space:"~240 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,25,000", working:"₹28,000", upfront:"₹14,000",
+           products:["Doormats","Rag rugs","Bath mats"]},
+          {name:"Cushion & Pillow", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹1,15,000", working:"₹26,000", upfront:"₹13,000",
+           products:["Fillers","Outer covers","Sofa protectors"]},
+          {name:"Home Tool & Repair Kits", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹95,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Basic tool kit","Hook kit","Sewing repair kit"]},
+          {name:"Laundry & Organizing Accessories", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹1,05,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Laundry bags","Hampers","Shoe organizers"]}
+        ]
+      },
+
+      "hariyali": {
+        key:"hariyali", name:"Hariyali", icon:"fa-seedling",
+        subtitle:"Green livelihoods with compost & small agri tools.",
+        coverGradient:"linear-gradient(135deg,#84cc16,#65a30d)",
+        impacts:["Sustainability","Local Economy"],
+        description:"Hariyali taps into growing urban farming and green living trends — producing compost, nursery kits, bio-inputs and garden tools — creating eco-friendly livelihoods with consistent demand.",
+        costs:{setup:"₹0.6–2.4L", working:"₹0.15–0.45L", upfront:"₹6k–20k"},
+        units:[
+          {name:"Compost & Potting Media", space:"~260 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹90,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Vermicompost","Potting mix","Cocopeat"]},
+          {name:"Seedling & Nursery Kits", space:"~240 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹85,000", working:"₹20,000", upfront:"₹10,000",
+           products:["Seed trays","Grow bags","Starter kits"]},
+          {name:"Neem & Bio-inputs", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹95,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Neem pesticide","Bio-fertilizers","Micro mix"]},
+          {name:"Irrigation & Drip Kits", space:"~260 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹1,20,000", working:"₹30,000", upfront:"₹15,000",
+           products:["Drip/micro sprinklers","Timer kits"]},
+          {name:"Garden Tools & Hardware", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹75,000", working:"₹18,000", upfront:"₹9,000",
+           products:["Trowel/Pruner","Watering can","Gloves"]},
+          {name:"Home Composting Systems", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹85,000", working:"₹20,000", upfront:"₹10,000",
+           products:["Home composter","Accelerator","Odour mix"]},
+          {name:"Garden QA & Test Kits", space:"~200 sqft", workers:"3 workers", profit:"₹20k–30k/m", setup:"₹70,000", working:"₹16,000", upfront:"₹8,000",
+           products:["pH/TDS pens","Hardness/RC kits"]},
+          {name:"Community Green Bundles", space:"~240 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹85,000", working:"₹20,000", upfront:"₹10,000",
+           products:["Kitchen garden box","School garden kit"]}
+        ]
+      },
+
+      "worship": {
+        key:"worship", name:"Worship", icon:"fa-hands-praying",
+        subtitle:"Puja samagri & incense products with local branding.",
+        coverGradient:"linear-gradient(135deg,#e11d48,#be123c)",
+        impacts:["Local Economy","Women Empowerment"],
+        description:"Worship units produce agarbatti, dhoop, camphor, puja essentials and festive kits — tapping into India's consistent devotional product demand while creating dignified employment for women.",
+        costs:{setup:"₹0.96–1.5L", working:"₹0.15–0.35L", upfront:"₹8k–18k"},
+        units:[
+          {name:"Agarbatti & Dhoop", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹1,00,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Sticks","Cones","Carding & pack"]},
+          {name:"Camphor & Sambrani", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹1,00,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Camphor tablets","Sambrani cups/blends"]},
+          {name:"Fragrance Blend & Attar Fill", space:"~220 sqft", workers:"3 workers", profit:"₹30k–50k/m", setup:"₹1,10,000", working:"₹26,000", upfront:"₹13,000",
+           products:["Temple blends","Attar/Oils"]},
+          {name:"Puja Essentials Pack", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹90,000", working:"₹22,000", upfront:"₹11,000",
+           products:["Wicks","Kumkum/Haldi/Chandan","Diya sets"]},
+          {name:"Puja Vastra & Décor", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹1,00,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Altar cloths","Chunri","Torans"]},
+          {name:"Thali & Metalware Kitting", space:"~220 sqft", workers:"3 workers", profit:"₹30k–50k/m", setup:"₹1,10,000", working:"₹26,000", upfront:"₹13,000",
+           products:["Steel/Brass sets","Branding"]},
+          {name:"Festival & Ritual Kits", space:"~220 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,05,000", working:"₹25,000", upfront:"₹12,500",
+           products:["Diwali/Navratri kits"]},
+          {name:"Temple/B2B Supply", space:"~240 sqft", workers:"3 workers", profit:"₹35k–55k/m", setup:"₹1,25,000", working:"₹30,000", upfront:"₹15,000",
+           products:["Bulk agarbatti/dhoop/camphor"]}
+        ]
+      },
+
+      "shiksha": {
+        key:"shiksha", name:"Shiksha", icon:"fa-pen-ruler",
+        subtitle:"Affordable stationery & learning essentials.",
+        coverGradient:"linear-gradient(135deg,#0ea5e9,#0284c7)",
+        impacts:["Education","Employment"],
+        description:"Shiksha creates employment through production of affordable notebooks, stationery sets, art supplies and school kits — serving the growing demand from schools, students and CSR programs.",
+        costs:{setup:"₹1.2–1.6L", working:"₹0.25–0.40L", upfront:"₹10k–20k"},
+        units:[
+          {name:"Notebook Printing & Binding", space:"~300 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹1,55,000", working:"₹36,000", upfront:"₹18,000",
+           products:["A5/A4 notebooks","Long books","Graph/Practical"]},
+          {name:"Pen/Pencil & Geometry Kitting", space:"~240 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,15,000", working:"₹28,000", upfront:"₹14,000",
+           products:["Pens/Pencils","Geometry box"]},
+          {name:"Art & Craft Supplies Pack", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹1,00,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Crayons/Colours","Brush/Paper kits"]},
+          {name:"Folders & PP Stationery", space:"~260 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹1,10,000", working:"₹26,000", upfront:"₹13,000",
+           products:["PP Button/Slider","L-Folders"]},
+          {name:"School Bag Branding & Pouches", space:"~260 sqft", workers:"3 workers", profit:"₹30k–48k/m", setup:"₹1,20,000", working:"₹28,000", upfront:"₹14,000",
+           products:["School bags","Pencil pouches"]},
+          {name:"Teaching Aids & Charts", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹1,00,000", working:"₹24,000", upfront:"₹12,000",
+           products:["Charts/Maps","Flashcards"]},
+          {name:"Ready School/CSR Kits", space:"~220 sqft", workers:"3 workers", profit:"₹22k–35k/m", setup:"₹90,000", working:"₹22,000", upfront:"₹11,000",
+           products:["School/Exam/Art kits"]},
+          {name:"Classroom Hardware Branding", space:"~280 sqft", workers:"3 workers", profit:"₹30k–50k/m", setup:"₹1,25,000", working:"₹30,000", upfront:"₹15,000",
+           products:["White/Notice boards"]}
+        ]
       }
-    };
+
+    }; /* end ALL_PROJECTS */
 
     function init() {
-      // Get project data from URL params or use sample
       const urlParams = new URLSearchParams(window.location.search);
-      const projectKey = urlParams.get('project');
-      
-      // TODO: Fetch actual project data
-      projectData = SAMPLE_PROJECT;
+      const projectKey = urlParams.get('project') || 'suraksha';
+      projectData = ALL_PROJECTS[projectKey] || ALL_PROJECTS['suraksha'];
+
+      // Apply cover gradient
+      document.querySelector('.cover').style.background = projectData.coverGradient;
+      document.body.style.background = projectData.coverGradient;
 
       // Populate cover
       document.getElementById('coverIcon').innerHTML = `<i class="fa-solid ${projectData.icon}"></i>`;
@@ -613,9 +874,9 @@
 
       // Populate summary
       document.getElementById('summaryDescription').textContent = projectData.description;
-      
-      const impactBadges = projectData.impacts.map(impact => 
-        `<span class="impact-badge"><i class="fa-solid fa-circle-check"></i>${impact}</span>`
+
+      const impactBadges = projectData.impacts.map(impact =>
+        `<span class="impact-badge" style="background:${projectData.coverGradient}"><i class="fa-solid fa-circle-check"></i> ${impact}</span>`
       ).join('');
       document.getElementById('impactBadges').innerHTML = impactBadges;
 
@@ -640,8 +901,9 @@
 
       // Populate index
       const indexList = document.getElementById('indexList');
+      indexList.innerHTML = '';
       projectData.units.forEach((unit, index) => {
-        const pageNum = index + 3; // Cover=0, Summary=1, Index=2, Units start at 3
+        const pageNum = index + 3;
         const item = document.createElement('div');
         item.className = 'index-item';
         item.innerHTML = `
@@ -650,12 +912,9 @@
         `;
         item.onclick = () => goToPage(pageNum);
         indexList.appendChild(item);
-
-        // Create unit detail page
         createUnitPage(unit, pageNum);
       });
 
-      // Update total pages
       totalPages = 3 + projectData.units.length;
       allPages = document.querySelectorAll('.page');
       updateUI();
@@ -666,64 +925,29 @@
       page.className = 'page unit-detail';
       page.setAttribute('data-page', pageNum);
 
-      const productsHTML = unit.products.map(p => 
-        `<div class="product-card">${p.name}</div>`
+      const productsHTML = unit.products.map(p =>
+        `<div class="product-card">${p}</div>`
       ).join('');
 
-      const machinesHTML = unit.machines ? 
-        `<div class="unit-section">
-          <h3><i class="fa-solid fa-cog"></i> Machines & Equipment</h3>
-          <ul style="margin-left: 20px; color: #4b5563; line-height: 1.8;">
-            ${unit.machines.map(m => `<li>${m}</li>`).join('')}
-          </ul>
-        </div>` : '';
-
-      const requirementsHTML = unit.requirements ? 
-        `<div class="unit-section">
-          <h3><i class="fa-solid fa-list-check"></i> Requirements</h3>
-          <ul style="margin-left: 20px; color: #4b5563; line-height: 1.8;">
-            ${unit.requirements.map(r => `<li>${r}</li>`).join('')}
-          </ul>
-        </div>` : '';
-
       page.innerHTML = `
-        <h2 class="page-title">${unit.name}</h2>
-        
+        <h2 class="page-title" style="font-size:22px;margin-bottom:12px">${unit.name}</h2>
+
         <div class="unit-meta">
-          <div class="unit-meta-item">
-            <i class="fa-solid fa-ruler-combined"></i>
-            <span>${unit.space}</span>
-          </div>
-          <div class="unit-meta-item">
-            <i class="fa-solid fa-users"></i>
-            <span>${unit.workers}</span>
-          </div>
-          <div class="unit-meta-item">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Profit: ${unit.profit}</span>
-          </div>
+          <div class="unit-meta-item"><i class="fa-solid fa-ruler-combined"></i><span>${unit.space}</span></div>
+          <div class="unit-meta-item"><i class="fa-solid fa-users"></i><span>${unit.workers}</span></div>
+          <div class="unit-meta-item"><i class="fa-solid fa-chart-line"></i><span>Profit: ${unit.profit}</span></div>
         </div>
 
         <div class="unit-section">
-          <h3><i class="fa-solid fa-align-left"></i> Description</h3>
-          <p style="color: #4b5563; line-height: 1.8;">${unit.description}</p>
+          <h3><i class="fa-solid fa-box"></i> Products / उत्पाद</h3>
+          <div class="products-grid">${productsHTML}</div>
         </div>
 
         <div class="unit-section">
-          <h3><i class="fa-solid fa-box"></i> Products</h3>
-          <div class="products-grid">
-            ${productsHTML}
-          </div>
-        </div>
-
-        ${machinesHTML}
-        ${requirementsHTML}
-
-        <div class="unit-section">
-          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Details</h3>
+          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Details / वित्तीय विवरण</h3>
           <div class="finance-box">
             <div class="finance-row">
-              <span class="finance-label">Project Start Cost</span>
+              <span class="finance-label">Project Start Cost (Setup)</span>
               <span class="finance-value">${unit.setup}</span>
             </div>
             <div class="finance-row">
@@ -742,36 +966,28 @@
     }
 
     function nextPage() {
-      if (currentPage < totalPages - 1) {
-        goToPage(currentPage + 1);
-      }
+      if (currentPage < totalPages - 1) goToPage(currentPage + 1);
     }
 
     function prevPage() {
-      if (currentPage > 0) {
-        goToPage(currentPage - 1);
-      }
+      if (currentPage > 0) goToPage(currentPage - 1);
     }
 
     function goToPage(pageNum) {
       if (pageNum < 0 || pageNum >= totalPages || pageNum === currentPage) return;
-
       const currentPageEl = allPages[currentPage];
       const nextPageEl = allPages[pageNum];
-
-      // Add flip animation
-      if (pageNum > currentPage) {
-        currentPageEl.classList.add('turning-left');
-      } else {
-        nextPageEl.classList.add('turning-right');
-      }
-
+      if (pageNum > currentPage) currentPageEl.classList.add('turning-left');
+      else nextPageEl.classList.add('turning-right');
       setTimeout(() => {
-        currentPageEl.classList.remove('active', 'turning-left');
+        currentPageEl.classList.remove('active','turning-left');
         nextPageEl.classList.add('active');
         currentPageEl.classList.remove('turning-right');
         currentPage = pageNum;
         updateUI();
+        // Scroll to top of page on mobile
+        nextPageEl.scrollTop = 0;
+        window.scrollTo(0,0);
       }, 400);
     }
 
@@ -781,7 +997,6 @@
       document.getElementById('pageCounter').textContent = `Page ${currentPage + 1} / ${totalPages}`;
     }
 
-    // Initialize on load
     window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>

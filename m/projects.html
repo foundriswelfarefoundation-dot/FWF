@@ -3,112 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="theme-color" content="#E87722" />
   <title>Our Projects - FWF</title>
 
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="../assets/css/mobile.css" rel="stylesheet">
-  
+
   <style>
-    .project-card {
-      background: white;
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-    }
-    
-    .project-image {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-    }
-    
-    .project-content {
-      padding: 16px;
-    }
-    
-    .project-tag {
-      display: inline-block;
-      padding: 4px 12px;
-      background: var(--accent);
-      color: white;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    
-    .project-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-      color: var(--ink);
-    }
-    
-    .project-desc {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-      margin: 0 0 12px 0;
-    }
-    
-    .project-stats {
-      display: flex;
-      gap: 16px;
-      margin: 12px 0;
-      padding: 12px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .stat {
-      flex: 1;
+    body { background: #f4f6f9; }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #E87722 0%, #f59d45 100%);
+      padding: 28px 20px 22px;
       text-align: center;
+      color: #fff;
     }
-    
-    .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--brand1);
-      margin-bottom: 4px;
-    }
-    
-    .stat-label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    
-    .filter-chips {
+    .hero-banner h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+    .hero-banner p  { font-size: 13px; opacity: .88; margin: 0; line-height: 1.5; }
+
+    .stats-strip {
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 16px 0;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .stats-strip .s {
+      flex: 1; text-align: center; padding: 12px 6px;
+      border-right: 1px solid #e5e7eb;
+    }
+    .stats-strip .s:last-child { border-right: none; }
+    .stats-strip .sv { font-size: 16px; font-weight: 800; color: #E87722; }
+    .stats-strip .sl { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
+
+    .filter-row {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 14px 16px; background: #fff;
+      border-bottom: 1px solid #e5e7eb;
       -webkit-overflow-scrolling: touch;
     }
-    
-    .filter-chips::-webkit-scrollbar {
-      display: none;
-    }
-    
+    .filter-row::-webkit-scrollbar { display: none; }
     .chip {
-      padding: 8px 16px;
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: 20px;
-      font-size: 14px;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.2s;
+      flex-shrink: 0; padding: 6px 14px;
+      background: #f3f4f6; border: 1.5px solid #e5e7eb;
+      border-radius: 20px; font-size: 12px; font-weight: 700;
+      color: #374151; cursor: pointer; transition: all .18s; white-space: nowrap;
     }
-    
-    .chip.active {
-      background: var(--brand1);
-      color: white;
-      border-color: var(--brand1);
+    .chip.active { background: #E87722; border-color: #E87722; color: #fff; }
+
+    .projects-list { padding: 16px; }
+
+    .project-card {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      margin-bottom: 14px; border: 1px solid #e5e7eb;
+    }
+    .card-header {
+      padding: 18px 16px 14px; display: flex;
+      align-items: flex-start; gap: 14px;
+    }
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 22px; color: #fff;
+    }
+    .card-title { font-size: 16px; font-weight: 800; color: #111827; margin: 0 0 3px; }
+    .card-subtitle { font-size: 12px; color: #6b7280; line-height: 1.4; margin: 0; }
+
+    .impact-row { padding: 0 16px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .impact-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;
+    }
+    .impact-tag i { font-size: 9px; }
+
+    .card-meta {
+      padding: 10px 16px; display: flex; gap: 10px;
+      border-top: 1px solid #f3f4f6; background: #fafafa;
+    }
+    .meta-item { flex: 1; }
+    .meta-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+    .meta-value { font-size: 13px; font-weight: 700; color: #111827; }
+
+    .card-footer { padding: 12px 16px; border-top: 1px solid #f3f4f6; }
+    .btn-view {
+      display: block; width: 100%; padding: 11px; border: none;
+      border-radius: 10px; font-size: 13px; font-weight: 700;
+      text-align: center; text-decoration: none; cursor: pointer;
+      transition: opacity .18s; color: #fff;
+    }
+    .btn-view:hover { opacity: .88; }
+
+    .cta-card {
+      margin: 4px 16px 24px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 16px; padding: 22px 20px; text-align: center; color: #fff;
+    }
+    .cta-card h3 { font-size: 16px; font-weight: 800; margin: 0 0 8px; color: #fff; }
+    .cta-card p  { font-size: 13px; opacity: .88; margin: 0 0 16px; }
+    .btn-cta {
+      display: inline-block; padding: 11px 28px; background: #fff;
+      color: #1e3a8a; border-radius: 10px; font-size: 13px;
+      font-weight: 800; text-decoration: none;
     }
   </style>
 </head>
@@ -119,7 +116,7 @@
         <img src="../assets/images/logo.png" alt="FWF" width="36" height="36">
         <span>FWF</span>
       </a>
-      <button class="nav-toggle" id="navToggle">
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
         <i class="fas fa-bars"></i>
       </button>
     </div>
@@ -127,239 +124,373 @@
 
   <nav class="nav" id="mobileNav">
     <a href="index.html">Home</a>
-    <a href="https://www.fwfindia.org/donation#donateModal">Join</a>
-    <a href="https://www.fwfindia.org/donation#donateModal">Donate</a>
+    <a href="join.html">Join</a>
+    <a href="donation.html">Donate</a>
     <a href="projects.html" class="active">Projects</a>
     <a href="member-login.html">Login</a>
   </nav>
 
-  <section style="padding: 20px 0;">
-    <div class="container">
-      <h1 class="text-center" style="margin-bottom: 8px;">💼 Our Projects</h1>
-      <p class="text-center" style="color: var(--muted); margin-bottom: 24px;">
-        Creating livelihood opportunities
-      </p>
+  <!-- Hero -->
+  <div class="hero-banner">
+    <div style="font-size:32px;margin-bottom:8px">💼</div>
+    <h1>Our Projects</h1>
+    <p>Skill-to-livelihood micro-enterprises empowering women across India</p>
+  </div>
 
-      <!-- Filters -->
-      <div class="filter-chips">
-        <div class="chip active" onclick="filterProjects('all')">All</div>
-        <div class="chip" onclick="filterProjects('handicraft')">Handicraft</div>
-        <div class="chip" onclick="filterProjects('digital')">Digital</div>
-        <div class="chip" onclick="filterProjects('food')">Food</div>
-        <div class="chip" onclick="filterProjects('textile')">Textile</div>
-      </div>
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="s"><div class="sv">11</div><div class="sl">Projects</div></div>
+    <div class="s"><div class="sv">88+</div><div class="sl">Unit Types</div></div>
+    <div class="s"><div class="sv">1200+</div><div class="sl">Women</div></div>
+    <div class="s"><div class="sv">₹80L+</div><div class="sl">Income</div></div>
+  </div>
 
-      <!-- Stats Overview -->
-      <div class="card mb-3">
-        <div class="project-stats">
-          <div class="stat">
-            <div class="stat-value">250+</div>
-            <div class="stat-label">Active Projects</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">1200+</div>
-            <div class="stat-label">Women Employed</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">₹80L+</div>
-            <div class="stat-label">Income Generated</div>
-          </div>
+  <!-- Filter chips -->
+  <div class="filter-row">
+    <div class="chip active"  onclick="filterProjects('all',this)">🎯 All</div>
+    <div class="chip" onclick="filterProjects('health',this)">🏥 Health</div>
+    <div class="chip" onclick="filterProjects('food',this)">🍲 Food</div>
+    <div class="chip" onclick="filterProjects('energy',this)">⚡ Energy</div>
+    <div class="chip" onclick="filterProjects('craft',this)">🎨 Craft</div>
+    <div class="chip" onclick="filterProjects('apparel',this)">👗 Apparel</div>
+    <div class="chip" onclick="filterProjects('green',this)">🌱 Green</div>
+    <div class="chip" onclick="filterProjects('puja',this)">🪔 Puja</div>
+    <div class="chip" onclick="filterProjects('education',this)">📚 Education</div>
+  </div>
+
+  <!-- Project cards -->
+  <div class="projects-list" id="projectsList">
+
+    <!-- 1. Suraksha -->
+    <div class="project-card" data-cat="health">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
+          <i class="fa-solid fa-shield-heart"></i>
+        </div>
+        <div>
+          <div class="card-title">Suraksha</div>
+          <p class="card-subtitle">Health &amp; hygiene products for safer communities.</p>
         </div>
       </div>
-
-      <!-- Projects List -->
-      <div id="projectsList">
-        <!-- Project 1 -->
-        <div class="project-card" data-category="handicraft">
-          <div class="project-image" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
-              🎨
-            </div>
-          </div>
-          <div class="project-content">
-            <span class="project-tag">Handicraft</span>
-            <h3 class="project-title">Madhubani Art</h3>
-            <p class="project-desc">
-              Traditional Madhubani paintings on canvas, paper, and textiles. Women artisans create beautiful handmade artwork.
-            </p>
-            <div class="project-stats">
-              <div class="stat">
-                <div class="stat-value">45</div>
-                <div class="stat-label">Artisans</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">₹3.2L</div>
-                <div class="stat-label">Monthly Income</div>
-              </div>
-            </div>
-            <a href="../project-booklet.html" class="btn btn-primary btn-block">
-              View Details →
-            </a>
-          </div>
-        </div>
-
-        <!-- Project 2 -->
-        <div class="project-card" data-category="digital">
-          <div class="project-image" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
-              💻
-            </div>
-          </div>
-          <div class="project-content">
-            <span class="project-tag">Digital</span>
-            <h3 class="project-title">Digital Marketing Services</h3>
-            <p class="project-desc">
-              Social media management, content creation, and digital marketing services by trained women professionals.
-            </p>
-            <div class="project-stats">
-              <div class="stat">
-                <div class="stat-value">30</div>
-                <div class="stat-label">Experts</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">₹4.5L</div>
-                <div class="stat-label">Monthly Income</div>
-              </div>
-            </div>
-            <a href="../project-booklet.html" class="btn btn-primary btn-block">
-              View Details →
-            </a>
-          </div>
-        </div>
-
-        <!-- Project 3 -->
-        <div class="project-card" data-category="food">
-          <div class="project-image" style="background: linear-gradient(135deg, #fa709a, #fee140);">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
-              🍲
-            </div>
-          </div>
-          <div class="project-content">
-            <span class="project-tag">Food</span>
-            <h3 class="project-title">Home Food Business</h3>
-            <p class="project-desc">
-              Homemade pickles, snacks, and traditional food items prepared by skilled women entrepreneurs.
-            </p>
-            <div class="project-stats">
-              <div class="stat">
-                <div class="stat-value">60</div>
-                <div class="stat-label">Entrepreneurs</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">₹5.8L</div>
-                <div class="stat-label">Monthly Income</div>
-              </div>
-            </div>
-            <a href="../project-booklet.html" class="btn btn-primary btn-block">
-              View Details →
-            </a>
-          </div>
-        </div>
-
-        <!-- Project 4 -->
-        <div class="project-card" data-category="textile">
-          <div class="project-image" style="background: linear-gradient(135deg, #a8edea, #fed6e3);">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
-              🧵
-            </div>
-          </div>
-          <div class="project-content">
-            <span class="project-tag">Textile</span>
-            <h3 class="project-title">Garment Manufacturing</h3>
-            <p class="project-desc">
-              Tailoring and garment production unit providing steady employment to women with sewing skills.
-            </p>
-            <div class="project-stats">
-              <div class="stat">
-                <div class="stat-value">80</div>
-                <div class="stat-label">Workers</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">₹6.5L</div>
-                <div class="stat-label">Monthly Income</div>
-              </div>
-            </div>
-            <a href="../project-booklet.html" class="btn btn-primary btn-block">
-              View Details →
-            </a>
-          </div>
-        </div>
-
-        <!-- Project 5 -->
-        <div class="project-card" data-category="handicraft">
-          <div class="project-image" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 60px;">
-              🪴
-            </div>
-          </div>
-          <div class="project-content">
-            <span class="project-tag">Handicraft</span>
-            <h3 class="project-title">Handmade Jewelry</h3>
-            <p class="project-desc">
-              Beautiful handcrafted jewelry using traditional techniques and modern designs.
-            </p>
-            <div class="project-stats">
-              <div class="stat">
-                <div class="stat-value">35</div>
-                <div class="stat-label">Artisans</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">₹2.7L</div>
-                <div class="stat-label">Monthly Income</div>
-              </div>
-            </div>
-            <a href="../project-booklet.html" class="btn btn-primary btn-block">
-              View Details →
-            </a>
-          </div>
-        </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Women Empowerment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Health</span>
       </div>
-
-      <!-- CTA Card -->
-      <div class="card mt-3" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-align: center;">
-        <h3 style="margin: 0 0 12px 0; color: white;">Want to Join a Project?</h3>
-        <p style="margin: 0 0 16px 0; opacity: 0.9;">
-          Become a member and get access to all projects
-        </p>
-        <a href="https://www.fwfindia.org/donation#donateModal" class="btn btn-block" style="background: white; color: #667eea;">
-          <i class="fas fa-user-plus"></i> Join Now
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.2–1.8L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.30–0.50L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
     </div>
-  </section>
+
+    <!-- 2. Swachh Bharat -->
+    <div class="project-card" data-cat="health">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+          <i class="fa-solid fa-soap"></i>
+        </div>
+        <div>
+          <div class="card-title">Swachh Bharat</div>
+          <p class="card-subtitle">Home &amp; surface care units for cleaner cities.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Sustainability</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.0–1.8L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.45L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. Happy Meal -->
+    <div class="project-card" data-cat="food">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <div>
+          <div class="card-title">Happy Meal</div>
+          <p class="card-subtitle">Safe &amp; value-added foods made locally.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Nutrition</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.3–1.8L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.45L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 4. Green Energy -->
+    <div class="project-card" data-cat="energy">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
+          <i class="fa-solid fa-solar-panel"></i>
+        </div>
+        <div>
+          <div class="card-title">Green Energy</div>
+          <p class="card-subtitle">Affordable clean-tech assembly &amp; services.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Green Energy</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Innovation</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹2.4–6.0L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.60–1.50L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 5. DIY Crafts -->
+    <div class="project-card" data-cat="craft">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#ec4899,#be185d)">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <div>
+          <div class="card-title">DIY Crafts</div>
+          <p class="card-subtitle">Creative &amp; custom products with strong margins.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Women Empowerment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Skill Building</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹0.9–1.3L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.15–0.30L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#ec4899,#be185d)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 6. Swachh Jal -->
+    <div class="project-card" data-cat="health">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">
+          <i class="fa-solid fa-droplet"></i>
+        </div>
+        <div>
+          <div class="card-title">Swachh Jal</div>
+          <p class="card-subtitle">Water purification &amp; services for safe drinking.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Health</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Sustainability</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.7–6.0L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.50–1.50L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 7. Samman -->
+    <div class="project-card" data-cat="apparel">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+          <i class="fa-solid fa-shirt"></i>
+        </div>
+        <div>
+          <div class="card-title">Samman</div>
+          <p class="card-subtitle">Apparel manufacturing for steady livelihoods.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Women Empowerment</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.6–2.7L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.30–0.60L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 8. Sweet Home -->
+    <div class="project-card" data-cat="apparel">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#f97316,#ea580c)">
+          <i class="fa-solid fa-house-chimney"></i>
+        </div>
+        <div>
+          <div class="card-title">Sweet Home</div>
+          <p class="card-subtitle">Home utility products — stitched &amp; assembled.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.1–2.2L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.50L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#f97316,#ea580c)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 9. Hariyali -->
+    <div class="project-card" data-cat="green">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#84cc16,#65a30d)">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div>
+          <div class="card-title">Hariyali</div>
+          <p class="card-subtitle">Green livelihoods with compost &amp; small agri tools.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Sustainability</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹0.6–2.4L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.15–0.45L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#84cc16,#65a30d)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 10. Worship -->
+    <div class="project-card" data-cat="puja">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#e11d48,#be123c)">
+          <i class="fa-solid fa-hands-praying"></i>
+        </div>
+        <div>
+          <div class="card-title">Worship</div>
+          <p class="card-subtitle">Puja samagri &amp; incense products with local branding.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Women Empowerment</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹0.96–1.5L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.15–0.35L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#e11d48,#be123c)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+    <!-- 11. Shiksha -->
+    <div class="project-card" data-cat="education">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">
+          <i class="fa-solid fa-pen-ruler"></i>
+        </div>
+        <div>
+          <div class="card-title">Shiksha</div>
+          <p class="card-subtitle">Affordable stationery &amp; learning essentials.</p>
+        </div>
+      </div>
+      <div class="impact-row">
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Education</span>
+        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.2–1.6L</div></div>
+        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.40L</div></div>
+        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
+      </div>
+      <div class="card-footer">
+        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">
+          <i class="fa-solid fa-book-open"></i> View Project Booklet
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /projects-list -->
+
+  <!-- CTA -->
+  <div class="cta-card">
+    <h3>Want to Join a Project?</h3>
+    <p>Become a member and get access to all livelihood projects</p>
+    <a href="join.html" class="btn-cta">
+      <i class="fas fa-user-plus"></i> Join Now
+    </a>
+  </div>
 
   <footer>
     <div class="container">
-      <p><strong>FWF</strong> - Foundation for Women's Future</p>
+      <p><strong>FWF</strong> — Foundation for Women's Future</p>
       <p>&copy; 2025 FWF. All rights reserved.</p>
     </div>
   </footer>
 
   <script>
-    function filterProjects(category) {
-      // Update active chip
-      document.querySelectorAll('.chip').forEach(chip => {
-        chip.classList.remove('active');
-      });
-      event.target.classList.add('active');
-
-      // Filter projects
-      const projects = document.querySelectorAll('.project-card');
-      projects.forEach(project => {
-        if (category === 'all' || project.dataset.category === category) {
-          project.style.display = 'block';
-        } else {
-          project.style.display = 'none';
-        }
+    function filterProjects(cat, el) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('#projectsList .project-card').forEach(card => {
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'block' : 'none';
       });
     }
 
-    // Mobile nav toggle
     document.getElementById('navToggle')?.addEventListener('click', () => {
       document.getElementById('mobileNav')?.classList.toggle('show');
     });
   </script>
-
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 </body>
 </html>

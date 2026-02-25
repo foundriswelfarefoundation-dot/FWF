@@ -14,6 +14,18 @@
   <style>
     body { background: #f4f6f9; }
 
+    /* Logo fix: crisp, white bg, no blur */
+    .brand img {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 8px !important;
+      background: #fff !important;
+      object-fit: contain !important;
+      padding: 3px !important;
+    }
+    /* Hide the FWF text next to logo */
+    .brand span { display: none !important; }
+
     .hero-banner {
       background: linear-gradient(135deg, #E87722 0%, #f59d45 100%);
       padding: 28px 20px 22px;
@@ -22,19 +34,6 @@
     }
     .hero-banner h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
     .hero-banner p  { font-size: 13px; opacity: .88; margin: 0; line-height: 1.5; }
-
-    .stats-strip {
-      display: flex;
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .stats-strip .s {
-      flex: 1; text-align: center; padding: 12px 6px;
-      border-right: 1px solid #e5e7eb;
-    }
-    .stats-strip .s:last-child { border-right: none; }
-    .stats-strip .sv { font-size: 16px; font-weight: 800; color: #E87722; }
-    .stats-strip .sl { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
 
     .filter-row {
       display: flex; gap: 8px; overflow-x: auto;
@@ -134,15 +133,7 @@
   <div class="hero-banner">
     <div style="font-size:32px;margin-bottom:8px">💼</div>
     <h1>Our Projects</h1>
-    <p>Skill-to-livelihood micro-enterprises empowering women across India</p>
-  </div>
-
-  <!-- Stats strip -->
-  <div class="stats-strip">
-    <div class="s"><div class="sv">11</div><div class="sl">Projects</div></div>
-    <div class="s"><div class="sv">88+</div><div class="sl">Unit Types</div></div>
-    <div class="s"><div class="sv">1200+</div><div class="sl">Women</div></div>
-    <div class="s"><div class="sv">₹80L+</div><div class="sl">Income</div></div>
+    <p><strong>Mission:</strong> Berozgaar logo ko rojgar aur Aatmnirbhar banana<br><strong>Vision:</strong> India ko Manufacturing Hub banana</p>
   </div>
 
   <!-- Filter chips -->
@@ -183,7 +174,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
+        <a href="../project-booklet.html?project=suraksha" class="btn-view" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -210,7 +201,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+        <a href="../project-booklet.html?project=swachh-bharat" class="btn-view" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -238,7 +229,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+        <a href="../project-booklet.html?project=happy-meal" class="btn-view" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -266,7 +257,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
+        <a href="../project-booklet.html?project=green-energy" class="btn-view" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -293,7 +284,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#ec4899,#be185d)">
+        <a href="../project-booklet.html?project=diy-crafts" class="btn-view" style="background:linear-gradient(135deg,#ec4899,#be185d)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -320,7 +311,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">
+        <a href="../project-booklet.html?project=swachh-jal" class="btn-view" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -347,7 +338,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+        <a href="../project-booklet.html?project=samman" class="btn-view" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -374,7 +365,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#f97316,#ea580c)">
+        <a href="../project-booklet.html?project=sweet-home" class="btn-view" style="background:linear-gradient(135deg,#f97316,#ea580c)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -401,7 +392,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#84cc16,#65a30d)">
+        <a href="../project-booklet.html?project=hariyali" class="btn-view" style="background:linear-gradient(135deg,#84cc16,#65a30d)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -428,7 +419,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#e11d48,#be123c)">
+        <a href="../project-booklet.html?project=worship" class="btn-view" style="background:linear-gradient(135deg,#e11d48,#be123c)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -455,7 +446,7 @@
         <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
       </div>
       <div class="card-footer">
-        <a href="../project-booklet.html" class="btn-view" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">
+        <a href="../project-booklet.html?project=shiksha" class="btn-view" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">
           <i class="fa-solid fa-book-open"></i> View Project Booklet
         </a>
       </div>
@@ -474,7 +465,7 @@
 
   <footer>
     <div class="container">
-      <p><strong>FWF</strong> — Foundation for Women's Future</p>
+      <p><strong>FWF</strong> — Foundries Welfare Foundation</p>
       <p>&copy; 2025 FWF. All rights reserved.</p>
     </div>
   </footer>

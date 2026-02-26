@@ -16,6 +16,9 @@
   <style>
     /* Hindi typography */
     [data-lang="hi"] body { font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif; }
+  <style>
+    /* Hindi typography */
+    [data-lang="hi"] body { font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif; }
 
     /* Language switcher pill */
     .lang-pill {
@@ -32,68 +35,105 @@
       color: var(--text3);
       transition: all .15s;
     }
-    .lang-pill button.active {
-      background: var(--primary);
-      color: #fff;
-    }
+    .lang-pill button.active { background: var(--primary); color: #fff; }
 
-    /* Stats strip */
-    .stats-strip {
+    /* ── Motivational tag strip ── */
+    .motiv-strip {
       display: flex;
       overflow-x: auto;
-      gap: 10px;
-      padding: 16px 16px 4px;
+      gap: 8px;
+      padding: 14px 16px 6px;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
-    .stats-strip::-webkit-scrollbar { display: none; }
-    .stat-chip {
+    .motiv-strip::-webkit-scrollbar { display: none; }
+    .motiv-chip {
       flex-shrink: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      font-size: 11px; font-weight: 700;
+      padding: 6px 14px;
       border-radius: 50px;
-      padding: 8px 16px;
-      display: flex; align-items: center; gap: 7px;
       white-space: nowrap;
+      letter-spacing: .2px;
     }
-    .stat-chip .sc-val { font-size: 16px; font-weight: 800; color: var(--primary); }
-    .stat-chip .sc-lbl { font-size: 11px; color: var(--text2); }
+    .motiv-chip.mc-orange { background: rgba(249,115,22,.18); color: #fb923c; border: 1px solid rgba(249,115,22,.35); }
+    .motiv-chip.mc-green  { background: rgba(34,197,94,.15);  color: #4ade80; border: 1px solid rgba(34,197,94,.3); }
+    .motiv-chip.mc-blue   { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+    .motiv-chip.mc-amber  { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+    .motiv-chip.mc-rose   { background: rgba(244,63,94,.15);  color: #fb7185; border: 1px solid rgba(244,63,94,.3); }
 
-    /* Action cards horizontal scroll */
-    .action-scroll {
+    /* ── Action feature cards (vertical) ── */
+    .action-cards {
       display: flex;
-      gap: 12px;
-      padding: 0 16px 4px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      flex-direction: column;
+      gap: 14px;
+      padding: 0 16px;
     }
-    .action-scroll::-webkit-scrollbar { display: none; }
-    .action-chip {
-      flex-shrink: 0;
-      width: 130px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 14px;
-      text-align: center;
+    .feat-card {
+      border-radius: 18px;
+      padding: 20px 18px;
       text-decoration: none;
-      transition: all .18s;
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s;
     }
-    .action-chip:active { transform: scale(.96); }
-    .action-chip .ac-icon {
-      font-size: 28px; margin-bottom: 8px; display: block;
+    .feat-card:active { transform: scale(.98); }
+    .feat-card.fc-orange { background: linear-gradient(135deg, rgba(249,115,22,.22) 0%, rgba(234,88,12,.12) 100%); border: 1px solid rgba(249,115,22,.35); }
+    .feat-card.fc-blue   { background: linear-gradient(135deg, rgba(59,130,246,.2) 0%, rgba(37,99,235,.1) 100%); border: 1px solid rgba(59,130,246,.3); }
+    .feat-card.fc-green  { background: linear-gradient(135deg, rgba(34,197,94,.2) 0%, rgba(21,128,61,.1) 100%); border: 1px solid rgba(34,197,94,.3); }
+    .feat-card .fc-head {
+      display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;
     }
-    .action-chip .ac-title {
+    .feat-card .fc-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .fc-orange .fc-icon { background: rgba(249,115,22,.25); }
+    .fc-blue   .fc-icon { background: rgba(59,130,246,.2); }
+    .fc-green  .fc-icon { background: rgba(34,197,94,.2); }
+    .feat-card .fc-title {
+      font-size: 16px; font-weight: 800;
+      color: var(--text); line-height: 1.2; margin-bottom: 4px;
+    }
+    .feat-card .fc-price {
       font-size: 13px; font-weight: 700;
-      color: var(--text); display: block; margin-bottom: 3px;
     }
-    .action-chip .ac-sub {
-      font-size: 10px; color: var(--text3);
+    .fc-orange .fc-price { color: #fb923c; }
+    .fc-blue   .fc-price { color: #60a5fa; }
+    .fc-green  .fc-price { color: #4ade80; }
+    .feat-card .fc-desc {
+      font-size: 12.5px; color: var(--text2); line-height: 1.55; margin-bottom: 14px;
     }
-    .action-chip.ac-primary { background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.3); }
-    .action-chip.ac-blue    { background: rgba(59,130,246,0.12);  border-color: rgba(59,130,246,0.3);  }
-    .action-chip.ac-green   { background: rgba(34,197,94,0.12);   border-color: rgba(34,197,94,0.3);   }
+    /* Benefits list */
+    .benefit-list {
+      list-style: none; padding: 0; margin: 0 0 14px;
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .benefit-list li {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 12.5px; color: var(--text);
+    }
+    .benefit-list li .bl-icon {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: rgba(249,115,22,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0;
+      color: #fb923c;
+    }
+    .feat-card .tc-note {
+      font-size: 10px; color: var(--text3); margin-bottom: 14px;
+    }
+    .tc-note a { color: var(--primary); font-weight: 700; cursor: pointer; }
+    .feat-card .fc-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px; border-radius: 12px;
+      font-size: 13px; font-weight: 800; text-decoration: none;
+      transition: opacity .15s;
+    }
+    .feat-card .fc-btn:active { opacity: .8; }
+    .fc-orange .fc-btn { background: var(--primary); color: #fff; }
+    .fc-blue   .fc-btn { background: #3b82f6; color: #fff; }
+    .fc-green  .fc-btn { background: #22c55e; color: #fff; }
 
     /* Step cards grid */
     .how-grid {
@@ -120,6 +160,80 @@
     .how-card .hc-icon { font-size: 26px; margin-bottom: 8px; }
     .how-card h3 { font-size: 13px; color: var(--text); margin-bottom: 5px; }
     .how-card p  { font-size: 11px; color: var(--text2); margin: 0; }
+
+    /* Mission + Vision cards */
+    .mv-grid {
+      display: flex; flex-direction: column; gap: 14px;
+      padding: 0 16px;
+    }
+    .mv-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 18px;
+    }
+    .mv-card-head {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .mv-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .mv-icon.orange { background: rgba(249,115,22,.2); }
+    .mv-icon.violet { background: rgba(139,92,246,.2); }
+    .mv-card-head h2 { font-size: 16px; font-weight: 800; color: var(--text); margin: 0; }
+    .mv-card p { font-size: 13px; color: var(--text2); line-height: 1.65; margin: 0; }
+
+    /* Modern Footer extras */
+    .footer-badges {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 10px 16px 0;
+    }
+    .fbadge {
+      font-size: 10px; font-weight: 700;
+      padding: 5px 11px; border-radius: 50px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text2);
+    }
+    .fbadge i { margin-right: 5px; }
+    .footer-made {
+      text-align: center;
+      font-size: 11px; color: var(--text3);
+      padding: 10px 16px 0;
+    }
+
+    /* T&C Modal */
+    .tc-modal-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,.75);
+      display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .tc-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .tc-modal {
+      background: #0f1f35;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 22px 22px 0 0;
+      padding: 24px 20px 36px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: translateY(60px);
+      transition: transform .25s;
+    }
+    .tc-modal-overlay.open .tc-modal { transform: translateY(0); }
+    .tc-modal h3 { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 16px; }
+    .tc-modal p, .tc-modal li { font-size: 12.5px; color: var(--text2); line-height: 1.7; }
+    .tc-modal ul { padding-left: 18px; margin-bottom: 12px; }
+    .tc-close-btn {
+      float: right; background: rgba(255,255,255,.1); border: none;
+      border-radius: 50%; width: 30px; height: 30px;
+      font-size: 16px; color: var(--text); cursor: pointer;
+      margin-top: -4px;
+    }
   </style>
 </head>
 <body>
@@ -129,7 +243,6 @@
     <div class="brand">
       <img src="../assets/images/logo.png" alt="FWF Logo" loading="eager">
       <div>
-        <div class="brand-text" data-i18n="brand">FWF</div>
         <div class="brand-sub">Foundris Welfare Foundation</div>
       </div>
     </div>
@@ -157,36 +270,78 @@
     </div>
   </section>
 
-  <!-- Stats Strip -->
-  <div class="stats-strip">
-    <div class="stat-chip"><span class="sc-val">5000+</span><span class="sc-lbl" data-i18n="stats.members">Members</span></div>
-    <div class="stat-chip"><span class="sc-val">11</span><span class="sc-lbl" data-i18n="stats.projects">Projects</span></div>
-    <div class="stat-chip"><span class="sc-val">₹200</span><span class="sc-lbl" data-i18n="stats.fee">/month</span></div>
-    <div class="stat-chip"><span class="sc-val">100%</span><span class="sc-lbl" data-i18n="stats.transparent">Transparent</span></div>
+  <!-- Motivational Tags Strip -->
+  <div class="motiv-strip">
+    <div class="motiv-chip mc-orange">🇮🇳 Aatmnirbhar Bharat</div>
+    <div class="motiv-chip mc-green">🏭 Make in India</div>
+    <div class="motiv-chip mc-blue">🛒 Vocal for Local</div>
+    <div class="motiv-chip mc-amber">🎓 Skill India</div>
+    <div class="motiv-chip mc-rose">💪 Self Reliant</div>
   </div>
 
-  <!-- Quick Actions -->
+  <!-- Get Started Today -->
   <div class="app-section">
     <div class="section-head">
       <h2 data-i18n="actions.title">Get Started Today</h2>
     </div>
   </div>
-  <div class="action-scroll">
-    <a href="join.html" class="action-chip ac-primary">
-      <span class="ac-icon">👩‍🎓</span>
-      <span class="ac-title" data-i18n="actions.member.title">Become a Member</span>
-      <span class="ac-sub" data-i18n="actions.member.sub">₹200/month</span>
+  <div class="action-cards">
+
+    <!-- Card 1: Become a Member -->
+    <div class="feat-card fc-orange">
+      <div class="fc-head">
+        <div class="fc-icon">👩‍🎓</div>
+        <div>
+          <div class="fc-title" data-i18n="actions.member.title">Become a Member</div>
+          <div class="fc-price" data-i18n="actions.member.sub">₹500/month</div>
+        </div>
+      </div>
+      <div class="fc-desc" data-i18n="actions.member.desc">Join FWF and unlock free skill training, project funding support, and a powerful network of women entrepreneurs.</div>
+      <ul class="benefit-list">
+        <li><span class="bl-icon"><i class="fas fa-graduation-cap"></i></span><span data-i18n="actions.member.b1">Free Skill Development Training</span></li>
+        <li><span class="bl-icon"><i class="fas fa-seedling"></i></span><span data-i18n="actions.member.b2">Project Start Funding Help</span></li>
+        <li><span class="bl-icon"><i class="fas fa-store"></i></span><span data-i18n="actions.member.b3">Member Network for Selling Products</span></li>
+        <li><span class="bl-icon"><i class="fas fa-hands-helping"></i></span><span data-i18n="actions.member.b4">Future Support Programs</span></li>
+      </ul>
+      <div class="tc-note">*<span data-i18n="actions.member.tc_text">Benefits subject to eligibility.</span> <a onclick="openTCModal()" data-i18n="actions.member.tc_link">T&amp;C Apply</a></div>
+      <a href="join.html" class="fc-btn">
+        <i class="fas fa-user-plus"></i>
+        <span data-i18n="actions.member.cta">Join Now — ₹500/month</span>
+      </a>
+    </div>
+
+    <!-- Card 2: Support Our Cause -->
+    <a href="donation.html" class="feat-card fc-blue">
+      <div class="fc-head">
+        <div class="fc-icon">❤️</div>
+        <div>
+          <div class="fc-title" data-i18n="actions.donate.title">Support Our Cause</div>
+          <div class="fc-price" data-i18n="actions.donate.sub">Help women thrive</div>
+        </div>
+      </div>
+      <div class="fc-desc" data-i18n="actions.donate.desc">Buy products made by our members, help collect donations for NGO projects, or recommend our products and services to your network.</div>
+      <div class="fc-btn">
+        <i class="fas fa-heart"></i>
+        <span data-i18n="actions.donate.cta">Donate / Buy Products</span>
+      </div>
     </a>
-    <a href="donation.html" class="action-chip ac-blue">
-      <span class="ac-icon">❤️</span>
-      <span class="ac-title" data-i18n="actions.donate.title">Support Our Cause</span>
-      <span class="ac-sub" data-i18n="actions.donate.sub">Donate today</span>
+
+    <!-- Card 3: CSR Partnership -->
+    <a href="csr.html" class="feat-card fc-green">
+      <div class="fc-head">
+        <div class="fc-icon">🤝</div>
+        <div>
+          <div class="fc-title" data-i18n="actions.csr.title">CSR Partnership</div>
+          <div class="fc-price" data-i18n="actions.csr.sub">Corporate Impact</div>
+        </div>
+      </div>
+      <div class="fc-desc" data-i18n="actions.csr.desc">Meet your CSR goals while creating real livelihoods. Fund skill training, sponsor micro-enterprises, or co-create products under Make in India.</div>
+      <div class="fc-btn">
+        <i class="fas fa-handshake"></i>
+        <span data-i18n="actions.csr.cta">Explore CSR Options</span>
+      </div>
     </a>
-    <a href="../csr.html" class="action-chip ac-green">
-      <span class="ac-icon">🤝</span>
-      <span class="ac-title" data-i18n="actions.csr.title">CSR Partnership</span>
-      <span class="ac-sub" data-i18n="actions.csr.sub">Corporate</span>
-    </a>
+
   </div>
 
   <!-- How It Works -->
@@ -222,14 +377,26 @@
     </div>
   </div>
 
-  <!-- Mission -->
+  <!-- Mission + Vision -->
   <div class="app-section" style="margin-top:24px;">
     <div class="section-head">
-      <h2 data-i18n="about.title">Our Mission</h2>
+      <h2 data-i18n="about.section_title">Who We Are</h2>
     </div>
-    <div class="glass-card">
-      <p data-i18n="about.mission">FWF (Foundris Welfare Foundation) is dedicated to empowering women through skills training and creating sustainable livelihood opportunities. We believe every woman deserves financial independence and the chance to build her own future.</p>
-      <a href="../about.html" style="color:var(--primary);font-size:13px;font-weight:700;" data-i18n="about.learn_more">Learn more about us →</a>
+  </div>
+  <div class="mv-grid">
+    <div class="mv-card">
+      <div class="mv-card-head">
+        <div class="mv-icon orange">🎯</div>
+        <h2 data-i18n="about.mission_head">Our Mission</h2>
+      </div>
+      <p data-i18n="about.mission">Berojgar logo ko skill development ki training de kar unko livelihood create karne mein help karna aur unko Aatmnirbhar banana.</p>
+    </div>
+    <div class="mv-card">
+      <div class="mv-card-head">
+        <div class="mv-icon violet">🔭</div>
+        <h2 data-i18n="about.vision_head">Our Vision</h2>
+      </div>
+      <p data-i18n="about.vision">India ko Manufacturing hub banana jisse aur desh ki growth mein help karna.</p>
     </div>
   </div>
 
@@ -238,44 +405,74 @@
     <div class="footer-brand-row">
       <img src="../assets/images/logo.png" alt="FWF">
       <div>
-        <div class="footer-brand-name">FWF</div>
-        <div class="footer-brand-tagline">Foundris Welfare Foundation</div>
+        <div class="footer-brand-name">Foundris Welfare Foundation</div>
+        <div class="footer-brand-tagline">Skills → Livelihood → Aatmnirbharta</div>
       </div>
     </div>
-    <p class="footer-about">Empowering women through skills, training &amp; livelihood since 2020.</p>
+    <p class="footer-about">Empowering women through skills training, micro-entrepreneurship &amp; livelihood creation since 2020. Vocal for Local. Make in India. 🇮🇳</p>
+
+    <div class="footer-badges">
+      <span class="fbadge"><i class="fas fa-certificate" style="color:#f59e0b"></i> 12A Certified</span>
+      <span class="fbadge"><i class="fas fa-receipt" style="color:#60a5fa"></i> 80G Tax Benefit</span>
+      <span class="fbadge"><i class="fas fa-handshake" style="color:#4ade80"></i> CSR-1 Registered</span>
+    </div>
+
     <div class="footer-grid">
       <div class="footer-col">
         <h4>Quick Links</h4>
         <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="projects.html">Projects</a></li>
-          <li><a href="join.html">Join</a></li>
+          <li><a href="join.html">Join Us</a></li>
           <li><a href="donation.html">Donate</a></li>
-          <li><a href="member-login.html">Login</a></li>
+          <li><a href="csr.html">CSR Partnership</a></li>
+          <li><a href="member-login.html">Member Login</a></li>
         </ul>
       </div>
       <div class="footer-col footer-contact">
-        <h4>Contact</h4>
-        <div class="fci"><i class="fas fa-envelope"></i><a href="mailto:info@fwfindia.org">info@fwfindia.org</a></div>
-        <div class="fci"><i class="fas fa-phone"></i><a href="tel:+911234567890">+91 12345 67890</a></div>
-        <div class="fci"><i class="fas fa-map-marker-alt"></i><span>India</span></div>
-        <div class="footer-reg"><i class="fas fa-certificate"></i> Reg. No. FWF/2020/001</div>
+        <h4>Contact Us</h4>
+        <div class="fci"><i class="fas fa-map-marker-alt" style="color:#ef4444"></i><span>1398/1850 Sagarpuri Gallamandi, Kanpur - 208021 U.P</span></div>
+        <div class="fci"><i class="fas fa-phone" style="color:#22c55e"></i><a href="tel:+919580118412">+91-9580118412</a></div>
+        <div class="fci"><i class="fas fa-envelope" style="color:#3b82f6"></i><a href="mailto:info@fwfindia.org">info@fwfindia.org</a></div>
+        <div class="fci"><i class="fab fa-whatsapp" style="color:#25d366"></i><a href="https://wa.me/919580118412" target="_blank">WhatsApp Us</a></div>
       </div>
     </div>
     <div class="footer-socials">
-      <a href="#"><i class="fab fa-facebook-f"></i></a>
-      <a href="#"><i class="fab fa-instagram"></i></a>
-      <a href="#"><i class="fab fa-whatsapp"></i></a>
-      <a href="#"><i class="fab fa-youtube"></i></a>
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://wa.me/919580118412" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
     </div>
+    <div class="footer-made">Made with ❤️ in India 🇮🇳</div>
     <div class="footer-bar">
-      <span class="footer-bar-copy">&copy; 2026 FWF. All rights reserved.</span>
+      <span class="footer-bar-copy">&copy; <span id="footerYear"></span> FWF. All rights reserved.</span>
       <div class="footer-bar-links">
         <a href="../privacy.html">Privacy</a>
         <a href="../terms.html">Terms</a>
       </div>
     </div>
   </footer>
+
+  <!-- T&C Modal -->
+  <div class="tc-modal-overlay" id="tcModalOverlay" onclick="closeTCModal(event)">
+    <div class="tc-modal" id="tcModal">
+      <button class="tc-close-btn" onclick="closeTCModal(null, true)">✕</button>
+      <h3>Membership Terms &amp; Conditions</h3>
+      <p>By becoming a member of Foundris Welfare Foundation (FWF), you agree to the following terms:</p>
+      <ul>
+        <li><strong>Membership Fee:</strong> ₹500/month, payable in advance. Non-refundable once training begins.</li>
+        <li><strong>Skill Training:</strong> Free training is provided subject to availability of batches and slots. FWF reserves the right to schedule sessions as per operational capacity.</li>
+        <li><strong>Project Funding Help:</strong> Funding support for livelihood projects is evaluated on a case-by-case basis and is subject to project viability and availability of corpus funds.</li>
+        <li><strong>Member Network:</strong> Access to the member marketplace for selling products is subject to quality standards and FWF approval.</li>
+        <li><strong>Future Support Programs:</strong> Additional programs will be announced periodically and are subject to eligibility criteria at the time of launch.</li>
+        <li><strong>Code of Conduct:</strong> Members must maintain respectful conduct within the community at all times.</li>
+        <li><strong>Data Privacy:</strong> Your personal data is protected as per our <a href="../privacy.html" style="color:var(--primary)">Privacy Policy</a>.</li>
+      </ul>
+      <p>For queries, contact us at <a href="mailto:info@fwfindia.org" style="color:var(--primary)">info@fwfindia.org</a>.</p>
+      <br>
+      <button onclick="closeTCModal(null, true)" style="width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;">I Understand</button>
+    </div>
+  </div>
 
   <!-- Bottom Tab Bar -->
   <nav class="app-tabs">
@@ -298,22 +495,40 @@
   </nav>
 
   <script>
+    // Set footer year
+    const fy = document.getElementById('footerYear');
+    if (fy) fy.textContent = new Date().getFullYear();
+
+    // T&C Modal
+    function openTCModal() { document.getElementById('tcModalOverlay').classList.add('open'); }
+    function closeTCModal(e, force) {
+      if (force || (e && e.target === document.getElementById('tcModalOverlay'))) {
+        document.getElementById('tcModalOverlay').classList.remove('open');
+      }
+    }
+
     const T = {
       en: {
-        brand: "FWF",
         hero: { title: "Empowering Women Through Skills & Livelihood", subtitle: "Join India's fastest growing community of skilled women creating their own futures", join: "Join Now", donate: "Donate" },
-        stats: { members: "Members", projects: "Projects", fee: "/month", transparent: "Transparent" },
         how: { title: "How It Works", step1: { title: "Register", desc: "Fill simple form and join our community" }, step2: { title: "Learn Skills", desc: "Get trained in valuable skills for free" }, step3: { title: "Get Projects", desc: "Work on real projects and earn income" }, step4: { title: "Grow", desc: "Build your career and become independent" } },
-        actions: { title: "Get Started Today", member: { title: "Become a Member", sub: "₹200/month" }, donate: { title: "Support Our Cause", sub: "Donate today" }, csr: { title: "CSR Partnership", sub: "Corporate" } },
-        about: { title: "Our Mission", mission: "FWF (Foundris Welfare Foundation) is dedicated to empowering women through skills training and creating sustainable livelihood opportunities. We believe every woman deserves financial independence and the chance to build her own future.", learn_more: "Learn more about us →" }
+        actions: {
+          title: "Get Started Today",
+          member: { title: "Become a Member", sub: "₹500/month", desc: "Join FWF and unlock free skill training, project funding support, and a powerful network of women entrepreneurs.", b1: "Free Skill Development Training", b2: "Project Start Funding Help", b3: "Member Network for Selling Products", b4: "Future Support Programs", tc_text: "Benefits subject to eligibility.", tc_link: "T&C Apply", cta: "Join Now — ₹500/month" },
+          donate: { title: "Support Our Cause", sub: "Help women thrive", desc: "Buy products made by our members, help collect donations for NGO projects, or recommend our products and services to your network.", cta: "Donate / Buy Products" },
+          csr: { title: "CSR Partnership", sub: "Corporate Impact", desc: "Meet your CSR goals while creating real livelihoods. Fund skill training, sponsor micro-enterprises, or co-create products under Make in India.", cta: "Explore CSR Options" }
+        },
+        about: { section_title: "Who We Are", mission_head: "Our Mission", vision_head: "Our Vision", mission: "Berojgar logo ko skill development ki training de kar unko livelihood create karne mein help karna aur unko Aatmnirbhar banana.", vision: "India ko Manufacturing hub banana jisse aur desh ki growth mein help karna." }
       },
       hi: {
-        brand: "FWF",
         hero: { title: "महिलाओं को कौशल और आजीविका के माध्यम से सशक्त बनाना", subtitle: "भारत के सबसे तेजी से बढ़ते कुशल महिलाओं के समुदाय में शामिल हों जो अपना भविष्य बना रही हैं", join: "अभी जुड़ें", donate: "दान करें" },
-        stats: { members: "सदस्य", projects: "प्रोजेक्ट्स", fee: "/माह", transparent: "पारदर्शी" },
         how: { title: "यह कैसे काम करता है", step1: { title: "रजिस्टर करें", desc: "सरल फॉर्म भरें और हमारे समुदाय में शामिल हों" }, step2: { title: "कौशल सीखें", desc: "मुफ्त में मूल्यवान कौशल में प्रशिक्षित हों" }, step3: { title: "प्रोजेक्ट प्राप्त करें", desc: "वास्तविक परियोजनाओं पर काम करें और आय अर्जित करें" }, step4: { title: "विकास करें", desc: "अपना करियर बनाएं और स्वतंत्र बनें" } },
-        actions: { title: "आज ही शुरू करें", member: { title: "सदस्य बनें", sub: "₹200/माह" }, donate: { title: "समर्थन करें", sub: "दान करें" }, csr: { title: "CSR साझेदारी", sub: "कॉर्पोरेट" } },
-        about: { title: "हमारा मिशन", mission: "FWF (फाउंड्रिस वेलफेयर फाउंडेशन) महिलाओं को कौशल प्रशिक्षण और टिकाऊ आजीविका के अवसर प्रदान करने के लिए समर्पित है। हम मानते हैं कि हर महिला वित्तीय स्वतंत्रता और अपना भविष्य बनाने का अवसर पाने की हकदार है।", learn_more: "हमारे बारे में और जानें →" }
+        actions: {
+          title: "आज ही शुरू करें",
+          member: { title: "सदस्य बनें", sub: "₹500/माह", desc: "FWF में शामिल हों और मुफ्त कौशल प्रशिक्षण, प्रोजेक्ट फंडिंग और महिला उद्यमियों के नेटवर्क का लाभ लें।", b1: "मुफ्त कौशल विकास प्रशिक्षण", b2: "प्रोजेक्ट शुरू करने में मदद", b3: "उत्पाद बेचने के लिए सदस्य नेटवर्क", b4: "भविष्य के सहायता कार्यक्रम", tc_text: "लाभ पात्रता के अधीन हैं।", tc_link: "नियम लागू", cta: "अभी जुड़ें — ₹500/माह" },
+          donate: { title: "समर्थन करें", sub: "महिलाओं की मदद करें", desc: "हमारी सदस्यों द्वारा बनाए उत्पाद खरीदें, NGO प्रोजेक्ट के लिए दान जमा करें, या उत्पाद/सेवाएं अपने नेटवर्क को सुझाएं।", cta: "दान करें / उत्पाद खरीदें" },
+          csr: { title: "CSR साझेदारी", sub: "कॉर्पोरेट प्रभाव", desc: "अपने CSR लक्ष्य पूरे करें और वास्तविक आजीविका बनाएं। कौशल प्रशिक्षण, लघु उद्यम या मेक इन इंडिया उत्पाद को फंड करें।", cta: "CSR विकल्प देखें" }
+        },
+        about: { section_title: "हम कौन हैं", mission_head: "हमारा मिशन", vision_head: "हमारी दृष्टि", mission: "बेरोजगार लोगों को स्किल डेवलपमेंट की ट्रेनिंग देकर उनको लाइवलीहुड क्रिएट करने में मदद करना और उनको आत्मनिर्भर बनाना।", vision: "इंडिया को मैन्युफैक्चरिंग हब बनाना जिससे और देश की ग्रोथ में मदद करना।" }
       }
     };
 

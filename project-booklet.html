@@ -448,28 +448,129 @@
     }
 
     @media (max-width: 768px) {
-      body { padding: 0; align-items: flex-start; }
+      /* ── Layout ── */
+      body { padding: 0; align-items: flex-start; background: #667eea; }
+
       .booklet {
         max-width: 100%;
         min-height: 100vh;
         border-radius: 0;
         box-shadow: none;
+        overflow: visible;
       }
+
+      /* Pages scroll naturally; nav pinned at bottom */
       .page {
-        padding: 20px 16px 80px;
-        min-height: 100vh;
         position: relative;
-        overflow-y: auto;
+        display: none;
+        padding: 16px 14px 90px;
+        min-height: auto;
+        overflow-y: visible;
       }
-      .cover { padding: 40px 20px 80px; min-height: 100vh; }
-      .cover-title { font-size: 36px; }
-      .cover-icon { font-size: 56px; }
-      .page-title { font-size: 24px !important; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .unit-meta { gap: 10px; }
-      .nav-controls { bottom: 16px; right: 16px; }
-      .page-counter { bottom: 16px; left: 16px; font-size: 12px; }
+      .page.active { display: block; }
+
+      /* ── Cover ── */
+      .cover {
+        min-height: 100vh;
+        padding: 48px 18px 90px;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .cover-icon  { font-size: 48px; margin-bottom: 16px; }
+      .cover-title { font-size: 28px; word-break: break-word; }
+      .cover-subtitle { font-size: 13px; }
+      .cover-touch { bottom: 72px; font-size: 12px; }
+
+      /* ── Page headings ── */
+      .page-title { font-size: 20px !important; margin-bottom: 16px !important; }
+
+      /* ── Summary section ── */
+      .summary-section { margin-bottom: 20px; }
+      .summary-section h3 { font-size: 14px; margin-bottom: 8px; }
+      .summary-section p  { font-size: 13px; line-height: 1.65; }
+
+      /* ── Impact badges ── */
+      .impact-badge { font-size: 11px; padding: 5px 10px; }
+
+      /* ── Stats grid ── */
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+      .stat-box { padding: 12px 10px; }
+      .stat-value { font-size: 16px; }
+      .stat-label { font-size: 10px; }
+
+      /* ── Index list ── */
+      .index .page-title { font-size: 20px !important; }
+      .index-list { max-height: none; padding-right: 0; gap: 8px; }
+      .index-item { padding: 12px 14px; border-radius: 10px; }
+      .index-item:hover { transform: translateX(4px); }
+      .index-item-name { font-size: 13px; }
+      .index-item-page { font-size: 11px; }
+
+      /* ── Unit detail ── */
+      .unit-detail .page-title { font-size: 16px !important; margin-bottom: 6px !important; }
+      .unit-meta { gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+      .unit-meta-item { font-size: 12px; gap: 5px; }
+
+      /* Products grid: 2 columns on mobile */
+      .unit-section { margin-bottom: 18px; }
+      .unit-section h3 { font-size: 13px; margin-bottom: 8px; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .product-card { padding: 10px 8px; font-size: 11px; border-radius: 8px; }
+
+      /* Finance box */
+      .finance-box { padding: 12px 14px; margin-top: 10px; }
+      .finance-row { padding: 8px 0; }
+      .finance-label { font-size: 12px; }
+      .finance-value { font-size: 13px; }
+
+      /* ── Navigation — fixed at bottom ── */
+      .nav-controls {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        justify-content: center;
+        gap: 12px;
+        padding: 10px 16px;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(0,0,0,.08);
+        box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+        border-radius: 0;
+      }
+
+      .nav-btn {
+        width: 44px; height: 44px; font-size: 15px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+
+      /* Page counter: centered in the fixed nav bar */
+      .page-counter {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 64px;          /* matches nav-controls height */
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        background: none;
+        box-shadow: none;
+        font-size: 12px;
+        font-weight: 700;
+        color: #374151;
+        pointer-events: none;
+        z-index: 21;
+      }
+
+      /* Close button */
+      .close-btn {
+        top: 10px; right: 10px;
+        width: 34px; height: 34px;
+        font-size: 16px;
+        background: rgba(0,0,0,.28);
+        border: 1.5px solid rgba(255,255,255,.35);
+      }
     }
   </style>
 </head>

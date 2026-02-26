@@ -9,7 +9,7 @@
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link href="../assets/css/mobile.css" rel="stylesheet">
+  <link href="../assets/css/fwf-app.css" rel="stylesheet">
 
   <style>
     /* ── Base: dark night theme (matches desktop) ── */
@@ -19,12 +19,7 @@
       color: #e5e7eb;
     }
 
-    .brand img {
-      width: 36px !important; height: 36px !important;
-      border-radius: 8px !important; background: #fff !important;
-      object-fit: contain !important; padding: 3px !important;
-    }
-    .brand span { display: none !important; }
+
 
     /* ── Hero ── */
     .hero-banner {
@@ -183,30 +178,21 @@
     }
     .footer-bar-copy { font-size: 11px; color: #374151; }
     .footer-bar-links { display: flex; gap: 12px; }
-    .footer-bar-links a { font-size: 11px; color: #374151; text-decoration: none; }
+    .footer-bar-links a { font-size: 11px; color: #6b7280; text-decoration: none; }
     .footer-bar-links a:hover { color: #f97316; }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="index.html" class="brand">
-        <img src="../assets/images/logo.png" alt="FWF" width="36" height="36">
-        <span>FWF</span>
-      </a>
-      <button class="nav-toggle" id="navToggle" aria-label="Menu">
-        <i class="fas fa-bars"></i>
-      </button>
+  <!-- Top Bar -->
+  <header class="app-topbar">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="FWF">
+      <div>
+        <div class="brand-text">Projects</div>
+        <div class="brand-sub">FWF Livelihood Programs</div>
+      </div>
     </div>
   </header>
-
-  <nav class="nav" id="mobileNav">
-    <a href="index.html">Home</a>
-    <a href="join.html">Join</a>
-    <a href="donation.html">Donate</a>
-    <a href="projects.html" class="active">Projects</a>
-    <a href="member-login.html">Login</a>
-  </nav>
 
   <!-- Hero -->
   <div class="hero-banner">
@@ -612,9 +598,26 @@
       });
     }
 
-    document.getElementById('navToggle')?.addEventListener('click', () => {
-      document.getElementById('mobileNav')?.classList.toggle('show');
-    });
   </script>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="app-tabs">
+    <a href="index.html" class="tab-item">
+      <i class="fas fa-home"></i><span>Home</span>
+    </a>
+    <a href="projects.html" class="tab-item active">
+      <i class="fas fa-briefcase"></i><span>Projects</span>
+    </a>
+    <a href="join.html" class="tab-item tab-join">
+      <div class="tab-fab"><i class="fas fa-plus"></i></div>
+      <span>Join</span>
+    </a>
+    <a href="donation.html" class="tab-item">
+      <i class="fas fa-heart"></i><span>Donate</span>
+    </a>
+    <a href="member-login.html" class="tab-item">
+      <i class="fas fa-user"></i><span>Login</span>
+    </a>
+  </nav>
 </body>
 </html>

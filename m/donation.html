@@ -1,411 +1,345 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <meta name="theme-color" content="#1e3a8a" />
-  <title>Donate to FWF</title>
-
+  <meta name="theme-color" content="#0b1220" />
+  <title>Donate — FWF</title>
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
-  <link href="../assets/css/mobile.css" rel="stylesheet">
-  
+  <link href="../assets/css/fwf-app.css" rel="stylesheet">
   <style>
-    .donation-amounts {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin: 20px 0;
-    }
-    
-    .amount-option {
-      padding: 16px;
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: white;
-    }
-    
-    .amount-option:hover {
-      border-color: var(--brand1);
-      background: var(--bg);
-    }
-    
-    .amount-option.selected {
-      border-color: var(--brand1);
-      background: var(--brand1);
-      color: white;
-    }
-    
-    .amount-option .amount {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-    
-    .amount-option .label {
-      font-size: 12px;
-      opacity: 0.8;
-    }
-    
-    .custom-amount {
-      display: none;
-      animation: fadeIn 0.3s;
-    }
-    
-    .custom-amount.show {
-      display: block;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .payment-info {
-      background: linear-gradient(135deg, #dbeafe, #f0fdf4);
-      padding: 20px;
-      border-radius: var(--radius);
-      margin: 20px 0;
-      border: 2px solid #93c5fd;
-    }
-    
-    .payment-info strong {
-      color: var(--brand1);
-    }
-    
+    /* Impact cards */
+    .impact-row { display: flex; flex-direction: column; gap: 10px; }
     .impact-card {
-      background: linear-gradient(135deg, #fef3c7, #fed7aa);
-      padding: 16px;
-      border-radius: var(--radius);
-      margin: 12px 0;
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
     }
-    
-    .impact-card h4 {
-      margin: 0 0 8px 0;
-      color: #92400e;
+    .impact-amt {
+      font-size: 18px; font-weight: 800;
+      color: var(--primary); min-width: 60px;
     }
-    
-    .impact-card p {
-      margin: 0;
-      color: #78350f;
-      font-size: 14px;
+    .impact-desc { font-size: 13px; color: var(--text2); margin: 0; }
+
+    /* Payment info box */
+    .pay-info-box {
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: none;
     }
+    .pay-info-box.show { display: block; }
+    .pay-info-box h5 {
+      font-size: 13px; color: #93c5fd; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .pay-info-box p { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+    .pay-info-box strong { color: var(--text); }
+
+    /* Trust badges */
+    .trust-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .trust-badge {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--text3);
+    }
+    .trust-badge i { color: var(--green); font-size: 12px; }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="index.html" class="brand">
-        <img src="../assets/images/logo.png" alt="FWF" width="36" height="36">
-        <span>FWF</span>
-      </a>
-      <button class="nav-toggle" id="navToggle">
-        <i class="fas fa-bars"></i>
-      </button>
+
+  <!-- Top Bar -->
+  <header class="app-topbar">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="FWF">
+      <div>
+        <div class="brand-text">Donate</div>
+        <div class="brand-sub">Support our mission</div>
+      </div>
     </div>
   </header>
 
-  <nav class="nav" id="mobileNav">
-    <a href="index.html">Home</a>
-    <a href="https://www.fwfindia.org/donation#donateModal">Join</a>
-    <a href="https://www.fwfindia.org/donation#donateModal" class="active">Donate</a>
-    <a href="projects.html">Projects</a>
-    <a href="member-login.html">Login</a>
-  </nav>
-
-  <section style="padding: 20px 0;">
-    <div class="container">
-      <h1 class="text-center" style="margin-bottom: 8px;">❤️ Support Our Cause</h1>
-      <p class="text-center" style="color: var(--muted); margin-bottom: 24px;">
-        Help us empower more women
-      </p>
-
-      <!-- Impact Section -->
-      <div class="card mb-3">
-        <h3 style="margin-bottom: 16px;">Your Impact</h3>
-        
-        <div class="impact-card">
-          <h4>₹500</h4>
-          <p>Provides skill training materials for one woman</p>
-        </div>
-        
-        <div class="impact-card">
-          <h4>₹1,000</h4>
-          <p>Supports one woman's training for a month</p>
-        </div>
-        
-        <div class="impact-card">
-          <h4>₹5,000</h4>
-          <p>Funds complete training & job placement for one woman</p>
-        </div>
+  <!-- Impact section -->
+  <div class="app-section">
+    <div class="section-head">
+      <h2>❤️ Your Impact</h2>
+      <p>Every rupee directly supports women's empowerment</p>
+    </div>
+    <div class="impact-row">
+      <div class="impact-card">
+        <div class="impact-amt">₹500</div>
+        <p class="impact-desc">Provides skill training materials for one woman</p>
       </div>
-
-      <!-- Donation Form -->
-      <div class="card">
-        <h3 class="mb-2">Make a Donation</h3>
-        
-        <div id="alertBox" class="alert hidden"></div>
-
-        <form id="donationForm">
-          <!-- Amount Selection -->
-          <div class="form-group">
-            <label>Select Amount</label>
-            <div class="donation-amounts">
-              <div class="amount-option" onclick="selectAmount(500)">
-                <div class="amount">₹500</div>
-                <div class="label">Starter</div>
-              </div>
-              <div class="amount-option" onclick="selectAmount(1000)">
-                <div class="amount">₹1,000</div>
-                <div class="label">Supporter</div>
-              </div>
-              <div class="amount-option" onclick="selectAmount(2500)">
-                <div class="amount">₹2,500</div>
-                <div class="label">Champion</div>
-              </div>
-              <div class="amount-option" onclick="selectAmount(5000)">
-                <div class="amount">₹5,000</div>
-                <div class="label">Patron</div>
-              </div>
-              <div class="amount-option" onclick="selectAmount(10000)">
-                <div class="amount">₹10,000</div>
-                <div class="label">Benefactor</div>
-              </div>
-              <div class="amount-option" onclick="selectAmount('custom')">
-                <div class="amount">₹<i class="fas fa-pen"></i></div>
-                <div class="label">Custom</div>
-              </div>
-            </div>
-          </div>
-
-          <input type="hidden" name="amount" id="donationAmount" required>
-
-          <!-- Custom Amount -->
-          <div class="form-group custom-amount" id="customAmountField">
-            <label>Custom Amount (₹)</label>
-            <input type="number" id="customAmount" min="100" placeholder="Enter amount" onchange="setCustomAmount()">
-          </div>
-
-          <!-- Donor Details -->
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input type="text" name="name" required placeholder="Your name">
-          </div>
-
-          <div class="form-group">
-            <label>Mobile Number *</label>
-            <input type="tel" name="mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile">
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" placeholder="Optional">
-          </div>
-
-          <div class="form-group">
-            <label>PAN Number (for 80G tax benefit)</label>
-            <input type="text" name="pan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" placeholder="Optional" style="text-transform: uppercase;">
-          </div>
-
-          <!-- Payment Method -->
-          <div class="form-group">
-            <label>Payment Method *</label>
-            <select name="paymentMethod" required onchange="togglePaymentInfo()">
-              <option value="">Select method</option>
-              <option value="upi">UPI</option>
-              <option value="bank">Bank Transfer</option>
-              <option value="cash">Cash</option>
-            </select>
-          </div>
-
-          <!-- Payment Info -->
-          <div class="payment-info" id="paymentInfo" style="display: none;">
-            <h4 style="margin: 0 0 12px 0;"><i class="fas fa-info-circle"></i> Payment Details</h4>
-            <div id="upiInfo" style="display: none;">
-              <p><strong>UPI ID:</strong> fwf@paytm</p>
-              <p><strong>Name:</strong> FWF Foundation</p>
-            </div>
-            <div id="bankInfo" style="display: none;">
-              <p><strong>Account Name:</strong> FWF Foundation</p>
-              <p><strong>Account No:</strong> 1234567890</p>
-              <p><strong>IFSC:</strong> SBIN0001234</p>
-              <p><strong>Bank:</strong> State Bank of India</p>
-            </div>
-            <p style="margin-top: 12px; font-size: 14px;">
-              After payment, upload screenshot below
-            </p>
-          </div>
-
-          <div class="form-group">
-            <label>Transaction ID / Reference</label>
-            <input type="text" name="transactionId" placeholder="Optional">
-          </div>
-
-          <!-- Payment Proof -->
-          <div class="form-group">
-            <label>Payment Screenshot</label>
-            <div style="border: 2px dashed var(--border); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer;" onclick="document.getElementById('paymentProof').click()">
-              <input type="file" id="paymentProof" name="paymentProof" accept="image/*" style="display: none;" onchange="previewFile(this)">
-              <div id="filePreview">
-                <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--brand1); margin-bottom: 8px;"></i>
-                <p><strong>Tap to upload proof</strong></p>
-                <p style="font-size: 12px; color: var(--muted);">Optional</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Message (Optional)</label>
-            <textarea name="message" rows="3" placeholder="Share your thoughts..."></textarea>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
-            <i class="fas fa-heart"></i> Donate Now
-          </button>
-        </form>
+      <div class="impact-card">
+        <div class="impact-amt">₹1,000</div>
+        <p class="impact-desc">Supports one woman's training for a month</p>
       </div>
-
-      <!-- Trust Badges -->
-      <div class="card mt-3">
-        <h4 class="text-center" style="margin-bottom: 12px;">Why Donate?</h4>
-        <p class="text-center" style="color: var(--muted); font-size: 14px;">
-          ✅ 100% Transparent<br>
-          ✅ 80G Tax Benefit<br>
-          ✅ Direct Impact<br>
-          ✅ Regular Updates
-        </p>
+      <div class="impact-card">
+        <div class="impact-amt">₹5,000</div>
+        <p class="impact-desc">Funds complete training &amp; job placement for one woman</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <footer>
-    <div class="container">
-      <p><strong>FWF</strong> - Foundation for Women's Future</p>
-      <p>&copy; 2025 FWF. All rights reserved.</p>
+  <!-- Donation Form -->
+  <div class="app-section" style="margin-top:8px;">
+    <div class="section-head">
+      <h2>Make a Donation</h2>
+    </div>
+
+    <div id="alertBox" class="app-alert mb-16"></div>
+
+    <form id="donationForm">
+      <!-- Amount Selection -->
+      <div class="form-group">
+        <label class="form-label">Select Amount</label>
+        <div class="amount-grid">
+          <div class="amount-pill" onclick="selectAmount(500, this)">
+            <div class="av">₹500</div><div class="al">Starter</div>
+          </div>
+          <div class="amount-pill" onclick="selectAmount(1000, this)">
+            <div class="av">₹1,000</div><div class="al">Supporter</div>
+          </div>
+          <div class="amount-pill" onclick="selectAmount(2500, this)">
+            <div class="av">₹2,500</div><div class="al">Champion</div>
+          </div>
+          <div class="amount-pill" onclick="selectAmount(5000, this)">
+            <div class="av">₹5,000</div><div class="al">Patron</div>
+          </div>
+          <div class="amount-pill" onclick="selectAmount(10000, this)">
+            <div class="av">₹10,000</div><div class="al">Benefactor</div>
+          </div>
+          <div class="amount-pill" onclick="selectAmount('custom', this)">
+            <div class="av">₹<i class="fas fa-pen" style="font-size:12px;"></i></div>
+            <div class="al">Custom</div>
+          </div>
+        </div>
+        <input type="hidden" name="amount" id="donationAmount" required>
+      </div>
+
+      <div class="form-group" id="customAmountField" style="display:none;">
+        <label class="form-label">Custom Amount (₹)</label>
+        <input class="form-input" type="number" id="customAmount" min="100" placeholder="Enter amount" oninput="setCustomAmount()">
+      </div>
+
+      <!-- Donor Details -->
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input class="form-input" type="text" name="name" required placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mobile Number *</label>
+        <input class="form-input" type="tel" name="mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" name="email" placeholder="Optional">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PAN Number (for 80G tax benefit)</label>
+        <input class="form-input" type="text" name="pan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" placeholder="Optional" style="text-transform:uppercase;">
+      </div>
+
+      <!-- Payment Method -->
+      <div class="form-group">
+        <label class="form-label">Payment Method *</label>
+        <select class="form-select" name="paymentMethod" required onchange="togglePaymentInfo(this.value)">
+          <option value="">Select method</option>
+          <option value="upi">UPI</option>
+          <option value="bank">Bank Transfer</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
+
+      <!-- Payment Info -->
+      <div class="pay-info-box" id="paymentInfo">
+        <h5><i class="fas fa-info-circle"></i> Payment Details</h5>
+        <div id="upiInfo" style="display:none;">
+          <p><strong>UPI ID:</strong> fwf@paytm</p>
+          <p><strong>Name:</strong> FWF Foundation</p>
+        </div>
+        <div id="bankInfo" style="display:none;">
+          <p><strong>Account Name:</strong> FWF Foundation</p>
+          <p><strong>Account No:</strong> 1234567890</p>
+          <p><strong>IFSC:</strong> SBIN0001234</p>
+          <p><strong>Bank:</strong> State Bank of India</p>
+        </div>
+        <p style="margin-top:8px;font-size:12px;color:var(--text3);">After payment, upload screenshot below</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Transaction ID / Reference</label>
+        <input class="form-input" type="text" name="transactionId" placeholder="Optional">
+      </div>
+
+      <!-- Payment Proof Upload -->
+      <div class="form-group">
+        <label class="form-label">Payment Screenshot</label>
+        <div class="file-zone" onclick="document.getElementById('paymentProof').click()">
+          <input type="file" id="paymentProof" name="paymentProof" accept="image/*" style="display:none;" onchange="previewFile(this)">
+          <div id="filePreview">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p><strong>Tap to upload proof</strong></p>
+            <p style="font-size:11px;color:var(--text3);margin:0;">Optional · JPG, PNG</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Message (Optional)</label>
+        <textarea class="form-textarea" name="message" rows="2" placeholder="Share your thoughts..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+        <i class="fas fa-heart"></i> Donate Now
+      </button>
+
+      <!-- Trust -->
+      <div class="trust-row">
+        <div class="trust-badge"><i class="fas fa-check-circle"></i> 100% Transparent</div>
+        <div class="trust-badge"><i class="fas fa-check-circle"></i> 80G Tax Benefit</div>
+        <div class="trust-badge"><i class="fas fa-check-circle"></i> Direct Impact</div>
+        <div class="trust-badge"><i class="fas fa-check-circle"></i> Regular Updates</div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Rich Footer -->
+  <footer class="app-footer">
+    <div class="footer-brand-row">
+      <img src="../assets/images/logo.png" alt="FWF">
+      <div>
+        <div class="footer-brand-name">FWF</div>
+        <div class="footer-brand-tagline">Foundris Welfare Foundation</div>
+      </div>
+    </div>
+    <div class="footer-bar" style="border-top:none;padding-top:0;">
+      <span class="footer-bar-copy">&copy; 2026 FWF. All rights reserved.</span>
+      <div class="footer-bar-links">
+        <a href="../privacy.html">Privacy</a>
+        <a href="../terms.html">Terms</a>
+      </div>
     </div>
   </footer>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="app-tabs">
+    <a href="index.html" class="tab-item">
+      <i class="fas fa-home"></i><span>Home</span>
+    </a>
+    <a href="projects.html" class="tab-item">
+      <i class="fas fa-briefcase"></i><span>Projects</span>
+    </a>
+    <a href="join.html" class="tab-item tab-join">
+      <div class="tab-fab"><i class="fas fa-plus"></i></div>
+      <span>Join</span>
+    </a>
+    <a href="donation.html" class="tab-item active">
+      <i class="fas fa-heart"></i><span>Donate</span>
+    </a>
+    <a href="member-login.html" class="tab-item">
+      <i class="fas fa-user"></i><span>Login</span>
+    </a>
+  </nav>
 
   <script>
     let selectedAmount = null;
 
-    function selectAmount(amount) {
-      // Remove previous selection
-      document.querySelectorAll('.amount-option').forEach(opt => {
-        opt.classList.remove('selected');
-      });
-
+    function selectAmount(amount, el) {
+      document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('sel'));
+      el.classList.add('sel');
       if (amount === 'custom') {
-        document.getElementById('customAmountField').classList.add('show');
+        document.getElementById('customAmountField').style.display = 'block';
         document.getElementById('donationAmount').value = '';
-        event.target.closest('.amount-option').classList.add('selected');
       } else {
-        document.getElementById('customAmountField').classList.remove('show');
+        document.getElementById('customAmountField').style.display = 'none';
         document.getElementById('donationAmount').value = amount;
-        event.target.closest('.amount-option').classList.add('selected');
         selectedAmount = amount;
       }
     }
 
     function setCustomAmount() {
-      const customVal = document.getElementById('customAmount').value;
-      document.getElementById('donationAmount').value = customVal;
-      selectedAmount = customVal;
+      const v = document.getElementById('customAmount').value;
+      document.getElementById('donationAmount').value = v;
+      selectedAmount = v;
     }
 
-    function togglePaymentInfo() {
-      const method = event.target.value;
-      const paymentInfo = document.getElementById('paymentInfo');
-      const upiInfo = document.getElementById('upiInfo');
-      const bankInfo = document.getElementById('bankInfo');
-
+    function togglePaymentInfo(method) {
+      const box = document.getElementById('paymentInfo');
+      document.getElementById('upiInfo').style.display = 'none';
+      document.getElementById('bankInfo').style.display = 'none';
       if (method) {
-        paymentInfo.style.display = 'block';
-        upiInfo.style.display = method === 'upi' ? 'block' : 'none';
-        bankInfo.style.display = method === 'bank' ? 'block' : 'none';
+        box.classList.add('show');
+        if (method === 'upi')  document.getElementById('upiInfo').style.display = 'block';
+        if (method === 'bank') document.getElementById('bankInfo').style.display = 'block';
       } else {
-        paymentInfo.style.display = 'none';
+        box.classList.remove('show');
       }
     }
 
     function previewFile(input) {
       const preview = document.getElementById('filePreview');
       const file = input.files[0];
-      
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 8px;" alt="Preview">`;
+        reader.onload = e => {
+          preview.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:180px;border-radius:8px;" alt="Preview">`;
         };
         reader.readAsDataURL(file);
       }
     }
 
-    function showAlert(message, type = 'info') {
-      const alertBox = document.getElementById('alertBox');
-      alertBox.textContent = message;
-      alertBox.className = `alert alert-${type}`;
-      alertBox.classList.remove('hidden');
+    function showAlert(msg, type) {
+      const a = document.getElementById('alertBox');
+      a.textContent = msg;
+      a.className = 'app-alert show ' + type;
       window.scrollTo(0, 0);
-      setTimeout(() => alertBox.classList.add('hidden'), 5000);
+      setTimeout(() => a.classList.remove('show'), 5000);
     }
 
-    // Form submission
     document.getElementById('donationForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      
-      if (!selectedAmount && !document.getElementById('customAmount').value) {
+      if (!document.getElementById('donationAmount').value) {
         showAlert('Please select or enter donation amount', 'error');
         return;
       }
-
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
       try {
-        const formData = new FormData(this);
-        
-        const response = await fetch('/api/contact', {
+        const fd = new FormData(this);
+        const res = await fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: formData.get('name'),
-            mobile: formData.get('mobile'),
-            email: formData.get('email'),
-            message: `Donation: ₹${formData.get('amount')} | Payment: ${formData.get('paymentMethod')} | PAN: ${formData.get('pan') || 'N/A'} | Ref: ${formData.get('transactionId') || 'N/A'} | Message: ${formData.get('message') || 'N/A'}`,
+            name: fd.get('name'), mobile: fd.get('mobile'), email: fd.get('email'),
+            message: `Donation: ₹${fd.get('amount')} | Payment: ${fd.get('paymentMethod')} | PAN: ${fd.get('pan')||'N/A'} | Ref: ${fd.get('transactionId')||'N/A'} | Note: ${fd.get('message')||'N/A'}`,
             subject: 'Donation Received'
           })
         });
-
-        const data = await response.json();
-
-        if (data.ok || response.ok) {
+        const data = await res.json();
+        if (data.ok || res.ok) {
           showAlert('🙏 Thank you for your generous donation! We will contact you shortly.', 'success');
           this.reset();
-          document.querySelectorAll('.amount-option').forEach(opt => opt.classList.remove('selected'));
-          document.getElementById('customAmountField').classList.remove('show');
+          document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('sel'));
+          document.getElementById('customAmountField').style.display = 'none';
+          document.getElementById('filePreview').innerHTML = '<i class="fas fa-cloud-upload-alt"></i><p><strong>Tap to upload proof</strong></p><p style="font-size:11px;color:var(--text3);margin:0;">Optional · JPG, PNG</p>';
           selectedAmount = null;
         } else {
           throw new Error(data.error || 'Donation submission failed');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        showAlert('❌ ' + error.message, 'error');
+      } catch(err) {
+        showAlert('❌ ' + err.message, 'error');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-heart"></i> Donate Now';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-heart"></i> Donate Now';
       }
     });
-
-    // Mobile nav toggle
-    document.getElementById('navToggle')?.addEventListener('click', () => {
-      document.getElementById('mobileNav')?.classList.toggle('show');
-    });
   </script>
-
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 </body>
 </html>

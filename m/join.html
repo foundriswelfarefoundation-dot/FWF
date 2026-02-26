@@ -1,422 +1,396 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="theme-color" content="#0b1220" />
   <title>Join FWF — Membership</title>
-
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
-  <link href="../assets/css/mobile.css" rel="stylesheet">
-  
+  <link href="../assets/css/fwf-app.css" rel="stylesheet">
   <style>
-    .form-steps {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      position: relative;
+    /* Benefits list */
+    .benefits-list { list-style: none; padding: 0; margin: 0; }
+    .benefits-list li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px; color: var(--text2);
     }
-    
-    .step {
-      flex: 1;
-      text-align: center;
-      position: relative;
+    .benefits-list li:last-child { border-bottom: none; }
+    .benefits-list li i { color: var(--green); font-size: 14px; flex-shrink: 0; }
+
+    /* Fee badge */
+    .fee-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(249,115,22,0.15);
+      border: 1px solid rgba(249,115,22,0.35);
+      border-radius: 50px; padding: 6px 14px;
+      font-size: 14px; font-weight: 700; color: var(--primary);
+      margin-bottom: 20px;
     }
-    
-    .step-number {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--border);
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 8px;
-      font-weight: bold;
-      font-size: 14px;
+
+    /* Step progress nav */
+    .step-progress {
+      display: flex; align-items: center;
+      margin-bottom: 28px; gap: 0;
     }
-    
-    .step.active .step-number {
-      background: var(--brand1);
-      color: white;
+    .sp-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; position: relative;
     }
-    
-    .step.completed .step-number {
-      background: var(--accent);
-      color: white;
+    .sp-item::after {
+      content: ''; position: absolute;
+      top: 16px; left: 50%; width: 100%; height: 2px;
+      background: var(--border); z-index: 0;
     }
-    
-    .step-label {
-      font-size: 12px;
-      color: var(--muted);
+    .sp-item:last-child::after { display: none; }
+    .sp-item.done::after { background: var(--primary); }
+    .sp-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800;
+      border: 2px solid var(--border);
+      background: rgba(11,18,32,0.9);
+      color: var(--text3); z-index: 1; position: relative;
+      transition: all .25s;
     }
-    
-    .step.active .step-label {
-      color: var(--brand1);
-      font-weight: 600;
+    .sp-item.active .sp-circle {
+      border-color: var(--primary); color: var(--primary);
+      background: rgba(249,115,22,0.12);
     }
-    
-    .form-section {
-      display: none;
+    .sp-item.done .sp-circle {
+      border-color: var(--primary); background: var(--primary); color: #fff;
     }
-    
-    .form-section.active {
-      display: block;
+    .sp-label { font-size: 10px; color: var(--text3); margin-top: 5px; text-transform: uppercase; letter-spacing: .3px; }
+    .sp-item.active .sp-label { color: var(--primary); font-weight: 700; }
+
+    /* Form section transitions */
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    /* Payment info */
+    .pay-note {
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px; margin-bottom: 16px;
     }
-    
-    .file-upload {
-      border: 2px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .file-upload:hover {
-      border-color: var(--brand1);
-      background: var(--bg);
-    }
-    
-    .file-upload input {
-      display: none;
-    }
-    
-    .preview-image {
-      max-width: 100%;
-      max-height: 200px;
-      margin: 10px auto;
-      border-radius: 8px;
-    }
+    .pay-note p { font-size: 13px; color: #93c5fd; margin: 0; }
+    .pay-note strong { color: var(--text); }
+
+    /* Nav buttons row */
+    .nav-btns { display: flex; gap: 10px; margin-top: 4px; }
+    .nav-btns .btn { flex: 1; }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="index.html" class="brand">
-        <img src="../assets/images/logo.png" alt="FWF" width="36" height="36">
-        <span>FWF</span>
-      </a>
-      <button class="nav-toggle" id="navToggle">
-        <i class="fas fa-bars"></i>
-      </button>
+
+  <!-- Top Bar -->
+  <header class="app-topbar">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="FWF">
+      <div>
+        <div class="brand-text">Join FWF</div>
+        <div class="brand-sub">Membership registration</div>
+      </div>
     </div>
   </header>
 
-  <nav class="nav" id="mobileNav">
-    <a href="index.html">Home</a>
-    <a href="https://www.fwfindia.org/donation#donateModal" class="active">Join</a>
-    <a href="https://www.fwfindia.org/donation#donateModal">Donate</a>
-    <a href="projects.html">Projects</a>
-    <a href="member-login.html">Login</a>
-  </nav>
+  <div class="app-section">
+    <!-- Fee badge -->
+    <div class="txt-center mb-16">
+      <div class="fee-badge"><i class="fas fa-star"></i> ₹200/month Membership</div>
+    </div>
 
-  <section style="padding: 20px 0;">
-    <div class="container">
-      <h1 class="text-center" style="margin-bottom: 8px;">🎯 Join FWF</h1>
-      <p class="text-center" style="color: var(--muted); margin-bottom: 24px;">
-        ₹200/month membership
-      </p>
+    <!-- Benefits -->
+    <div class="glass-card mb-16">
+      <h3 style="font-size:15px;margin-bottom:12px;">✨ Membership Benefits</h3>
+      <ul class="benefits-list">
+        <li><i class="fas fa-check-circle"></i>Free skill training programs</li>
+        <li><i class="fas fa-check-circle"></i>Project assignments &amp; earning opportunities</li>
+        <li><i class="fas fa-check-circle"></i>One-on-one mentoring sessions</li>
+        <li><i class="fas fa-check-circle"></i>Job placement assistance</li>
+      </ul>
+    </div>
 
-      <!-- Benefits Card -->
-      <div class="card mb-3">
-        <h3 style="margin-bottom: 12px;">✨ Membership Benefits</h3>
-        <ul style="margin: 0; padding-left: 20px; color: var(--muted);">
-          <li>Free skill training programs</li>
-          <li>Project assignments & earning</li>
-          <li>One-on-one mentoring</li>
-          <li>Job placement assistance</li>
-        </ul>
+    <!-- Alert -->
+    <div id="alertBox" class="app-alert mb-16"></div>
+
+    <!-- Step Progress -->
+    <div class="step-progress" id="stepProgress">
+      <div class="sp-item active" id="sp1">
+        <div class="sp-circle">1</div>
+        <div class="sp-label">Personal</div>
       </div>
-
-      <!-- Form Steps -->
-      <div class="form-steps">
-        <div class="step active" id="stepIndicator1">
-          <div class="step-number">1</div>
-          <div class="step-label">Personal</div>
-        </div>
-        <div class="step" id="stepIndicator2">
-          <div class="step-number">2</div>
-          <div class="step-label">Contact</div>
-        </div>
-        <div class="step" id="stepIndicator3">
-          <div class="step-number">3</div>
-          <div class="step-label">Payment</div>
-        </div>
+      <div class="sp-item" id="sp2">
+        <div class="sp-circle">2</div>
+        <div class="sp-label">Contact</div>
       </div>
-
-      <!-- Form Card -->
-      <div class="card">
-        <div id="alertBox" class="alert hidden"></div>
-
-        <form id="joinForm">
-          <!-- Step 1: Personal Info -->
-          <div class="form-section active" id="step1">
-            <h3 class="mb-2">Personal Information</h3>
-            
-            <div class="form-group">
-              <label>Full Name *</label>
-              <input type="text" name="fullName" required placeholder="Enter your full name">
-            </div>
-
-            <div class="form-group">
-              <label>Gender *</label>
-              <select name="gender" required>
-                <option value="">Select gender</option>
-                <option value="female">Female</option>
-                <option value="male">Male</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Date of Birth *</label>
-              <input type="date" name="dob" required>
-            </div>
-
-            <div class="form-group">
-              <label>Marital Status *</label>
-              <select name="maritalStatus" required>
-                <option value="">Select status</option>
-                <option value="single">Single</option>
-                <option value="married">Married</option>
-                <option value="widowed">Widowed</option>
-                <option value="divorced">Divorced</option>
-              </select>
-            </div>
-
-            <button type="button" class="btn btn-primary btn-block" onclick="nextStep(2)">
-              Next →
-            </button>
-          </div>
-
-          <!-- Step 2: Contact Info -->
-          <div class="form-section" id="step2">
-            <h3 class="mb-2">Contact Details</h3>
-            
-            <div class="form-group">
-              <label>Mobile Number *</label>
-              <input type="tel" name="mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile">
-            </div>
-
-            <div class="form-group">
-              <label>WhatsApp Number</label>
-              <input type="tel" name="whatsapp" pattern="[0-9]{10}" placeholder="Optional">
-            </div>
-
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" name="email" placeholder="Optional">
-            </div>
-
-            <div class="form-group">
-              <label>Address *</label>
-              <textarea name="address" required rows="3" placeholder="Complete address"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label>City *</label>
-              <input type="text" name="city" required placeholder="Your city">
-            </div>
-
-            <div class="form-group">
-              <label>State *</label>
-              <input type="text" name="state" required placeholder="Your state">
-            </div>
-
-            <div class="form-group">
-              <label>PIN Code *</label>
-              <input type="text" name="pincode" required pattern="[0-9]{6}" placeholder="6-digit PIN">
-            </div>
-
-            <div class="btn-group">
-              <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
-                ← Back
-              </button>
-              <button type="button" class="btn btn-primary" onclick="nextStep(3)">
-                Next →
-              </button>
-            </div>
-          </div>
-
-          <!-- Step 3: Payment -->
-          <div class="form-section" id="step3">
-            <h3 class="mb-2">Payment Details</h3>
-            
-            <div class="alert alert-info mb-2">
-              <strong>₹200 Membership Fee</strong><br>
-              Pay via UPI/Bank Transfer and upload screenshot
-            </div>
-
-            <div class="form-group">
-              <label>Payment Method *</label>
-              <select name="paymentMethod" required>
-                <option value="">Select method</option>
-                <option value="upi">UPI</option>
-                <option value="bank">Bank Transfer</option>
-                <option value="cash">Cash</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Transaction ID / Reference</label>
-              <input type="text" name="transactionId" placeholder="Optional">
-            </div>
-
-            <div class="form-group">
-              <label>Payment Screenshot *</label>
-              <div class="file-upload" onclick="document.getElementById('paymentProof').click()">
-                <input type="file" id="paymentProof" name="paymentProof" accept="image/*" required onchange="previewImage(this, 'paymentPreview')">
-                <div id="paymentPreview">
-                  <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: var(--brand1); margin-bottom: 8px;"></i>
-                  <p><strong>Tap to upload payment proof</strong></p>
-                  <p style="font-size: 12px; color: var(--muted);">JPG, PNG (Max 5MB)</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label style="display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" name="agreeTerms" required style="width: auto;">
-                <span style="font-size: 14px;">I agree to <a href="../terms.html" target="_blank">Terms & Conditions</a></span>
-              </label>
-            </div>
-
-            <div class="btn-group">
-              <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
-                ← Back
-              </button>
-              <button type="submit" class="btn btn-primary" id="submitBtn">
-                Submit Application →
-              </button>
-            </div>
-          </div>
-        </form>
+      <div class="sp-item" id="sp3">
+        <div class="sp-circle">3</div>
+        <div class="sp-label">Payment</div>
       </div>
     </div>
-  </section>
 
-  <footer>
-    <div class="container">
-      <p><strong>FWF</strong> - Foundation for Women's Future</p>
-      <p>&copy; 2025 FWF. All rights reserved.</p>
+    <!-- Form -->
+    <form id="joinForm">
+
+      <!-- Step 1: Personal -->
+      <div class="form-section active glass-card" id="step1">
+        <h3 style="font-size:16px;margin-bottom:18px;">Personal Information</h3>
+
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input class="form-input" type="text" name="fullName" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender *</label>
+          <select class="form-select" name="gender" required>
+            <option value="">Select gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Birth *</label>
+          <input class="form-input" type="date" name="dob" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Marital Status *</label>
+          <select class="form-select" name="maritalStatus" required>
+            <option value="">Select status</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="widowed">Widowed</option>
+            <option value="divorced">Divorced</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" onclick="nextStep(2)">
+          Next <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Step 2: Contact -->
+      <div class="form-section glass-card" id="step2">
+        <h3 style="font-size:16px;margin-bottom:18px;">Contact Details</h3>
+
+        <div class="form-group">
+          <label class="form-label">Mobile Number *</label>
+          <input class="form-input" type="tel" name="mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile">
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp Number</label>
+          <input class="form-input" type="tel" name="whatsapp" pattern="[0-9]{10}" placeholder="Optional">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" name="email" placeholder="Optional">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address *</label>
+          <textarea class="form-textarea" name="address" required rows="2" placeholder="Complete address"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">City *</label>
+          <input class="form-input" type="text" name="city" required placeholder="Your city">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State *</label>
+          <input class="form-input" type="text" name="state" required placeholder="Your state">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PIN Code *</label>
+          <input class="form-input" type="text" name="pincode" required pattern="[0-9]{6}" placeholder="6-digit PIN">
+        </div>
+
+        <div class="nav-btns">
+          <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="btn btn-primary" onclick="nextStep(3)">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Payment -->
+      <div class="form-section glass-card" id="step3">
+        <h3 style="font-size:16px;margin-bottom:14px;">Payment Details</h3>
+
+        <div class="pay-note">
+          <p><strong>₹200 Membership Fee</strong> — Pay via UPI or Bank Transfer and upload screenshot</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Method *</label>
+          <select class="form-select" name="paymentMethod" required>
+            <option value="">Select method</option>
+            <option value="upi">UPI</option>
+            <option value="bank">Bank Transfer</option>
+            <option value="cash">Cash</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Transaction ID / Reference</label>
+          <input class="form-input" type="text" name="transactionId" placeholder="Optional">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Screenshot *</label>
+          <div class="file-zone" onclick="document.getElementById('paymentProof').click()">
+            <input type="file" id="paymentProof" name="paymentProof" accept="image/*" required
+              onchange="previewImage(this, 'paymentPreview')" style="display:none;">
+            <div id="paymentPreview">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p><strong>Tap to upload payment proof</strong></p>
+              <p style="font-size:11px;color:var(--text3);margin:0;">JPG, PNG (Max 5MB)</p>
+            </div>
+          </div>
+        </div>
+
+        <label class="check-row mb-16">
+          <input type="checkbox" name="agreeTerms" required>
+          <span>I agree to <a href="../terms.html" target="_blank">Terms &amp; Conditions</a></span>
+        </label>
+
+        <div class="nav-btns">
+          <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            Submit <i class="fas fa-check"></i>
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Rich Footer -->
+  <footer class="app-footer">
+    <div class="footer-brand-row">
+      <img src="../assets/images/logo.png" alt="FWF">
+      <div>
+        <div class="footer-brand-name">FWF</div>
+        <div class="footer-brand-tagline">Foundris Welfare Foundation</div>
+      </div>
+    </div>
+    <div class="footer-bar" style="border-top:none;padding-top:0;">
+      <span class="footer-bar-copy">&copy; 2026 FWF. All rights reserved.</span>
+      <div class="footer-bar-links">
+        <a href="../privacy.html">Privacy</a>
+        <a href="../terms.html">Terms</a>
+      </div>
     </div>
   </footer>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="app-tabs">
+    <a href="index.html" class="tab-item">
+      <i class="fas fa-home"></i><span>Home</span>
+    </a>
+    <a href="projects.html" class="tab-item">
+      <i class="fas fa-briefcase"></i><span>Projects</span>
+    </a>
+    <a href="join.html" class="tab-item tab-join active">
+      <div class="tab-fab"><i class="fas fa-plus"></i></div>
+      <span>Join</span>
+    </a>
+    <a href="donation.html" class="tab-item">
+      <i class="fas fa-heart"></i><span>Donate</span>
+    </a>
+    <a href="member-login.html" class="tab-item">
+      <i class="fas fa-user"></i><span>Login</span>
+    </a>
+  </nav>
 
   <script>
     let currentStep = 1;
 
+    function showAlert(msg, type) {
+      const a = document.getElementById('alertBox');
+      a.textContent = msg;
+      a.className = 'app-alert show ' + type;
+      setTimeout(() => a.classList.remove('show'), 5000);
+    }
+
     function nextStep(step) {
-      // Validate current step
-      const currentSection = document.getElementById(`step${currentStep}`);
-      const inputs = currentSection.querySelectorAll('input[required], select[required], textarea[required]');
-      
-      let isValid = true;
-      inputs.forEach(input => {
-        if (!input.value) {
-          isValid = false;
-          input.style.borderColor = '#ef4444';
-        } else {
-          input.style.borderColor = '';
+      const cur = document.getElementById('step' + currentStep);
+      const req = cur.querySelectorAll('input[required], select[required], textarea[required]');
+      let valid = true;
+      req.forEach(inp => {
+        if (!inp.value) {
+          valid = false;
+          inp.style.borderColor = '#ef4444';
+          inp.addEventListener('input', () => inp.style.borderColor = '', { once: true });
         }
       });
+      if (!valid) { showAlert('Please fill all required fields', 'error'); return; }
 
-      if (!isValid) {
-        showAlert('Please fill all required fields', 'error');
-        return;
-      }
+      cur.classList.remove('active');
+      document.getElementById('sp' + currentStep).classList.remove('active');
+      document.getElementById('sp' + currentStep).classList.add('done');
+      // mark connector line
+      if (currentStep < 3) document.getElementById('sp' + currentStep).classList.add('done');
 
-      // Move to next step
-      document.getElementById(`step${currentStep}`).classList.remove('active');
-      document.getElementById(`stepIndicator${currentStep}`).classList.add('completed');
-      
       currentStep = step;
-      
-      document.getElementById(`step${currentStep}`).classList.add('active');
-      document.getElementById(`stepIndicator${currentStep}`).classList.add('active');
-      
+      document.getElementById('step' + currentStep).classList.add('active');
+      document.getElementById('sp' + currentStep).classList.add('active');
       window.scrollTo(0, 0);
     }
 
     function prevStep(step) {
-      document.getElementById(`step${currentStep}`).classList.remove('active');
-      document.getElementById(`stepIndicator${currentStep}`).classList.remove('active');
-      
+      document.getElementById('step' + currentStep).classList.remove('active');
+      document.getElementById('sp' + currentStep).classList.remove('active');
+
       currentStep = step;
-      
-      document.getElementById(`step${currentStep}`).classList.add('active');
-      document.getElementById(`stepIndicator${currentStep -1}`).classList.remove('completed');
-      
+      document.getElementById('step' + currentStep).classList.add('active');
+      document.getElementById('sp' + currentStep).classList.remove('done');
+      document.getElementById('sp' + currentStep).classList.add('active');
       window.scrollTo(0, 0);
     }
 
     function previewImage(input, previewId) {
       const preview = document.getElementById(previewId);
       const file = input.files[0];
-      
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          preview.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Preview">`;
+        reader.onload = e => {
+          preview.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:180px;border-radius:8px;" alt="Preview">`;
         };
         reader.readAsDataURL(file);
       }
     }
 
-    function showAlert(message, type = 'info') {
-      const alertBox = document.getElementById('alertBox');
-      alertBox.textContent = message;
-      alertBox.className = `alert alert-${type}`;
-      alertBox.classList.remove('hidden');
-      setTimeout(() => alertBox.classList.add('hidden'), 5000);
-    }
-
-    // Form submission
     document.getElementById('joinForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
-
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
       try {
-        const formData = new FormData(this);
-        
-        const response = await fetch('/api/join', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (data.ok || response.ok) {
-          showAlert('✅ Application submitted successfully! Check your mobile for member ID.', 'success');
+        const res = await fetch('/api/join', { method: 'POST', body: new FormData(this) });
+        const data = await res.json();
+        if (data.ok || res.ok) {
+          showAlert('✅ Application submitted! Check your mobile for member ID.', 'success');
           setTimeout(() => window.location.href = 'member-login.html', 3000);
         } else {
           throw new Error(data.error || 'Submission failed');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        showAlert('❌ ' + error.message, 'error');
+      } catch(err) {
+        showAlert('❌ ' + err.message, 'error');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Application →';
+        btn.disabled = false;
+        btn.innerHTML = 'Submit <i class="fas fa-check"></i>';
       }
     });
 
-    // Mobile nav toggle
-    document.getElementById('navToggle')?.addEventListener('click', () => {
-      document.getElementById('mobileNav')?.classList.toggle('show');
-    });
-
-    // Prevent form resubmission on back button
     if (window.history.replaceState) {
       window.history.replaceState(null, null, window.location.href);
     }
   </script>
-
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 </body>
 </html>

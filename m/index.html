@@ -132,6 +132,28 @@
     .fc-blue   .fc-btn { background: #3b82f6; color: #fff; }
     .fc-green  .fc-btn { background: #22c55e; color: #fff; }
 
+    /* ── Accordion cards ── */
+    .feat-card { cursor: pointer; }
+    .feat-card .fc-head { margin-bottom: 0; cursor: pointer; }
+    .feat-card .fc-head-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .feat-card .fc-chevron {
+      font-size: 12px; color: var(--text3);
+      transition: transform .25s;
+      flex-shrink: 0; margin-left: 8px;
+    }
+    .feat-card.expanded .fc-chevron { transform: rotate(180deg); }
+    .feat-card .fc-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s ease, padding-top .25s;
+      padding-top: 0;
+    }
+    .feat-card.expanded .fc-body {
+      max-height: 600px;
+      padding-top: 14px;
+    }
+
     /* Step cards grid */
     .how-grid {
       display: grid;
@@ -255,11 +277,11 @@
       <h1 data-i18n="hero.title">Empowering Women Through Skills &amp; Livelihood</h1>
       <p data-i18n="hero.subtitle">Join India's fastest growing community of skilled women creating their own futures</p>
       <div class="hero-btns">
-        <a href="join.html" class="btn-hero-primary">
+        <a href="https://www.fwfindia.org/donation#donateModal" class="btn-hero-primary">
           <i class="fas fa-user-plus"></i>
           <span data-i18n="hero.join">Join Now</span>
         </a>
-        <a href="donation.html" class="btn-hero-accent">
+        <a href="https://www.fwfindia.org/donation#donateModal" class="btn-hero-accent">
           <i class="fas fa-heart"></i>
           <span data-i18n="hero.donate">Donate</span>
         </a>
@@ -285,59 +307,80 @@
   <div class="action-cards">
 
     <!-- Card 1: Become a Member -->
-    <div class="feat-card fc-orange">
+    <div class="feat-card fc-orange" onclick="toggleCard(this)">
       <div class="fc-head">
-        <div class="fc-icon">👩‍🎓</div>
-        <div>
-          <div class="fc-title" data-i18n="actions.member.title">Become a Member</div>
-          <div class="fc-price" data-i18n="actions.member.sub">₹500/month</div>
+        <div class="fc-head-row" style="flex:1;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div class="fc-icon">👩‍🎓</div>
+            <div>
+              <div class="fc-title" data-i18n="actions.member.title">Become a Member</div>
+              <div class="fc-price" data-i18n="actions.member.sub">₹500/month</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-down fc-chevron"></i>
         </div>
       </div>
-      <div class="fc-desc" data-i18n="actions.member.desc">Join FWF and unlock free skill training, project funding support, and a powerful network of women entrepreneurs.</div>
-      <ul class="benefit-list">
-        <li><span class="bl-icon"><i class="fas fa-graduation-cap"></i></span><span data-i18n="actions.member.b1">Free Skill Development Training</span></li>
-        <li><span class="bl-icon"><i class="fas fa-seedling"></i></span><span data-i18n="actions.member.b2">Project Start Funding Help</span></li>
-        <li><span class="bl-icon"><i class="fas fa-store"></i></span><span data-i18n="actions.member.b3">Member Network for Selling Products</span></li>
-        <li><span class="bl-icon"><i class="fas fa-hands-helping"></i></span><span data-i18n="actions.member.b4">Future Support Programs</span></li>
-      </ul>
-      <div class="tc-note">*<span data-i18n="actions.member.tc_text">Benefits subject to eligibility.</span> <a onclick="openTCModal()" data-i18n="actions.member.tc_link">T&amp;C Apply</a></div>
-      <a href="join.html" class="fc-btn">
-        <i class="fas fa-user-plus"></i>
-        <span data-i18n="actions.member.cta">Join Now — ₹500/month</span>
-      </a>
+      <div class="fc-body">
+        <div class="fc-desc" data-i18n="actions.member.desc">Join FWF and unlock free skill training, project funding support, and a powerful network of women entrepreneurs.</div>
+        <ul class="benefit-list">
+          <li><span class="bl-icon"><i class="fas fa-graduation-cap"></i></span><span data-i18n="actions.member.b1">Free Skill Development Training</span></li>
+          <li><span class="bl-icon"><i class="fas fa-seedling"></i></span><span data-i18n="actions.member.b2">Project Start Funding Help</span></li>
+          <li><span class="bl-icon"><i class="fas fa-store"></i></span><span data-i18n="actions.member.b3">Member Network for Selling Products</span></li>
+          <li><span class="bl-icon"><i class="fas fa-hands-helping"></i></span><span data-i18n="actions.member.b4">Future Support Programs</span></li>
+        </ul>
+        <div class="tc-note">*<span data-i18n="actions.member.tc_text">Benefits subject to eligibility.</span> <a onclick="event.stopPropagation();openTCModal()" data-i18n="actions.member.tc_link">T&amp;C Apply</a></div>
+        <a href="https://www.fwfindia.org/donation#donateModal" class="fc-btn" onclick="event.stopPropagation()">
+          <i class="fas fa-user-plus"></i>
+          <span data-i18n="actions.member.cta">Join Now — ₹500/month</span>
+        </a>
+      </div>
     </div>
 
     <!-- Card 2: Support Our Cause -->
-    <a href="donation.html" class="feat-card fc-blue">
+    <div class="feat-card fc-blue" onclick="toggleCard(this)">
       <div class="fc-head">
-        <div class="fc-icon">❤️</div>
-        <div>
-          <div class="fc-title" data-i18n="actions.donate.title">Support Our Cause</div>
-          <div class="fc-price" data-i18n="actions.donate.sub">Help women thrive</div>
+        <div class="fc-head-row" style="flex:1;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div class="fc-icon">❤️</div>
+            <div>
+              <div class="fc-title" data-i18n="actions.donate.title">Support Our Cause</div>
+              <div class="fc-price" data-i18n="actions.donate.sub">Help women thrive</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-down fc-chevron"></i>
         </div>
       </div>
-      <div class="fc-desc" data-i18n="actions.donate.desc">Buy products made by our members, help collect donations for NGO projects, or recommend our products and services to your network.</div>
-      <div class="fc-btn">
-        <i class="fas fa-heart"></i>
-        <span data-i18n="actions.donate.cta">Donate / Buy Products</span>
+      <div class="fc-body">
+        <div class="fc-desc" data-i18n="actions.donate.desc">Buy products made by our members, help collect donations for NGO projects, or recommend our products and services to your network.</div>
+        <a href="https://www.fwfindia.org/donation#donateModal" class="fc-btn" onclick="event.stopPropagation()">
+          <i class="fas fa-heart"></i>
+          <span data-i18n="actions.donate.cta">Donate / Buy Products</span>
+        </a>
       </div>
-    </a>
+    </div>
 
     <!-- Card 3: CSR Partnership -->
-    <a href="csr.html" class="feat-card fc-green">
+    <div class="feat-card fc-green" onclick="toggleCard(this)">
       <div class="fc-head">
-        <div class="fc-icon">🤝</div>
-        <div>
-          <div class="fc-title" data-i18n="actions.csr.title">CSR Partnership</div>
-          <div class="fc-price" data-i18n="actions.csr.sub">Corporate Impact</div>
+        <div class="fc-head-row" style="flex:1;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div class="fc-icon">🤝</div>
+            <div>
+              <div class="fc-title" data-i18n="actions.csr.title">CSR Partnership</div>
+              <div class="fc-price" data-i18n="actions.csr.sub">Corporate Impact</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-down fc-chevron"></i>
         </div>
       </div>
-      <div class="fc-desc" data-i18n="actions.csr.desc">Meet your CSR goals while creating real livelihoods. Fund skill training, sponsor micro-enterprises, or co-create products under Make in India.</div>
-      <div class="fc-btn">
-        <i class="fas fa-handshake"></i>
-        <span data-i18n="actions.csr.cta">Explore CSR Options</span>
+      <div class="fc-body">
+        <div class="fc-desc" data-i18n="actions.csr.desc">Meet your CSR goals while creating real livelihoods. Fund skill training, sponsor micro-enterprises, or co-create products under Make in India.</div>
+        <a href="csr.html" class="fc-btn" onclick="event.stopPropagation()">
+          <i class="fas fa-handshake"></i>
+          <span data-i18n="actions.csr.cta">Explore CSR Options</span>
+        </a>
       </div>
-    </a>
+    </div>
 
   </div>
 
@@ -386,14 +429,14 @@
         <div class="mv-icon orange">🎯</div>
         <h2 data-i18n="about.mission_head">Our Mission</h2>
       </div>
-      <p data-i18n="about.mission">Berojgar logo ko skill development ki training de kar unko livelihood create karne mein help karna aur unko Aatmnirbhar banana.</p>
+      <p>Berojgar logo ko skill development ki training de kar unko livelihood create karne mein help karna aur unko Aatmnirbhar banana.</p>
     </div>
     <div class="mv-card">
       <div class="mv-card-head">
         <div class="mv-icon violet">🔭</div>
         <h2 data-i18n="about.vision_head">Our Vision</h2>
       </div>
-      <p data-i18n="about.vision">India ko Manufacturing hub banana jisse aur desh ki growth mein help karna.</p>
+      <p>India ko Manufacturing hub banana jisse aur desh ki growth mein help karna.</p>
     </div>
   </div>
 
@@ -406,8 +449,6 @@
         <div class="footer-brand-tagline">Skills → Livelihood → Aatmnirbharta</div>
       </div>
     </div>
-    <p class="footer-about">Empowering women through skills training, micro-entrepreneurship &amp; livelihood creation since 2020. Vocal for Local. Make in India. 🇮🇳</p>
-
     <div class="footer-badges">
       <span class="fbadge"><i class="fas fa-certificate" style="color:#f59e0b"></i> 12A Certified</span>
       <span class="fbadge"><i class="fas fa-receipt" style="color:#60a5fa"></i> 80G Tax Benefit</span>
@@ -495,6 +536,9 @@
     // Set footer year
     const fy = document.getElementById('footerYear');
     if (fy) fy.textContent = new Date().getFullYear();
+
+    // Accordion toggle
+    function toggleCard(card) { card.classList.toggle('expanded'); }
 
     // T&C Modal
     function openTCModal() { document.getElementById('tcModalOverlay').classList.add('open'); }

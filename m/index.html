@@ -283,7 +283,7 @@
       <h1 data-i18n="hero.title">Empowering Women Through Skills &amp; Livelihood</h1>
       <p data-i18n="hero.subtitle">Join India's fastest growing community of skilled women creating their own futures</p>
       <div class="hero-btns">
-        <a href="https://www.fwfindia.org/donation#memberModal" class="btn-hero-primary">
+        <a href="https://www.fwfindia.org/donation#donateModal" class="btn-hero-primary">
           <i class="fas fa-user-plus"></i>
           <span data-i18n="hero.join">Join Now</span>
         </a>
@@ -334,7 +334,7 @@
           <li><span class="bl-icon"><i class="fas fa-hands-helping"></i></span><span data-i18n="actions.member.b4">Future Support Programs</span></li>
         </ul>
         <div class="tc-note">*<span data-i18n="actions.member.tc_text">Benefits subject to eligibility.</span> <a onclick="event.stopPropagation();openTCModal()" data-i18n="actions.member.tc_link">T&amp;C Apply</a></div>
-        <a href="https://www.fwfindia.org/donation#memberModal" class="fc-btn" onclick="event.stopPropagation()">
+        <a href="https://www.fwfindia.org/donation#donateModal" class="fc-btn" onclick="event.stopPropagation()">
           <i class="fas fa-user-plus"></i>
           <span data-i18n="actions.member.cta">Join Now</span>
         </a>
@@ -380,7 +380,7 @@
       </div>
       <div class="fc-body">
         <div class="fc-desc" data-i18n="actions.csr.desc">Meet your CSR goals while creating real livelihoods. Fund skill training, sponsor micro-enterprises, or co-create products under Make in India.</div>
-        <a href="/m/csr" class="fc-btn" onclick="event.stopPropagation()">
+        <a href="csr.html" class="fc-btn" onclick="event.stopPropagation()">
           <i class="fas fa-handshake"></i>
           <span data-i18n="actions.csr.cta">Explore CSR Options</span>
         </a>
@@ -447,33 +447,17 @@
 
   <!-- Rich Footer -->
   <footer class="app-footer">
-    <!-- Brand -->
-    <div class="footer-brand-row">
-      <img src="../assets/images/logo.png" alt="FWF">
-      <div>
-        <div class="footer-brand-name">Foundris Welfare Foundation</div>
-        <div class="footer-brand-tagline">Skills → Livelihood → Aatmnirbharta 🇮🇳</div>
-      </div>
-    </div>
-    <!-- Badges -->
-    <div class="footer-badges" style="margin:12px 0;">
+    <div class="footer-badges">
       <span class="fbadge"><i class="fas fa-certificate" style="color:#f59e0b"></i> 12A Certified</span>
       <span class="fbadge"><i class="fas fa-receipt" style="color:#60a5fa"></i> 80G Tax Benefit</span>
       <span class="fbadge"><i class="fas fa-handshake" style="color:#4ade80"></i> CSR-1 Registered</span>
     </div>
-    <!-- Social Icons -->
-    <div class="footer-socials" style="justify-content:center;margin:14px 0;">
-      <a href="https://www.facebook.com/fwfindia" target="_blank" aria-label="Facebook" style="background:rgba(24,119,242,0.15);border-color:rgba(24,119,242,0.3);color:#1877f2"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://www.instagram.com/fwfindia" target="_blank" aria-label="Instagram" style="background:rgba(225,48,108,0.15);border-color:rgba(225,48,108,0.3);color:#e1306c"><i class="fab fa-instagram"></i></a>
-      <a href="https://wa.me/919580118412" target="_blank" aria-label="WhatsApp" style="background:rgba(37,211,102,0.15);border-color:rgba(37,211,102,0.3);color:#25d366"><i class="fab fa-whatsapp"></i></a>
-      <a href="https://youtube.com/@fwf_india" target="_blank" aria-label="YouTube" style="background:rgba(255,0,0,0.15);border-color:rgba(255,0,0,0.3);color:#ff0000"><i class="fab fa-youtube"></i></a>
-    </div>
     <div class="footer-made">Made with ❤️ in India 🇮🇳</div>
     <div class="footer-bar">
-      <span class="footer-bar-copy">&copy; 2024–2026 FWF. All rights reserved.</span>
+      <span class="footer-bar-copy">&copy; <span id="footerYear"></span> FWF. All rights reserved.</span>
       <div class="footer-bar-links">
-        <a href="/privacy">Privacy</a>
-        <a href="/terms">Terms</a>
+        <a href="../privacy.html">Privacy</a>
+        <a href="../terms.html">Terms</a>
       </div>
     </div>
   </footer>
@@ -501,20 +485,20 @@
 
   <!-- Bottom Tab Bar -->
   <nav class="app-tabs">
-    <a href="/m/home" class="tab-item active">
+    <a href="index.html" class="tab-item active">
       <i class="fas fa-home"></i><span>Home</span>
     </a>
-    <a href="/m/projects" class="tab-item">
+    <a href="projects.html" class="tab-item">
       <i class="fas fa-briefcase"></i><span>Projects</span>
     </a>
-    <a href="https://www.fwfindia.org/donation#memberModal" class="tab-item tab-join">
+    <a href="https://www.fwfindia.org/donation#donateModal" class="tab-item tab-join">
       <div class="tab-fab"><i class="fas fa-plus"></i></div>
       <span>Join</span>
     </a>
-    <a href="/m/donation" class="tab-item">
+    <a href="donation.html" class="tab-item">
       <i class="fas fa-heart"></i><span>Donate</span>
     </a>
-    <a href="/m/member-login" class="tab-item">
+    <a href="member-login.html" class="tab-item">
       <i class="fas fa-user"></i><span>Login</span>
     </a>
   </nav>

@@ -1042,6 +1042,10 @@
   if(window.location.hash === '#donateModal') {
     resetDonate(); openModal(donateModal);
   }
+  // Auto-open memberModal when navigated via URL hash
+  if(window.location.hash === '#memberModal') {
+    resetForm(memberForm); memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
+  }
 </script>
 </body>
 </html>

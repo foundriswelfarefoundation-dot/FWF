@@ -175,6 +175,18 @@ async function nextMemberId() {
   const next = (n + 1).toString().padStart(6, '0');
   return `${ORG_PREFIX}-${next}`;
 }
+
+async function nextSupporterId() {
+  const lastUser = await User.findOne({ role: 'supporter', member_id: { $regex: /^\w+-S-\d{6}$/ } })
+    .sort({ created_at: -1 }).select('member_id').lean();
+  let n = 0;
+  if (lastUser && lastUser.member_id) {
+    const m = lastUser.member_id.match(/(\d{6})$/);
+    if (m) n = parseInt(m[1], 10);
+  }
+  const next = (n + 1).toString().padStart(6, '0');
+  return `${ORG_PREFIX}-S-${next}`;
+}
 async function nextDonationId() {
   const last = await Donation.findOne({ donation_id: { $regex: /^DON-\d{6}$/ } })
     .sort({ created_at: -1 }).select('donation_id').lean();
@@ -429,7 +441,10 @@ function auth(requiredRole) {
       if (!token) return res.status(401).json({ error: 'Unauthorized' });
       const data = jwt.verify(token, JWT_SECRET);
       req.user = data;
-      if (requiredRole && data.role !== requiredRole) return res.status(403).json({ error: 'Forbidden' });
+      if (requiredRole) {
+        const allowed = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+        if (!allowed.includes(data.role)) return res.status(403).json({ error: 'Forbidden' });
+      }
       next();
     } catch (e) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -501,6 +516,111 @@ app.post('/api/pay/simulate-join', internalAuth, async (req, res) => {
   });
 
   res.json({ ok: true, memberId, password: plain });
+});
+
+// ═══════════════════════════════════════════════════════
+// SUPPORTER REGISTRATION (public — from donation page)
+// ═══════════════════════════════════════════════════════
+app.post('/api/pay/register-supporter', async (req, res) => {
+  try {
+    const { name, mobile, email, project, message } = req.body;
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' });
+
+    // Check if already registered
+    const orCond = [{ email }];
+    if (mobile) orCond.push({ mobile });
+    const exists = await User.findOne({ $or: orCond });
+    if (exists) return res.status(400).json({ error: 'This email/mobile is already registered. Please login with your existing credentials.' });
+
+    const supporterId = await nextSupporterId();
+    const plain = randPass();
+    const hash = bcrypt.hashSync(plain, 10);
+    const refCode = generateReferralCode(supporterId);
+
+    await User.create({
+      member_id: supporterId,
+      name,
+      mobile: mobile || null,
+      email,
+      password_hash: hash,
+      role: 'supporter',
+      membership_active: true,
+      referral_code: refCode,
+      bio: `Project: ${project || '-'} | ${message || ''}`.trim(),
+      wallet: {}
+    });
+
+    // Send credentials email
+    try {
+      const transporter = getTransporter();
+      await transporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: email,
+        subject: `Welcome to FWF! Your Supporter Login Credentials — ${supporterId}`,
+        html: `
+        <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff">
+          <div style="background:linear-gradient(135deg,#10b981,#059669);padding:30px 32px 24px;border-radius:12px 12px 0 0;text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">🤝</div>
+            <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">Welcome, ${name}!</h1>
+            <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px">You are now a FWF Supporter</p>
+          </div>
+          <div style="padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
+            <p style="color:#374151;font-size:15px;margin-bottom:24px">
+              Thank you for joining Foundris Welfare Foundation as a <strong>Supporter</strong>!
+              Below are your login credentials. Please save them securely.
+            </p>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px">
+              <tr style="background:#f0fdf4">
+                <td style="padding:14px 16px;color:#6b7280;font-weight:600;border-bottom:1px solid #d1fae5">Supporter ID</td>
+                <td style="padding:14px 16px;color:#059669;font-weight:800;font-size:18px;border-bottom:1px solid #d1fae5">${supporterId}</td>
+              </tr>
+              <tr>
+                <td style="padding:14px 16px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb">Password</td>
+                <td style="padding:14px 16px;color:#111827;font-weight:700;font-family:monospace;font-size:16px;border-bottom:1px solid #e5e7eb">${plain}</td>
+              </tr>
+              <tr style="background:#f9fafb">
+                <td style="padding:14px 16px;color:#6b7280;font-weight:600">Login Page</td>
+                <td style="padding:14px 16px"><a href="https://www.fwfindia.org/login" style="color:#10b981;text-decoration:none;font-weight:700">www.fwfindia.org/login</a></td>
+              </tr>
+            </table>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin-bottom:20px">
+              <p style="margin:0;color:#166534;font-size:13px;font-weight:600">
+                <strong>🔒 Security Tip:</strong> Change your password after first login from your dashboard settings.
+              </p>
+            </div>
+            <p style="color:#6b7280;font-size:12px;margin:0;text-align:center">
+              © ${new Date().getFullYear()} Foundris Welfare Foundation • <a href="https://www.fwfindia.org" style="color:#10b981">www.fwfindia.org</a>
+            </p>
+          </div>
+        </div>`
+      });
+      console.log(`✅ Supporter credentials email sent to ${email} for ${supporterId}`);
+    } catch (mailErr) {
+      console.error('⚠️ Failed to send supporter credentials email:', mailErr.message);
+      // Don't fail the registration if email fails
+    }
+
+    // Also notify admin
+    try {
+      const transporter = getTransporter();
+      await transporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: process.env.SMTP_USER,
+        subject: `New Supporter Registered: ${supporterId} — ${name}`,
+        html: `<p><strong>${name}</strong> (${email}${mobile ? ', ' + mobile : ''}) registered as a Supporter.</p>
+               <p>ID: <strong>${supporterId}</strong></p>
+               <p>Project: ${project || '-'}</p>
+               <p>Message: ${message || '-'}</p>`
+      });
+    } catch (e) { /* ignore admin notification failure */ }
+
+    addBreadcrumb('registration', 'New supporter registered', { supporterId, name, email });
+    res.json({ ok: true, supporterId, message: `Registration successful! Your Supporter ID is ${supporterId}. Check your email for login credentials.` });
+  } catch (err) {
+    console.error('Supporter registration error:', err);
+    captureError(err, { context: 'supporter-registration' });
+    res.status(500).json({ error: 'Registration failed: ' + err.message });
+  }
 });
 
 // ═══════════════════════════════════════════════════════
@@ -1058,7 +1178,7 @@ app.post('/api/auth/update-password', internalAuth, async (req, res) => {
   res.json({ ok: true, message: 'Password updated successfully' });
 });
 
-app.get('/api/member/me', auth('member'), async (req, res) => {
+app.get('/api/member/me', auth(['member','supporter']), async (req, res) => {
   const u = await User.findById(req.user.uid)
     .select('member_id name mobile email created_at first_login_done referral_code avatar_url bio wallet member_project').lean();
   if (!u) return res.status(404).json({ error: 'User not found' });
@@ -1115,13 +1235,13 @@ app.get('/api/member/me', auth('member'), async (req, res) => {
 });
 
 // Mark first login as done
-app.post('/api/member/welcome-done', auth('member'), async (req, res) => {
+app.post('/api/member/welcome-done', auth(['member','supporter']), async (req, res) => {
   await User.updateOne({ _id: req.user.uid }, { first_login_done: true });
   res.json({ ok: true });
 });
 
 // Update profile
-app.post('/api/member/update-profile', auth('member'), async (req, res) => {
+app.post('/api/member/update-profile', auth(['member','supporter']), async (req, res) => {
   const { name, bio, avatar_url } = req.body;
   const update = {};
   if (name) update.name = name;
@@ -1519,7 +1639,7 @@ async function nextTicketId() {
 }
 
 // Member: submit support ticket
-app.post('/api/member/support-ticket', auth('member'), async (req, res) => {
+app.post('/api/member/support-ticket', auth(['member','supporter']), async (req, res) => {
   const { subject, message, category } = req.body;
   if (!subject || !message) return res.status(400).json({ error: 'Subject and message required' });
   const u = await User.findById(req.user.uid).select('name email');
@@ -1532,7 +1652,7 @@ app.post('/api/member/support-ticket', auth('member'), async (req, res) => {
 });
 
 // Member: get my tickets
-app.get('/api/member/support-tickets', auth('member'), async (req, res) => {
+app.get('/api/member/support-tickets', auth(['member','supporter']), async (req, res) => {
   const tickets = await SupportTicket.find({ user_id: req.user.uid }).sort({ created_at: -1 }).lean();
   res.json({ ok: true, tickets });
 });
@@ -1999,7 +2119,7 @@ app.post('/api/admin/order/:orderId', auth('admin'), async (req, res) => {
 // ========================
 
 // Get current week's task + completion status
-app.get('/api/member/weekly-task', auth('member'), async (req, res) => {
+app.get('/api/member/weekly-task', auth(['member','supporter']), async (req, res) => {
   try {
     // Calculate current week (1-10 repeating cycle)
     const now = new Date();
@@ -2029,7 +2149,7 @@ app.get('/api/member/weekly-task', auth('member'), async (req, res) => {
 });
 
 // Get all 10 tasks
-app.get('/api/member/all-tasks', auth('member'), async (req, res) => {
+app.get('/api/member/all-tasks', auth(['member','supporter']), async (req, res) => {
   try {
     const tasks = await SocialTask.find({ is_active: true }).sort({ week_number: 1 }).lean();
     // Get user's completions
@@ -2043,7 +2163,7 @@ app.get('/api/member/all-tasks', auth('member'), async (req, res) => {
 });
 
 // Complete a task (with photo upload)
-app.post('/api/member/complete-task', auth('member'), async (req, res) => {
+app.post('/api/member/complete-task', auth(['member','supporter']), async (req, res) => {
   try {
     const { task_id, photo_url, latitude, longitude, location_address } = req.body;
     if (!task_id || !photo_url) return res.status(400).json({ error: 'task_id और photo_url ज़रूरी है' });
@@ -2125,7 +2245,7 @@ app.post('/api/member/complete-task', auth('member'), async (req, res) => {
 });
 
 // Get task completion history
-app.get('/api/member/task-history', auth('member'), async (req, res) => {
+app.get('/api/member/task-history', auth(['member','supporter']), async (req, res) => {
   try {
     const completions = await TaskCompletion.find({ user_id: req.user.uid })
       .sort({ completed_at: -1 }).limit(50).lean();
@@ -2142,7 +2262,7 @@ app.get('/api/member/task-history', auth('member'), async (req, res) => {
 // ========================
 
 // Get social feed
-app.get('/api/member/feed', auth('member'), async (req, res) => {
+app.get('/api/member/feed', auth(['member','supporter']), async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
@@ -2160,7 +2280,7 @@ app.get('/api/member/feed', auth('member'), async (req, res) => {
 });
 
 // Create a social post
-app.post('/api/member/create-post', auth('member'), async (req, res) => {
+app.post('/api/member/create-post', auth(['member','supporter']), async (req, res) => {
   try {
     const { content, images, post_type, location } = req.body;
     if (!content) return res.status(400).json({ error: 'Post content required' });
@@ -2216,7 +2336,7 @@ app.post('/api/member/like-post', auth('member'), async (req, res) => {
 // ========================
 
 // Get active quizzes
-app.get('/api/member/active-quizzes', auth('member'), async (req, res) => {
+app.get('/api/member/active-quizzes', auth(['member','supporter']), async (req, res) => {
   try {
     const quizzes = await Quiz.find({ status: { $in: ['upcoming', 'active'] } })
       .sort({ start_date: 1 })
@@ -2246,7 +2366,7 @@ app.get('/api/member/active-quizzes', auth('member'), async (req, res) => {
 });
 
 // Enroll in quiz (after Razorpay payment)
-app.post('/api/member/quiz-enroll', auth('member'), async (req, res) => {
+app.post('/api/member/quiz-enroll', auth(['member','supporter']), async (req, res) => {
   try {
     const { quiz_id, razorpay_payment_id, razorpay_order_id, razorpay_signature, referred_by } = req.body;
     if (!quiz_id || !razorpay_payment_id) return res.status(400).json({ error: 'Quiz ID and payment required' });
@@ -2380,7 +2500,7 @@ app.get('/api/member/quiz-questions/:quizId', auth('member'), async (req, res) =
 });
 
 // Submit quiz answers
-app.post('/api/member/quiz-submit', auth('member'), async (req, res) => {
+app.post('/api/member/quiz-submit', auth(['member','supporter']), async (req, res) => {
   try {
     const { quiz_id, answers } = req.body;
     if (!quiz_id || !answers) return res.status(400).json({ error: 'quiz_id and answers required' });
@@ -2421,7 +2541,7 @@ app.post('/api/member/quiz-submit', auth('member'), async (req, res) => {
 });
 
 // Quiz history for user
-app.get('/api/member/quiz-history', auth('member'), async (req, res) => {
+app.get('/api/member/quiz-history', auth(['member','supporter']), async (req, res) => {
   try {
     const participations = await QuizParticipation.find({ user_id: req.user.uid })
       .sort({ created_at: -1 }).lean();

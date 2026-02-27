@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
   mobile: { type: String, unique: true, sparse: true, index: true },
   email: { type: String, unique: true, sparse: true, index: true },
   password_hash: { type: String, required: true },
-  role: { type: String, enum: ['member', 'admin'], default: 'member', index: true },
+  role: { type: String, enum: ['member', 'admin', 'supporter'], default: 'member', index: true },
   membership_active: { type: Boolean, default: false },
   first_login_done: { type: Boolean, default: false },
   referral_code: { type: String, unique: true, sparse: true, index: true },

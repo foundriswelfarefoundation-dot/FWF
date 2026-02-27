@@ -1151,7 +1151,48 @@
   document.getElementById('openSupporter2').addEventListener('click', ()=>{ resetForm(document.getElementById('supForm')); openModal(supModal); });
   document.getElementById('closeSupporter').addEventListener('click', ()=> closeModal(supModal));
   supModal.addEventListener('click', (e)=>{ if(e.target===supModal) closeModal(supModal); });
-  document.getElementById('supForm').addEventListener('submit', (e)=>{ e.preventDefault(); const f=e.target; if(!f.checkValidity()){ f.reportValidity(); return; } FWF_Notify.toast('Thanks! Your support request has been sent to our support team and a thank-you email is on its way to you.', 'success', 6000); closeModal(supModal); });
+  document.getElementById('supForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const f = e.target;
+    if(!f.checkValidity()){ f.reportValidity(); return; }
+    const btn = f.querySelector('button[type="submit"]');
+    const origLabel = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering...';
+    try {
+      const fd = new FormData(f);
+      const res = await fetch('/api/pay/register-supporter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fd.get('name'),
+          mobile: fd.get('mobile'),
+          email: fd.get('email'),
+          project: fd.get('project'),
+          message: fd.get('message')
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        FWF_Notify.toast(data.error || 'Registration failed', 'error', 5000);
+        btn.disabled = false; btn.innerHTML = origLabel;
+        return;
+      }
+      // Show success
+      f.innerHTML = `
+        <div style="text-align:center;padding:24px 0">
+          <div style="font-size:56px;margin-bottom:12px">🎉</div>
+          <h3 style="color:#10b981;margin:0 0 8px">Welcome, Supporter!</h3>
+          <p style="color:#374151;margin:0 0 16px">Your Supporter ID is:</p>
+          <div style="background:#f0fdf4;border:2px solid #10b981;border-radius:10px;padding:16px;font-size:1.4rem;font-weight:800;color:#059669;letter-spacing:1px;margin-bottom:16px">${data.supporterId}</div>
+          <p style="color:#6b7280;font-size:0.9rem;margin:0 0 20px"><i class="fa-solid fa-envelope"></i> Login credentials have been sent to your email.</p>
+          <a href="/login" class="btn-primary" style="display:inline-block;text-decoration:none;padding:12px 32px;border-radius:8px"><i class="fa-solid fa-right-to-bracket"></i> Login Now</a>
+        </div>`;
+    } catch(err) {
+      FWF_Notify.toast('Network error: ' + err.message, 'error');
+      btn.disabled = false; btn.innerHTML = origLabel;
+    }
+  });
 
   /* PARTNER */
   const partnerModal=document.getElementById('partnerModal');
@@ -1167,6 +1208,10 @@
   // Auto-open memberModal when navigated via URL hash
   if(window.location.hash === '#memberModal') {
     resetForm(memberForm); memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
+  }
+  // Auto-open supporterModal when navigated via URL hash
+  if(window.location.hash === '#supporterModal') {
+    resetForm(document.getElementById('supForm')); openModal(supModal);
   }
 </script>
 </body>

@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Supporter Dashboard — FWF</title>
+  <link rel="icon" type="image/png" href="/assets/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+/* ==============================
+   CSS VARIABLES (Supporter Green Theme)
+   ============================== */
+:root {
+  --bg-1:#f4f5f7; --bg-2:#ebedf0;
+  --accent:#10b981; --accent2:#059669; --accent-soft:rgba(16,185,129,.08);
+  --accent-light:#ecfdf5; --accent-dark:#047857;
+  --sidebar-bg:#ffffff;
+  --sidebar-text:#5f6368; --sidebar-active:#10b981;
+  --card-bg:#ffffff; --card-border:#e0e0e0;
+  --text-primary:#1a1a2e; --text-secondary:#54595f; --text-muted:#8c8c8c;
+  --success:#0a8f3f; --warning:#e5a100; --danger:#d93025; --info:#1a73e8;
+  --topbar-bg:#10b981;
+  --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
+  --shadow-card:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-hover:0 4px 12px rgba(0,0,0,.1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+  background:var(--bg-1);
+  min-height:100vh; color:var(--text-primary);
+  display:flex; -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+
+/* ==============================
+   SIDEBAR
+   ============================== */
+.sidebar{
+  position:fixed; left:0; top:0; bottom:0; width:240px; z-index:100;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--card-border);
+  display:flex; flex-direction:column;
+  padding:0;
+  transition:transform .3s ease;
+  box-shadow:1px 0 3px rgba(0,0,0,.04);
+}
+.sidebar-brand{
+  display:flex; align-items:center; gap:10px;
+  padding:16px 18px;
+  border-bottom:1px solid var(--card-border);
+}
+.sidebar-brand img{ width:36px; height:36px; border-radius:8px; }
+.sidebar-brand span{ font-size:16px; font-weight:900; color:var(--accent); }
+.sidebar-brand small{ display:block; font-size:10px; color:var(--success); font-weight:700; margin-top:1px; letter-spacing:.3px; }
+.sidebar-nav{ flex:1; display:flex; flex-direction:column; gap:1px; overflow-y:auto; padding:8px 0; }
+.sidebar-nav::-webkit-scrollbar{width:3px}
+.sidebar-nav::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+.nav-item{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 20px; border-radius:0;
+  font-size:13px; font-weight:600;
+  color:var(--sidebar-text);
+  cursor:pointer; transition:all .15s;
+  border:none; background:none; width:100%; text-align:left;
+  font-family:inherit;
+  position:relative;
+}
+.nav-item:hover{ background:var(--accent-light); color:var(--accent); }
+.nav-item.active{
+  background:var(--accent-light); color:var(--accent); font-weight:700;
+}
+.nav-item.active::before{
+  content:''; position:absolute; left:0; top:6px; bottom:6px;
+  width:3px; background:var(--accent); border-radius:0 3px 3px 0;
+}
+.nav-item i{ width:18px; text-align:center; font-size:14px; }
+.nav-divider{
+  font-size:10px; font-weight:700; color:var(--text-muted);
+  text-transform:uppercase; letter-spacing:.8px;
+  padding:18px 20px 6px; user-select:none;
+}
+.sidebar-footer{
+  border-top:1px solid var(--card-border);
+  padding:8px 0;
+}
+.nav-item.logout-btn{ color:var(--danger); }
+.nav-item.logout-btn:hover{ background:#fef2f2; }
+
+/* ==============================
+   MOBILE
+   ============================== */
+.mobile-toggle{
+  display:none; position:fixed; top:12px; left:12px; z-index:200;
+  width:40px; height:40px; border-radius:var(--radius-sm);
+  background:#fff; border:1px solid var(--card-border);
+  box-shadow:var(--shadow-card);
+  font-size:16px; cursor:pointer; color:var(--text-primary);
+  font-family:inherit;
+}
+.mobile-overlay{
+  display:none; position:fixed; inset:0; z-index:90;
+  background:rgba(0,0,0,.35); backdrop-filter:blur(3px);
+}
+
+/* ==============================
+   TOP HEADER BAR
+   ============================== */
+.top-header{
+  position:fixed; top:0; left:240px; right:0; z-index:50;
+  background:var(--topbar-bg);
+  height:56px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 28px;
+  box-shadow:0 2px 4px rgba(0,0,0,.08);
+}
+.top-header h1{
+  font-size:16px; font-weight:700; color:#fff; letter-spacing:-.2px;
+  display:flex; align-items:center; gap:8px;
+}
+.top-header h1 i{ font-size:15px; opacity:.85; }
+.top-header-right{ display:flex; align-items:center; gap:12px; }
+.member-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.2); backdrop-filter:blur(4px);
+  color:#fff; padding:6px 14px; border-radius:99px;
+  font-size:12px; font-weight:700;
+}
+.top-header .btn-header{
+  background:rgba(255,255,255,.15); color:#fff;
+  border:1px solid rgba(255,255,255,.25);
+  padding:6px 14px; border-radius:var(--radius-sm);
+  font-size:12px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; gap:5px;
+  transition:.2s; font-family:inherit;
+}
+.top-header .btn-header:hover{ background:rgba(255,255,255,.25); }
+
+/* ==============================
+   MAIN
+   ============================== */
+.main{
+  flex:1; margin-left:240px;
+  padding:72px 28px 28px;
+  min-height:100vh;
+}
+
+/* ==============================
+   PAGES
+   ============================== */
+.page{ display:none; animation:fadeIn .3s ease; }
+.page.active{ display:block; }
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ==============================
+   STAT CARDS
+   ============================== */
+.stats-row{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px;
+}
+.stat-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:var(--radius-md); padding:18px;
+  box-shadow:var(--shadow-card);
+}
+.stat-card .s-icon{
+  width:40px; height:40px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; margin-bottom:10px; color:#fff;
+}
+.stat-card .s-value{ font-size:26px; font-weight:900; color:var(--text-primary); }
+.stat-card .s-label{ font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:2px; }
+.s-green{ background:linear-gradient(135deg,#0a8f3f,#10b981); }
+.s-amber{ background:linear-gradient(135deg,#d97706,#f59e0b); }
+.s-purple{ background:linear-gradient(135deg,#7c3aed,#8b5cf6); }
+
+/* ==============================
+   CONTENT CARDS
+   ============================== */
+.content-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:var(--radius-md); padding:20px; margin-bottom:18px;
+  box-shadow:var(--shadow-card);
+}
+.content-card h3{ font-size:16px; font-weight:800; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+/* ==============================
+   GRIDS
+   ============================== */
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+/* ==============================
+   TABLES
+   ============================== */
+.table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.data-table{ width:100%; border-collapse:collapse; font-size:13px; }
+.data-table th{
+  text-align:left; padding:10px 12px; font-size:10px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted);
+  border-bottom:2px solid var(--card-border); background:var(--bg-1);
+}
+.data-table td{
+  padding:10px 12px; border-bottom:1px solid #f1f5f9; font-weight:600;
+}
+.badge{
+  display:inline-block; padding:3px 10px; border-radius:99px;
+  font-size:10px; font-weight:800; text-transform:uppercase;
+}
+.b-active{background:#dcfce7;color:#166534} .b-inactive{background:#fee2e2;color:#991b1b}
+.b-open{background:#dbeafe;color:#1e40af} .b-progress{background:#fef3c7;color:#92400e}
+.b-resolved{background:#d1fae5;color:#065f46} .b-closed{background:#f3f4f6;color:#6b7280}
+.b-pending{background:#fef9c3;color:#854d0e}
+.empty-state{ text-align:center; padding:30px; color:var(--text-muted); font-size:13px; }
+
+/* ==============================
+   FORMS
+   ============================== */
+.form-group{ margin-bottom:14px; }
+.form-group label{ display:block; font-size:12px; font-weight:700; margin-bottom:5px; color:var(--text-secondary); }
+.form-input{
+  width:100%; padding:10px 14px; border:1.5px solid var(--card-border);
+  border-radius:var(--radius-sm); font-size:14px; font-family:inherit;
+  transition:border .2s; color:var(--text-primary); background:#fff;
+}
+.form-input:focus{ border-color:var(--accent); outline:none; box-shadow:0 0 0 3px var(--accent-soft); }
+select.form-input{ appearance:none; cursor:pointer; }
+textarea.form-input{ resize:vertical; min-height:80px; }
+
+/* ==============================
+   BUTTONS
+   ============================== */
+.btn{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:10px 18px; border-radius:var(--radius-sm);
+  font-size:13px; font-weight:700; cursor:pointer;
+  border:none; transition:.2s; font-family:inherit;
+}
+.btn-primary{ background:var(--accent); color:#fff; }
+.btn-primary:hover{ background:var(--accent2); }
+.btn-success{ background:var(--success); color:#fff; }
+.btn-ghost{ background:transparent; color:var(--text-secondary); border:1.5px solid var(--card-border); }
+.btn-ghost:hover{ border-color:var(--accent); color:var(--accent); }
+.btn-sm{ padding:6px 12px; font-size:12px; }
+
+/* ==============================
+   ACCOUNT OVERVIEW
+   ============================== */
+.account-overview{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:var(--radius-md); overflow:hidden; box-shadow:var(--shadow-card);
+}
+.account-overview-header{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 20px; border-bottom:1px solid var(--card-border); background:var(--bg-1);
+}
+.account-overview-header h3{
+  font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.3px; color:var(--text-secondary);
+  display:flex; align-items:center; gap:8px; margin:0;
+}
+.acc-type{ background:var(--accent); color:#fff; padding:2px 8px; border-radius:99px; font-size:9px; font-weight:800; }
+.account-overview-body{ padding:20px; }
+.account-actions{
+  display:flex; margin:16px -20px -20px; border-top:1px solid var(--card-border);
+}
+.account-action-btn{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+  padding:14px 8px; border:none; background:none; cursor:pointer;
+  font-family:inherit; font-size:11px; font-weight:700; color:var(--text-secondary);
+  transition:.2s; border-right:1px solid var(--card-border);
+}
+.account-action-btn:last-child{ border-right:none; }
+.account-action-btn:hover{ background:var(--accent-light); color:var(--accent); }
+.account-action-btn i{ font-size:18px; color:var(--accent); }
+
+/* ==============================
+   PROFILE CARD
+   ============================== */
+.profile-header{
+  display:flex; align-items:center; gap:18px; margin-bottom:24px;
+}
+.profile-avatar{
+  width:64px; height:64px; border-radius:50%; background:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; font-weight:900; color:#fff; flex-shrink:0;
+}
+.profile-name{ font-size:22px; font-weight:900; }
+.profile-id{ font-size:13px; color:var(--accent); font-weight:700; margin:2px 0 6px; }
+.profile-meta{ display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--text-muted); font-weight:600; }
+
+/* ==============================
+   ACTIVITY FEED
+   ============================== */
+.feed-card{
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:var(--radius-md); padding:18px; margin-bottom:14px;
+  box-shadow:var(--shadow-card);
+}
+.feed-header{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.feed-avatar{
+  width:38px; height:38px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:800; color:#fff; flex-shrink:0;
+}
+.feed-name{ font-size:14px; font-weight:800; }
+.feed-time{ font-size:11px; color:var(--text-muted); font-weight:600; }
+.feed-body{ font-size:14px; line-height:1.7; color:var(--text-secondary); margin-bottom:10px; }
+.feed-actions{ display:flex; gap:8px; }
+.feed-actions button{
+  padding:6px 14px; border-radius:var(--radius-sm);
+  font-size:12px; font-weight:700; color:var(--text-muted);
+  background:var(--bg-1); border:1px solid var(--card-border);
+  cursor:pointer; transition:.15s; font-family:inherit;
+}
+.feed-actions button:hover{ color:var(--accent); border-color:var(--accent); }
+
+/* ==============================
+   EVENT CARD
+   ============================== */
+.skeleton-loader{
+  background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:var(--radius-md);
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ==============================
+   MODAL
+   ============================== */
+.modal{
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,.5); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:16px;
+}
+.modal.show{ display:flex; }
+.modal-content{
+  background:#fff; border-radius:var(--radius-lg);
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+  width:100%; max-width:500px;
+}
+.modal-overlay{
+  position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,.5); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center; padding:16px;
+}
+.modal-overlay.hidden{ display:none; }
+.modal-card{
+  background:#fff; border-radius:var(--radius-lg);
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+  width:100%; max-width:500px;
+}
+
+/* ==============================
+   RESPONSIVE
+   ============================== */
+@media(max-width:1100px){
+  .stats-row{ grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:900px){
+  .sidebar{ transform:translateX(-100%); }
+  .sidebar.open{ transform:translateX(0); }
+  .main{ margin-left:0; padding:16px; padding-top:68px; padding-bottom:80px; }
+  .top-header{ left:0; }
+  .mobile-toggle{ display:grid; place-items:center; z-index:200; }
+  .mobile-overlay.show{ display:block; }
+}
+@media(max-width:640px){
+  .stats-row{ grid-template-columns:1fr 1fr; }
+  .grid-2{ grid-template-columns:1fr; }
+  .account-actions{ flex-wrap:wrap; }
+  .account-action-btn{ min-width:33%; flex:1 1 40%; }
+  .profile-header{ flex-direction:column; text-align:center; }
+  .profile-meta{ justify-content:center; }
+  .top-header{ padding:0 14px; }
+  .top-header h1{ font-size:14px; }
+  .main{ padding:12px 10px; padding-top:64px; padding-bottom:80px; }
+  .home-cards-grid{ grid-template-columns:1fr !important; }
+  .account-overview-header{ padding:12px 16px; }
+  .account-overview-header h3{ font-size:12px; }
+  .account-overview-body{ padding:16px; }
+}
+@media(max-width:480px){
+  body{ background:var(--bg-1); }
+  .main{ padding:8px; padding-top:60px; padding-bottom:76px; }
+  .top-header{ height:50px; padding:0 12px; }
+  .top-header h1{ font-size:13px; gap:6px; }
+  .top-header h1 i{ font-size:13px; }
+  .top-header-right{ gap:8px; }
+  .member-badge{ padding:4px 10px; font-size:10px; gap:4px; }
+  .top-header .btn-header{ padding:4px 10px; font-size:10px; }
+  .mobile-toggle{ top:8px; left:8px; width:36px; height:36px; font-size:14px; }
+  .stats-row{ grid-template-columns:1fr 1fr; gap:8px; }
+  .stat-card{ padding:14px; border-radius:12px; }
+  .stat-card .s-icon{ width:34px; height:34px; font-size:15px; margin-bottom:8px; border-radius:8px; }
+  .stat-card .s-value{ font-size:20px; }
+  .stat-card .s-label{ font-size:10px; }
+  .content-card{ border-radius:14px; padding:16px; margin-bottom:14px; }
+  .content-card h3{ font-size:15px; }
+  .account-overview{ border-radius:14px; margin-bottom:14px; }
+  .account-overview-header{ padding:10px 14px; }
+  .account-overview-header h3{ font-size:11px; }
+  .account-overview-body{ padding:14px; }
+  .data-table th,.data-table td{ padding:8px 6px; font-size:11px; }
+  .data-table th{ font-size:9px; }
+  .form-input{ padding:10px 12px; font-size:13px; border-radius:10px; }
+  .form-group label{ font-size:12px; }
+  .btn{ padding:10px 16px; font-size:12px; border-radius:10px; }
+  .profile-avatar{ width:56px; height:56px; font-size:22px; }
+  .profile-name{ font-size:18px; }
+  .feed-card{ padding:14px; border-radius:12px; }
+  .feed-avatar{ width:34px; height:34px; font-size:12px; }
+  .feed-name{ font-size:13px; }
+  .feed-body{ font-size:13px; }
+  .modal{ padding:0; }
+  .modal-content{ max-width:100%; border-radius:16px 16px 0 0; max-height:92vh; margin-top:auto; }
+  .modal-overlay{ padding:0; }
+  .modal-card{ max-width:100%; border-radius:16px 16px 0 0; padding:20px; max-height:92vh; margin-top:auto; }
+}
+
+/* ==============================
+   MOBILE BOTTOM NAV BAR
+   ============================== */
+.mobile-bottom-nav{
+  display:none;
+  position:fixed; bottom:0; left:0; right:0; z-index:200;
+  background:#fff; border-top:1px solid var(--card-border);
+  box-shadow:0 -2px 10px rgba(0,0,0,.06);
+  padding:4px 0; padding-bottom:max(4px, env(safe-area-inset-bottom));
+}
+.mobile-bottom-nav .nav-row{
+  display:flex; justify-content:space-around; align-items:center;
+}
+.mobile-bottom-nav .bnav{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:6px 8px; border:none; background:none;
+  font-family:inherit; font-size:9px; font-weight:700;
+  color:var(--text-muted); cursor:pointer; transition:.15s;
+  min-width:0; flex:1;
+}
+.mobile-bottom-nav .bnav i{ font-size:18px; transition:.15s; }
+.mobile-bottom-nav .bnav.active{ color:var(--accent); }
+.mobile-bottom-nav .bnav.active i{ transform:scale(1.1); }
+@media(max-width:900px){
+  .mobile-bottom-nav{ display:block; }
+}
+
+/* ==============================
+   POST PILL STYLES
+   ============================== */
+.post-pill{
+  background:#fff;border:1.5px solid #d1d5db;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;color:#303030;white-space:nowrap;
+}
+.post-pill:hover{background:#f0f0f0}
+.post-pill.active{background:#dcf8c6;border-color:#25d366;color:#075e54;font-weight:700;box-shadow:0 0 0 2px rgba(37,211,102,.15)}
+#postThumbStrip::-webkit-scrollbar{display:none}
+#postThumbStrip .thumb-item{
+  display:inline-block;width:56px;height:56px;border-radius:8px;overflow:hidden;
+  margin-right:8px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;
+  position:relative;flex-shrink:0;vertical-align:middle;
+}
+#postThumbStrip .thumb-item.active{border-color:#25d366}
+#postThumbStrip .thumb-item img{width:100%;height:100%;object-fit:cover;display:block}
+#postThumbStrip .thumb-item .thumb-remove{
+  position:absolute;top:1px;right:1px;width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;
+}
+#postThumbStrip .thumb-item .thumb-remove:hover{background:rgba(220,38,38,.9)}
+  </style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" id="mobileToggle"><i class="fa-solid fa-bars"></i></button>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- ======== SIDEBAR ======== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="/assets/images/logo.png" alt="FWF">
+    <div>
+      <small>SUPPORTER PANEL</small>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-page="home">
+      <i class="fa-solid fa-house"></i> Dashboard
+    </button>
+
+    <div class="nav-divider">Profile</div>
+    <button class="nav-item" data-page="profile">
+      <i class="fa-solid fa-id-card"></i> Profile & ID Card
+    </button>
+
+    <div class="nav-divider">Engage</div>
+    <button class="nav-item" data-page="feed">
+      <i class="fa-solid fa-book-open"></i> Social Book
+    </button>
+    <button class="nav-item" data-page="events">
+      <i class="fa-solid fa-calendar-days"></i> Events & Activities
+    </button>
+
+    <div class="nav-divider">More</div>
+    <button class="nav-item" data-page="support">
+      <i class="fa-solid fa-headset"></i> Help & Support
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item logout-btn" id="logoutBtn">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </div>
+</aside>
+
+<!-- ======== TOP HEADER ======== -->
+<header class="top-header" id="topHeader">
+  <h1 id="pageTitle"><i class="fa-solid fa-house"></i> Dashboard</h1>
+  <div class="top-header-right">
+    <span class="member-badge" id="memberBadge"><i class="fa-solid fa-handshake"></i> Supporter</span>
+    <button class="btn-header" id="topLogoutBtn"><i class="fa-solid fa-user"></i> <span id="topUserName">SUPPORTER</span> <i class="fa-solid fa-chevron-down" style="font-size:9px;opacity:.7"></i></button>
+  </div>
+</header>
+
+<!-- ======== MAIN ======== -->
+<main class="main">
+
+  <!-- ===================== HOME / DASHBOARD ===================== -->
+  <div class="page active" id="page-home">
+    <div class="home-cards-grid" style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:22px">
+      <!-- Left: Supporter Info -->
+      <div class="account-overview">
+        <div class="account-overview-header">
+          <h3><i class="fa-solid fa-handshake" style="color:var(--accent)"></i> SUPPORTER ACCOUNT <span class="acc-type">ACTIVE</span></h3>
+        </div>
+        <div class="account-overview-body">
+          <div style="font-size:20px;font-weight:900;color:var(--text-primary);margin-bottom:8px" id="welcomeName">Welcome, Supporter!</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Empowering women through skills, welfare & self-employment.</div>
+          <div class="account-actions">
+            <button class="account-action-btn" onclick="switchPage('feed')">
+              <i class="fa-solid fa-book-open"></i> Social Book
+            </button>
+            <button class="account-action-btn" onclick="switchPage('events')">
+              <i class="fa-solid fa-calendar-days"></i> Events
+            </button>
+            <button class="account-action-btn" onclick="switchPage('support')">
+              <i class="fa-solid fa-headset"></i> Help
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Supporter ID Card -->
+      <div class="account-overview">
+        <div class="account-overview-header">
+          <h3><i class="fa-solid fa-id-card" style="color:var(--accent)"></i> SUPPORTER ID CARD</h3>
+        </div>
+        <div class="account-overview-body" style="padding:20px">
+          <div style="background:linear-gradient(135deg,#064e3b, #065f46);border-radius:var(--radius-md);padding:20px;color:#fff;position:relative;overflow:hidden">
+            <div style="position:absolute;right:-15px;top:-15px;width:100px;height:100px;border-radius:50%;background:rgba(16,185,129,.15)"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;position:relative;z-index:1">
+              <img src="/assets/images/logo.png" alt="FWF" style="width:32px;height:32px;border-radius:6px">
+              <div>
+                <div style="font-size:13px;font-weight:800">Foundris Welfare Foundation</div>
+                <div style="font-size:9px;opacity:.6;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Supporter Identity Card</div>
+              </div>
+            </div>
+            <div style="position:relative;z-index:1">
+              <div style="font-size:18px;font-weight:800;margin-bottom:4px" id="dashCardName">Supporter Name</div>
+              <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.25);padding:4px 10px;border-radius:6px;margin-bottom:12px">
+                <i class="fa-solid fa-id-badge" style="color:#34d399;font-size:12px"></i>
+                <span style="font-size:13px;font-weight:700;color:#6ee7b7" id="dashCardId">FWF-S-000000</span>
+              </div>
+              <div style="display:flex;gap:16px;font-size:11px;opacity:.75;font-weight:600;flex-wrap:wrap">
+                <span><i class="fa-solid fa-phone" style="margin-right:4px;color:#34d399;font-size:10px"></i><span id="dashCardMobile">—</span></span>
+                <span><i class="fa-solid fa-calendar" style="margin-right:4px;color:#34d399;font-size:10px"></i>Joined <span id="dashCardJoined">—</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="content-card">
+      <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3>
+      <div id="homeActivity">
+        <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px"><p>No recent activity</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PROFILE & ID CARD ===================== -->
+  <div class="page" id="page-profile">
+    <div class="content-card">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">S</div>
+        <div>
+          <div class="profile-name" id="profileName">Supporter</div>
+          <div class="profile-id" id="profileId">FWF-S-000000</div>
+          <div class="profile-meta">
+            <span><i class="fa-solid fa-phone"></i> <span id="profileMobile">—</span></span>
+            <span><i class="fa-solid fa-envelope"></i> <span id="profileEmail">—</span></span>
+            <span><i class="fa-solid fa-calendar"></i> Joined <span id="profileJoined">—</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3 style="font-size:15px;font-weight:800;margin-bottom:12px"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i> Supporter Status</h3>
+          <div class="stat-card" style="margin-bottom:12px">
+            <div class="s-label">Status</div>
+            <div id="profileStatus" style="font-weight:800;font-size:16px;color:var(--success)">Active</div>
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:15px;font-weight:800;margin-bottom:12px"><i class="fa-solid fa-pen" style="color:var(--accent)"></i> Update Profile</h3>
+          <div class="form-group">
+            <label>Display Name</label>
+            <input type="text" class="form-input" id="editName" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea class="form-input" id="editBio" placeholder="Tell us about yourself..." rows="3"></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveProfileBtn"><i class="fa-solid fa-save"></i> Save Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ID Card -->
+    <div class="content-card">
+      <h3><i class="fa-solid fa-id-card"></i> Digital Supporter ID Card</h3>
+      <div style="max-width:400px;margin:0 auto">
+        <div style="background:linear-gradient(135deg,#064e3b,#065f46);border-radius:var(--radius-md);padding:22px;color:#fff;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(16,185,129,.2)"></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <img src="/assets/images/logo.png" alt="FWF" style="width:40px;height:40px;border-radius:8px">
+            <div>
+              <div style="font-size:16px;font-weight:900">Foundris Welfare Foundation</div>
+              <div style="font-size:10px;opacity:.7;font-weight:600">Supporter Identity Card</div>
+            </div>
+          </div>
+          <div style="font-size:22px;font-weight:900;margin-bottom:4px" id="cardName">Supporter Name</div>
+          <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:16px" id="cardId">FWF-S-000000</div>
+          <div style="display:flex;gap:20px;font-size:11px;opacity:.7;font-weight:600">
+            <span><i class="fa-solid fa-phone"></i> <span id="cardMobile">—</span></span>
+            <span><i class="fa-solid fa-calendar"></i> <span id="cardJoined">—</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SOCIAL BOOK ===================== -->
+  <div class="page" id="page-feed">
+    <div style="background:var(--accent);border-radius:var(--radius-md);padding:16px 22px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:14px">
+      <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div style="flex:1">
+        <h2 style="font-size:18px;font-weight:700;margin:0;display:flex;align-items:center;gap:8px"><i class="fa-solid fa-book-open"></i> Share your social work, inspire others!</h2>
+      </div>
+    </div>
+
+    <!-- Create Post Box -->
+    <div class="content-card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px" onclick="openModal('postModal')">
+        <div class="feed-avatar" style="width:40px;height:40px;font-size:14px" id="feedUserAvatar">S</div>
+        <div style="flex:1;background:var(--bg-1);padding:10px 16px;border-radius:var(--radius-sm);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid var(--card-border)" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg-1)'">
+          What's your social work story today?
+        </div>
+        <button class="btn btn-primary" onclick="openModal('postModal')"><i class="fa-solid fa-image"></i> Post</button>
+      </div>
+    </div>
+
+    <div id="feedContainer">
+      <div class="feed-card">
+        <div class="feed-header">
+          <div class="feed-avatar">FW</div>
+          <div style="flex:1">
+            <div class="feed-name">FWF Community</div>
+            <div class="feed-time">Today • Welfare Activity</div>
+          </div>
+        </div>
+        <div class="feed-body">
+          🌱 Tree plantation drive completed! 50 trees planted by our supporters in collaboration with local schools. 
+          Together, we're building a greener future.
+        </div>
+        <div class="feed-actions">
+          <button><i class="fa-regular fa-heart"></i> 24</button>
+          <button><i class="fa-regular fa-comment"></i> 8</button>
+          <button><i class="fa-solid fa-share"></i> Share</button>
+        </div>
+      </div>
+
+      <div class="content-card" style="text-align:center;padding:40px 20px;display:none" id="emptyFeedState">
+        <i class="fa-solid fa-book-open" style="font-size:48px;color:var(--text-muted);opacity:.5;margin-bottom:12px"></i>
+        <h4 style="font-size:16px;font-weight:800;margin-bottom:6px">No posts yet</h4>
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Be the first to share your social work story!</p>
+        <button class="btn btn-primary" onclick="openModal('postModal')"><i class="fa-solid fa-plus"></i> Create First Post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== EVENTS & ACTIVITIES ===================== -->
+  <div class="page" id="page-events">
+    <div style="margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:800;margin:0 0 12px"><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> My Activity</h3>
+      <div class="stats-row" style="margin-bottom:0">
+        <div class="stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
+          <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="s-label">Tasks Done</div>
+          <div class="s-value" id="myTasksCompleted">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+          <div class="s-icon s-amber"><i class="fa-solid fa-gamepad"></i></div>
+          <div class="s-label">Quizzes Played</div>
+          <div class="s-value" id="myQuizCount">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">
+          <div class="s-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)"><i class="fa-solid fa-trophy"></i></div>
+          <div class="s-label">Quiz Wins</div>
+          <div class="s-value" id="myQuizWins">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:24px 16px 8px">
+      <div style="font-size:40px;margin-bottom:4px">🙏</div>
+      <h2 style="font-size:20px;font-weight:900;margin:0 0 6px;color:var(--text-primary);line-height:1.3">बदलाव आप से शुरू होता है!</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.5">एक छोटा सा कदम — समाज के लिए बड़ा बदलाव। आज ही कोई नेक काम करें और Selfie share करें!</p>
+    </div>
+
+    <div style="margin:16px 0 24px">
+      <div id="socialTasksGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px">
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:160px;border-radius:16px"></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="font-size:15px;font-weight:800;margin:0"><i class="fa-solid fa-trophy" style="color:#e5a100"></i> Fund Raiser Games</h3>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+        <button class="game-chip active" data-tier="all" onclick="filterQuizTier('all')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🎯 All Games</button>
+        <button class="game-chip" data-tier="monthly" onclick="filterQuizTier('monthly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #3b82f6;background:transparent;color:#3b82f6;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🗓️ Monthly ₹100</button>
+        <button class="game-chip" data-tier="half_yearly" onclick="filterQuizTier('half_yearly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #8b5cf6;background:transparent;color:#8b5cf6;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">📅 Half-Yearly ₹500</button>
+        <button class="game-chip" data-tier="yearly" onclick="filterQuizTier('yearly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #e11d48;background:transparent;color:#e11d48;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🏆 Yearly ₹1000</button>
+      </div>
+      <div id="quizGamesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+        <div class="skeleton-loader" style="height:220px;border-radius:16px"></div>
+        <div class="skeleton-loader" style="height:220px;border-radius:16px"></div>
+      </div>
+      <div id="quizEmptyState" style="display:none;text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:12px">🎮</div>
+        <h4 style="color:var(--text-muted);font-weight:700;margin-bottom:6px">कोई game अभी available नहीं है</h4>
+        <p style="font-size:13px;color:var(--text-muted)">जल्दी ही नए fund raiser games आएंगे!</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <details style="background:#fff;border:1px solid var(--card-border);border-radius:14px;overflow:hidden">
+        <summary style="padding:14px 16px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> View Task & Quiz Result
+        </summary>
+        <div style="padding:0 16px 16px">
+          <h4 style="font-size:13px;font-weight:700;margin:8px 0">📋 Task History</h4>
+          <div id="taskHistoryList">
+            <p style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px 0">अभी तक कोई task पूरा नहीं किया</p>
+          </div>
+          <h4 style="font-size:13px;font-weight:700;margin:14px 0 8px">🎮 Quiz History</h4>
+          <div id="quizHistoryList">
+            <p style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px 0">अभी तक किसी quiz में हिस्सा नहीं लिया</p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ═══════ SOCIAL TASK POPUP MODAL ═══════ -->
+  <div class="modal" id="socialTaskModal">
+    <div class="modal-content" style="max-width:440px;border-radius:20px;overflow:hidden">
+      <div id="taskModalHeader" style="padding:20px 20px 14px;color:#fff;position:relative">
+        <div style="position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent);pointer-events:none"></div>
+        <button onclick="closeModal('socialTaskModal')" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">&times;</button>
+        <div style="font-size:36px;margin-bottom:6px" id="taskModalIcon">🌱</div>
+        <h3 style="color:#fff;margin:0 0 4px;font-size:18px;font-weight:900" id="taskModalTitle">Task Title</h3>
+      </div>
+      <div style="padding:16px 20px 20px">
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 12px" id="taskModalDesc">Task description...</p>
+        <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <i class="fa-solid fa-camera" style="color:var(--accent)"></i>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary)">📸 How to participate</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5" id="taskModalInstruction">Photo instruction...</p>
+        </div>
+        <div style="border:2px dashed #e5e7eb;border-radius:14px;padding:14px;text-align:center;margin-bottom:14px" id="taskSelfieArea">
+          <div id="taskSelfiePreview" style="display:none;margin-bottom:10px">
+            <img id="taskSelfieImg" style="max-width:100%;max-height:200px;border-radius:12px">
+          </div>
+          <label style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px">
+            <i class="fa-solid fa-camera"></i> Selfie लें / Photo चुनें
+            <input type="file" accept="image/*" capture="user" id="taskSelfieInput" onchange="previewTaskSelfie(this)" style="display:none">
+          </label>
+        </div>
+        <button class="btn" id="taskSelfieSubmitBtn" onclick="submitTaskSelfie()" style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px" disabled>
+          <i class="fa-solid fa-paper-plane"></i> Selfie Share करें — Social Book पर Post होगा!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== HELP & SUPPORT ===================== -->
+  <div class="page" id="page-support">
+    <div class="grid-2">
+      <div>
+        <div class="content-card">
+          <h3><i class="fa-solid fa-ticket"></i> Submit Support Ticket</h3>
+          <div class="form-group">
+            <label>Category</label>
+            <select class="form-input" id="supCategory">
+              <option value="general">General</option>
+              <option value="technical">Technical</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" class="form-input" id="supSubject" placeholder="Brief subject">
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea class="form-input" id="supMessage" placeholder="Describe your issue in detail..." rows="4"></textarea>
+          </div>
+          <button class="btn btn-primary" id="submitTicketBtn"><i class="fa-solid fa-paper-plane"></i> Submit Ticket</button>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-circle-question"></i> Quick Help</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="https://wa.me/919580118412" target="_blank" class="btn btn-success" style="justify-content:center"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</a>
+            <a href="mailto:info@fwfindia.org" class="btn btn-ghost" style="justify-content:center"><i class="fa-solid fa-envelope"></i> Email Support</a>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3><i class="fa-solid fa-message"></i> FAQ</h3>
+          <details style="margin-bottom:8px">
+            <summary style="font-weight:700;font-size:13px;cursor:pointer;padding:8px 0">What can I do as a Supporter?</summary>
+            <p style="font-size:12px;color:var(--text-muted);padding:8px 0 8px 16px">As a supporter, you can participate in social activities, share your work on Social Book, participate in quizzes and events, and help FWF's mission.</p>
+          </details>
+          <details style="margin-bottom:8px">
+            <summary style="font-weight:700;font-size:13px;cursor:pointer;padding:8px 0">How do I participate in events?</summary>
+            <p style="font-size:12px;color:var(--text-muted);padding:8px 0 8px 16px">Go to "Events & Activities" to see social tasks. Complete tasks by uploading selfies, and participate in Fund Raiser quiz games.</p>
+          </details>
+          <details style="margin-bottom:8px">
+            <summary style="font-weight:700;font-size:13px;cursor:pointer;padding:8px 0">How do I become a Member?</summary>
+            <p style="font-size:12px;color:var(--text-muted);padding:8px 0 8px 16px">To upgrade to full membership with wallet, referral, and marketplace features, visit our <a href="/membership" style="color:var(--accent)">Membership page</a> and complete the registration.</p>
+          </details>
+          <details>
+            <summary style="font-weight:700;font-size:13px;cursor:pointer;padding:8px 0">How do I contact support?</summary>
+            <p style="font-size:12px;color:var(--text-muted);padding:8px 0 8px 16px">Use the support ticket form above, or reach us via WhatsApp or email. Our team typically responds within 24 hours.</p>
+          </details>
+        </div>
+      </div>
+
+      <div>
+        <div class="content-card">
+          <h3><i class="fa-solid fa-list-check"></i> My Tickets</h3>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Ticket</th><th>Subject</th><th>Status</th><th>Reply</th><th>Date</th></tr></thead>
+              <tbody id="myTicketsBody">
+                <tr><td colspan="5" class="empty-state"><p>No tickets submitted</p></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ======== MOBILE BOTTOM NAV ======== -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <div class="nav-row">
+    <button class="bnav active" data-page="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button class="bnav" data-page="feed"><i class="fa-solid fa-book-open"></i><span>Social</span></button>
+    <button class="bnav" data-page="events"><i class="fa-solid fa-calendar-days"></i><span>Events</span></button>
+    <button class="bnav" data-page="profile"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+  </div>
+</nav>
+
+<!-- ======== POST MODAL (WhatsApp Style) ======== -->
+<div class="modal-overlay hidden" id="postModal">
+  <div class="modal-card" style="max-width:480px;background:#fff;border-radius:16px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <div style="background:#075e54;padding:14px 18px;color:#fff;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="closeModal('postModal')" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0;display:flex;align-items:center"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="feed-avatar" id="postModalAvatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0">S</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700">Share Your Impact</div>
+        <div style="font-size:11px;opacity:.75">your story inspires others ✨</div>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;background:#e5ddd5;background-image:url('data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M0 0h20v20H0z%22 fill=%22%23e5ddd5%22/%3E%3Cpath d=%22M10 3l1 2 2 .3-1.5 1.4.4 2L10 8l-1.9 .7.4-2L7 5.3l2-.3z%22 fill=%22%23d4ccb5%22 opacity=%22.15%22/%3E%3C/svg%3E')">
+      <div id="postImageArea" style="display:none;background:#111;position:relative">
+        <div id="postMainPreview" style="width:100%;height:280px;overflow:hidden;position:relative">
+          <img id="postMainImg" src="" style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity .2s" alt="">
+          <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,rgba(0,0,0,.65),transparent);pointer-events:none"></div>
+        </div>
+        <div id="postThumbStrip" style="display:none;position:absolute;bottom:8px;left:0;right:0;padding:0 10px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        </div>
+        <button type="button" onclick="document.getElementById('postMedia').click()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:.2s">
+          <i class="fa-solid fa-plus" style="font-size:9px"></i> Add More
+        </button>
+        <div id="postPhotoCount" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px">
+          <i class="fa-solid fa-image" style="font-size:10px"></i> <span id="postPhotoNum">0</span>
+        </div>
+      </div>
+      <div id="postAddPhotoPrompt" style="padding:16px">
+        <div onclick="document.getElementById('postMedia').click()" style="background:rgba(255,255,255,.6);border:2px dashed #b8b8b8;border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s">
+          <i class="fa-solid fa-camera-retro" style="font-size:32px;color:#075e54;margin-bottom:8px;display:block"></i>
+          <div style="font-size:14px;font-weight:700;color:#303030">Add Photos</div>
+          <div style="font-size:11px;color:#667781;margin-top:2px">Tap to upload from gallery</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#f0f0f0;padding:6px 8px;display:flex;align-items:flex-end;gap:6px;flex-shrink:0;border-top:1px solid #dfe5e7">
+      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center" title="Add Photos">
+        <i class="fa-solid fa-camera"></i>
+      </button>
+      <button type="button" onclick="document.getElementById('postMedia').click()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:#54656f;font-size:20px;transition:.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center" title="Attach File">
+        <i class="fa-solid fa-paperclip"></i>
+      </button>
+      <input type="file" id="postMedia" accept="image/*,video/*" multiple style="display:none" onchange="handlePostImageSelect(event)">
+      <div style="flex:1;background:#fff;border-radius:22px;padding:8px 14px;display:flex;align-items:flex-end;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.1)">
+        <textarea id="postDesc" rows="1" style="flex:1;border:none;outline:none;font-family:inherit;font-size:14px;color:#303030;background:transparent;resize:none;max-height:100px;overflow-y:auto;line-height:1.5;padding:0" placeholder="Describe your activity... 📍 Where? 👥 Who? 🎯 What?" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';document.getElementById('postCharCount').textContent=this.value.length"></textarea>
+        <span style="font-size:9px;color:#aaa;align-self:flex-end;white-space:nowrap" id="postCharCount">0</span>
+      </div>
+      <button type="button" id="submitPostBtn" onclick="submitPost()" style="background:#00a884;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all .2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,168,132,.3)">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SCRIPTS ======== -->
+<script src="/assets/js/fwf.js"></script>
+<script src="/auth.js"></script>
+<script>
+/* ============================================
+   NAVIGATION
+   ============================================ */
+const pageTitles = {
+  home: '<i class="fa-solid fa-house"></i> Dashboard',
+  profile: '<i class="fa-solid fa-id-card"></i> Profile & ID Card',
+  feed: '<i class="fa-solid fa-book-open"></i> Social Book',
+  events: '<i class="fa-solid fa-calendar-days"></i> Events & Activities',
+  support: '<i class="fa-solid fa-headset"></i> Help & Support'
+};
+
+function switchPage(page, updateHash = true){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if(el) el.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(nav) nav.classList.add('active');
+  document.getElementById('pageTitle').innerHTML = pageTitles[page] || page;
+  closeMobile();
+
+  document.querySelectorAll('.mobile-bottom-nav .bnav').forEach(b => b.classList.remove('active'));
+  const bnav = document.querySelector('.mobile-bottom-nav .bnav[data-page="'+page+'"]');
+  if(bnav) bnav.classList.add('active');
+
+  if(updateHash) {
+    history.pushState({ page }, '', location.pathname + (page === 'home' ? '' : '#' + page));
+  }
+
+  if(page === 'support') loadMyTickets();
+  if(page === 'profile') loadProfile();
+  if(page === 'events')  loadEventsPage();
+}
+
+document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+document.querySelectorAll('.mobile-bottom-nav .bnav').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+window.addEventListener('popstate', (e) => {
+  const page = (e.state && e.state.page) || (location.hash.slice(1)) || 'home';
+  switchPage(page, false);
+});
+
+window.addEventListener('load', () => {
+  const pathMap = {
+    '/supporter/profile':  'profile',
+    '/supporter/feed':     'feed',
+    '/supporter/events':   'events',
+    '/supporter/support':  'support',
+  };
+  const pathPage = pathMap[location.pathname];
+  const hashPage = location.hash.slice(1);
+  const target = pathPage || hashPage;
+  if(target && document.getElementById('page-' + target)) {
+    switchPage(target, false);
+  }
+});
+
+// Mobile
+document.getElementById('mobileToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+});
+document.getElementById('mobileOverlay').addEventListener('click', closeMobile);
+function closeMobile(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+/* ============================================
+   CLOUDINARY IMAGE UPLOAD
+   ============================================ */
+async function uploadToCloudinary(file){
+  const fd = new FormData();
+  fd.append('file',          file);
+  fd.append('upload_preset', 'fwf_posts');
+  fd.append('folder',        'fwf-posts');
+  const upRes = await fetch('https://api.cloudinary.com/v1_1/dm1jowk69/image/upload', { method:'POST', body: fd });
+  if(!upRes.ok) throw new Error('Image upload failed');
+  const upData = await upRes.json();
+  return upData.secure_url;
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+function openModal(id){ 
+  const modal = document.getElementById(id);
+  if(modal.classList.contains('modal-overlay')){
+    modal.classList.remove('hidden'); 
+  } else {
+    modal.classList.add('show');
+  }
+}
+function closeModal(id){ 
+  const modal = document.getElementById(id);
+  if(modal.classList.contains('modal-overlay')){
+    modal.classList.add('hidden'); 
+  } else {
+    modal.classList.remove('show');
+  }
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+function fmtN(n){ return Math.round(n||0).toLocaleString('en-IN'); }
+function fmtDate(d){
+  if(!d) return '—';
+  try{ return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+  catch(e){ return d; }
+}
+function notify(msg, type){
+  if(typeof FWF_Notify !== 'undefined') FWF_Notify.toast(msg, type);
+  else alert(msg);
+}
+function statusBadge(s){
+  const map = {active:'b-active',inactive:'b-inactive',open:'b-open','in-progress':'b-progress',resolved:'b-resolved',closed:'b-closed',pending:'b-pending'};
+  return `<span class="badge ${map[s]||'b-open'}">${s}</span>`;
+}
+
+/* ============================================
+   SUPPORTER DATA
+   ============================================ */
+let memberData = null;
+
+async function loadDashboard(){
+  try {
+    const data = await AUTH.api('/api/member/me');
+    memberData = data;
+    const u = data.user || {};
+
+    // Welcome
+    document.getElementById('welcomeName').textContent = 'Welcome, ' + (u.name || 'Supporter') + '!';
+    document.getElementById('memberBadge').innerHTML = `<i class="fa-solid fa-handshake"></i> ${u.member_id || 'Supporter'}`;
+
+    const topUserEl = document.getElementById('topUserName');
+    if(topUserEl) topUserEl.textContent = (u.name || 'SUPPORTER').toUpperCase().split(' ')[0];
+
+    // Recent activity
+    if(data.pointsLedger && data.pointsLedger.length){
+      document.getElementById('homeActivity').innerHTML = data.pointsLedger.slice(0,5).map(p => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px">
+            <i class="fa-solid fa-${p.type==='donation'?'heart':p.type==='referral'?'user-plus':p.type==='quiz'?'ticket':'star'}"></i>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:700">${p.description||p.type}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${fmtDate(p.created_at)}</div>
+          </div>
+          <div style="font-weight:800;color:var(--success);font-size:13px">+${p.points}</div>
+        </div>
+      `).join('');
+    }
+
+    populateProfile(data);
+
+  } catch(e){
+    if(e.status === 401 || e.status === 403){
+      notify('Session expired. Redirecting to login...', 'error');
+      setTimeout(() => location.href = '/login', 2000);
+    } else {
+      notify('Failed to load dashboard: ' + (e.message || 'Server error.'), 'error');
+    }
+  }
+}
+
+function populateProfile(data){
+  const u = data.user || {};
+  const initials = (u.name||'S').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('profileName').textContent = u.name || 'Supporter';
+  document.getElementById('profileId').textContent = u.member_id || '';
+  document.getElementById('profileMobile').textContent = u.mobile || '—';
+  document.getElementById('profileEmail').textContent = u.email || '—';
+  document.getElementById('profileJoined').textContent = fmtDate(u.created_at);
+  document.getElementById('profileStatus').textContent = u.membership_active ? 'Active' : 'Inactive';
+  document.getElementById('profileStatus').style.color = u.membership_active ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('editName').value = u.name || '';
+  document.getElementById('editBio').value = u.bio || '';
+
+  // Dashboard ID Card
+  document.getElementById('dashCardName').textContent = u.name || 'Supporter';
+  document.getElementById('dashCardId').textContent = u.member_id || 'FWF-S-000000';
+  document.getElementById('dashCardMobile').textContent = u.mobile || '—';
+  document.getElementById('dashCardJoined').textContent = fmtDate(u.created_at);
+
+  // Profile ID Card
+  document.getElementById('cardName').textContent = u.name || 'Supporter';
+  document.getElementById('cardId').textContent = u.member_id || '';
+  document.getElementById('cardMobile').textContent = u.mobile || '—';
+  document.getElementById('cardJoined').textContent = fmtDate(u.created_at);
+
+  // Feed Avatar
+  const feedAvatar = document.getElementById('feedUserAvatar');
+  if(feedAvatar) feedAvatar.textContent = initials;
+}
+
+function loadProfile(){
+  if(memberData) populateProfile(memberData);
+}
+
+/* ============================================
+   SUPPORT
+   ============================================ */
+document.getElementById('submitTicketBtn').addEventListener('click', async ()=>{
+  const subject = document.getElementById('supSubject').value.trim();
+  const message = document.getElementById('supMessage').value.trim();
+  if(!subject || !message) return notify('Fill subject and message','warning');
+  try{
+    await AUTH.api('/api/member/support-ticket',{method:'POST',body:{
+      subject,
+      message,
+      category: document.getElementById('supCategory').value
+    }});
+    notify('Support ticket submitted!','success');
+    document.getElementById('supSubject').value = '';
+    document.getElementById('supMessage').value = '';
+    loadMyTickets();
+  } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+async function loadMyTickets(){
+  try{
+    const d = await AUTH.api('/api/member/support-tickets');
+    const tbody = document.getElementById('myTicketsBody');
+    if(!d.tickets || !d.tickets.length){
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No tickets submitted</p></td></tr>';
+      return;
+    }
+    tbody.innerHTML = d.tickets.map(t => `<tr>
+      <td style="font-weight:700;color:var(--accent)">${t.ticket_id}</td>
+      <td style="font-weight:700;font-size:12px">${t.subject}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.admin_reply||'—'}</td>
+      <td style="color:var(--text-muted);font-size:12px">${fmtDate(t.created_at)}</td>
+    </tr>`).join('');
+  } catch(e){}
+}
+
+/* ============================================
+   PROFILE UPDATE
+   ============================================ */
+document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('editName').value.trim();
+  const bio = document.getElementById('editBio').value.trim();
+  try{
+    await AUTH.api('/api/member/update-profile',{method:'POST',body:{name, bio}});
+    notify('Profile updated!','success');
+    memberData = null;
+    loadDashboard();
+  } catch(e){ notify(e.message||'Failed','error'); }
+});
+
+/* ============================================
+   SOCIAL BOOK POST
+   ============================================ */
+const POST_TEMPLATES = {
+  welfare: `📍 Location:\n👥 Participants:\n🎯 Activity:\n💚 Impact:\n✨ Outcome:`,
+  health: `🏥 Camp Type:\n📍 Location:\n👥 Beneficiaries:\n💊 Services:\n🎯 Impact:`,
+  plantation: `🌱 Trees Planted:\n📍 Location:\n👥 Supporters:\n🌍 Area Covered:`,
+  education: `📚 Program:\n👥 Students:\n📍 Location:\n📖 Subjects:\n🎯 Results:`,
+  donation: `💝 Items Collected:\n📊 Quantity:\n👥 Donors:\n📍 Location:\n🎁 Beneficiaries:`,
+  awareness: `📣 Campaign:\n🎯 Message:\n👥 Reached:\n📍 Location:`,
+  other: `📌 Activity:\n📍 Location:\n👥 Involved:\n🎯 Goal:\n✅ Completed:`
+};
+
+let postImageFiles = [];
+let postImageDataUrls = [];
+let postActiveImageIdx = 0;
+
+function handlePostImageSelect(e){
+  const files = Array.from(e.target.files || []);
+  for(const file of files){
+    if(postImageFiles.length >= 10){ notify('Max 10 photos allowed','warning'); break; }
+    if(file.size > 5 * 1024 * 1024){ notify(`${file.name} is too large (max 5MB)`,'warning'); continue; }
+    postImageFiles.push(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      postImageDataUrls.push(event.target.result);
+      renderPostImagePreview();
+    };
+    reader.readAsDataURL(file);
+  }
+  e.target.value = '';
+}
+
+function renderPostImagePreview(){
+  const area = document.getElementById('postImageArea');
+  const prompt = document.getElementById('postAddPhotoPrompt');
+  const mainImg = document.getElementById('postMainImg');
+  const strip = document.getElementById('postThumbStrip');
+  const countEl = document.getElementById('postPhotoNum');
+  
+  if(postImageDataUrls.length === 0){
+    area.style.display = 'none';
+    prompt.style.display = 'block';
+    return;
+  }
+  
+  area.style.display = 'block';
+  prompt.style.display = 'none';
+  
+  if(postActiveImageIdx >= postImageDataUrls.length) postActiveImageIdx = postImageDataUrls.length - 1;
+  if(postActiveImageIdx < 0) postActiveImageIdx = 0;
+  
+  mainImg.src = postImageDataUrls[postActiveImageIdx];
+  countEl.textContent = postImageDataUrls.length;
+  
+  if(postImageDataUrls.length > 1){
+    strip.style.display = 'block';
+    strip.innerHTML = postImageDataUrls.map((url, i) => `
+      <span class="thumb-item ${i === postActiveImageIdx ? 'active' : ''}" onclick="selectPostThumb(${i})">
+        <img src="${url}" alt="">
+        <button type="button" class="thumb-remove" onclick="event.stopPropagation();removePostImage(${i})">&times;</button>
+      </span>
+    `).join('');
+  } else {
+    strip.style.display = 'none';
+    strip.innerHTML = '';
+  }
+}
+
+function selectPostThumb(idx){ postActiveImageIdx = idx; renderPostImagePreview(); }
+function removePostImage(idx){ postImageFiles.splice(idx,1); postImageDataUrls.splice(idx,1); renderPostImagePreview(); }
+
+async function submitPost(){
+  const description = document.getElementById('postDesc').value.trim();
+  if(!description || description.length < 10){ notify('Please describe your activity (at least 10 characters)','warning'); return; }
+  
+  const btn = document.getElementById('submitPostBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  
+  try{
+    const images = [];
+    if(postImageFiles.length > 0){
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span style="font-size:11px;margin-left:4px">Uploading...</span>';
+      for(const f of postImageFiles){
+        if(f.size > 15*1024*1024){ notify(`${f.name} is too large (max 15MB)`,'warning'); continue; }
+        const url = await uploadToCloudinary(f);
+        images.push(url);
+      }
+    }
+    
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    
+    await AUTH.api('/api/member/create-post', {
+      method: 'POST',
+      body: { content: description, images, post_type: 'other' }
+    });
+    
+    closeModal('postModal');
+    notify('🎉 Post submitted for admin review!', 'success');
+    
+    document.getElementById('postDesc').value = '';
+    document.getElementById('postDesc').style.height = 'auto';
+    document.getElementById('postMedia').value = '';
+    document.getElementById('postCharCount').textContent = '0';
+    postImageFiles = [];
+    postImageDataUrls = [];
+    postActiveImageIdx = 0;
+    renderPostImagePreview();
+    
+  } catch(e){
+    notify(e.message || 'Failed to submit post','error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+  }
+}
+
+/* ============================================
+   EVENTS & ACTIVITIES
+   ============================================ */
+let eventsLoaded = false;
+let allQuizzesCache = [];
+let currentTaskData = null;
+
+async function loadEventsPage(){
+  if(eventsLoaded) return;
+  eventsLoaded = true;
+  try {
+    await Promise.all([loadSocialTasksGrid(), loadActiveQuizzes(), loadMyActivities()]);
+  } catch(e){ console.error('Events load err:', e); }
+}
+
+const taskGradients = [
+  'linear-gradient(135deg,#065f46,#059669)',
+  'linear-gradient(135deg,#1e40af,#3b82f6)',
+  'linear-gradient(135deg,#92400e,#d97706)',
+  'linear-gradient(135deg,#7c2d12,#ea580c)',
+  'linear-gradient(135deg,#581c87,#9333ea)',
+  'linear-gradient(135deg,#155e75,#06b6d4)',
+  'linear-gradient(135deg,#9f1239,#f43f5e)',
+  'linear-gradient(135deg,#1e3a5f,#3b82f6)',
+  'linear-gradient(135deg,#064e3b,#10b981)',
+  'linear-gradient(135deg,#78350f,#f59e0b)',
+];
+
+async function loadSocialTasksGrid(){
+  try {
+    const data = await AUTH.api('/api/member/all-tasks');
+    const grid = document.getElementById('socialTasksGrid');
+    if(!data.ok || !data.tasks?.length){
+      grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">कोई task उपलब्ध नहीं</p>';
+      return;
+    }
+    const completedIds = new Set(data.completions?.map(c => c.task_id || `TASK-0${c.week_number}`) || []);
+
+    grid.innerHTML = data.tasks.map((t, i) => {
+      const done = completedIds.has(t.task_id);
+      const grad = taskGradients[i % taskGradients.length];
+      return `
+        <div onclick="openTaskPopup(${i})" style="cursor:pointer;border-radius:18px;overflow:hidden;position:relative;background:${grad};padding:18px 14px 14px;color:#fff;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(0,0,0,.08)" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='none'">
+          <div style="position:absolute;top:0;right:0;width:70px;height:70px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent);pointer-events:none"></div>
+          ${done ? '<div style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,.25);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">✅</div>' : ''}
+          <div style="font-size:32px;margin-bottom:8px">${t.icon}</div>
+          <div>
+            <div style="font-size:12px;font-weight:800;line-height:1.35;margin-bottom:4px">${t.title}</div>
+            <div style="font-size:10px;opacity:.75;line-height:1.3">${t.description.substring(0,50)}...</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    window._socialTasks = data.tasks;
+    window._socialCompletedIds = completedIds;
+  } catch(e){
+    document.getElementById('socialTasksGrid').innerHTML = '<p style="color:var(--danger);font-size:13px">Tasks load error</p>';
+  }
+}
+
+function openTaskPopup(idx){
+  const t = window._socialTasks[idx];
+  if(!t) return;
+  currentTaskData = t;
+  const grad = taskGradients[idx % taskGradients.length];
+  const done = window._socialCompletedIds?.has(t.task_id);
+
+  document.getElementById('taskModalHeader').style.background = grad;
+  document.getElementById('taskModalIcon').textContent = t.icon;
+  document.getElementById('taskModalTitle').textContent = t.title;
+  document.getElementById('taskModalDesc').textContent = t.description;
+  document.getElementById('taskModalInstruction').textContent = t.photo_instruction;
+
+  document.getElementById('taskSelfiePreview').style.display = 'none';
+  document.getElementById('taskSelfieInput').value = '';
+  const submitBtn = document.getElementById('taskSelfieSubmitBtn');
+  submitBtn.disabled = true;
+
+  if(done){
+    document.getElementById('taskSelfieArea').innerHTML = `
+      <div style="padding:16px;text-align:center">
+        <div style="font-size:40px;margin-bottom:6px">🎉</div>
+        <div style="font-weight:800;font-size:14px;color:#166534">आपने यह कार्य पूरा कर दिया!</div>
+      </div>`;
+    submitBtn.style.display = 'none';
+  } else {
+    document.getElementById('taskSelfieArea').innerHTML = `
+      <div id="taskSelfiePreview" style="display:none;margin-bottom:10px">
+        <img id="taskSelfieImg" style="max-width:100%;max-height:200px;border-radius:12px">
+      </div>
+      <label style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px">
+        <i class="fa-solid fa-camera"></i> Selfie लें / Photo चुनें
+        <input type="file" accept="image/*" capture="user" id="taskSelfieInput" onchange="previewTaskSelfie(this)" style="display:none">
+      </label>`;
+    submitBtn.style.display = 'flex';
+    submitBtn.disabled = true;
+  }
+
+  openModal('socialTaskModal');
+}
+
+function previewTaskSelfie(input){
+  if(input.files && input.files[0]){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      let preview = document.getElementById('taskSelfiePreview');
+      let img = document.getElementById('taskSelfieImg');
+      if(!preview || !img){
+        const area = document.getElementById('taskSelfieArea');
+        preview = area.querySelector('#taskSelfiePreview');
+        img = area.querySelector('#taskSelfieImg');
+      }
+      if(img) img.src = e.target.result;
+      if(preview) preview.style.display = 'block';
+      document.getElementById('taskSelfieSubmitBtn').disabled = false;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function submitTaskSelfie(){
+  const fileInput = document.getElementById('taskSelfieInput');
+  if(!fileInput?.files?.length){ notify('कृपया Selfie/Photo लें','error'); return; }
+  if(!currentTaskData){ notify('Task data not found','error'); return; }
+
+  const btn = document.getElementById('taskSelfieSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+
+  try {
+    const imgUrl = await uploadToCloudinary(fileInput.files[0]);
+    let latitude = null, longitude = null;
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+      });
+      latitude = pos.coords.latitude;
+      longitude = pos.coords.longitude;
+    } catch(e){ /* optional */ }
+
+    const taskRes = await AUTH.api('/api/member/complete-task', {
+      method: 'POST',
+      body: { task_id: currentTaskData.task_id, photo_url: imgUrl, latitude, longitude, location_address: '' }
+    });
+
+    closeModal('socialTaskModal');
+    if(taskRes.ok){
+      notify('🎉 बहुत अच्छे! Selfie Social Book पर share हो गई!', 'success');
+    } else {
+      notify(taskRes.error || 'Error submitting task', 'error');
+    }
+    eventsLoaded = false;
+    loadEventsPage();
+    memberData = null;
+  } catch(e){
+    notify(e.message || 'Submit failed', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Selfie Share करें — Social Book पर Post होगा!';
+  }
+}
+
+// --- QUIZ GAMES ---
+const tierConfig = {
+  monthly:     { color:'#3b82f6', gradient:'linear-gradient(135deg,#3b82f6,#2563eb)', label:'Monthly', emoji:'🗓️', fee:100 },
+  half_yearly: { color:'#8b5cf6', gradient:'linear-gradient(135deg,#8b5cf6,#7c3aed)', label:'Half-Yearly', emoji:'📅', fee:500 },
+  yearly:      { color:'#e11d48', gradient:'linear-gradient(135deg,#e11d48,#be123c)', label:'Yearly', emoji:'🏆', fee:1000 }
+};
+const gameTypeIcons = {
+  mcq:         { icon:'fa-solid fa-list-check', label:'MCQ Quiz', color:'#3b82f6' },
+  true_false:  { icon:'fa-solid fa-check-double', label:'True / False', color:'#10b981' },
+  picture:     { icon:'fa-solid fa-image', label:'Picture Quiz', color:'#f59e0b' },
+  speed:       { icon:'fa-solid fa-bolt', label:'Speed Round', color:'#ef4444' },
+  puzzle:      { icon:'fa-solid fa-puzzle-piece', label:'Puzzle', color:'#8b5cf6' },
+  general:     { icon:'fa-solid fa-brain', label:'GK Quiz', color:'#06b6d4' }
+};
+
+async function loadActiveQuizzes(){
+  try {
+    const data = await AUTH.api('/api/member/active-quizzes');
+    const grid = document.getElementById('quizGamesGrid');
+    const empty = document.getElementById('quizEmptyState');
+    if(!data.ok || !data.quizzes?.length){
+      grid.style.display = 'none';
+      empty.style.display = 'block';
+      allQuizzesCache = [];
+      return;
+    }
+    allQuizzesCache = data.quizzes;
+    renderQuizCards(allQuizzesCache);
+  } catch(e){
+    document.getElementById('quizGamesGrid').innerHTML = '<p style="color:var(--danger);font-size:13px;text-align:center;padding:20px">Games load error</p>';
+  }
+}
+
+function renderQuizCards(quizzes){
+  const grid = document.getElementById('quizGamesGrid');
+  const empty = document.getElementById('quizEmptyState');
+  if(!quizzes.length){ grid.style.display = 'none'; empty.style.display = 'block'; return; }
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+
+  grid.innerHTML = quizzes.map(q => {
+    const tc = tierConfig[q.type] || tierConfig.monthly;
+    const gt = gameTypeIcons[q.game_type] || gameTypeIcons.mcq;
+    const endDate = new Date(q.end_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short'});
+    const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
+    const participants = q.total_participants || 0;
+    const prizePool = q.prize_pool || (q.entry_fee * participants * 0.7);
+    return `
+      <div class="quiz-game-card" data-tier="${q.type}" style="position:relative;border-radius:18px;overflow:hidden;background:#fff;border:1.5px solid ${tc.color}22;box-shadow:0 4px 20px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s">
+        <div style="background:${tc.gradient};padding:16px 18px 14px;color:#fff;position:relative">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:800;letter-spacing:.5px">${tc.emoji} ${tc.label.toUpperCase()}</span>
+            <span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:700"><i class="${gt.icon}"></i> ${gt.label}</span>
+          </div>
+          <h4 style="margin:6px 0 4px;font-size:16px;font-weight:900;line-height:1.3;color:#fff">${q.title}</h4>
+          <div style="display:flex;gap:12px;font-size:11px;opacity:.8;font-weight:600;margin-top:4px">
+            <span>Last Date: ${endDate}</span>
+            <span>Result: ${resultDate}</span>
+          </div>
+        </div>
+        <div style="padding:14px 18px 16px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+            <div><div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Entry Fee</div><div style="font-size:18px;font-weight:900;color:${tc.color}">₹${q.entry_fee}</div></div>
+            <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Players</div><div style="font-size:18px;font-weight:900">${participants}</div></div>
+            <div style="text-align:right"><div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Prize Pool</div><div style="font-size:18px;font-weight:900;color:var(--success)">₹${fmtN(prizePool)}</div></div>
+          </div>
+          ${q.enrolled ? 
+            (q.played ? `<button class="btn btn-ghost" style="width:100%;justify-content:center" disabled><i class="fa-solid fa-check"></i> Already Played</button>` :
+            `<button class="btn" style="width:100%;justify-content:center;background:${tc.gradient};color:#fff;border:none;font-weight:800" onclick="openQuizPlay('${q._id}')"><i class="fa-solid fa-play"></i> Play Now</button>`) :
+            `<button class="btn" style="width:100%;justify-content:center;background:${tc.gradient};color:#fff;border:none;font-weight:800" onclick="enrollInQuiz('${q._id}', ${q.entry_fee}, '${q.type}')"><i class="fa-solid fa-ticket"></i> Join — ₹${q.entry_fee}</button>`}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterQuizTier(tier){
+  document.querySelectorAll('.game-chip').forEach(c => {
+    c.classList.remove('active');
+    c.style.background = 'transparent';
+    c.style.color = c.style.borderColor;
+  });
+  const active = document.querySelector(`.game-chip[data-tier="${tier}"]`);
+  if(active){ active.classList.add('active'); active.style.background = active.style.borderColor; active.style.color = '#fff'; }
+  const filtered = tier === 'all' ? allQuizzesCache : allQuizzesCache.filter(q => q.type === tier);
+  renderQuizCards(filtered);
+}
+
+async function enrollInQuiz(quizId, fee, type){
+  try {
+    const tc = tierConfig[type] || tierConfig.monthly;
+    const orderRes = await AUTH.api('/api/pay/create-order', { method:'POST', body:{ amount: fee, purpose: 'quiz_enrollment', quiz_id: quizId } });
+    if(!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
+    const rzp = new Razorpay({
+      key: orderRes.razorpayKeyId,
+      order_id: orderRes.orderId,
+      amount: fee * 100,
+      currency: 'INR',
+      name: 'FWF Fund Raiser',
+      description: `${tc.emoji} ${tc.label} Quiz`,
+      theme: { color: tc.color },
+      handler: async function(response){
+        const enrollRes = await AUTH.api('/api/member/quiz-enroll', { method:'POST', body:{ quiz_id: quizId, payment_id: response.razorpay_payment_id, order_id: response.razorpay_order_id, signature: response.razorpay_signature } });
+        if(enrollRes.ok){ notify('Enrolled! You can now play.','success'); eventsLoaded = false; loadEventsPage(); }
+        else notify(enrollRes.error || 'Enrollment failed','error');
+      }
+    });
+    rzp.open();
+  } catch(e){ notify(e.message || 'Failed','error'); }
+}
+
+async function openQuizPlay(quizId){
+  try {
+    const data = await AUTH.api('/api/member/active-quizzes');
+    const quiz = data.quizzes?.find(q => q._id === quizId);
+    if(!quiz) throw new Error('Quiz not found');
+    const questions = quiz.questions || [];
+    if(!questions.length) throw new Error('No questions');
+    let currentQ = 0;
+    const answers = {};
+    const gameType = quiz.game_type || 'mcq';
+    const tc = tierConfig[quiz.type] || tierConfig.monthly;
+    const gt = gameTypeIcons[gameType] || gameTypeIcons.mcq;
+
+    const existing = document.getElementById('quizPlayModal');
+    if(existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.id = 'quizPlayModal';
+    modal.style.zIndex = '600';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto">
+        <div class="modal-header" style="background:${tc.gradient};color:#fff;padding:16px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 style="color:#fff;margin:0;font-size:16px"><i class="${gt.icon}"></i> ${quiz.title}</h3>
+            <button onclick="document.getElementById('quizPlayModal').remove();" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">&times;</button>
+          </div>
+        </div>
+        <div class="modal-body" id="quizPlayBody" style="padding:20px"></div>
+        <div class="modal-actions" id="quizPlayActions" style="padding:14px 20px;display:flex;justify-content:space-between"></div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    function renderQuestion(){
+      const q = questions[currentQ];
+      document.getElementById('quizPlayBody').innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="background:#eff6ff;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">Q ${currentQ+1}/${questions.length}</span>
+        </div>
+        <h4 style="font-size:15px;margin-bottom:16px;line-height:1.5">${q.question}</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${q.options.map((opt,i) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:2px solid ${answers[currentQ]===i?'#10b981':'#e5e7eb'};cursor:pointer;transition:all .2s;background:${answers[currentQ]===i?'#ecfdf5':'#fff'}" onclick="selectQuizAnswer(${currentQ},${i})">
+              <input type="radio" name="q${currentQ}" value="${i}" ${answers[currentQ]===i?'checked':''} style="accent-color:#10b981">
+              <span style="font-size:14px">${opt}</span>
+            </label>
+          `).join('')}
+        </div>`;
+      document.getElementById('quizPlayActions').innerHTML = `
+        ${currentQ > 0 ? `<button class="btn btn-ghost" onclick="quizPrev()"><i class="fa-solid fa-arrow-left"></i> Previous</button>` : '<span></span>'}
+        ${currentQ < questions.length-1 ? 
+          `<button class="btn btn-primary" onclick="quizNext()">Next <i class="fa-solid fa-arrow-right"></i></button>` :
+          `<button class="btn btn-success" onclick="submitQuizAnswers('${quizId}')"><i class="fa-solid fa-paper-plane"></i> Submit Quiz</button>`}`;
+    }
+
+    window.selectQuizAnswer = (qi, ai) => { answers[qi] = ai; renderQuestion(); };
+    window.quizPrev = () => { if(currentQ > 0){ currentQ--; renderQuestion(); } };
+    window.quizNext = () => { if(currentQ < questions.length-1){ currentQ++; renderQuestion(); } };
+    window.submitQuizAnswers = async (qId) => {
+      const unanswered = questions.filter((_,i) => answers[i] === undefined).length;
+      if(unanswered > 0 && !confirm(`${unanswered} questions unanswered! Submit anyway?`)) return;
+      try {
+        const formattedAnswers = questions.map((q,i) => ({ q_no: q.q_no, selected: answers[i] ?? -1 }));
+        const res = await AUTH.api('/api/member/quiz-submit', { method:'POST', body:{ quiz_id: qId, answers: formattedAnswers } });
+        if(res.ok){ notify(res.message || 'Quiz submitted!', 'success'); document.getElementById('quizPlayModal').remove(); eventsLoaded = false; loadEventsPage(); }
+        else { notify(res.error, 'error'); }
+      } catch(e){ notify('Submit failed','error'); }
+    };
+
+    renderQuestion();
+  } catch(e){ notify(e.message || 'Quiz load failed','error'); }
+}
+
+async function loadMyActivities(){
+  try {
+    const [taskRes, quizRes] = await Promise.all([
+      AUTH.api('/api/member/task-history'),
+      AUTH.api('/api/member/quiz-history')
+    ]);
+    document.getElementById('myTasksCompleted').textContent = taskRes.totalTasks || 0;
+    document.getElementById('myQuizCount').textContent = quizRes.participations?.length || 0;
+    document.getElementById('myQuizWins').textContent = quizRes.participations?.filter(p => p.status === 'won').length || 0;
+
+    const taskList = document.getElementById('taskHistoryList');
+    if(taskRes.completions?.length){
+      taskList.innerHTML = taskRes.completions.map(c => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--bg-1);margin-bottom:6px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0">✅</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700">Task #${c.week_number}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${fmtDate(c.completed_at)}</div>
+          </div>
+          ${c.photo_url ? `<img src="${c.photo_url}" style="width:36px;height:36px;border-radius:6px;object-fit:cover" onclick="window.open(this.src)">` : ''}
+        </div>
+      `).join('');
+    }
+
+    const quizList = document.getElementById('quizHistoryList');
+    if(quizRes.participations?.length){
+      quizList.innerHTML = quizRes.participations.map(p => {
+        const statusColors = { enrolled:'#3b82f6', submitted:'#f59e0b', won:'#22c55e', lost:'#ef4444' };
+        const statusLabels = { enrolled:'Enrolled', submitted:'Submitted', won:'🏆 Won', lost:'Result Out' };
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:var(--bg-1);margin-bottom:6px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,${statusColors[p.status]||'#6b7280'},${statusColors[p.status]||'#4b5563'});display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0">
+              <i class="fa-solid fa-${p.status==='won'?'trophy':p.status==='submitted'?'check':'ticket'}"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:700">${p.quiz_details?.title || p.quiz_ref}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${p.enrollment_number} • ₹${p.amount_paid}</div>
+            </div>
+            <span style="background:${statusColors[p.status]}22;color:${statusColors[p.status]};padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700">${statusLabels[p.status]}</span>
+          </div>`;
+      }).join('');
+    }
+  } catch(e){ console.error('Activities load err:', e); }
+}
+
+/* ============================================
+   LOGOUT
+   ============================================ */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  if(typeof FWF_Notify !== 'undefined'){
+    FWF_Notify.confirm('Logout from your account?', async ()=>{
+      await AUTH.api('/api/auth/logout',{method:'POST'});
+      notify('Logged out','success');
+      setTimeout(()=> location.href = '/', 1000);
+    });
+  } else {
+    if(confirm('Logout?')){
+      AUTH.api('/api/auth/logout',{method:'POST'}).finally(()=> location.href = '/');
+    }
+  }
+});
+
+// Also allow top-right button to logout
+document.getElementById('topLogoutBtn').addEventListener('click', ()=>{
+  document.getElementById('logoutBtn').click();
+});
+
+/* ============================================
+   INIT
+   ============================================ */
+loadDashboard();
+</script>
+</body>
+</html>

@@ -639,11 +639,6 @@
   document.getElementById('closeDonateModal').addEventListener('click', ()=>{ closeModal(donateModal); resetDonate(); });
   donateModal.addEventListener('click', (e)=>{ if(e.target===donateModal){ closeModal(donateModal); resetDonate(); }});
 
-  // Auto-open donateModal when navigated via URL hash
-  if(window.location.hash === '#donateModal') {
-    resetDonate(); openModal(donateModal);
-  }
-
   const donateForm=document.getElementById('donateForm');
   const donateStep1=document.getElementById('donateStep1');
   const donateStepOtp=document.getElementById('donateStepOtp');
@@ -1042,6 +1037,11 @@
   document.getElementById('closePartner').addEventListener('click', ()=> closeModal(partnerModal));
   partnerModal.addEventListener('click', (e)=>{ if(e.target===partnerModal) closeModal(partnerModal); });
   document.getElementById('partnerForm').addEventListener('submit', (e)=>{ e.preventDefault(); if(!e.target.checkValidity()){ e.target.reportValidity(); return;} FWF_Notify.toast('Thanks! CSR partnership request received. Our team will contact you.', 'success', 5000); closeModal(partnerModal); });
+
+  // Auto-open donateModal when navigated via URL hash (placed last, after all vars/fns are defined)
+  if(window.location.hash === '#donateModal') {
+    resetDonate(); openModal(donateModal);
+  }
 </script>
 </body>
 </html>

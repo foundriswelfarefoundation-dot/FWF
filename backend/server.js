@@ -165,27 +165,28 @@ const QUIZ_TICKET_POINTS_PERCENT = 10;
 const QUIZ_TICKET_PRICE = 100;
 
 async function nextMemberId() {
-  const lastUser = await User.findOne({ role: 'member', member_id: { $regex: /^\w+-\d{6}$/ } })
-    .sort({ created_at: -1 }).select('member_id').lean();
-  let n = 0;
-  if (lastUser && lastUser.member_id) {
-    const m = lastUser.member_id.match(/(\d{6})$/);
-    if (m) n = parseInt(m[1], 10);
+  // FWFM + 3 random digits (e.g. FWFM847) — retry until unique
+  for (let i = 0; i < 100; i++) {
+    const digits = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const id = `FWFM${digits}`;
+    const exists = await User.findOne({ member_id: id }).lean();
+    if (!exists) return id;
   }
-  const next = (n + 1).toString().padStart(6, '0');
-  return `${ORG_PREFIX}-${next}`;
+  // Fallback: use count-based
+  const count = await User.countDocuments({ role: 'member' });
+  return `FWFM${(count + 1).toString().padStart(3, '0')}`;
 }
 
 async function nextSupporterId() {
-  const lastUser = await User.findOne({ role: 'supporter', member_id: { $regex: /^\w+-S-\d{6}$/ } })
-    .sort({ created_at: -1 }).select('member_id').lean();
-  let n = 0;
-  if (lastUser && lastUser.member_id) {
-    const m = lastUser.member_id.match(/(\d{6})$/);
-    if (m) n = parseInt(m[1], 10);
+  // FWFS + 4 random digits (e.g. FWFS3821) — retry until unique
+  for (let i = 0; i < 100; i++) {
+    const digits = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const id = `FWFS${digits}`;
+    const exists = await User.findOne({ member_id: id }).lean();
+    if (!exists) return id;
   }
-  const next = (n + 1).toString().padStart(6, '0');
-  return `${ORG_PREFIX}-S-${next}`;
+  const count = await User.countDocuments({ role: 'supporter' });
+  return `FWFS${(count + 1).toString().padStart(4, '0')}`;
 }
 async function nextDonationId() {
   const last = await Donation.findOne({ donation_id: { $regex: /^DON-\d{6}$/ } })
@@ -1684,13 +1685,15 @@ app.post('/api/admin/support-ticket/:ticketId', auth('admin'), async (req, res) 
 // ===== CSR PARTNERS SYSTEM =====
 
 async function nextPartnerId() {
-  const last = await CsrPartner.findOne().sort({ created_at: -1 }).select('partner_id');
-  let n = 0;
-  if (last && last.partner_id) {
-    const m = last.partner_id.match(/(\d+)$/);
-    if (m) n = parseInt(m[1], 10);
+  // FWFC + 2 random digits (e.g. FWFC47) — retry until unique
+  for (let i = 0; i < 100; i++) {
+    const digits = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+    const id = `FWFC${digits}`;
+    const exists = await CsrPartner.findOne({ partner_id: id }).lean();
+    if (!exists) return id;
   }
-  return `CSR-${(n + 1).toString().padStart(4, '0')}`;
+  const count = await CsrPartner.countDocuments();
+  return `FWFC${(count + 1).toString().padStart(2, '0')}`;
 }
 
 // Admin: get all CSR partners

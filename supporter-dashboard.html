@@ -572,7 +572,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
               <div style="font-size:18px;font-weight:800;margin-bottom:4px" id="dashCardName">Supporter Name</div>
               <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.25);padding:4px 10px;border-radius:6px;margin-bottom:12px">
                 <i class="fa-solid fa-id-badge" style="color:#34d399;font-size:12px"></i>
-                <span style="font-size:13px;font-weight:700;color:#6ee7b7" id="dashCardId">FWF-S-000000</span>
+                <span style="font-size:13px;font-weight:700;color:#6ee7b7" id="dashCardId">FWFS0000</span>
               </div>
               <div style="display:flex;gap:16px;font-size:11px;opacity:.75;font-weight:600;flex-wrap:wrap">
                 <span><i class="fa-solid fa-phone" style="margin-right:4px;color:#34d399;font-size:10px"></i><span id="dashCardMobile">—</span></span>
@@ -600,7 +600,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="profile-avatar" id="profileAvatar">S</div>
         <div>
           <div class="profile-name" id="profileName">Supporter</div>
-          <div class="profile-id" id="profileId">FWF-S-000000</div>
+          <div class="profile-id" id="profileId">FWFS0000</div>
           <div class="profile-meta">
             <span><i class="fa-solid fa-phone"></i> <span id="profileMobile">—</span></span>
             <span><i class="fa-solid fa-envelope"></i> <span id="profileEmail">—</span></span>
@@ -646,7 +646,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             </div>
           </div>
           <div style="font-size:22px;font-weight:900;margin-bottom:4px" id="cardName">Supporter Name</div>
-          <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:16px" id="cardId">FWF-S-000000</div>
+          <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:16px" id="cardId">FWFS0000</div>
           <div style="display:flex;gap:20px;font-size:11px;opacity:.7;font-weight:600">
             <span><i class="fa-solid fa-phone"></i> <span id="cardMobile">—</span></span>
             <span><i class="fa-solid fa-calendar"></i> <span id="cardJoined">—</span></span>
@@ -1144,7 +1144,7 @@ function populateProfile(data){
 
   // Dashboard ID Card
   document.getElementById('dashCardName').textContent = u.name || 'Supporter';
-  document.getElementById('dashCardId').textContent = u.member_id || 'FWF-S-000000';
+  document.getElementById('dashCardId').textContent = u.member_id || 'FWFS0000';
   document.getElementById('dashCardMobile').textContent = u.mobile || '—';
   document.getElementById('dashCardJoined').textContent = fmtDate(u.created_at);
 

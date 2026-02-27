@@ -999,7 +999,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <div class="welcome-banner" id="welcomeBanner">
       <h2 id="welcomeName">Welcome Back!</h2>
       <p>Empowering women through skills, welfare & self-employment.</p>
-      <div class="wid"><i class="fa-solid fa-id-badge"></i> <span id="welcomeId">FWF-000000</span></div>
+      <div class="wid"><i class="fa-solid fa-id-badge"></i> <span id="welcomeId">FWFM000</span></div>
     </div>
 
     <!-- ACCOUNT OVERVIEW — ICICI-style -->
@@ -1055,7 +1055,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
               <div style="font-size:18px;font-weight:800;margin-bottom:4px" id="dashCardName">Member Name</div>
               <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(232,119,34,.2);padding:4px 10px;border-radius:6px;margin-bottom:12px">
                 <i class="fa-solid fa-id-badge" style="color:#E87722;font-size:12px"></i>
-                <span style="font-size:13px;font-weight:700;color:#ffb366" id="dashCardId">FWF-000000</span>
+                <span style="font-size:13px;font-weight:700;color:#ffb366" id="dashCardId">FWFM000</span>
               </div>
               <div style="display:flex;gap:16px;font-size:11px;opacity:.75;font-weight:600;flex-wrap:wrap">
                 <span><i class="fa-solid fa-phone" style="margin-right:4px;color:#E87722;font-size:10px"></i><span id="dashCardMobile">—</span></span>
@@ -1083,7 +1083,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="profile-avatar" id="profileAvatar">M</div>
         <div>
           <div class="profile-name" id="profileName">Member</div>
-          <div class="profile-id" id="profileId">FWF-000000</div>
+          <div class="profile-id" id="profileId">FWFM000</div>
           <div class="profile-meta">
             <span><i class="fa-solid fa-phone"></i> <span id="profileMobile">—</span></span>
             <span><i class="fa-solid fa-envelope"></i> <span id="profileEmail">—</span></span>
@@ -1129,7 +1129,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             </div>
           </div>
           <div style="font-size:22px;font-weight:900;margin-bottom:4px" id="cardName">Member Name</div>
-          <div style="font-size:14px;font-weight:700;color:#E87722;margin-bottom:16px" id="cardId">FWF-000000</div>
+          <div style="font-size:14px;font-weight:700;color:#E87722;margin-bottom:16px" id="cardId">FWFM000</div>
           <div style="display:flex;gap:20px;font-size:11px;opacity:.7;font-weight:600">
             <span><i class="fa-solid fa-phone"></i> <span id="cardMobile">—</span></span>
             <span><i class="fa-solid fa-calendar"></i> <span id="cardJoined">—</span></span>
@@ -3440,7 +3440,7 @@ async function loadDashboard(){
 
     // Welcome
     document.getElementById('welcomeName').textContent = 'Welcome, ' + (u.name || 'Member') + '!';
-    document.getElementById('welcomeId').textContent = u.member_id || 'FWF-000000';
+    document.getElementById('welcomeId').textContent = u.member_id || 'FWFM000';
     document.getElementById('memberBadge').innerHTML = `<i class="fa-solid fa-circle-check"></i> ${u.member_id || 'Member'}`;
 
     // Top header
@@ -3498,7 +3498,7 @@ function populateProfile(data){
 
   // Dashboard ID Card
   document.getElementById('dashCardName').textContent = u.name || 'Member';
-  document.getElementById('dashCardId').textContent = u.member_id || 'FWF-000000';
+  document.getElementById('dashCardId').textContent = u.member_id || 'FWFM000';
   document.getElementById('dashCardMobile').textContent = u.mobile || '—';
   document.getElementById('dashCardJoined').textContent = fmtDate(u.created_at);
 

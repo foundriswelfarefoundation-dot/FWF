@@ -14,9 +14,11 @@ const donationSchema = new mongoose.Schema({
   donor_address:  { type: String, default: null },      // For KYC (high-value donors)
 
   // Payment info
-  source:         { type: String, default: 'razorpay' }, // razorpay | cash | bank_transfer | upi
+  source:         { type: String, default: 'razorpay' }, // razorpay | razorpay_recurring | cash | bank_transfer | upi
   payment_id:     { type: String, default: null },       // Razorpay payment ID
-  order_id:       { type: String, default: null },       // Razorpay order ID
+  order_id:       { type: String, default: null },       // Razorpay order ID (one-time)
+  subscription_id:{ type: String, default: null },       // Razorpay subscription ID (recurring)
+  recurring:      { type: Boolean, default: false },     // true for monthly recurring donations
 
   // KYC / Compliance
   kyc_required:   { type: Boolean, default: false },    // true when amount >= 50000

@@ -428,6 +428,21 @@
           <div class="fl-group"><i class="fl-icon fa-solid fa-location-dot"></i><input class="fl-input" name="address" id="addressInput" placeholder=" " /><label class="fl-label">Full Address</label></div>
         </div>
 
+        <!-- Recurring Donation Checkbox -->
+        <label id="toggleRecurring" style="display:flex;align-items:center;gap:10px;cursor:pointer;background:#f0f7ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:12px 14px;margin-bottom:12px;transition:.2s">
+          <div style="position:relative;flex-shrink:0">
+            <input type="checkbox" id="wantRecurring" style="opacity:0;position:absolute;width:0;height:0">
+            <div id="checkBoxRecurring" style="width:22px;height:22px;border-radius:6px;border:2px solid #c7d0e4;background:#fff;display:flex;align-items:center;justify-content:center;transition:.2s">
+              <i class="fa-solid fa-check" style="font-size:12px;color:#fff;display:none" id="checkIconRecurring"></i>
+            </div>
+          </div>
+          <div>
+            <p style="margin:0;font-size:0.88rem;font-weight:800;color:#1e293b">Make it Monthly</p>
+            <p style="margin:0;font-size:0.75rem;color:#64748b">Auto-debit every month · Cancel anytime from UPI app</p>
+          </div>
+          <span style="margin-left:auto;background:#dbeafe;color:#1d4ed8;font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:20px;white-space:nowrap"><i class="fa-solid fa-rotate" style="margin-right:3px"></i>Monthly</span>
+        </label>
+
         <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#ff416c,#ff4f81);margin-top:4px"><i class="fa-solid fa-arrow-right"></i> Next: Payment</button>
       </form>
     </div>
@@ -461,6 +476,11 @@
     <div id="donateStep2" style="display:none;">
       <h2 class="payTitle">Complete Payment</h2>
       <div style="text-align:center;margin:16px 0">
+        <!-- Recurring info (shown only when monthly is selected) -->
+        <div id="donateRecurringInfo" style="display:none;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #bfdbfe;border-radius:14px;padding:14px;margin-bottom:14px">
+          <p style="margin:0 0 2px;font-weight:700;color:#1d4ed8;font-size:0.95rem"><i class="fa-solid fa-rotate" style="margin-right:6px"></i>Monthly Auto-Debit Enabled</p>
+          <p style="margin:0;font-size:0.8rem;color:#1e40af">First payment charged now. A UPI AutoPay mandate will be set up for monthly auto-debit. Cancel anytime from your UPI app.</p>
+        </div>
         <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #c7d2fe;border-radius:14px;padding:16px;margin-bottom:16px">
           <p style="margin:0 0 4px;font-weight:600;color:#4338ca;font-size:0.95rem">Pay securely via Razorpay</p>
           <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap">
@@ -469,7 +489,7 @@
             <span style="background:#fff;padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#334155"><i class="fas fa-university" style="color:#8b5cf6"></i> Net Banking</span>
           </div>
         </div>
-        <p style="font-weight:900;font-size:1.4rem;color:#0f172a;margin:12px 0">Amount: ₹<span id="donateAmountDisplay">0</span></p>
+        <p style="font-weight:900;font-size:1.4rem;color:#0f172a;margin:12px 0">Amount: ₹<span id="donateAmountDisplay">0</span><span id="donateAmountSuffix"></span></p>
       </div>
       <button id="razorpayDonateBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay Securely Now</button>
       <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay</p>
@@ -664,6 +684,12 @@
     panInput.required = false;
     panInput.value = '';
     addressInput.value = '';
+    // Reset recurring checkbox
+    wantRecurring.checked = false;
+    setRecurringVisual(false);
+    document.getElementById('donateRecurringInfo').style.display = 'none';
+    document.getElementById('donateAmountSuffix').textContent = '';
+    document.getElementById('razorpayDonateBtn').innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now';
     document.querySelectorAll('.amount-chip').forEach(c => c.classList.remove('active'));
     // Safe check for optional elements
     const doneWrap = document.getElementById('doneWrap');
@@ -696,6 +722,24 @@
     set80GVisual(want80G.checked);
     panField.style.display = want80G.checked ? 'block' : 'none';
     if(!want80G.checked) panInput.value = '';
+  });
+
+  // Recurring donation toggle
+  const wantRecurring = document.getElementById('wantRecurring');
+  const checkBoxRecurring = document.getElementById('checkBoxRecurring');
+  const checkIconRecurring = document.getElementById('checkIconRecurring');
+
+  function setRecurringVisual(checked){
+    checkBoxRecurring.style.background = checked ? '#3b82f6' : '#fff';
+    checkBoxRecurring.style.borderColor = checked ? '#3b82f6' : '#c7d0e4';
+    checkIconRecurring.style.display = checked ? 'block' : 'none';
+    document.getElementById('toggleRecurring').style.background = checked ? '#dbeafe' : '#f0f7ff';
+    document.getElementById('toggleRecurring').style.borderColor = checked ? '#93c5fd' : '#bfdbfe';
+  }
+
+  document.getElementById('toggleRecurring').addEventListener('click', ()=>{
+    wantRecurring.checked = !wantRecurring.checked;
+    setRecurringVisual(wantRecurring.checked);
   });
 
   // Show/hide conditional fields on amount change
@@ -738,9 +782,17 @@
       pan:      panInput ? panInput.value : '',
       address:  addressInput ? addressInput.value : '',
       want80g:  want80G ? want80G.checked : false,
+      recurring: wantRecurring ? wantRecurring.checked : false,
       verified_token: null
     };
     document.getElementById('donateAmountDisplay').textContent = donateFormData.amount;
+    // Show/hide recurring info & update suffix + button label
+    const isRecurring = donateFormData.recurring;
+    document.getElementById('donateRecurringInfo').style.display = isRecurring ? 'block' : 'none';
+    document.getElementById('donateAmountSuffix').textContent = isRecurring ? '/month' : '';
+    document.getElementById('razorpayDonateBtn').innerHTML = isRecurring
+      ? '<i class="fa-solid fa-rotate"></i> Set Up Monthly Donation'
+      : '<i class="fa-solid fa-lock"></i> Pay Securely Now';
 
     if(Number(donateFormData.amount) >= HIGH_VALUE) {
       // Require OTP verification
@@ -830,76 +882,146 @@
   // Razorpay Donate Button
   document.getElementById('razorpayDonateBtn').addEventListener('click', async () => {
     const btn = document.getElementById('razorpayDonateBtn');
+    const isRecurring = donateFormData.recurring;
+    const BTN_LABEL = isRecurring
+      ? '<i class="fa-solid fa-rotate"></i> Set Up Monthly Donation'
+      : '<i class="fa-solid fa-lock"></i> Pay Securely Now';
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating Order...';
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + (isRecurring ? 'Setting up subscription...' : 'Creating Order...');
     
     try {
-      const orderRes = await fetch('/api/pay/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: Number(donateFormData.amount), type: 'donation', notes: { name: donateFormData.name, email: donateFormData.email } })
-      });
-      const orderData = await orderRes.json();
-      if (!orderData.ok) { FWF_Notify.toast(orderData.error || 'Failed to create order', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; return; }
-      
-      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now';
-      
-      const options = {
-        key: orderData.key,
-        amount: orderData.order.amount,
-        currency: orderData.order.currency,
-        name: 'FWF - Foundation for Women\'s Future',
-        description: 'Donation ₹' + donateFormData.amount,
-        image: '/assets/images/logo.png',
-        order_id: orderData.order.id,
-        prefill: { name: donateFormData.name, email: donateFormData.email, contact: donateFormData.mobile },
-        theme: { color: '#ff416c' },
-        handler: async function(response) {
-          btn.disabled = true;
-          btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording Donation...';
-          try {
-            const res = await fetch('/api/pay/donation', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: donateFormData.name,
-                mobile: donateFormData.mobile,
-                email: donateFormData.email,
-                pan: donateFormData.pan,
-                address: donateFormData.address,
-                amount: Number(donateFormData.amount),
-                want80g: donateFormData.want80g,
-                verified_token: donateFormData.verified_token,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature
-              })
-            });
-            const data = await res.json();
-            if (data.ok) {
-              FWF_Notify.modal({
-                title: '🎉 Thank You!',
-                message: `Your donation of ₹${donateFormData.amount} has been received successfully!${data.receipt80GSent ? '<br><br><span style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block">📄 80G Receipt sent to <strong>' + donateFormData.email + '</strong></span>' : (donateFormData.want80g ? '<br><br><small style="color:#ef4444">80G receipt could not be sent — our team will follow up.</small>' : '')}<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>${data.pointsEarned ? '<br><small style="color:#22c55e">Points earned: ' + data.pointsEarned + '</small>' : ''}`,
-                type: 'success',
-                confirmText: 'OK',
-                onConfirm: () => { closeModal(donateModal); resetDonate(); }
+      let options;
+
+      if (isRecurring) {
+        // ── RECURRING: create a Razorpay subscription ──
+        const subRes = await fetch('/api/pay/create-donation-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: Number(donateFormData.amount), name: donateFormData.name, email: donateFormData.email, mobile: donateFormData.mobile })
+        });
+        const subData = await subRes.json();
+        if (!subData.ok) { FWF_Notify.toast(subData.error || 'Failed to create subscription', 'error'); btn.disabled = false; btn.innerHTML = BTN_LABEL; return; }
+
+        btn.innerHTML = BTN_LABEL;
+
+        options = {
+          key: subData.key,
+          subscription_id: subData.subscription_id,
+          name: "FWF - Foundation for Women's Future",
+          description: 'Monthly Donation ₹' + donateFormData.amount + '/month',
+          image: '/assets/images/logo.png',
+          prefill: { name: donateFormData.name, email: donateFormData.email, contact: donateFormData.mobile },
+          theme: { color: '#3b82f6' },
+          handler: async function(response) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording Donation...';
+            try {
+              const res = await fetch('/api/pay/donation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: donateFormData.name,
+                  mobile: donateFormData.mobile,
+                  email: donateFormData.email,
+                  pan: donateFormData.pan,
+                  address: donateFormData.address,
+                  amount: Number(donateFormData.amount),
+                  want80g: donateFormData.want80g,
+                  recurring: true,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_subscription_id: response.razorpay_subscription_id,
+                  razorpay_signature: response.razorpay_signature
+                })
               });
-            } else {
-              FWF_Notify.toast(data.error || 'Error recording donation', 'error', 5000);
-            }
-          } catch(e) {
-            FWF_Notify.toast('Payment successful but recording failed. Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
-          } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; }
-        },
-        modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; } }
-      };
+              const data = await res.json();
+              if (data.ok) {
+                FWF_Notify.modal({
+                  title: '🎉 Monthly Donation Active!',
+                  message: `Your monthly donation of ₹${donateFormData.amount}/month has been set up successfully!<br><br><span style="background:#dbeafe;border:1px solid #bfdbfe;color:#1d4ed8;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block"><i class="fa-solid fa-rotate"></i> Auto-debits every month · Cancel anytime from UPI app</span>${data.receipt80GSent ? '<br><br><span style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block">📄 80G Receipt sent to <strong>' + donateFormData.email + '</strong></span>' : ''}<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>`,
+                  type: 'success',
+                  confirmText: 'OK',
+                  onConfirm: () => { closeModal(donateModal); resetDonate(); }
+                });
+              } else {
+                FWF_Notify.toast(data.error || 'Error recording donation', 'error', 5000);
+              }
+            } catch(e) {
+              FWF_Notify.toast('Payment successful but recording failed. Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
+            } finally { btn.disabled = false; btn.innerHTML = BTN_LABEL; }
+          },
+          modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = BTN_LABEL; } }
+        };
+
+      } else {
+        // ── ONE-TIME: create a Razorpay order ──
+        const orderRes = await fetch('/api/pay/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: Number(donateFormData.amount), type: 'donation', notes: { name: donateFormData.name, email: donateFormData.email } })
+        });
+        const orderData = await orderRes.json();
+        if (!orderData.ok) { FWF_Notify.toast(orderData.error || 'Failed to create order', 'error'); btn.disabled = false; btn.innerHTML = BTN_LABEL; return; }
+
+        btn.innerHTML = BTN_LABEL;
+
+        options = {
+          key: orderData.key,
+          amount: orderData.order.amount,
+          currency: orderData.order.currency,
+          name: "FWF - Foundation for Women's Future",
+          description: 'Donation ₹' + donateFormData.amount,
+          image: '/assets/images/logo.png',
+          order_id: orderData.order.id,
+          prefill: { name: donateFormData.name, email: donateFormData.email, contact: donateFormData.mobile },
+          theme: { color: '#ff416c' },
+          handler: async function(response) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording Donation...';
+            try {
+              const res = await fetch('/api/pay/donation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: donateFormData.name,
+                  mobile: donateFormData.mobile,
+                  email: donateFormData.email,
+                  pan: donateFormData.pan,
+                  address: donateFormData.address,
+                  amount: Number(donateFormData.amount),
+                  want80g: donateFormData.want80g,
+                  verified_token: donateFormData.verified_token,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature
+                })
+              });
+              const data = await res.json();
+              if (data.ok) {
+                FWF_Notify.modal({
+                  title: '🎉 Thank You!',
+                  message: `Your donation of ₹${donateFormData.amount} has been received successfully!${data.receipt80GSent ? '<br><br><span style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block">📄 80G Receipt sent to <strong>' + donateFormData.email + '</strong></span>' : (donateFormData.want80g ? '<br><br><small style="color:#ef4444">80G receipt could not be sent — our team will follow up.</small>' : '')}<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>${data.pointsEarned ? '<br><small style="color:#22c55e">Points earned: ' + data.pointsEarned + '</small>' : ''}`,
+                  type: 'success',
+                  confirmText: 'OK',
+                  onConfirm: () => { closeModal(donateModal); resetDonate(); }
+                });
+              } else {
+                FWF_Notify.toast(data.error || 'Error recording donation', 'error', 5000);
+              }
+            } catch(e) {
+              FWF_Notify.toast('Payment successful but recording failed. Contact support with ID: ' + response.razorpay_payment_id, 'warning', 8000);
+            } finally { btn.disabled = false; btn.innerHTML = BTN_LABEL; }
+          },
+          modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = BTN_LABEL; } }
+        };
+      }
+
       const rzp = new Razorpay(options);
-      rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now'; });
+      rzp.on('payment.failed', (resp) => { FWF_Notify.toast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error'); btn.disabled = false; btn.innerHTML = BTN_LABEL; });
       rzp.open();
     } catch(e) {
       FWF_Notify.toast('Error: ' + e.message, 'error');
       btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay Securely Now';
+      btn.innerHTML = isRecurring ? '<i class="fa-solid fa-rotate"></i> Set Up Monthly Donation' : '<i class="fa-solid fa-lock"></i> Pay Securely Now';
     }
   });
 

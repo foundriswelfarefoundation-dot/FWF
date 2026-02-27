@@ -452,7 +452,7 @@ app.get('/', (req, res) => {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
       admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
-      payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
+      payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
     }
@@ -563,6 +563,46 @@ app.post('/api/pay/create-subscription', async (req, res) => {
   } catch (err) {
     console.error('Razorpay create-subscription error:', err);
     captureError(err, { context: 'razorpay-create-subscription' });
+    res.status(500).json({ error: 'Failed to create subscription: ' + (err.error?.description || err.message) });
+  }
+});
+
+// Create Razorpay Donation Subscription (variable monthly amount)
+app.post('/api/pay/create-donation-subscription', async (req, res) => {
+  try {
+    const { amount, name, email, mobile } = req.body || {};
+    if (!amount || Number(amount) < 1) return res.status(400).json({ error: 'Valid amount required (min ₹1)' });
+    const amountPaise = Math.round(Number(amount) * 100);
+
+    // Create a fresh plan for this donation amount
+    const plan = await razorpay.plans.create({
+      period: 'monthly',
+      interval: 1,
+      item: {
+        name: `FWF Monthly Donation ₹${amount}`,
+        amount: amountPaise,
+        currency: 'INR',
+        description: "Foundation for Women's Future — monthly donation"
+      },
+      notes: { org: 'FWF', type: 'recurring_donation' }
+    });
+
+    const subscription = await razorpay.subscriptions.create({
+      plan_id:         plan.id,
+      total_count:     120,   // up to 10 years; donor can cancel anytime
+      quantity:        1,
+      customer_notify: 1,
+      notes: { name: name || '', email: email || '', mobile: mobile || '', org: 'FWF', type: 'recurring_donation' }
+    });
+
+    res.json({
+      ok: true,
+      subscription_id: subscription.id,
+      key: process.env.RAZORPAY_KEY_ID
+    });
+  } catch (err) {
+    console.error('Razorpay create-donation-subscription error:', err);
+    captureError(err, { context: 'razorpay-create-donation-subscription' });
     res.status(500).json({ error: 'Failed to create subscription: ' + (err.error?.description || err.message) });
   }
 });
@@ -775,13 +815,24 @@ app.post('/api/pay/donation', async (req, res) => {
       otpVerified = true;
     }
 
-    // Verify Razorpay signature
+    // Verify Razorpay signature (order for one-time; subscription for recurring)
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    const generated_signature = crypto
-      .createHmac('sha256', keySecret)
-      .update(razorpay_order_id + '|' + razorpay_payment_id)
-      .digest('hex');
-    if (generated_signature !== razorpay_signature) {
+    const { razorpay_subscription_id, recurring } = req.body;
+    let sig_ok = false;
+    if (recurring && razorpay_subscription_id) {
+      // Subscription signature: HMAC(payment_id + '|' + subscription_id)
+      const expected = crypto.createHmac('sha256', keySecret)
+        .update(razorpay_payment_id + '|' + razorpay_subscription_id)
+        .digest('hex');
+      sig_ok = expected === razorpay_signature;
+    } else {
+      // Order signature: HMAC(order_id + '|' + payment_id)
+      const expected = crypto.createHmac('sha256', keySecret)
+        .update(razorpay_order_id + '|' + razorpay_payment_id)
+        .digest('hex');
+      sig_ok = expected === razorpay_signature;
+    }
+    if (!sig_ok) {
       return res.status(400).json({ ok: false, error: 'Payment verification failed' });
     }
 
@@ -798,9 +849,11 @@ app.post('/api/pay/donation', async (req, res) => {
       donor_mobile: mobile || null,
       donor_pan:    pan   || null,
       donor_address: address || null,
-      source:       'razorpay',
+      source:       recurring ? 'razorpay_recurring' : 'razorpay',
       payment_id:   razorpay_payment_id,
-      order_id:     razorpay_order_id,
+      order_id:     razorpay_order_id || null,
+      subscription_id: razorpay_subscription_id || null,
+      recurring:    !!recurring,
       kyc_required: kycRequired,
       otp_verified: otpVerified,
       kyc_status:   kycRequired ? (otpVerified ? 'otp_verified' : 'pending_docs') : 'not_required'

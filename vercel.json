@@ -1,5 +1,9 @@
 {
-  "cleanUrls": false,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/m", "destination": "/m/home", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/terms",                  "destination": "/terms-conditions.html" },
     { "source": "/privacy",                "destination": "/privacy-policy.html" },
@@ -25,9 +29,6 @@
     { "source": "/csr-login",             "destination": "/csr-login.html" },
     { "source": "/csr-dashboard",         "destination": "/csr-dashboard.html" },
     { "source": "/store",                  "destination": "/store.html" },
-    { "source": "/m",                     "destination": "/m/home.html" },
-    { "source": "/m/",                    "destination": "/m/home.html" },
-    { "source": "/m/:page",               "destination": "/m/:page.html" },
     { "source": "/api/store/:path*",      "destination": "https://fwf-production.up.railway.app/api/store/:path*" },
     { "source": "/api/auth/:path*",       "destination": "https://fwf-production.up.railway.app/api/auth/:path*" },
     { "source": "/api/member/:path*",     "destination": "https://fwf-production.up.railway.app/api/member/:path*" },

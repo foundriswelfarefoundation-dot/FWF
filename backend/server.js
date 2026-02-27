@@ -164,29 +164,42 @@ const REFERRAL_POINTS_PERCENT = 50;
 const QUIZ_TICKET_POINTS_PERCENT = 10;
 const QUIZ_TICKET_PRICE = 100;
 
-async function nextMemberId() {
-  // FWFM + 3 random digits (e.g. FWFM847) — retry until unique
-  for (let i = 0; i < 100; i++) {
-    const digits = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    const id = `FWFM${digits}`;
-    const exists = await User.findOne({ member_id: id }).lean();
-    if (!exists) return id;
+/**
+ * Generate a unique random ID with auto-expanding digit width.
+ * Starts at `baseDigits` length; when that pool fills up, moves to baseDigits+1, etc.
+ * @param {string} prefix  - e.g. 'FWFM'
+ * @param {number} baseDigits - starting digit count
+ * @param {(id:string) => Promise<boolean>} existsFn - returns true if id already taken
+ */
+async function generateUniqueId(prefix, baseDigits, existsFn) {
+  let digits = baseDigits;
+  while (true) {
+    const pool = Math.pow(10, digits);  // e.g. 1000 for 3 digits
+    let found = false;
+    // Try up to 3× the pool size — if >90% full, auto-expand
+    const attempts = Math.min(pool * 3, 500);
+    for (let i = 0; i < attempts; i++) {
+      const n = Math.floor(Math.random() * pool).toString().padStart(digits, '0');
+      const id = `${prefix}${n}`;
+      const taken = await existsFn(id);
+      if (!taken) return id;
+    }
+    // Pool appears exhausted — expand by one digit
+    console.log(`⚠️  ${prefix} pool at ${digits} digits appears full — expanding to ${digits + 1} digits`);
+    digits++;
   }
-  // Fallback: use count-based
-  const count = await User.countDocuments({ role: 'member' });
-  return `FWFM${(count + 1).toString().padStart(3, '0')}`;
+}
+
+async function nextMemberId() {
+  return generateUniqueId('FWFM', 3, (id) =>
+    User.findOne({ member_id: id }).lean().then(Boolean)
+  );
 }
 
 async function nextSupporterId() {
-  // FWFS + 4 random digits (e.g. FWFS3821) — retry until unique
-  for (let i = 0; i < 100; i++) {
-    const digits = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    const id = `FWFS${digits}`;
-    const exists = await User.findOne({ member_id: id }).lean();
-    if (!exists) return id;
-  }
-  const count = await User.countDocuments({ role: 'supporter' });
-  return `FWFS${(count + 1).toString().padStart(4, '0')}`;
+  return generateUniqueId('FWFS', 4, (id) =>
+    User.findOne({ member_id: id }).lean().then(Boolean)
+  );
 }
 async function nextDonationId() {
   const last = await Donation.findOne({ donation_id: { $regex: /^DON-\d{6}$/ } })
@@ -1685,15 +1698,9 @@ app.post('/api/admin/support-ticket/:ticketId', auth('admin'), async (req, res) 
 // ===== CSR PARTNERS SYSTEM =====
 
 async function nextPartnerId() {
-  // FWFC + 2 random digits (e.g. FWFC47) — retry until unique
-  for (let i = 0; i < 100; i++) {
-    const digits = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-    const id = `FWFC${digits}`;
-    const exists = await CsrPartner.findOne({ partner_id: id }).lean();
-    if (!exists) return id;
-  }
-  const count = await CsrPartner.countDocuments();
-  return `FWFC${(count + 1).toString().padStart(2, '0')}`;
+  return generateUniqueId('FWFC', 2, (id) =>
+    CsrPartner.findOne({ partner_id: id }).lean().then(Boolean)
+  );
 }
 
 // Admin: get all CSR partners

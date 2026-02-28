@@ -643,6 +643,88 @@
       }
     }
 
+    /* ── Product Detail Modal ── */
+    .prod-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      align-items: flex-end; justify-content: center;
+    }
+    .prod-modal-overlay.open { display: flex; }
+    .prod-modal {
+      background: #fff; width: 100%; max-width: 580px; max-height: 90dvh;
+      border-radius: 22px 22px 0 0; display: flex; flex-direction: column;
+      overflow: hidden; animation: pmdSlideUp .35s cubic-bezier(.32,1,.32,1);
+    }
+    @keyframes pmdSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .prod-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px 14px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+    }
+    .prod-modal-header h2 { font-size: 17px; font-weight: 700; color: #111; flex: 1; margin-right: 12px; }
+    .prod-modal-close {
+      width: 34px; height: 34px; border: none; cursor: pointer;
+      background: #f3f4f6; border-radius: 50%; font-size: 16px;
+      display: flex; align-items: center; justify-content: center; color: #374151;
+      transition: background .15s;
+    }
+    .prod-modal-close:hover { background: #e5e7eb; }
+    .prod-modal-body { overflow-y: auto; flex: 1; padding: 16px 20px 40px; -webkit-overflow-scrolling: touch; }
+    /* Overview grid */
+    .pmd-overview { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+    .pmd-ov-item { background: #f0f4ff; border-radius: 10px; padding: 10px 8px; text-align: center; border: 1px solid #dde6ff; }
+    .pmd-ov-label { font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; }
+    .pmd-ov-value { font-size: 12px; font-weight: 700; color: #1e40af; }
+    /* Section title */
+    .pmd-title { font-size: 13px; font-weight: 700; color: #111; margin: 14px 0 8px; display: flex; align-items: center; gap: 6px; }
+    .pmd-title i { color: #667eea; }
+    /* Table */
+    .pmd-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px; }
+    .pmd-total { display: flex; justify-content: space-between; padding: 8px 12px; margin-top: 6px; background: #f0fdf4; border-radius: 8px; font-weight: 700; font-size: 13px; color: #15803d; }
+    /* Investment */
+    .pmd-inv-row { display: flex; justify-content: space-between; padding: 8px 12px; background: #f9fafb; border-radius: 8px; font-size: 12px; margin-bottom: 4px; }
+    .pmd-inv-grand { display: flex; justify-content: space-between; padding: 10px 14px; background: #1e40af; border-radius: 8px; color: #fff; font-weight: 700; font-size: 14px; margin-top: 4px; }
+    /* Funding */
+    .pmd-fund-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .pmd-fund-box { padding: 12px 10px; border-radius: 10px; text-align: center; }
+    .pmd-fund-pct { font-size: 24px; font-weight: 800; margin-bottom: 2px; }
+    .pmd-fund-label { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+    .pmd-fund-amt { font-size: 13px; font-weight: 700; }
+    .pmd-fund-total { padding: 10px 14px; background: #1f2937; border-radius: 8px; display: flex; justify-content: space-between; color: #fff; font-size: 13px; font-weight: 700; }
+    /* EMI */
+    .pmd-emi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pmd-emi-item { padding: 10px; background: #f9fafb; border-radius: 8px; text-align: center; }
+    .pmd-emi-item.highlight { background: #dcfce7; border: 1.5px solid #22c55e; }
+    .pmd-emi-label { font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; }
+    .pmd-emi-value { font-size: 14px; font-weight: 700; color: #111; }
+    .pmd-emi-item.highlight .pmd-emi-value { color: #15803d; font-size: 16px; }
+    /* Profit */
+    .pmd-profit { padding: 14px 16px; border-radius: 10px; background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 1.5px solid #22c55e; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .pmd-profit-label { font-size: 12px; font-weight: 600; color: #166534; }
+    .pmd-profit-value { font-size: 18px; font-weight: 800; color: #15803d; }
+    /* Clickable product card */
+    .product-card.has-detail {
+      cursor: pointer; position: relative;
+      transition: transform .15s, box-shadow .15s, background .15s, border-color .15s;
+    }
+    .product-card.has-detail::after {
+      content: '↗'; position: absolute; top: 5px; right: 8px;
+      font-size: 11px; color: #667eea; font-weight: 700;
+    }
+    .product-card.has-detail:hover,
+    .product-card.has-detail:active {
+      background: linear-gradient(135deg,#eef2ff,#f5f3ff) !important;
+      border-color: #667eea !important; color: #4338ca;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102,126,234,.25);
+    }
+    /* Desktop modal: centered + scale-in */
+    @media (min-width: 769px) {
+      .prod-modal-overlay { align-items: center; }
+      .prod-modal { border-radius: 20px; max-width: 560px; animation: pmdScaleIn .28s cubic-bezier(.32,1,.32,1); }
+      @keyframes pmdScaleIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      .pmd-overview { grid-template-columns: repeat(4,1fr); }
+    }
+
     /* ── Hide mobile-only elements on desktop ── */
     .mob-topbar, .mob-nav, .swipe-hint { display: none; }
     .mob-viewport { display: contents; } /* pages pass through on desktop */
@@ -771,7 +853,8 @@
            setupBreakdown:{total:"₹85,500", items:[{name:"Shop Setup & Electrical",cost:"₹57,000"},{name:"Trade License",cost:"₹9,500"},{name:"GST Registration",cost:"₹3,800"},{name:"MSME Registration",cost:"₹1,900"},{name:"Branding & Label Design",cost:"₹13,300"}]},
            workingBreakdown:{total:"₹1,99,500", items:[{name:"Surfactants (SLES etc.)",cost:"₹66,500"},{name:"Fragrance & Color",cost:"₹19,000"},{name:"Preservatives & Additives",cost:"₹15,200"},{name:"Bottles & Caps",cost:"₹76,000"},{name:"Labels & Packaging",cost:"₹22,800"}]},
            funding:{beneficiary:"50%",beneficiaryAmt:"₹2,85,000",ngoLoan:"50%",ngoLoanAmt:"₹2,85,000",totalProject:"₹5,70,000"},
-           emi:{loanAmount:"₹2,85,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹2,375"}},
+           emi:{loanAmount:"₹2,85,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹2,375"},
+           profitDetail:"₹60,000 – ₹90,000 / month"},
           {name:"Antiseptic Liquid Unit", space:"~225 sqft", workers:"2–3 workers", profit:"₹35k–80k/m", setup:"₹8,70,000", working:"₹5,40,000", upfront:"₹87,000",
            products:["Antiseptic liquid","Disinfectant surface spray"],
            capacity:"400–600 L/day", production:"4,000–6,000 bottles/month",
@@ -779,7 +862,8 @@
            setupBreakdown:{total:"₹95,000", items:[{name:"Shop Interior & Electrical Setup",cost:"₹50,000"},{name:"Trade License & Local Authority Fees",cost:"₹10,000"},{name:"GST Registration",cost:"₹3,000"},{name:"MSME Registration",cost:"₹2,000"},{name:"Branding, Logo & Label Design",cost:"₹15,000"},{name:"Initial Marketing Expense",cost:"₹15,000"}]},
            workingBreakdown:{total:"₹5,40,000", items:[{name:"Active Ingredients (₹70k × 3)",cost:"₹2,10,000"},{name:"Bottles & Caps (₹60k × 3)",cost:"₹1,80,000"},{name:"Labels & Packaging (₹20k × 3)",cost:"₹60,000"},{name:"Preservatives & Misc. Chemicals (₹30k × 3)",cost:"₹90,000"}]},
            funding:{beneficiary:"50%",beneficiaryAmt:"₹4,35,000",ngoLoan:"50%",ngoLoanAmt:"₹4,35,000",totalProject:"₹8,70,000"},
-           emi:{loanAmount:"₹4,35,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹3,625"}},
+           emi:{loanAmount:"₹4,35,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹3,625"},
+           profitDetail:"₹35,000 – ₹80,000 / month"},
           {name:"FreshWipe Converting Unit", space:"~240 sqft", workers:"4 workers", profit:"₹40k–65k/m", setup:"₹6,00,000", working:"₹1,50,000", upfront:"₹60,000",
            products:["Hygiene wet wipes","Alcohol wipes","Surface wipes (multipurpose)"]},
           {name:"MedBand Unit", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹4,50,000", working:"₹1,10,000", upfront:"₹45,000",
@@ -1156,9 +1240,19 @@
       page.className = 'page unit-detail';
       page.setAttribute('data-page', pageNum);
 
-      const productsHTML = unit.products.map(p =>
-        `<div class="product-card">${p}</div>`
-      ).join('');
+      // Store unit in global map for product modal lookup
+      if (!window._unitMap) window._unitMap = {};
+      const unitKey = unit.name.replace(/[^a-z0-9]/gi, '_');
+      window._unitMap[unitKey] = unit;
+
+      const hasDetail = !!(unit.machinery || unit.setupBreakdown || unit.workingBreakdown || unit.funding);
+      const productsHTML = unit.products.map(p => {
+        if (hasDetail) {
+          const safeP = p.replace(/'/g, "\\'");
+          return `<div class="product-card has-detail" onclick="showProdDetail('${safeP}','${unitKey}')">${p}</div>`;
+        }
+        return `<div class="product-card">${p}</div>`;
+      }).join('');
 
       // Generate machinery breakdown if available
       let machineryHTML = '';
@@ -1419,7 +1513,118 @@
       }
     }
 
+    /* ─── Product Detail Modal ─── */
+    function showProdDetail(productName, unitKey) {
+      const unit = (window._unitMap || {})[unitKey];
+      if (!unit) return;
+
+      document.getElementById('prodModalTitle').textContent = productName;
+      let h = '';
+
+      // Overview row
+      h += '<div class="pmd-overview">';
+      h += `<div class="pmd-ov-item"><div class="pmd-ov-label">Space</div><div class="pmd-ov-value">${unit.space}</div></div>`;
+      if (unit.capacity) h += `<div class="pmd-ov-item"><div class="pmd-ov-label">Capacity</div><div class="pmd-ov-value">${unit.capacity}</div></div>`;
+      h += `<div class="pmd-ov-item"><div class="pmd-ov-label">Manpower</div><div class="pmd-ov-value">${unit.workers}</div></div>`;
+      if (unit.production) h += `<div class="pmd-ov-item"><div class="pmd-ov-label">Production</div><div class="pmd-ov-value">${unit.production}</div></div>`;
+      h += '</div>';
+
+      // Machinery
+      if (unit.machinery && unit.machinery.items) {
+        h += '<div class="pmd-title"><i class="fa-solid fa-cogs"></i> Machinery &amp; Equipment</div>';
+        unit.machinery.items.filter(i => i.cost && i.cost !== '₹0').forEach(i => {
+          h += `<div class="pmd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`;
+        });
+        h += `<div class="pmd-total"><span>Total Machinery</span><span>${unit.machinery.total}</span></div>`;
+      }
+
+      // Setup
+      if (unit.setupBreakdown && unit.setupBreakdown.items) {
+        h += '<div class="pmd-title"><i class="fa-solid fa-building"></i> Setup &amp; Registration</div>';
+        unit.setupBreakdown.items.forEach(i => {
+          h += `<div class="pmd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`;
+        });
+        h += `<div class="pmd-total"><span>Total Setup</span><span>${unit.setupBreakdown.total}</span></div>`;
+      }
+
+      // Working Capital
+      if (unit.workingBreakdown && unit.workingBreakdown.items) {
+        h += '<div class="pmd-title"><i class="fa-solid fa-cubes"></i> Working Capital (3 Months)</div>';
+        unit.workingBreakdown.items.forEach(i => {
+          h += `<div class="pmd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`;
+        });
+        h += `<div class="pmd-total"><span>Total Working Capital</span><span>${unit.workingBreakdown.total}</span></div>`;
+      }
+
+      // Investment Summary
+      if (unit.machinery || unit.setupBreakdown || unit.workingBreakdown) {
+        const grand = unit.funding ? unit.funding.totalProject : unit.setup;
+        h += '<div class="pmd-title"><i class="fa-solid fa-table"></i> Total Project Investment</div>';
+        if (unit.machinery)        h += `<div class="pmd-inv-row"><span>Machinery &amp; Equipment</span><strong>${unit.machinery.total}</strong></div>`;
+        if (unit.setupBreakdown)   h += `<div class="pmd-inv-row"><span>Setup &amp; Registration</span><strong>${unit.setupBreakdown.total}</strong></div>`;
+        if (unit.workingBreakdown) h += `<div class="pmd-inv-row"><span>Working Capital (3 Months)</span><strong>${unit.workingBreakdown.total}</strong></div>`;
+        h += `<div class="pmd-inv-grand"><span>Grand Total Project Cost</span><span>${grand}</span></div>`;
+      }
+
+      // Funding
+      if (unit.funding) {
+        h += '<div class="pmd-title"><i class="fa-solid fa-handshake"></i> Funding Structure (50:50 NGO Model)</div>';
+        h += '<div class="pmd-fund-grid">';
+        h += `<div class="pmd-fund-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">`;
+        h += `<div class="pmd-fund-pct" style="color:#15803d;">${unit.funding.beneficiary}</div>`;
+        h += `<div class="pmd-fund-label" style="color:#166534;">Beneficiary Share</div>`;
+        h += `<div class="pmd-fund-amt" style="color:#15803d;">${unit.funding.beneficiaryAmt}</div></div>`;
+        h += `<div class="pmd-fund-box" style="background:#fef3c7;border:1.5px solid #fde68a;">`;
+        h += `<div class="pmd-fund-pct" style="color:#b45309;">${unit.funding.ngoLoan}</div>`;
+        h += `<div class="pmd-fund-label" style="color:#92400e;">NGO Loan (0% Interest)</div>`;
+        h += `<div class="pmd-fund-amt" style="color:#b45309;">${unit.funding.ngoLoanAmt}</div></div>`;
+        h += '</div>';
+        h += `<div class="pmd-fund-total"><span>Total Project Cost</span><span>${unit.funding.totalProject}</span></div>`;
+      }
+
+      // EMI
+      if (unit.emi) {
+        h += '<div class="pmd-title"><i class="fa-solid fa-calculator"></i> EMI Details</div>';
+        h += '<div class="pmd-emi-grid">';
+        h += `<div class="pmd-emi-item"><div class="pmd-emi-label">Loan Amount</div><div class="pmd-emi-value">${unit.emi.loanAmount}</div></div>`;
+        h += `<div class="pmd-emi-item"><div class="pmd-emi-label">Tenure</div><div class="pmd-emi-value">${unit.emi.tenure}</div></div>`;
+        h += `<div class="pmd-emi-item"><div class="pmd-emi-label">Moratorium</div><div class="pmd-emi-value">${unit.emi.moratorium}</div></div>`;
+        h += `<div class="pmd-emi-item highlight"><div class="pmd-emi-label">Monthly EMI</div><div class="pmd-emi-value">${unit.emi.monthlyEMI}</div></div>`;
+        h += '</div>';
+      }
+
+      // Profit
+      if (unit.profitDetail || unit.profit) {
+        const profitStr = unit.profitDetail || unit.profit;
+        h += '<div class="pmd-title" style="margin-top:16px;"><i class="fa-solid fa-chart-line"></i> Estimated Monthly Profit</div>';
+        h += `<div class="pmd-profit"><span class="pmd-profit-label">Monthly Profit Estimate</span><span class="pmd-profit-value">${profitStr}</span></div>`;
+        h += '<p style="font-size:10px;color:#9ca3af;margin-top:8px;">EMI is easily manageable from net monthly profit.</p>';
+      }
+
+      document.getElementById('prodModalBody').innerHTML = h;
+      const ov = document.getElementById('prodModalOverlay');
+      ov.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProdModal(e) {
+      if (e && e.target !== document.getElementById('prodModalOverlay')) return;
+      document.getElementById('prodModalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
     window.addEventListener('DOMContentLoaded', init);
   </script>
+  <!-- Product Detail Modal -->
+  <div class="prod-modal-overlay" id="prodModalOverlay" onclick="closeProdModal(event)">
+    <div class="prod-modal" id="prodModal">
+      <div class="prod-modal-header">
+        <h2 id="prodModalTitle">Product Details</h2>
+        <button class="prod-modal-close" onclick="closeProdModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="prod-modal-body" id="prodModalBody"></div>
+    </div>
+  </div>
+
 </body>
 </html>

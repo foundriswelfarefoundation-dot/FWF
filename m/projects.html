@@ -8,6 +8,7 @@
 
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="../assets/css/fwf-app.css" rel="stylesheet">
 
@@ -21,16 +22,38 @@
 
 
 
-    /* ── Hero ── */
-    .hero-banner {
-      background: rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding: 32px 20px 28px;
-      text-align: center;
-      color: #fff;
+    /* ── Hero (matches desktop) ── */
+    .hero-wrap { padding: 22px 14px 18px; display: flex; justify-content: center; }
+    .hero-content {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 16px; padding: 28px 18px 22px;
+      text-align: center; backdrop-filter: blur(8px); width: 100%;
     }
-    .hero-banner h1 { font-size: 22px; font-weight: 800; margin: 0 0 8px; }
-    .hero-banner p  { font-size: 13px; opacity: .85; margin: 0; line-height: 1.6; color: #d1d5db; }
+    .hero-title {
+      font-family: 'Montserrat', system-ui, sans-serif;
+      font-weight: 900; font-size: 26px; line-height: 1.1;
+      margin-bottom: 10px; letter-spacing: -.02em; color: #fff;
+    }
+    .hero-sub { font-size: 13px; color: #d1d5db; margin-bottom: 18px; line-height: 1.6; }
+    .hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn-hero-primary {
+      background: #f97316; color: #fff; border: none; border-radius: 12px;
+      padding: 11px 20px; font-weight: 800; font-size: 14px;
+      cursor: pointer; text-decoration: none; display: inline-block;
+    }
+    .btn-hero-outline {
+      background: transparent; color: #fff;
+      border: 2px solid #f97316; border-radius: 999px;
+      padding: 9px 18px; font-weight: 800; font-size: 14px; cursor: pointer;
+    }
+    /* TOGETHER multicolor letters */
+    .kick.modern { display: inline-flex; gap: 1px; align-items: baseline; font-family: 'Unbounded', system-ui, sans-serif; font-weight: 900; letter-spacing: -.018em; text-transform: uppercase; }
+    .kick.modern .L { display: inline-block; line-height: 1; font-size: 1.04em; }
+    .kick.modern .T  { color: #f43f5e; } .kick.modern .O  { color: #fb923c; }
+    .kick.modern .G  { color: #f59e0b; } .kick.modern .E1 { color: #10b981; }
+    .kick.modern .T2 { color: #06b6d4; } .kick.modern .H  { color: #3b82f6; }
+    .kick.modern .E2 { color: #8b5cf6; } .kick.modern .R  { color: #ec4899; }
 
     /* ── Filter chips ── */
     .filter-row {
@@ -194,11 +217,22 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <div class="hero-banner">
-    <div style="font-size:32px;margin-bottom:8px">💼</div>
-    <h1>Our Projects</h1>
-    <p><strong>Mission:</strong> Berozgaar logo ko rojgar aur Aatmnirbhar banana<br><strong>Vision:</strong> India ko Manufacturing Hub banana</p>
+  <!-- Hero — same as desktop -->
+  <div class="hero-wrap">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="kick modern" aria-label="Together">
+          <span class="L T">T</span><span class="L O">O</span><span class="L G">G</span>
+          <span class="L E1">E</span><span class="L T2">T</span><span class="L H">H</span>
+          <span class="L E2">E</span><span class="L R">R</span>
+        </span>, We Turn Skills into Livelihoods
+      </h1>
+      <p class="hero-sub">From learning to earning — we're with you every step of the way.</p>
+      <div class="hero-btns">
+        <a href="../join.html" class="btn-hero-primary">Start Your Journey</a>
+        <button class="btn-hero-outline" onclick="document.getElementById('projectsList').scrollIntoView({behavior:'smooth'})">Explore Projects</button>
+      </div>
+    </div>
   </div>
 
   <!-- Filter chips -->

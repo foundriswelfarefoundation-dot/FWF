@@ -1,5 +1,5 @@
 import { connectDB } from "../lib/db.js";
-import { getTransporter } from "../lib/mailer.js";
+import { sendMemberWelcome, getTransporter } from "../lib/mailer.js";
 import Member from "../models/Member.js";
 
 export default async function handler(req, res) {
@@ -41,20 +41,19 @@ export default async function handler(req, res) {
       memberId = "FWF-" + saved._id.toString().slice(-6).toUpperCase();
     }
 
-    const transporter = getTransporter();
-    await transporter.sendMail({
-      from: process.env.MAIL_FROM,
-      to: email,
-      subject: "FWF Membership Details",
-      text: `Dear ${finalName},\n\nYour membership is confirmed!\nMember ID: ${memberId}\n${password ? `Password: ${password}\n\nPlease change your password after first login.` : 'Password: (will be sent separately)'}\n\nThank you!\nFWF`
-    });
+    // Send HTML welcome email with credentials
+    sendMemberWelcome({ name: finalName, email, memberId, password, mobile })
+      .then(() => console.log(`✅ Member welcome email sent → ${email}`))
+      .catch(e => console.error('⚠️ Member welcome email failed:', e.message));
 
-    await transporter.sendMail({
+    // Admin notification (plain text)
+    const transporter = getTransporter();
+    transporter.sendMail({
       from: process.env.MAIL_FROM,
       to: process.env.SMTP_USER,
       subject: `New Member: ${finalName} (${memberId})`,
-      text: `Name: ${finalName}\nMobile: ${mobile}\nEmail: ${email}\nProject: ${project || "-"}\nPaymentRef: ${paymentRef || "-"}\nMember ID: ${memberId}\nPassword: ${password || "Not set"}`
-    });
+      text: `New member registered via join form.\n\nName: ${finalName}\nMobile: ${mobile}\nEmail: ${email}\nProject: ${project || "-"}\nPaymentRef: ${paymentRef || "-"}\nMember ID: ${memberId}\nPassword: ${password || "Not set"}`
+    }).catch(e => console.error('⚠️ Admin alert failed:', e.message));
 
     return res.json({ ok:true, id: saved._id, memberId, password });
   } catch (err) {

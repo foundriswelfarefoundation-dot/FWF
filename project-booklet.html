@@ -83,7 +83,6 @@
     .cover {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #fff;
-      display: flex !important;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -91,13 +90,17 @@
       position: relative;
       overflow: hidden;
     }
+    .cover.active {
+      display: flex !important;
+    }
 
     .cover::before {
       content: '';
       position: absolute;
       inset: -50%;
-      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1), transparent 50%);
+      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.04), transparent 50%);
       animation: shimmer 15s linear infinite;
+      opacity: 0.3;
     }
 
     @keyframes shimmer {
@@ -539,10 +542,13 @@
       .cover {
         min-height: 100% !important; height: auto;
         padding: 40px 20px !important;
-        display: flex !important; flex-direction: column;
+        flex-direction: column;
         align-items: center; justify-content: center;
         background: linear-gradient(135deg, #667eea, #764ba2);
         overflow: hidden;
+      }
+      .page.cover.active {
+        display: flex !important;
       }
       .cover-icon  { font-size: 52px; margin-bottom: 16px; }
       .cover-title { font-size: 28px; word-break: break-word; }

@@ -47,7 +47,7 @@ async function handler(req, res) {
     });
 
     // Send SMS OTP via MSG91 (non-blocking)
-    sendSmsOtp({ mobile, otp: generatedOtp })
+    sendSmsOtp({ mobile, otp: generatedOtp, type: 'donation' })
       .catch(e => console.error('⚠️ MSG91 SMS OTP failed:', e.message));
 
     // Send email with OTP

@@ -1189,9 +1189,9 @@ app.post('/api/auth/logout', (req, res) => {
 app.post('/api/auth/get-user-email', internalAuth, async (req, res) => {
   const { memberId } = req.body;
   if (!memberId) return res.status(400).json({ error: 'Member ID is required' });
-  const u = await User.findOne({ member_id: memberId }).select('email');
+  const u = await User.findOne({ member_id: memberId }).select('email mobile');
   if (!u) return res.status(404).json({ error: 'Member ID not found' });
-  res.json({ email: u.email });
+  res.json({ email: u.email, mobile: u.mobile || null });
 });
 
 // Update password — internal only

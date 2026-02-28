@@ -1,5 +1,6 @@
 import { connectDB } from "../lib/db.js";
 import { getTransporter } from "../lib/mailer.js";
+import { sendSmsOtp } from "../lib/msg91.js";
 import PasswordReset from "../models/PasswordReset.js";
 import { withSentry } from "../lib/sentry.js";
 
@@ -48,13 +49,19 @@ async function handler(req, res) {
         return res.status(404).json({ error: "Member ID not found" });
       }
 
-      const { email } = await response.json();
+      const { email, mobile } = await response.json();
 
       // Generate 6-digit OTP
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
       await PasswordReset.create({ memberId, email, otp, expiresAt, used: false });
+
+      // Send SMS OTP via MSG91 (non-blocking)
+      if (mobile) {
+        sendSmsOtp({ mobile, otp, type: 'forgot' })
+          .catch(e => console.error('⚠️ MSG91 forgot-password SMS failed:', e.message));
+      }
 
       // Send OTP email
       const transporter = getTransporter();

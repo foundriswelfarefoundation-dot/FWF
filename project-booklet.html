@@ -720,9 +720,24 @@
     /* Desktop modal: centered + scale-in */
     @media (min-width: 769px) {
       .prod-modal-overlay { align-items: center; }
-      .prod-modal { border-radius: 20px; max-width: 560px; animation: pmdScaleIn .28s cubic-bezier(.32,1,.32,1); }
+      .prod-modal {
+        border-radius: 20px; max-width: 560px; max-height: 85vh;
+        animation: pmdScaleIn .28s cubic-bezier(.32,1,.32,1);
+      }
       @keyframes pmdScaleIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
       .pmd-overview { grid-template-columns: repeat(4,1fr); }
+
+      /* ── Desktop unit-detail: scrollable within booklet ── */
+      .booklet { height: auto; min-height: 600px; overflow: hidden; }
+      .unit-detail { overflow-y: auto; overflow-x: hidden; }
+      .unit-detail.active {
+        overflow-y: auto !important;
+        padding-bottom: 80px; /* clear nav buttons */
+      }
+      /* custom scrollbar for unit detail pages */
+      .unit-detail::-webkit-scrollbar { width: 5px; }
+      .unit-detail::-webkit-scrollbar-track { background: #f3f4f6; }
+      .unit-detail::-webkit-scrollbar-thumb { background: linear-gradient(#667eea,#764ba2); border-radius: 4px; }
     }
 
     /* ── Hide mobile-only elements on desktop ── */

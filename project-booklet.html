@@ -740,6 +740,143 @@
       .unit-detail::-webkit-scrollbar-thumb { background: linear-gradient(#667eea,#764ba2); border-radius: 4px; }
     }
 
+    /* ── Product detail page ── */
+    .prod-detail-page .prod-tag {
+      display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px;
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      background: rgba(102,126,234,.1); color: #667eea; border: 1px solid rgba(102,126,234,.25);
+    }
+    .prod-section-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px;
+    }
+    .prod-row-total {
+      display: flex; justify-content: space-between; padding: 7px 12px; margin-top: 6px;
+      background: #f0fdf4; border-radius: 7px; font-weight: 700; font-size: 12px; color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    .prod-inv-row {
+      display: flex; justify-content: space-between; padding: 6px 10px;
+      background: #f9fafb; border-radius: 6px; font-size: 12px; margin-bottom: 3px;
+    }
+    .prod-inv-grand {
+      display: flex; justify-content: space-between; padding: 9px 12px;
+      background: #1e40af; border-radius: 7px; color: #fff; font-weight: 700;
+      font-size: 13px; margin-top: 4px;
+    }
+    .prod-fund-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;
+    }
+    .prod-fund-box { padding: 10px; border-radius: 9px; text-align: center; }
+    .prod-fund-pct { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+    .prod-fund-lbl { font-size: 10px; font-weight: 600; margin-bottom: 3px; }
+    .prod-fund-amt { font-size: 12px; font-weight: 700; }
+    .prod-fund-total {
+      display: flex; justify-content: space-between; padding: 8px 12px;
+      background: #1f2937; border-radius: 7px; color: #fff; font-size: 12px; font-weight: 700;
+    }
+    .prod-emi-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+    }
+    .prod-emi-box { padding: 9px 8px; border-radius: 8px; text-align: center; background: #f9fafb; border: 1px solid #e5e7eb; }
+    .prod-emi-box.hl { background: #dcfce7; border-color: #22c55e; }
+    .prod-emi-lbl { font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 3px; text-transform: uppercase; }
+    .prod-emi-val { font-size: 13px; font-weight: 700; color: #111; }
+    .prod-emi-box.hl .prod-emi-val { color: #15803d; font-size: 15px; }
+    .prod-profit-banner {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-radius: 10px;
+      background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 1.5px solid #22c55e;
+      margin-top: 10px;
+    }
+    .prod-profit-lbl { font-size: 12px; font-weight: 600; color: #166534; }
+    .prod-profit-val { font-size: 17px; font-weight: 800; color: #15803d; }
+    .prod-basic-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
+    }
+    .prod-basic-card {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 9px; padding: 10px 12px;
+    }
+    .prod-basic-lbl { font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; }
+    .prod-basic-val { font-size: 13px; font-weight: 700; color: #111; }
+
+    /* ── Index grouped by unit ── */
+    .index-unit-group { margin-bottom: 14px; }
+    .index-unit-header {
+      font-size: 12px; font-weight: 700; color: #667eea; text-transform: uppercase;
+      letter-spacing: .5px; padding: 6px 0 4px; border-bottom: 2px solid #e0e7ff;
+      margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .index-prod-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 2px;
+      border: 1px solid #f0f0f0; transition: background .15s, border-color .15s;
+    }
+    .index-prod-item:hover { background: #f5f7ff; border-color: #c7d2fe; }
+    .index-prod-name { font-size: 13px; font-weight: 600; color: #1f2937; }
+    .index-prod-unit { font-size: 10px; color: #6b7280; margin-top: 1px; }
+    .index-prod-page { font-size: 13px; font-weight: 700; color: #667eea; }
+
+    /* ── CTA Page ── */
+    .cta-page { background: #fff; }
+    .cta-hero {
+      text-align: center; margin-bottom: 20px; padding: 20px 0 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .cta-hero-icon {
+      width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 12px;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: #fff;
+    }
+    .cta-hero h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1f2937; margin-bottom: 6px; }
+    .cta-hero p { font-size: 13px; color: #6b7280; line-height: 1.6; }
+    .cta-form { display: flex; flex-direction: column; gap: 10px; }
+    .cta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cta-field label { display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; }
+    .cta-field input, .cta-field select, .cta-field textarea {
+      width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 9px;
+      font-size: 13px; color: #111; background: #fafafa; outline: none;
+      transition: border-color .15s;
+    }
+    .cta-field input:focus, .cta-field select:focus, .cta-field textarea:focus {
+      border-color: #667eea; background: #fff;
+    }
+    .cta-field textarea { resize: none; height: 64px; }
+    .cta-upload-box {
+      border: 2px dashed #c7d2fe; border-radius: 10px; padding: 16px;
+      text-align: center; cursor: pointer; transition: background .15s, border-color .15s;
+      background: #f5f7ff;
+    }
+    .cta-upload-box:hover { background: #eef2ff; border-color: #818cf8; }
+    .cta-upload-box i { font-size: 22px; color: #667eea; margin-bottom: 6px; display: block; }
+    .cta-upload-box p { font-size: 12px; color: #6b7280; margin: 0; }
+    .cta-upload-box small { font-size: 10px; color: #9ca3af; }
+    .cta-upload-name { font-size: 11px; color: #667eea; margin-top: 4px; font-weight: 600; }
+    .cta-submit-btn {
+      padding: 13px; border: none; border-radius: 12px; cursor: pointer; font-size: 15px;
+      font-weight: 700; color: #fff; width: 100%;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      box-shadow: 0 4px 14px rgba(102,126,234,.4);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .cta-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(102,126,234,.5); }
+    .cta-submit-btn:active { transform: translateY(0); }
+    .cta-success {
+      display: none; text-align: center; padding: 20px;
+      background: #f0fdf4; border-radius: 12px; border: 1.5px solid #22c55e; margin-top: 10px;
+    }
+    .cta-success i { font-size: 32px; color: #22c55e; display: block; margin-bottom: 10px; }
+    .cta-success h3 { font-size: 16px; color: #15803d; margin-bottom: 6px; }
+    .cta-success p { font-size: 12px; color: #166534; }
+
+    @media (max-width: 768px) {
+      .cta-row { grid-template-columns: 1fr; }
+      .prod-fund-grid { grid-template-columns: 1fr 1fr; }
+      .prod-basic-grid { grid-template-columns: 1fr 1fr; }
+      .prod-emi-grid { grid-template-columns: 1fr 1fr; }
+    }
+
     /* ── Hide mobile-only elements on desktop ── */
     .mob-topbar, .mob-nav, .swipe-hint { display: none; }
     .mob-viewport { display: contents; } /* pages pass through on desktop */
@@ -1193,18 +1330,21 @@
       ).join('');
       document.getElementById('impactBadges').innerHTML = impactBadges;
 
+      // Count total products across all units
+      const totalProductCount = projectData.units.reduce((sum, u) => sum + (u.products ? u.products.length : 0), 0);
+
       document.getElementById('statsGrid').innerHTML = `
         <div class="stat-box">
+          <div class="stat-value">${totalProductCount}</div>
+          <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-box">
           <div class="stat-value">${projectData.units.length}</div>
-          <div class="stat-label">Total Units</div>
+          <div class="stat-label">Business Units</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">${projectData.costs.setup}</div>
           <div class="stat-label">Total Project Cost</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">${projectData.costs.working}</div>
-          <div class="stat-label">Working Capital</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">${projectData.costs.upfront}</div>
@@ -1212,35 +1352,73 @@
         </div>
       `;
 
-      // Populate index
+      // Build one page per product, collect entries for index
       const indexList = document.getElementById('indexList');
       indexList.innerHTML = '';
-      projectData.units.forEach((unit, index) => {
-        const pageNum = index + 3;
-        const item = document.createElement('div');
-        item.className = 'index-item';
-        item.innerHTML = `
-          <span class="index-item-name">${unit.name}</span>
-          <span class="index-item-page">Page ${pageNum + 1}</span>
-        `;
-        item.onclick = () => goToPage(pageNum);
-        indexList.appendChild(item);
-        createUnitPage(unit, pageNum);
+      const allProductEntries = [];
+      let pageNum = 3;
+
+      projectData.units.forEach(unit => {
+        (unit.products || []).forEach(product => {
+          allProductEntries.push({ product, unit, pageNum });
+          createProductPage(product, unit, pageNum);
+          pageNum++;
+        });
       });
 
-      totalPages = 3 + projectData.units.length;
+      // CTA page
+      const ctaPageNum = pageNum;
+      createCTAPage(ctaPageNum);
+      pageNum++;
+
+      totalPages = pageNum;
       allPages = document.querySelectorAll('.page');
+
+      // Build index grouped by unit
+      projectData.units.forEach(unit => {
+        const unitEntries = allProductEntries.filter(e => e.unit === unit);
+        if (!unitEntries.length) return;
+        const group = document.createElement('div');
+        group.className = 'index-unit-group';
+        group.innerHTML = `<div class="index-unit-header"><i class="fa-solid fa-layer-group"></i> ${unit.name}</div>`;
+        unitEntries.forEach(({ product, pageNum: pn }) => {
+          const item = document.createElement('div');
+          item.className = 'index-prod-item';
+          item.innerHTML = `
+            <div>
+              <div class="index-prod-name">${product}</div>
+              <div class="index-prod-unit">${unit.name}</div>
+            </div>
+            <span class="index-prod-page">${pn + 1}</span>
+          `;
+          item.onclick = () => goToPage(pn);
+          group.appendChild(item);
+        });
+        indexList.appendChild(group);
+      });
+
+      // CTA entry at bottom of index
+      const ctaItem = document.createElement('div');
+      ctaItem.className = 'index-prod-item';
+      ctaItem.style.cssText = 'background:linear-gradient(135deg,#f5f3ff,#fdf4ff);border-color:#e9d5ff;margin-top:8px;';
+      ctaItem.innerHTML = `
+        <div>
+          <div class="index-prod-name" style="color:#7c3aed;">🚀 Submit Your Business Idea</div>
+          <div class="index-prod-unit">Propose a project to FWF admins</div>
+        </div>
+        <span class="index-prod-page" style="color:#7c3aed;">${ctaPageNum + 1}</span>
+      `;
+      ctaItem.onclick = () => goToPage(ctaPageNum);
+      indexList.appendChild(ctaItem);
 
       // Mobile: set up top bar title & gradient
       if (isMobile) {
         document.getElementById('mobTitle').textContent = projectData.name;
         const topbar = document.getElementById('mobTopbar');
         if (topbar) topbar.style.background = projectData.coverGradient;
-        // Match nav button gradient
         document.querySelectorAll('.mob-btn').forEach(btn => {
           btn.style.background = projectData.coverGradient;
         });
-        // Hide swipe hint after 4 seconds
         setTimeout(() => {
           const hint = document.querySelector('.swipe-hint');
           if (hint) hint.style.opacity = '0';
@@ -1250,173 +1428,269 @@
       updateUI();
     }
 
-    function createUnitPage(unit, pageNum) {
+    function createProductPage(product, unit, pageNum) {
       const page = document.createElement('div');
-      page.className = 'page unit-detail';
+      page.className = 'page unit-detail prod-detail-page';
       page.setAttribute('data-page', pageNum);
 
-      // Store unit in global map for product modal lookup
-      if (!window._unitMap) window._unitMap = {};
-      const unitKey = unit.name.replace(/[^a-z0-9]/gi, '_');
-      window._unitMap[unitKey] = unit;
-
       const hasDetail = !!(unit.machinery || unit.setupBreakdown || unit.workingBreakdown || unit.funding);
-      const productsHTML = unit.products.map(p => {
-        if (hasDetail) {
-          const safeP = p.replace(/'/g, "\\'");
-          return `<div class="product-card has-detail" onclick="showProdDetail('${safeP}','${unitKey}')">${p}</div>`;
-        }
-        return `<div class="product-card">${p}</div>`;
-      }).join('');
 
-      // Generate machinery breakdown if available
-      let machineryHTML = '';
-      if (unit.machinery && unit.machinery.items) {
-        machineryHTML = `
-          <div class="unit-section">
-            <h3><i class="fa-solid fa-cogs"></i> Machinery & Equipment Costs</h3>
-            <div style="font-size:12px;">
-              ${unit.machinery.items.map(item => `
-                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
-                  <span>${item.name}</span>
-                  <strong>${item.cost}</strong>
-                </div>
-              `).join('')}
-              <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;border-top:2px solid #e5e7eb;margin-top:8px;">
-                <span>Total Machinery</span>
-                <span>${unit.machinery.total}</span>
-              </div>
+      // ── Basic (no detailed data): simple overview ──
+      if (!hasDetail) {
+        page.innerHTML = `
+          <div class="prod-tag"><i class="fa-solid fa-layer-group"></i> ${unit.name}</div>
+          <h2 class="page-title" style="font-size:22px;margin-bottom:16px">${product}</h2>
+          <div class="unit-meta" style="margin-bottom:16px;">
+            <div class="unit-meta-item"><i class="fa-solid fa-ruler-combined"></i><span>${unit.space}</span></div>
+            <div class="unit-meta-item"><i class="fa-solid fa-users"></i><span>${unit.workers}</span></div>
+            <div class="unit-meta-item"><i class="fa-solid fa-chart-line"></i><span>${unit.profit}</span></div>
+          </div>
+          <div class="prod-basic-grid">
+            <div class="prod-basic-card">
+              <div class="prod-basic-lbl">Setup Cost</div>
+              <div class="prod-basic-val">${unit.setup}</div>
+            </div>
+            <div class="prod-basic-card">
+              <div class="prod-basic-lbl">Working Capital</div>
+              <div class="prod-basic-val">${unit.working}</div>
+            </div>
+            <div class="prod-basic-card">
+              <div class="prod-basic-lbl">Upfront Payment</div>
+              <div class="prod-basic-val">${unit.upfront}</div>
+            </div>
+            <div class="prod-basic-card" style="background:#f0fdf4;border-color:#bbf7d0;">
+              <div class="prod-basic-lbl" style="color:#166534;">Monthly Profit</div>
+              <div class="prod-basic-val" style="color:#15803d;">${unit.profit}</div>
             </div>
           </div>
-        `;
-      }
-
-      // Generate setup & registration breakdown if available
-      let setupHTML = '';
-      if (unit.setupBreakdown && unit.setupBreakdown.items) {
-        setupHTML = `
-          <div class="unit-section">
-            <h3><i class="fa-solid fa-building"></i> Setup & Registration Costs</h3>
-            <div style="font-size:12px;">
-              ${unit.setupBreakdown.items.map(item => `
-                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
-                  <span>${item.name}</span>
-                  <strong>${item.cost}</strong>
-                </div>
-              `).join('')}
-              <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;border-top:2px solid #e5e7eb;margin-top:8px;">
-                <span>Total Setup</span>
-                <span>${unit.setupBreakdown.total}</span>
-              </div>
-            </div>
+          <div style="text-align:center;padding:20px;background:#fafafa;border-radius:12px;border:1px dashed #d1d5db;margin-top:10px;">
+            <i class="fa-solid fa-file-lines" style="font-size:24px;color:#9ca3af;margin-bottom:8px;display:block;"></i>
+            <p style="font-size:12px;color:#6b7280;margin:0;">Detailed project report coming soon.<br>Contact FWF for full breakdown.</p>
           </div>
         `;
-      }
+      } else {
+        // ── Detailed data available ──
+        const m = unit.machinery;
+        const s = unit.setupBreakdown;
+        const w = unit.workingBreakdown;
+        const f = unit.funding;
+        const e = unit.emi;
 
-      // Generate working capital breakdown if available
-      let workingHTML = '';
-      if (unit.workingBreakdown && unit.workingBreakdown.items) {
-        workingHTML = `
+        const machineryHTML = (m && m.items) ? `
+          <div class="unit-section">
+            <h3><i class="fa-solid fa-cogs"></i> Machinery & Equipment</h3>
+            ${m.items.map(i => `<div class="prod-section-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
+            <div class="prod-row-total"><span>Total Machinery</span><span>${m.total}</span></div>
+          </div>` : '';
+
+        const setupHTML = (s && s.items) ? `
+          <div class="unit-section">
+            <h3><i class="fa-solid fa-building"></i> Setup & Registration</h3>
+            ${s.items.map(i => `<div class="prod-section-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
+            <div class="prod-row-total"><span>Total Setup</span><span>${s.total}</span></div>
+          </div>` : '';
+
+        const workingHTML = (w && w.items) ? `
           <div class="unit-section">
             <h3><i class="fa-solid fa-cubes"></i> Working Capital (1 Month)</h3>
-            <div style="font-size:12px;">
-              ${unit.workingBreakdown.items.map(item => `
-                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
-                  <span>${item.name}</span>
-                  <strong>${item.cost}</strong>
-                </div>
-              `).join('')}
-              <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;border-top:2px solid #e5e7eb;margin-top:8px;">
-                <span>Total Working Capital</span>
-                <span>${unit.workingBreakdown.total}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }
+            ${w.items.map(i => `<div class="prod-inv-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
+            <div class="prod-inv-grand"><span>Total Working Capital</span><span>${w.total}</span></div>
+          </div>` : '';
 
-      // Generate funding & EMI section if available
-      let fundingHTML = '';
-      if (unit.funding && unit.emi) {
-        fundingHTML = `
+        const fundingHTML = (f && e) ? `
           <div class="unit-section">
-            <h3><i class="fa-solid fa-handshake"></i> Funding Structure (NGO Model - 50:50)</h3>
-            <div style="font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div style="padding:10px;background:#f0fdf4;border-radius:8px;">
-                <div style="color:#15803d;font-weight:700;margin-bottom:4px;">Beneficiary Share</div>
-                <div style="font-size:13px;font-weight:700;color:#000;">${unit.funding.beneficiary}</div>
-                <div style="font-size:11px;color:#666;margin-top:2px;">${unit.funding.beneficiaryAmt}</div>
+            <h3><i class="fa-solid fa-handshake"></i> Funding Structure (50 : 50)</h3>
+            <div class="prod-fund-grid">
+              <div class="prod-fund-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+                <div class="prod-fund-pct" style="color:#15803d;">50%</div>
+                <div class="prod-fund-lbl" style="color:#166534;">Beneficiary Share</div>
+                <div class="prod-fund-amt">${f.beneficiaryAmt}</div>
               </div>
-              <div style="padding:10px;background:#fef3c7;border-radius:8px;">
-                <div style="color:#b45309;font-weight:700;margin-bottom:4px;">NGO Loan (0% Interest)</div>
-                <div style="font-size:13px;font-weight:700;color:#000;">${unit.funding.ngoLoan}</div>
-                <div style="font-size:11px;color:#666;margin-top:2px;">${unit.funding.ngoLoanAmt}</div>
-              </div>
-            </div>
-            <div style="padding:10px;background:#f3f4f6;border-radius:8px;margin-top:10px;font-weight:700;">
-              <div style="display:flex;justify-content:space-between;">
-                <span>Total Project Cost</span>
-                <span>${unit.funding.totalProject}</span>
+              <div class="prod-fund-box" style="background:#fef3c7;border:1.5px solid #fde68a;">
+                <div class="prod-fund-pct" style="color:#b45309;">50%</div>
+                <div class="prod-fund-lbl" style="color:#92400e;">NGO Loan (0% Interest)</div>
+                <div class="prod-fund-amt">${f.ngoLoanAmt}</div>
               </div>
             </div>
-            
-            <h4 style="margin-top:12px;margin-bottom:8px;font-size:13px;font-weight:700;"><i class="fa-solid fa-calculator"></i> EMI Details</h4>
-            <div style="font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-              <div><strong>Loan Amount:</strong><br>${unit.emi.loanAmount}</div>
-              <div><strong>Tenure:</strong><br>${unit.emi.tenure}</div>
-              <div><strong>Moratorium:</strong><br>${unit.emi.moratorium}</div>
-              <div style="background:#dcfce7;padding:8px;border-radius:6px;border:1px solid #22c55e;"><strong style="color:#15803d;">Monthly EMI</strong><br><span style="font-size:14px;font-weight:700;color:#15803d;">${unit.emi.monthlyEMI}</span></div>
+            <div class="prod-fund-total"><span>Total Project Cost</span><span>${f.totalProject}</span></div>
+            <h4 style="margin:14px 0 8px;font-size:13px;"><i class="fa-solid fa-calculator"></i> EMI Details</h4>
+            <div class="prod-emi-grid">
+              <div class="prod-emi-box"><div class="prod-emi-lbl">Loan Amount</div><div class="prod-emi-val">${e.loanAmount}</div></div>
+              <div class="prod-emi-box"><div class="prod-emi-lbl">Tenure</div><div class="prod-emi-val">${e.tenure}</div></div>
+              <div class="prod-emi-box"><div class="prod-emi-lbl">Moratorium</div><div class="prod-emi-val">${e.moratorium}</div></div>
+              <div class="prod-emi-box hl"><div class="prod-emi-lbl">Monthly EMI</div><div class="prod-emi-val">${e.monthlyEMI}</div></div>
             </div>
+          </div>` : '';
+
+        const profitHTML = unit.profit ? `
+          <div class="prod-profit-banner">
+            <span class="prod-profit-lbl"><i class="fa-solid fa-chart-line"></i> Estimated Monthly Profit</span>
+            <span class="prod-profit-val">${unit.profit}</span>
+          </div>` : '';
+
+        page.innerHTML = `
+          <div class="prod-tag"><i class="fa-solid fa-layer-group"></i> ${unit.name}</div>
+          <h2 class="page-title" style="font-size:20px;margin-bottom:8px;line-height:1.3">${product}</h2>
+          <div class="unit-meta" style="margin-bottom:14px;">
+            <div class="unit-meta-item"><i class="fa-solid fa-ruler-combined"></i><span>${unit.space}</span></div>
+            <div class="unit-meta-item"><i class="fa-solid fa-users"></i><span>${unit.workers}</span></div>
+            ${unit.capacity ? `<div class="unit-meta-item"><i class="fa-solid fa-industry"></i><span>${unit.capacity}</span></div>` : ''}
           </div>
+          ${machineryHTML}
+          ${setupHTML}
+          ${workingHTML}
+          ${fundingHTML}
+          ${profitHTML}
+          <p style="font-size:10px;color:#9ca3af;margin-top:10px;line-height:1.5;">Costs include machinery, licensing (GST/MSME/Trade), infrastructure, raw materials, packaging, testing & training. 90% inflation buffer applied.</p>
         `;
       }
 
-      page.innerHTML = `
-        <h2 class="page-title" style="font-size:22px;margin-bottom:12px">${unit.name}</h2>
-
-        <div class="unit-meta">
-          <div class="unit-meta-item"><i class="fa-solid fa-ruler-combined"></i><span>${unit.space}</span></div>
-          <div class="unit-meta-item"><i class="fa-solid fa-users"></i><span>${unit.workers}</span></div>
-          <div class="unit-meta-item"><i class="fa-solid fa-chart-line"></i><span>Profit: ${unit.profit}</span></div>
-          ${unit.capacity ? `<div class="unit-meta-item"><i class="fa-solid fa-industry"></i><span>${unit.capacity}</span></div>` : ''}
-        </div>
-
-        <div class="unit-section">
-          <h3><i class="fa-solid fa-box"></i> Products / उत्पाद</h3>
-          <div class="products-grid">${productsHTML}</div>
-        </div>
-
-        ${machineryHTML}
-        ${setupHTML}
-        ${workingHTML}
-
-        <div class="unit-section">
-          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Summary / वित्तीय विवरण</h3>
-          <div class="finance-box">
-            <div class="finance-row">
-              <span class="finance-label">Total Project Cost</span>
-              <span class="finance-value">${unit.setup}</span>
-            </div>
-            <div class="finance-row">
-              <span class="finance-label">Working Capital (3 months)</span>
-              <span class="finance-value">${unit.working}</span>
-            </div>
-            <div class="finance-row">
-              <span class="finance-label">Beneficiary Upfront</span>
-              <span class="finance-value">${unit.upfront}</span>
-            </div>
-          </div>
-          <p style="font-size:10px;color:#9ca3af;margin-top:8px;line-height:1.5">Includes: Machines & Equipment, Licensing (GST/MSME/Trade), Infrastructure, Raw Material, Packaging & Branding, Testing, Training & Installation. 90% inflation buffer applied.</p>
-        </div>
-
-        ${fundingHTML}
-      `;
-
-      // On mobile, append to viewport; on desktop, append to booklet
       const container = isMobile
         ? document.getElementById('mobViewport')
         : document.getElementById('booklet');
       container.appendChild(page);
+    }
+
+    function createCTAPage(pageNum) {
+      const page = document.createElement('div');
+      page.className = 'page cta-page';
+      page.setAttribute('data-page', pageNum);
+
+      page.innerHTML = `
+        <div class="cta-hero">
+          <div class="cta-hero-icon">🚀</div>
+          <h2>Submit Your Business Idea</h2>
+          <p>Have a product or manufacturing idea? Share your project proposal with FWF admins — we'll review and help you get started.</p>
+        </div>
+        <form class="cta-form" id="ideaForm" onsubmit="submitIdea(event)">
+          <div class="cta-row">
+            <div class="cta-field">
+              <label>Your Name *</label>
+              <input type="text" name="name" placeholder="Full name" required>
+            </div>
+            <div class="cta-field">
+              <label>Phone *</label>
+              <input type="tel" name="phone" placeholder="10-digit mobile" required>
+            </div>
+          </div>
+          <div class="cta-field">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="your@email.com">
+          </div>
+          <div class="cta-row">
+            <div class="cta-field">
+              <label>Project / Business Name *</label>
+              <input type="text" name="projectName" placeholder="e.g. Herbal Soap Unit" required>
+            </div>
+            <div class="cta-field">
+              <label>Category *</label>
+              <select name="category" required>
+                <option value="">Select category</option>
+                <option>Healthcare & Hygiene</option>
+                <option>Food & Agro Processing</option>
+                <option>Textiles & Apparel</option>
+                <option>Education & Stationery</option>
+                <option>Home & Kitchen</option>
+                <option>Electronics & Electrical</option>
+                <option>Beauty & Wellness</option>
+                <option>Handicrafts & Artisans</option>
+                <option>Construction Materials</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="cta-row">
+            <div class="cta-field">
+              <label>Estimated Setup Cost</label>
+              <input type="text" name="setupCost" placeholder="e.g. ₹3,50,000">
+            </div>
+            <div class="cta-field">
+              <label>Monthly Profit Estimate</label>
+              <input type="text" name="profitEstimate" placeholder="e.g. ₹25,000–40,000">
+            </div>
+          </div>
+          <div class="cta-field">
+            <label>Project Description *</label>
+            <textarea name="description" placeholder="Briefly describe your idea, products, target market, and any experience you have..." required></textarea>
+          </div>
+          <div class="cta-field">
+            <label>Upload Project Details (PDF / Image)</label>
+            <div class="cta-upload-box" onclick="document.getElementById('ideaFile').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p>Click to upload PDF or image</p>
+              <small>Max 5 MB — PDF, JPG, PNG</small>
+              <div class="cta-upload-name" id="fileName"></div>
+            </div>
+            <input type="file" id="ideaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="showFileName(this)">
+          </div>
+          <button type="submit" class="cta-submit-btn" id="ctaSubmitBtn">
+            <i class="fa-solid fa-paper-plane"></i> Submit Proposal to FWF Admins
+          </button>
+        </form>
+        <div class="cta-success" id="ctaSuccess">
+          <i class="fa-solid fa-circle-check"></i>
+          <h3>Proposal Submitted!</h3>
+          <p>Thank you! Our team will review your business idea and reach out within 2–3 working days.</p>
+        </div>
+      `;
+
+      const container = isMobile
+        ? document.getElementById('mobViewport')
+        : document.getElementById('booklet');
+      container.appendChild(page);
+    }
+
+    function showFileName(input) {
+      const el = document.getElementById('fileName');
+      el.textContent = input.files[0] ? input.files[0].name : '';
+    }
+
+    async function submitIdea(e) {
+      e.preventDefault();
+      const btn = document.getElementById('ctaSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting…';
+
+      const form = document.getElementById('ideaForm');
+      const data = Object.fromEntries(new FormData(form));
+      const fileInput = document.getElementById('ideaFile');
+
+      // Read file as base64 if provided
+      let fileData = null;
+      if (fileInput.files[0]) {
+        fileData = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = ev => resolve({ name: fileInput.files[0].name, data: ev.target.result });
+          reader.readAsDataURL(fileInput.files[0]);
+        });
+      }
+
+      const payload = {
+        name: data.name,
+        email: data.email || 'not provided',
+        phone: data.phone,
+        message: `📋 BUSINESS IDEA PROPOSAL\n\nProject: ${data.projectName}\nCategory: ${data.category}\nSetup Cost: ${data.setupCost || 'N/A'}\nProfit Estimate: ${data.profitEstimate || 'N/A'}\n\nDescription:\n${data.description}`,
+        subject: `[FWF Business Idea] ${data.projectName} – ${data.category}`,
+        ...(fileData ? { attachment: fileData } : {})
+      };
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          form.style.display = 'none';
+          document.getElementById('ctaSuccess').style.display = 'block';
+        } else {
+          throw new Error('Server error');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Proposal to FWF Admins';
+        alert('Failed to submit. Please try again or email us directly at admin@fwfindia.org');
+      }
     }
 
     function nextPage() {

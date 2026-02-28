@@ -552,6 +552,10 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <button class="nav-item" data-page="settings">
       <i class="fa-solid fa-gear"></i> Settings
     </button>
+    <button class="nav-item" data-page="projectcosts">
+      <i class="fa-solid fa-indian-rupee-sign"></i> Project Costs
+      <span class="nav-badge" style="background:#22c55e;font-size:10px;padding:1px 6px;border-radius:8px;color:#fff;margin-left:4px">Edit</span>
+    </button>
   </nav>
   <div class="sidebar-footer">
     <button class="nav-item logout-btn" id="logoutBtn">
@@ -1412,6 +1416,32 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
+  <!-- ===================== PROJECT COST MANAGER ===================== -->
+  <div class="page" id="page-projectcosts">
+    <div class="content-card" style="margin-bottom:16px;background:#fef3c7;border:1px solid #f59e0b">
+      <p style="font-size:13px;color:#92400e;margin:0"><i class="fa-solid fa-circle-info" style="margin-right:6px"></i><strong>How it works:</strong> Changes saved here override the displayed figures in the Project Booklet and Projects page. Data is stored in this browser's localStorage. This is useful for updating costs when prices change due to inflation.</p>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <select class="form-input" id="costProjectSelect" style="max-width:260px" onchange="renderCostEditor()">
+        <option value="suraksha">Suraksha — Health & Hygiene</option>
+        <option value="swachh-bharat">Swachh Bharat — Home Care</option>
+        <option value="happy-meal">Happy Meal — Food Processing</option>
+        <option value="green-energy">Green Energy</option>
+        <option value="diy-crafts">DIY Crafts</option>
+        <option value="swachh-jal">Swachh Jal — Water</option>
+        <option value="samman">Samman — Apparel</option>
+        <option value="sweet-home">Sweet Home — Textiles</option>
+        <option value="hariyali">Hariyali — Green Livelihoods</option>
+        <option value="worship">Worship — Puja Essentials</option>
+        <option value="shiksha">Shiksha — Stationery</option>
+      </select>
+      <button class="btn btn-danger btn-sm" onclick="resetAllCostOverrides()"><i class="fa-solid fa-rotate-left"></i> Reset ALL Overrides</button>
+    </div>
+
+    <div id="costEditorGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
+  </div>
+
   <!-- ===================== SOCIAL POSTS APPROVAL ===================== -->
   <div class="page" id="page-posts">
     <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
@@ -1769,7 +1799,8 @@ const pageTitles = {
   marketplace: '<i class="fa-solid fa-store"></i> Marketplace Management',
   funds: '<i class="fa-solid fa-piggy-bank"></i> Fund & Loan Management',
   reports: '<i class="fa-solid fa-chart-bar"></i> Reports & Analytics',
-  settings: '<i class="fa-solid fa-gear"></i> Website & Settings'
+  settings: '<i class="fa-solid fa-gear"></i> Website & Settings',
+  projectcosts: '<i class="fa-solid fa-indian-rupee-sign"></i> Project Cost Manager'
 };
 
 function switchPage(page, updateHash = true){
@@ -1801,6 +1832,7 @@ function switchPage(page, updateHash = true){
   if(page === 'points')      loadPointsActivity();
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
+  if(page === 'projectcosts') renderCostEditor();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -2816,6 +2848,104 @@ async function updateOrderStatus(orderId, status){
     await AUTH.api('/api/admin/order/' + orderId, { method:'POST', body:{ status } });
     notify('Order status updated!','success');
   } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+/* ============================================
+   PROJECT COST EDITOR
+   ============================================ */
+
+const UNIT_DEFAULTS = {
+  "suraksha": [
+    { name:"MediSan Liquids Unit",       machineryTotal:"₹3,80,000", setupTotal:"₹1,50,000", workingTotal:"₹3,60,000", fundingTotal:"₹8,90,000", beneficiaryAmt:"₹4,45,000", emiAmount:"₹3,708", profit:"₹30,000–50,000/mo" },
+    { name:"FreshWipe Converting Unit",  machineryTotal:"₹4,62,000", setupTotal:"₹1,58,000", workingTotal:"₹2,60,000", fundingTotal:"₹8,80,000", beneficiaryAmt:"₹4,40,000", emiAmount:"₹3,667", profit:"₹40,000–65,000/mo" },
+    { name:"MedBand Manufacturing Unit", machineryTotal:"₹4,56,000", setupTotal:"₹1,14,000", workingTotal:"₹1,70,000", fundingTotal:"₹7,40,000", beneficiaryAmt:"₹3,70,000", emiAmount:"₹3,083", profit:"₹25,000–40,000/mo" },
+    { name:"SteriGauze Pack Unit",        machineryTotal:"₹3,67,000", setupTotal:"₹1,27,000", workingTotal:"₹1,76,000", fundingTotal:"₹6,70,000", beneficiaryAmt:"₹3,35,000", emiAmount:"₹2,792", profit:"₹22,000–35,000/mo" },
+    { name:"PPE Lite Pack Unit",          machineryTotal:"₹4,56,000", setupTotal:"₹1,33,000", workingTotal:"₹1,86,000", fundingTotal:"₹7,75,000", beneficiaryAmt:"₹3,87,500", emiAmount:"₹3,229", profit:"₹25,000–38,000/mo" },
+    { name:"FirstAid & ClinicKit Unit",   machineryTotal:"₹2,78,000", setupTotal:"₹1,48,000", workingTotal:"₹1,90,000", fundingTotal:"₹6,16,000", beneficiaryAmt:"₹3,08,000", emiAmount:"₹2,567", profit:"₹22,000–35,000/mo" },
+    { name:"VectorGuard Repellent Unit",  machineryTotal:"₹5,95,000", setupTotal:"₹1,77,000", workingTotal:"₹2,90,000", fundingTotal:"₹10,62,000",beneficiaryAmt:"₹5,31,000", emiAmount:"₹4,425", profit:"₹35,000–55,000/mo" },
+    { name:"HomeShield Net & Mesh Unit",  machineryTotal:"₹3,38,000", setupTotal:"₹1,33,000", workingTotal:"₹2,10,000", fundingTotal:"₹6,81,000", beneficiaryAmt:"₹3,40,500", emiAmount:"₹2,838", profit:"₹28,000–45,000/mo" },
+    { name:"Antiseptic Liquid Unit",      machineryTotal:"₹1,90,000", setupTotal:"₹1,40,000", workingTotal:"₹3,60,000", fundingTotal:"₹6,90,000", beneficiaryAmt:"₹3,45,000", emiAmount:"₹2,875", profit:"₹25,000–40,000/mo" }
+  ]
+};
+
+const COST_FIELDS = [
+  { key:'machineryTotal', label:'Machinery Total' },
+  { key:'setupTotal',     label:'Setup Costs Total' },
+  { key:'workingTotal',   label:'Working Capital (2 mo)' },
+  { key:'fundingTotal',   label:'Total Project Cost' },
+  { key:'beneficiaryAmt',label:'Beneficiary Amount (50%)' },
+  { key:'emiAmount',      label:'Monthly EMI' },
+  { key:'profit',         label:'Profit Range' }
+];
+
+function renderCostEditor() {
+  const projectKey = document.getElementById('costProjectSelect').value;
+  const grid = document.getElementById('costEditorGrid');
+  const units = UNIT_DEFAULTS[projectKey];
+
+  if (!units) {
+    grid.innerHTML = `<div class="content-card" style="grid-column:1/-1"><p style="color:var(--text-muted);text-align:center;padding:24px">Default unit data not available for this project. You can still save overrides if you know the unit names.</p></div>`;
+    return;
+  }
+
+  const overrides = JSON.parse(localStorage.getItem('fwf_cost_overrides') || '{}');
+  const projOverrides = overrides[projectKey] || {};
+
+  grid.innerHTML = units.map(unit => {
+    const ov = projOverrides[unit.name] || {};
+    const hasOverride = Object.keys(ov).length > 0;
+    const fieldsHTML = COST_FIELDS.map(f => {
+      const current = ov[f.key] || unit[f.key] || '';
+      return `<div class="form-group" style="margin-bottom:8px">
+        <label style="font-size:11px;color:var(--text-muted)">${f.label}</label>
+        <input type="text" class="form-input" style="font-size:12px" data-field="${f.key}" value="${current}" placeholder="${unit[f.key]||''}">
+      </div>`;
+    }).join('');
+    return `<div class="content-card" style="position:relative${hasOverride ? ';border:2px solid #22c55e' : ''}">
+      ${hasOverride ? '<span style="position:absolute;top:10px;right:12px;background:#22c55e;color:#fff;font-size:10px;padding:1px 7px;border-radius:8px;font-weight:700">OVERRIDDEN</span>' : ''}
+      <h4 style="font-size:13px;margin-bottom:12px"><i class="fa-solid fa-industry" style="color:#6366f1;margin-right:6px"></i>${unit.name}</h4>
+      ${fieldsHTML}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveCostOverrideUnit('${projectKey}','${unit.name.replace(/'/g,"\\'")}',this.closest('.content-card'))">
+          <i class="fa-solid fa-save"></i> Save
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="resetUnitOverride('${projectKey}','${unit.name.replace(/'/g,"\\'")}')">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveCostOverrideUnit(projectKey, unitName, card) {
+  const all = JSON.parse(localStorage.getItem('fwf_cost_overrides') || '{}');
+  if (!all[projectKey]) all[projectKey] = {};
+  const fields = {};
+  card.querySelectorAll('input[data-field]').forEach(inp => {
+    if (inp.value.trim()) fields[inp.dataset.field] = inp.value.trim();
+  });
+  all[projectKey][unitName] = fields;
+  localStorage.setItem('fwf_cost_overrides', JSON.stringify(all));
+  notify('Costs saved for "' + unitName + '"', 'success');
+  renderCostEditor();
+}
+
+function resetUnitOverride(projectKey, unitName) {
+  const all = JSON.parse(localStorage.getItem('fwf_cost_overrides') || '{}');
+  if (all[projectKey]) {
+    delete all[projectKey][unitName];
+    if (!Object.keys(all[projectKey]).length) delete all[projectKey];
+    localStorage.setItem('fwf_cost_overrides', JSON.stringify(all));
+  }
+  notify('Reset to default for "' + unitName + '"', 'success');
+  renderCostEditor();
+}
+
+function resetAllCostOverrides() {
+  if (!confirm('Reset ALL project cost overrides to defaults?')) return;
+  localStorage.removeItem('fwf_cost_overrides');
+  notify('All cost overrides cleared', 'success');
+  renderCostEditor();
 }
 
 /* ============================================

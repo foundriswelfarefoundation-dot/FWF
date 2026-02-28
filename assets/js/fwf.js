@@ -198,7 +198,6 @@ const header = `
 <a class="nav-link" href="about.html" data-page="about.html">About</a>
 <a class="nav-link" href="programs.html" data-page="programs.html">Programs</a>
 <a class="nav-link" href="projects.html" data-page="projects.html">Projects</a>
-<a class="nav-link" href="store.html" data-page="store.html">Store</a>
 <a class="nav-link" href="join.html" data-page="join.html">Join</a>
 <a class="nav-link" href="donate.html" data-page="donate.html">Donate</a>
 <a class="nav-link" href="contact.html" data-page="contact.html">Contact</a>

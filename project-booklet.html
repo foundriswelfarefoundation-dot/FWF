@@ -452,62 +452,117 @@
     }
 
     @media (max-width: 768px) {
-      /* ── Layout ── */
-      body { padding: 0; align-items: flex-start; background: #667eea; overflow-x: hidden; }
+      /* ═══════ MOBILE E-BOOK READER ═══════ */
+
+      /* Full-screen reader layout */
+      body {
+        padding: 0; margin: 0;
+        background: #0f172a;
+        overflow: hidden;
+        height: 100dvh;
+        display: block;
+      }
 
       .booklet {
-        max-width: 100%;
-        min-height: 100dvh;
-        border-radius: 0;
-        box-shadow: none;
-        overflow: visible;
-        overflow-x: hidden;
+        width: 100%; max-width: 100%;
+        min-height: 100dvh; height: 100dvh;
+        border-radius: 0; box-shadow: none;
+        display: flex; flex-direction: column;
+        overflow: hidden;
+        background: #fff;
       }
 
-      /* Pages scroll naturally; nav pinned at bottom */
-      .page {
+      /* ── Top bar (page info + close) ── */
+      .mob-topbar {
+        display: flex !important;
+        align-items: center; justify-content: space-between;
+        padding: 10px 14px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        flex-shrink: 0;
+        z-index: 30;
+      }
+      .mob-topbar .mob-title {
+        font-size: 13px; font-weight: 700; color: #fff;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        max-width: 60%;
+      }
+      .mob-topbar .mob-pages {
+        font-size: 11px; font-weight: 700; color: rgba(255,255,255,.8);
+        background: rgba(0,0,0,.15); padding: 4px 10px; border-radius: 12px;
+      }
+      .mob-topbar .mob-close {
+        background: rgba(255,255,255,.2); border: none; border-radius: 50%;
+        width: 30px; height: 30px; color: #fff; font-size: 15px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; flex-shrink: 0;
+      }
+
+      /* ── Page viewport — single page at a time ── */
+      .mob-viewport {
+        display: block !important;
+        flex: 1; overflow-y: auto; overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
         position: relative;
-        display: none;
-        padding: 16px 14px 80px;
-        min-height: auto;
-        overflow-y: visible;
+        scroll-behavior: smooth;
+      }
+
+      /* Pages — only active visible, full reader */
+      .page {
+        position: absolute !important;
+        inset: 0;
+        display: none !important;
+        overflow-y: auto;
         overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 20px 16px 24px;
+        min-height: auto; height: auto;
+        background: #fff;
         animation: none !important;
       }
-      .page.active { display: block; }
-
-      /* ── Cover ── */
-      .cover {
-        min-height: 100vh;
-        padding: 48px 18px 90px;
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+      .page.active {
+        display: block !important;
+        position: relative !important;
       }
-      .cover-icon  { font-size: 48px; margin-bottom: 16px; }
+
+      /* Slide transitions */
+      .page.slide-in-right  { display: block !important; position: relative !important; animation: slideInRight  .35s ease forwards !important; }
+      .page.slide-in-left   { display: block !important; position: relative !important; animation: slideInLeft   .35s ease forwards !important; }
+      .page.slide-out-left  { display: block !important; position: absolute !important; animation: slideOutLeft  .35s ease forwards !important; }
+      .page.slide-out-right { display: block !important; position: absolute !important; animation: slideOutRight .35s ease forwards !important; }
+
+      @keyframes slideInRight  { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes slideInLeft   { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes slideOutLeft  { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+      @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+      /* ── Cover (no scroll, centered) ── */
+      .cover {
+        min-height: 100% !important; height: auto;
+        padding: 40px 20px !important;
+        display: flex !important; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        overflow: hidden;
+      }
+      .cover-icon  { font-size: 52px; margin-bottom: 16px; }
       .cover-title { font-size: 28px; word-break: break-word; }
-      .cover-subtitle { font-size: 13px; }
-      .cover-touch { bottom: 72px; font-size: 12px; }
+      .cover-subtitle { font-size: 14px; max-width: 90%; }
+      .cover-touch { position: relative; bottom: auto; margin-top: 32px; font-size: 13px; }
 
-      /* ── Page headings ── */
-      .page-title { font-size: 20px !important; margin-bottom: 16px !important; }
+      /* ── Content pages ── */
+      .page-title { font-size: 20px !important; margin-bottom: 14px !important; }
 
-      /* ── Summary section ── */
-      .summary-section { margin-bottom: 20px; }
+      .summary-section { margin-bottom: 18px; }
       .summary-section h3 { font-size: 14px; margin-bottom: 8px; }
       .summary-section p  { font-size: 13px; line-height: 1.65; }
 
-      /* ── Impact badges ── */
       .impact-badge { font-size: 11px; padding: 5px 10px; }
 
-      /* ── Stats grid ── */
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
       .stat-box { padding: 12px 10px; }
       .stat-value { font-size: 16px; }
       .stat-label { font-size: 10px; }
 
-      /* ── Index list ── */
       .index .page-title { font-size: 20px !important; }
       .index-list { max-height: none; padding-right: 0; gap: 8px; }
       .index-item { padding: 12px 14px; border-radius: 10px; }
@@ -515,75 +570,91 @@
       .index-item-name { font-size: 13px; }
       .index-item-page { font-size: 11px; }
 
-      /* ── Unit detail ── */
-      .unit-detail .page-title { font-size: 16px !important; margin-bottom: 6px !important; }
-      .unit-meta { gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+      .unit-detail .page-title { font-size: 17px !important; margin-bottom: 6px !important; }
+      .unit-meta { gap: 6px 14px; margin-bottom: 14px; flex-wrap: wrap; }
       .unit-meta-item { font-size: 12px; gap: 5px; }
 
-      /* Products grid: 2 columns on mobile */
-      .unit-section { margin-bottom: 18px; }
+      .unit-section { margin-bottom: 16px; }
       .unit-section h3 { font-size: 13px; margin-bottom: 8px; }
       .products-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .product-card { padding: 10px 8px; font-size: 11px; border-radius: 8px; }
 
-      /* Finance box */
       .finance-box { padding: 12px 14px; margin-top: 10px; }
       .finance-row { padding: 8px 0; }
       .finance-label { font-size: 12px; }
       .finance-value { font-size: 13px; }
 
-      /* ── Navigation — fixed at bottom ── */
-      .nav-controls {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        justify-content: center;
-        gap: 12px;
-        padding: 10px 16px;
-        background: rgba(255,255,255,0.96);
-        backdrop-filter: blur(8px);
-        border-top: 1px solid rgba(0,0,0,.08);
-        box-shadow: 0 -4px 16px rgba(0,0,0,.08);
-        border-radius: 0;
+      /* ── Bottom navigation bar ── */
+      .mob-nav {
+        display: flex !important;
+        align-items: center; justify-content: space-between;
+        padding: 8px 14px;
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        flex-shrink: 0;
+        z-index: 30;
+        gap: 8px;
       }
-
-      .nav-btn {
-        width: 44px; height: 44px; font-size: 15px;
+      .mob-nav .mob-btn {
+        width: 44px; height: 44px; border-radius: 50%; border: none;
         background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff; font-size: 16px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: opacity .15s, transform .15s;
+        box-shadow: 0 3px 10px rgba(102,126,234,.35);
+      }
+      .mob-nav .mob-btn:disabled { opacity: .3; }
+      .mob-nav .mob-btn:active:not(:disabled) { transform: scale(.9); }
+      .mob-nav .mob-progress {
+        flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      }
+      .mob-nav .mob-progress-bar {
+        width: 100%; height: 4px; border-radius: 4px; background: #e5e7eb; overflow: hidden;
+      }
+      .mob-nav .mob-progress-fill {
+        height: 100%; border-radius: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transition: width .35s ease;
+      }
+      .mob-nav .mob-progress-text {
+        font-size: 10px; font-weight: 700; color: #6b7280;
       }
 
-      /* Page counter: centered in the fixed nav bar */
-      .page-counter {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 64px;          /* matches nav-controls height */
-        display: flex;
-        align-items: center;
-        padding: 0 8px;
-        background: none;
-        box-shadow: none;
-        font-size: 12px;
-        font-weight: 700;
-        color: #374151;
-        pointer-events: none;
-        z-index: 21;
-      }
+      /* Hide desktop-only elements on mobile */
+      .nav-controls { display: none !important; }
+      .page-counter { display: none !important; }
+      .close-btn { display: none !important; }
 
-      /* Close button */
-      .close-btn {
-        top: 10px; right: 10px;
-        width: 34px; height: 34px;
-        font-size: 16px;
-        background: rgba(0,0,0,.28);
-        border: 1.5px solid rgba(255,255,255,.35);
+      /* Swipe hint animation on cover */
+      .swipe-hint {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 12px; color: rgba(255,255,255,.7); margin-top: 12px;
+        animation: swipeHint 2s ease infinite;
+      }
+      @keyframes swipeHint {
+        0%, 100% { transform: translateX(0); opacity: .6; }
+        50% { transform: translateX(12px); opacity: 1; }
       }
     }
+
+    /* ── Hide mobile-only elements on desktop ── */
+    .mob-topbar, .mob-nav, .swipe-hint { display: none; }
+    .mob-viewport { display: contents; } /* pages pass through on desktop */
   </style>
 </head>
 <body>
   <div class="booklet" id="booklet">
     <button class="close-btn" onclick="window.history.back()">×</button>
+
+    <!-- Mobile Top Bar -->
+    <div class="mob-topbar" id="mobTopbar">
+      <div class="mob-title" id="mobTitle">Project Booklet</div>
+      <div class="mob-pages" id="mobPages">1 / 10</div>
+      <button class="mob-close" onclick="window.history.back()">×</button>
+    </div>
+
+    <!-- Mobile Viewport (wraps pages for scroll isolation) -->
+    <div class="mob-viewport" id="mobViewport">
     
     <!-- Cover Page -->
     <div class="page cover active" data-page="0">
@@ -593,8 +664,9 @@
       <h1 class="cover-title" id="coverTitle">Suraksha</h1>
       <p class="cover-subtitle" id="coverSubtitle">Health & hygiene products for safer communities.</p>
       <div class="cover-touch">
-        <i class="fa-solid fa-hand-pointer"></i> Click next to explore
+        <i class="fa-solid fa-hand-pointer"></i> Tap next or swipe to explore
       </div>
+      <div class="swipe-hint"><i class="fa-solid fa-arrow-right"></i> Swipe left</div>
     </div>
 
     <!-- Summary Page -->
@@ -645,7 +717,9 @@
 
     <!-- Unit Detail Pages (dynamically created) -->
 
-    <!-- Navigation Controls -->
+    </div><!-- /.mob-viewport -->
+
+    <!-- Navigation Controls (Desktop) -->
     <div class="nav-controls">
       <button class="nav-btn" id="prevBtn" onclick="prevPage()">
         <i class="fa-solid fa-chevron-left"></i>
@@ -654,8 +728,17 @@
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
-
     <div class="page-counter" id="pageCounter">Page 1 / 10</div>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="mob-nav" id="mobNav">
+      <button class="mob-btn" id="mobPrev" onclick="prevPage()"><i class="fa-solid fa-chevron-left"></i></button>
+      <div class="mob-progress">
+        <div class="mob-progress-bar"><div class="mob-progress-fill" id="mobFill" style="width:0%"></div></div>
+        <span class="mob-progress-text" id="mobText">Page 1 of 10</span>
+      </div>
+      <button class="mob-btn" id="mobNext" onclick="nextPage()"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
   </div>
 
   <script>
@@ -966,6 +1049,9 @@
 
     }; /* end ALL_PROJECTS */
 
+    const isMobile = window.innerWidth <= 768;
+    let isAnimating = false;
+
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const projectKey = urlParams.get('project') || 'suraksha';
@@ -973,7 +1059,7 @@
 
       // Apply cover gradient
       document.querySelector('.cover').style.background = projectData.coverGradient;
-      document.body.style.background = projectData.coverGradient;
+      if (!isMobile) document.body.style.background = projectData.coverGradient;
 
       // Populate cover
       document.getElementById('coverIcon').innerHTML = `<i class="fa-solid ${projectData.icon}"></i>`;
@@ -1025,6 +1111,23 @@
 
       totalPages = 3 + projectData.units.length;
       allPages = document.querySelectorAll('.page');
+
+      // Mobile: set up top bar title & gradient
+      if (isMobile) {
+        document.getElementById('mobTitle').textContent = projectData.name;
+        const topbar = document.getElementById('mobTopbar');
+        if (topbar) topbar.style.background = projectData.coverGradient;
+        // Match nav button gradient
+        document.querySelectorAll('.mob-btn').forEach(btn => {
+          btn.style.background = projectData.coverGradient;
+        });
+        // Hide swipe hint after 4 seconds
+        setTimeout(() => {
+          const hint = document.querySelector('.swipe-hint');
+          if (hint) hint.style.opacity = '0';
+        }, 4000);
+      }
+
       updateUI();
     }
 
@@ -1070,7 +1173,11 @@
         </div>
       `;
 
-      document.getElementById('booklet').appendChild(page);
+      // On mobile, append to viewport; on desktop, append to booklet
+      const container = isMobile
+        ? document.getElementById('mobViewport')
+        : document.getElementById('booklet');
+      container.appendChild(page);
     }
 
     function nextPage() {
@@ -1082,35 +1189,104 @@
     }
 
     function goToPage(pageNum) {
-      if (pageNum < 0 || pageNum >= totalPages || pageNum === currentPage) return;
-      const isMobile = window.innerWidth <= 768;
-      const delay = isMobile ? 280 : 550;
+      if (pageNum < 0 || pageNum >= totalPages || pageNum === currentPage || isAnimating) return;
+
       const currentPageEl = allPages[currentPage];
       const nextPageEl = allPages[pageNum];
-      if (pageNum > currentPage) currentPageEl.classList.add('turning-left');
-      else nextPageEl.classList.add('turning-right');
-      setTimeout(() => {
-        currentPageEl.classList.remove('active','turning-left','turning-right');
-        nextPageEl.classList.remove('turning-left','turning-right');
-        nextPageEl.classList.add('active');
-        currentPage = pageNum;
-        updateUI();
-        window.scrollTo({top: 0, behavior: 'smooth'});
-      }, delay);
+      const goingForward = pageNum > currentPage;
+
+      if (isMobile) {
+        // ── Mobile: slide animation ──
+        isAnimating = true;
+        const outClass = goingForward ? 'slide-out-left' : 'slide-out-right';
+        const inClass  = goingForward ? 'slide-in-right' : 'slide-in-left';
+
+        // Start animations
+        currentPageEl.classList.add(outClass);
+        nextPageEl.classList.add('active', inClass);
+
+        // After animation completes
+        setTimeout(() => {
+          currentPageEl.classList.remove('active', outClass);
+          nextPageEl.classList.remove(inClass);
+          currentPage = pageNum;
+          isAnimating = false;
+          updateUI();
+          // Scroll viewport to top
+          const vp = document.getElementById('mobViewport');
+          if (vp) vp.scrollTop = 0;
+        }, 350);
+      } else {
+        // ── Desktop: 3D flip animation ──
+        isAnimating = true;
+        const delay = 550;
+        if (goingForward) currentPageEl.classList.add('turning-left');
+        else nextPageEl.classList.add('turning-right');
+
+        setTimeout(() => {
+          currentPageEl.classList.remove('active', 'turning-left', 'turning-right');
+          nextPageEl.classList.remove('turning-left', 'turning-right');
+          nextPageEl.classList.add('active');
+          currentPage = pageNum;
+          isAnimating = false;
+          updateUI();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, delay);
+      }
     }
 
-    // Swipe support for mobile
-    let touchStartX = 0;
-    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
-    document.addEventListener('touchend', e => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 50) { dx < 0 ? nextPage() : prevPage(); }
-    }, {passive:true});
+    // ── Swipe support (mobile) ──
+    (function initSwipe() {
+      const el = isMobile ? document.getElementById('mobViewport') : document;
+      if (!el) return;
+      let startX = 0, startY = 0, tracking = false;
+
+      el.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+
+      el.addEventListener('touchend', e => {
+        if (!tracking) return;
+        tracking = false;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        // Only trigger if horizontal swipe is dominant and > 50px
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+          dx < 0 ? nextPage() : prevPage();
+        }
+      }, { passive: true });
+    })();
 
     function updateUI() {
-      document.getElementById('prevBtn').disabled = currentPage === 0;
-      document.getElementById('nextBtn').disabled = currentPage === totalPages - 1;
-      document.getElementById('pageCounter').textContent = `Page ${currentPage + 1} / ${totalPages}`;
+      // Desktop elements
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const pageCounter = document.getElementById('pageCounter');
+      if (prevBtn) prevBtn.disabled = currentPage === 0;
+      if (nextBtn) nextBtn.disabled = currentPage === totalPages - 1;
+      if (pageCounter) pageCounter.textContent = `Page ${currentPage + 1} / ${totalPages}`;
+
+      // Mobile elements
+      if (isMobile) {
+        const pct = totalPages > 1 ? ((currentPage) / (totalPages - 1)) * 100 : 0;
+        const mobPages = document.getElementById('mobPages');
+        const mobFill  = document.getElementById('mobFill');
+        const mobText  = document.getElementById('mobText');
+        const mobPrev  = document.getElementById('mobPrev');
+        const mobNext  = document.getElementById('mobNext');
+
+        if (mobPages) mobPages.textContent = `${currentPage + 1} / ${totalPages}`;
+        if (mobFill)  mobFill.style.width = pct + '%';
+        if (mobText)  mobText.textContent = `Page ${currentPage + 1} of ${totalPages}`;
+        if (mobPrev)  mobPrev.disabled = currentPage === 0;
+        if (mobNext)  mobNext.disabled = currentPage === totalPages - 1;
+
+        // Disable prev/next styling
+        if (mobPrev) mobPrev.style.opacity = currentPage === 0 ? '0.3' : '1';
+        if (mobNext) mobNext.style.opacity = currentPage === totalPages - 1 ? '0.3' : '1';
+      }
     }
 
     window.addEventListener('DOMContentLoaded', init);

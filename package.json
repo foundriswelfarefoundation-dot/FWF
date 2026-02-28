@@ -6,6 +6,7 @@
     "@sentry/browser": "^7.100.0",
     "@sentry/node": "^7.100.0",
     "mongoose": "^8.4.0",
-    "nodemailer": "^6.9.14"
+    "nodemailer": "^6.9.14",
+    "resend": "^6.9.3"
   }
 }

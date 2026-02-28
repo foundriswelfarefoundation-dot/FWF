@@ -27,7 +27,8 @@ import Quiz from './models/Quiz.js';
 import QuizParticipation from './models/QuizParticipation.js';
 import ReferralClick from './models/ReferralClick.js';
 import DonationOtp from './models/DonationOtp.js';
-import { send80GReceipt } from './lib/mailer.js';
+import { send80GReceipt, sendMemberWelcome, sendSupporterWelcome, sendDonationConfirmation, sendAdminAlert } from './lib/mailer.js';
+import { sendWhatsAppCredentials, sendWhatsAppDonation } from './lib/msg91.js';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -529,6 +530,23 @@ app.post('/api/pay/simulate-join', internalAuth, async (req, res) => {
     wallet: {}
   });
 
+  // Send welcome + credentials email (non-blocking)
+  sendMemberWelcome({ name, email: email || null, memberId, password: plain, mobile })
+    .then(() => console.log(`✅ Member welcome email sent → ${email || mobile}`))
+    .catch(e => console.error('⚠️ Member welcome email failed:', e.message));
+
+  // Send WhatsApp credentials (non-blocking)
+  if (mobile) {
+    sendWhatsAppCredentials({ mobile, name, userId: memberId, password: plain })
+      .catch(e => console.error('⚠️ WhatsApp credentials failed:', e.message));
+  }
+
+  // Admin alert (non-blocking)
+  sendAdminAlert({
+    subject: `New Member Registered: ${memberId} — ${name}`,
+    rows: [['Member ID', memberId], ['Name', name], ['Mobile', mobile], ['Email', email || '—']]
+  }).catch(() => {});
+
   res.json({ ok: true, memberId, password: plain });
 });
 
@@ -564,69 +582,22 @@ app.post('/api/pay/register-supporter', async (req, res) => {
       wallet: {}
     });
 
-    // Send credentials email
-    try {
-      const transporter = getTransporter();
-      await transporter.sendMail({
-        from: process.env.MAIL_FROM,
-        to: email,
-        subject: `Welcome to FWF! Your Supporter Login Credentials — ${supporterId}`,
-        html: `
-        <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff">
-          <div style="background:linear-gradient(135deg,#10b981,#059669);padding:30px 32px 24px;border-radius:12px 12px 0 0;text-align:center">
-            <div style="font-size:36px;margin-bottom:8px">🤝</div>
-            <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">Welcome, ${name}!</h1>
-            <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px">You are now a FWF Supporter</p>
-          </div>
-          <div style="padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
-            <p style="color:#374151;font-size:15px;margin-bottom:24px">
-              Thank you for joining Foundris Welfare Foundation as a <strong>Supporter</strong>!
-              Below are your login credentials. Please save them securely.
-            </p>
-            <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px">
-              <tr style="background:#f0fdf4">
-                <td style="padding:14px 16px;color:#6b7280;font-weight:600;border-bottom:1px solid #d1fae5">Supporter ID</td>
-                <td style="padding:14px 16px;color:#059669;font-weight:800;font-size:18px;border-bottom:1px solid #d1fae5">${supporterId}</td>
-              </tr>
-              <tr>
-                <td style="padding:14px 16px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb">Password</td>
-                <td style="padding:14px 16px;color:#111827;font-weight:700;font-family:monospace;font-size:16px;border-bottom:1px solid #e5e7eb">${plain}</td>
-              </tr>
-              <tr style="background:#f9fafb">
-                <td style="padding:14px 16px;color:#6b7280;font-weight:600">Login Page</td>
-                <td style="padding:14px 16px"><a href="https://www.fwfindia.org/login" style="color:#10b981;text-decoration:none;font-weight:700">www.fwfindia.org/login</a></td>
-              </tr>
-            </table>
-            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin-bottom:20px">
-              <p style="margin:0;color:#166534;font-size:13px;font-weight:600">
-                <strong>🔒 Security Tip:</strong> Change your password after first login from your dashboard settings.
-              </p>
-            </div>
-            <p style="color:#6b7280;font-size:12px;margin:0;text-align:center">
-              © ${new Date().getFullYear()} Foundris Welfare Foundation • <a href="https://www.fwfindia.org" style="color:#10b981">www.fwfindia.org</a>
-            </p>
-          </div>
-        </div>`
-      });
-      console.log(`✅ Supporter credentials email sent to ${email} for ${supporterId}`);
-    } catch (mailErr) {
-      console.error('⚠️ Failed to send supporter credentials email:', mailErr.message);
-      // Don't fail the registration if email fails
+    // Send supporter welcome email (non-blocking)
+    sendSupporterWelcome({ name, email, supporterId, password: plain, project })
+      .then(() => console.log(`✅ Supporter welcome email sent → ${email}`))
+      .catch(e => console.error('⚠️ Supporter welcome email failed:', e.message));
+
+    // Send WhatsApp credentials (non-blocking)
+    if (mobile) {
+      sendWhatsAppCredentials({ mobile, name, userId: supporterId, password: plain })
+        .catch(e => console.error('⚠️ WhatsApp supporter credentials failed:', e.message));
     }
 
-    // Also notify admin
-    try {
-      const transporter = getTransporter();
-      await transporter.sendMail({
-        from: process.env.MAIL_FROM,
-        to: process.env.SMTP_USER,
-        subject: `New Supporter Registered: ${supporterId} — ${name}`,
-        html: `<p><strong>${name}</strong> (${email}${mobile ? ', ' + mobile : ''}) registered as a Supporter.</p>
-               <p>ID: <strong>${supporterId}</strong></p>
-               <p>Project: ${project || '-'}</p>
-               <p>Message: ${message || '-'}</p>`
-      });
-    } catch (e) { /* ignore admin notification failure */ }
+    // Admin alert (non-blocking)
+    sendAdminAlert({
+      subject: `New Supporter Registered: ${supporterId} — ${name}`,
+      rows: [['Supporter ID', supporterId], ['Name', name], ['Email', email], ['Mobile', mobile || '—'], ['Project', project || '—'], ['Message', message || '—']]
+    }).catch(() => {});
 
     addBreadcrumb('registration', 'New supporter registered', { supporterId, name, email });
     res.json({ ok: true, supporterId, message: `Registration successful! Your Supporter ID is ${supporterId}. Check your email for login credentials.` });
@@ -909,6 +880,18 @@ app.post('/api/pay/membership', async (req, res) => {
     }
 
     addBreadcrumb('payment', 'Membership payment successful', { memberId, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id });
+
+    // Send member welcome email (non-blocking)
+    sendMemberWelcome({ name, email, memberId, password: plain, mobile })
+      .then(() => console.log(`✅ Member welcome email sent → ${email}`))
+      .catch(e => console.error('⚠️ Member welcome email failed:', e.message));
+
+    // Admin alert (non-blocking)
+    sendAdminAlert({
+      subject: `New Member via Payment: ${memberId} — ${name}`,
+      rows: [['Member ID', memberId], ['Name', name], ['Mobile', mobile], ['Email', email], ['Amount', '₹500'], ['Payment ID', razorpay_payment_id]]
+    }).catch(() => {});
+
     res.json({ ok: true, memberId, password: plain, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id, referralPoints });
   } catch (err) {
     console.error('Razorpay membership error:', err);
@@ -1037,6 +1020,47 @@ app.post('/api/pay/donation', async (req, res) => {
         captureError(mailErr, { context: '80g-receipt-email', donationId });
       }
     }
+
+    // Always send donation confirmation email if email provided (separate from 80G)
+    if (email && !receipt80GSent) {
+      sendDonationConfirmation({
+        name: name || 'Donor',
+        email,
+        amount: numAmount,
+        donationId,
+        paymentId: razorpay_payment_id,
+        recurring: !!recurring,
+        pointsEarned: donationData.points_earned || 0
+      })
+        .then(() => console.log(`✅ Donation confirmation email sent → ${email}`))
+        .catch(e => console.error('⚠️ Donation confirmation email failed:', e.message));
+    }
+
+    // Send WhatsApp donation confirmation (non-blocking)
+    if (mobile) {
+      sendWhatsAppDonation({
+        mobile,
+        name: name || 'Donor',
+        amount: numAmount,
+        donationId,
+        paymentId: razorpay_payment_id
+      }).catch(e => console.error('⚠️ WhatsApp donation confirmation failed:', e.message));
+    }
+
+    // Admin alert for donation (non-blocking)
+    sendAdminAlert({
+      subject: `New Donation: ₹${numAmount} — ${name || 'Anonymous'}`,
+      rows: [
+        ['Donation ID', donationId],
+        ['Amount', `₹${numAmount.toLocaleString('en-IN')}`],
+        ['Donor', name || 'Anonymous'],
+        ['Email', email || '—'],
+        ['Mobile', mobile || '—'],
+        ['Type', recurring ? 'Recurring (Monthly)' : 'One-time'],
+        ['Payment ID', razorpay_payment_id],
+        ['80G Sent', receipt80GSent ? 'Yes' : 'No']
+      ]
+    }).catch(() => {});
 
     res.json({
       ok: true,

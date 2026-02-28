@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { connectDB } from "../lib/db.js";
 import { getTransporter } from "../lib/mailer.js";
+import { sendSmsOtp } from "../lib/msg91.js";
 import DonationOtp from "../models/DonationOtp.js";
 import { withSentry } from "../lib/sentry.js";
 
@@ -44,6 +45,10 @@ async function handler(req, res) {
       otp: generatedOtp,
       expires_at: expiresAt
     });
+
+    // Send SMS OTP via MSG91 (non-blocking)
+    sendSmsOtp({ mobile, otp: generatedOtp })
+      .catch(e => console.error('⚠️ MSG91 SMS OTP failed:', e.message));
 
     // Send email with OTP
     const transporter = getTransporter();

@@ -765,7 +765,13 @@
         costs:{setup:"₹4.0–7.5L", working:"₹1.0–2.0L", upfront:"₹40k–75k"},
         units:[
           {name:"MediSan Liquids Unit", space:"~260 sqft", workers:"4 workers", profit:"₹60k–90k/m", setup:"₹7,50,000", working:"₹2,00,000", upfront:"₹75,000",
-           products:["Handwash (gel/foam)","Antiseptic liquid","Hand rub (70% IPA)","Disinfectant surface spray"]},
+           products:["Handwash (gel/foam)","Antiseptic liquid","Hand rub (70% IPA)","Disinfectant surface spray"],
+           capacity:"500–800 L/day", production:"5,000–8,000 bottles/month",
+           machinery:{total:"₹2,85,000", items:[{name:"Mixing Tank (SS 300L)",cost:"₹85,500"},{name:"Stirrer/Agitator",cost:"₹38,000"},{name:"Storage Tank",cost:"₹47,500"},{name:"Semi-Auto Filling Machine",cost:"₹66,500"},{name:"Weighing Machine",cost:"₹9,500"},{name:"Sealing Machine",cost:"₹15,200"},{name:"Misc. Tools & Installation",cost:"₹22,800"}]},
+           setupBreakdown:{total:"₹85,500", items:[{name:"Shop Setup & Electrical",cost:"₹57,000"},{name:"Trade License",cost:"₹9,500"},{name:"GST Registration",cost:"₹3,800"},{name:"MSME Registration",cost:"₹1,900"},{name:"Branding & Label Design",cost:"₹13,300"}]},
+           workingBreakdown:{total:"₹1,99,500", items:[{name:"Surfactants (SLES etc.)",cost:"₹66,500"},{name:"Fragrance & Color",cost:"₹19,000"},{name:"Preservatives & Additives",cost:"₹15,200"},{name:"Bottles & Caps",cost:"₹76,000"},{name:"Labels & Packaging",cost:"₹22,800"}]},
+           funding:{beneficiary:"50%",beneficiaryAmt:"₹2,85,000",ngoLoan:"50%",ngoLoanAmt:"₹2,85,000",totalProject:"₹5,70,000"},
+           emi:{loanAmount:"₹2,85,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹2,375"}},
           {name:"FreshWipe Converting Unit", space:"~240 sqft", workers:"4 workers", profit:"₹40k–65k/m", setup:"₹6,00,000", working:"₹1,50,000", upfront:"₹60,000",
            products:["Hygiene wet wipes","Alcohol wipes","Surface wipes (multipurpose)"]},
           {name:"MedBand Unit", space:"~220 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹4,50,000", working:"₹1,10,000", upfront:"₹45,000",
@@ -1146,6 +1152,108 @@
         `<div class="product-card">${p}</div>`
       ).join('');
 
+      // Generate machinery breakdown if available
+      let machineryHTML = '';
+      if (unit.machinery && unit.machinery.items) {
+        machineryHTML = `
+          <div class="unit-section">
+            <h3><i class="fa-solid fa-cogs"></i> Machinery & Equipment Costs</h3>
+            <div style="font-size:12px;">
+              ${unit.machinery.items.map(item => `
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
+                  <span>${item.name}</span>
+                  <strong>${item.cost}</strong>
+                </div>
+              `).join('')}
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;border-top:2px solid #e5e7eb;margin-top:8px;">
+                <span>Total Machinery</span>
+                <span>${unit.machinery.total}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Generate setup & registration breakdown if available
+      let setupHTML = '';
+      if (unit.setupBreakdown && unit.setupBreakdown.items) {
+        setupHTML = `
+          <div class="unit-section">
+            <h3><i class="fa-solid fa-building"></i> Setup & Registration Costs</h3>
+            <div style="font-size:12px;">
+              ${unit.setupBreakdown.items.map(item => `
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
+                  <span>${item.name}</span>
+                  <strong>${item.cost}</strong>
+                </div>
+              `).join('')}
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;border-top:2px solid #e5e7eb;margin-top:8px;">
+                <span>Total Setup</span>
+                <span>${unit.setupBreakdown.total}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Generate working capital breakdown if available
+      let workingHTML = '';
+      if (unit.workingBreakdown && unit.workingBreakdown.items) {
+        workingHTML = `
+          <div class="unit-section">
+            <h3><i class="fa-solid fa-cubes"></i> Working Capital (1 Month)</h3>
+            <div style="font-size:12px;">
+              ${unit.workingBreakdown.items.map(item => `
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
+                  <span>${item.name}</span>
+                  <strong>${item.cost}</strong>
+                </div>
+              `).join('')}
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;border-top:2px solid #e5e7eb;margin-top:8px;">
+                <span>Total Working Capital</span>
+                <span>${unit.workingBreakdown.total}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Generate funding & EMI section if available
+      let fundingHTML = '';
+      if (unit.funding && unit.emi) {
+        fundingHTML = `
+          <div class="unit-section">
+            <h3><i class="fa-solid fa-handshake"></i> Funding Structure (NGO Model - 50:50)</h3>
+            <div style="font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="padding:10px;background:#f0fdf4;border-radius:8px;">
+                <div style="color:#15803d;font-weight:700;margin-bottom:4px;">Beneficiary Share</div>
+                <div style="font-size:13px;font-weight:700;color:#000;">${unit.funding.beneficiary}</div>
+                <div style="font-size:11px;color:#666;margin-top:2px;">${unit.funding.beneficiaryAmt}</div>
+              </div>
+              <div style="padding:10px;background:#fef3c7;border-radius:8px;">
+                <div style="color:#b45309;font-weight:700;margin-bottom:4px;">NGO Loan (0% Interest)</div>
+                <div style="font-size:13px;font-weight:700;color:#000;">${unit.funding.ngoLoan}</div>
+                <div style="font-size:11px;color:#666;margin-top:2px;">${unit.funding.ngoLoanAmt}</div>
+              </div>
+            </div>
+            <div style="padding:10px;background:#f3f4f6;border-radius:8px;margin-top:10px;font-weight:700;">
+              <div style="display:flex;justify-content:space-between;">
+                <span>Total Project Cost</span>
+                <span>${unit.funding.totalProject}</span>
+              </div>
+            </div>
+            
+            <h4 style="margin-top:12px;margin-bottom:8px;font-size:13px;font-weight:700;"><i class="fa-solid fa-calculator"></i> EMI Details</h4>
+            <div style="font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div><strong>Loan Amount:</strong><br>${unit.emi.loanAmount}</div>
+              <div><strong>Tenure:</strong><br>${unit.emi.tenure}</div>
+              <div><strong>Moratorium:</strong><br>${unit.emi.moratorium}</div>
+              <div style="background:#dcfce7;padding:8px;border-radius:6px;border:1px solid #22c55e;"><strong style="color:#15803d;">Monthly EMI</strong><br><span style="font-size:14px;font-weight:700;color:#15803d;">${unit.emi.monthlyEMI}</span></div>
+            </div>
+          </div>
+        `;
+      }
+
       page.innerHTML = `
         <h2 class="page-title" style="font-size:22px;margin-bottom:12px">${unit.name}</h2>
 
@@ -1153,6 +1261,7 @@
           <div class="unit-meta-item"><i class="fa-solid fa-ruler-combined"></i><span>${unit.space}</span></div>
           <div class="unit-meta-item"><i class="fa-solid fa-users"></i><span>${unit.workers}</span></div>
           <div class="unit-meta-item"><i class="fa-solid fa-chart-line"></i><span>Profit: ${unit.profit}</span></div>
+          ${unit.capacity ? `<div class="unit-meta-item"><i class="fa-solid fa-industry"></i><span>${unit.capacity}</span></div>` : ''}
         </div>
 
         <div class="unit-section">
@@ -1160,8 +1269,12 @@
           <div class="products-grid">${productsHTML}</div>
         </div>
 
+        ${machineryHTML}
+        ${setupHTML}
+        ${workingHTML}
+
         <div class="unit-section">
-          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Details / वित्तीय विवरण</h3>
+          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Summary / वित्तीय विवरण</h3>
           <div class="finance-box">
             <div class="finance-row">
               <span class="finance-label">Total Project Cost</span>
@@ -1178,6 +1291,8 @@
           </div>
           <p style="font-size:10px;color:#9ca3af;margin-top:8px;line-height:1.5">Includes: Machines & Equipment, Licensing (GST/MSME/Trade), Infrastructure, Raw Material, Packaging & Branding, Testing, Training & Installation. 90% inflation buffer applied.</p>
         </div>
+
+        ${fundingHTML}
       `;
 
       // On mobile, append to viewport; on desktop, append to booklet

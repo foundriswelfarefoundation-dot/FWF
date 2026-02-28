@@ -700,6 +700,31 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .profit-val{font:800 16px "Inter",sans-serif;color:#15803d}
 .prj-sec-title{font:700 13px "Georgia",serif;color:#5d4e37;margin:12px 0 7px;display:flex;align-items:center;gap:6px}
 .prj-sec-title i{color:#c8a96e}
+/* product unit badge on product pages */
+.prj-prod-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(200,169,110,.15);color:#7c5c2e;border:1px solid rgba(200,169,110,.4);margin-bottom:10px}
+/* CTA page inside booklet */
+.booklet-cta{padding:18px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.booklet-cta h2{font:700 18px "Georgia",serif;color:#3d2e1a;margin-bottom:4px;text-align:center}
+.booklet-cta .cta-sub{font:400 11px "Inter",sans-serif;color:#8b7355;text-align:center;margin-bottom:10px;line-height:1.5}
+.booklet-cta label{display:block;font:600 10px "Inter",sans-serif;color:#8b7355;text-transform:uppercase;margin-bottom:3px}
+.booklet-cta input,.booklet-cta select,.booklet-cta textarea{width:100%;padding:7px 10px;border:1.5px solid #e8dcc8;border-radius:7px;font:400 12px "Inter",sans-serif;color:#3a2f20;background:#faf6ef;outline:none}
+.booklet-cta input:focus,.booklet-cta select:focus,.booklet-cta textarea:focus{border-color:#c8a96e;background:#fff}
+.booklet-cta textarea{resize:none;height:52px}
+.booklet-cta .cta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.booklet-cta .cta-upload{border:1.5px dashed #c8a96e;border-radius:8px;padding:10px;text-align:center;cursor:pointer;background:rgba(200,169,110,.06);font:400 11px "Inter",sans-serif;color:#8b7355}
+.booklet-cta .cta-upload:hover{background:rgba(200,169,110,.14)}
+.booklet-cta .cta-fname{font:600 10px "Inter",sans-serif;color:#c8a96e;margin-top:3px}
+.booklet-cta .cta-btn{padding:10px;border:none;border-radius:9px;cursor:pointer;font:700 13px "Inter",sans-serif;color:#fff;background:linear-gradient(135deg,#c8a96e,#a0845c);box-shadow:0 4px 12px rgba(160,132,92,.35)}
+.booklet-cta .cta-btn:hover{opacity:.9}
+.booklet-cta .cta-ok{display:none;text-align:center;padding:14px;background:#f0fdf4;border-radius:8px;border:1.5px solid #22c55e;font:600 12px "Inter",sans-serif;color:#15803d}
+/* index: product-grouped */
+.prj-idx-unit{margin-bottom:10px}
+.prj-idx-uhdr{font:700 11px "Inter",sans-serif;color:#c8a96e;text-transform:uppercase;letter-spacing:.4px;padding:4px 0 3px;border-bottom:1.5px solid rgba(200,169,110,.3);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.prj-idx-pitem{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:background .12s}
+.prj-idx-pitem:hover{background:rgba(200,169,110,.12);border-color:rgba(200,169,110,.3)}
+.prj-idx-pname{font:600 12px "Inter",sans-serif;color:#3a2f20}
+.prj-idx-psub{font:400 9px "Inter",sans-serif;color:#8b7355}
+.prj-idx-num{font:700 12px "Inter",sans-serif;color:#c8a96e}
 .product-list li.has-detail{cursor:pointer;transition:background .15s,border-color .15s;border-radius:0 6px 6px 0}
 .product-list li.has-detail::after{content:" ↗";font-size:10px;opacity:.6}
 .product-list li.has-detail:hover,.product-list li.has-detail:active{background:rgba(200,169,110,.18);border-color:#a0845c}
@@ -1757,38 +1782,48 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     allPageElements.push(summaryPage);
     pages.push({type:'summary',title:'Summary'});
 
-    // Page 3: Index
+    // Page 3: Index (grouped by unit, one entry per product)
+    const totalProductCount = project.units.reduce((s,u)=>s+(u.products||[]).length,0);
+    let productPageOffset = 3; // pages 0=cover,1=summary,2=index → products start at 3
+    const productPageMap = []; // [{product,unit,pageNum}]
+    project.units.forEach(unit=>{
+      (unit.products||[]).forEach(p=>{
+        productPageMap.push({product:p,unit,pageNum:productPageOffset++});
+      });
+    });
+    const ctaPageNum = productPageOffset;
+
     const indexPage = document.createElement('div');
     indexPage.className = 'booklet-page booklet-index';
-    indexPage.innerHTML = `
-      <h2>Production Units (${project.units.length})</h2>
-      <ul class="index-list">
-        ${project.units.map((unit, idx) => `
-          <li class="index-item" data-page="${3 + idx}">
-            <div>
-              <div class="index-item-name">${idx+1}. ${unit.name}</div>
-              <div class="index-item-meta">
-                ${unit.space} &middot; ${unit.workers} workers &middot; ${(unit.products || []).length} products
-              </div>
-            </div>
-            <div class="index-item-page">${4 + idx}</div>
-          </li>
-        `).join('')}
-      </ul>
-    `;
+    let idxHTML = `<h2>Products (${totalProductCount})</h2><div class="prj-idx-units">`;
+    project.units.forEach(unit=>{
+      const entries = productPageMap.filter(e=>e.unit===unit);
+      if(!entries.length) return;
+      idxHTML += `<div class="prj-idx-unit"><div class="prj-idx-uhdr"><i class="fa-solid fa-layer-group"></i> ${unit.name}</div>`;
+      entries.forEach(({product,pageNum})=>{
+        idxHTML += `<div class="prj-idx-pitem" onclick="goToSpread(Math.floor(${pageNum}/2))">
+          <div><div class="prj-idx-pname">${product.name||product}</div><div class="prj-idx-psub">${unit.name}</div></div>
+          <span class="prj-idx-num">${pageNum+1}</span>
+        </div>`;
+      });
+      idxHTML += '</div>';
+    });
+    idxHTML += `<div class="prj-idx-pitem" style="background:rgba(200,169,110,.08);border:1px solid rgba(200,169,110,.3);margin-top:6px" onclick="goToSpread(Math.floor(${ctaPageNum}/2))">
+      <div><div class="prj-idx-pname" style="color:#c8a96e">🚀 Submit Your Business Idea</div><div class="prj-idx-psub">Propose a project to FWF admins</div></div>
+      <span class="prj-idx-num">${ctaPageNum+1}</span>
+    </div>`;
+    idxHTML += '</div>';
+    indexPage.innerHTML = idxHTML;
     allPageElements.push(indexPage);
     pages.push({type:'index',title:'Index'});
 
-    // Pages 4+: Unit Details
-    if (!window._prjUnitMap) window._prjUnitMap = {};
-    project.units.forEach((unit, idx) => {
-      const uKey = unit.name.replace(/[^a-z0-9]/gi,'_');
-      window._prjUnitMap[uKey] = unit;
-
+    // Pages 4+: One page per product
+    const fallback = COSTS[project.key] || {setup:'\u2014',working:'\u2014',upfront:'\u2014'};
+    productPageMap.forEach(({product, unit}) => {
+      const prodName = product.name || product;
+      const hasDetail = !!(unit.machinery || unit.setupBreakdown || unit.workingBreakdown || unit.funding);
       const unitPage = document.createElement('div');
       unitPage.className = 'booklet-page unit-detail-page';
-      const fallback = COSTS[project.key] || {setup:'\u2014',working:'\u2014',upfront:'\u2014'};
-      const hasDetail = !!(unit.machinery || unit.setupBreakdown || unit.workingBreakdown || unit.funding);
 
       // Machinery section
       const macHTML = unit.machinery ? `
@@ -1869,41 +1904,87 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
           <div class="profit-badge"><span class="profit-lbl">Estimated Monthly Profit</span><span class="profit-val">${unit.profitDetail || unit.profit}</span></div>
         </div>` : '';
 
-      // Product list (clickable if detailed data available)
-      const prodListHTML = (unit.products||[]).map(p => {
-        if (hasDetail) {
-          const safeN = p.name.replace(/'/g,"\\'");
-          return `<li class="has-detail" onclick="showPrjProdDetail('${safeN}','${uKey}')">${p.name}</li>`;
-        }
-        return `<li>${p.name}</li>`;
-      }).join('');
-
-      unitPage.innerHTML = `
-        <h2>${unit.name}</h2>
-        <p class="unit-subtitle">${project.name} &middot; Unit ${idx+1} of ${project.units.length}</p>
-        <div class="detail-section">
-          <h3><i class="fa-solid fa-chart-line"></i> Quick Overview</h3>
-          <div class="detail-grid">
-            <div class="detail-card"><div class="detail-card-label">Space Required</div><div class="detail-card-value">${unit.space||'\u2014'}</div></div>
-            <div class="detail-card"><div class="detail-card-label">Workforce</div><div class="detail-card-value">${unit.workers||'\u2014'} workers</div></div>
-            ${unit.capacity ? `<div class="detail-card"><div class="detail-card-label">Capacity</div><div class="detail-card-value">${unit.capacity}</div></div>` : `<div class="detail-card"><div class="detail-card-label">Monthly Profit</div><div class="detail-card-value">${unit.profit||'\u2014'}</div></div>`}
-            <div class="detail-card"><div class="detail-card-label">Products</div><div class="detail-card-value">${(unit.products||[]).length} items</div></div>
+      if (!hasDetail) {
+        unitPage.innerHTML = `
+          <div class="prj-prod-badge"><i class="fa-solid fa-layer-group"></i> ${unit.name}</div>
+          <h2>${prodName}</h2>
+          <p class="unit-subtitle">${project.name}</p>
+          <div class="detail-section">
+            <div class="detail-grid">
+              <div class="detail-card"><div class="detail-card-label">Space Required</div><div class="detail-card-value">${unit.space||'\u2014'}</div></div>
+              <div class="detail-card"><div class="detail-card-label">Workforce</div><div class="detail-card-value">${unit.workers||'\u2014'} workers</div></div>
+              <div class="detail-card"><div class="detail-card-label">Setup Cost</div><div class="detail-card-value">${unit.setup||fallback.setup}</div></div>
+              <div class="detail-card" style="background:rgba(21,128,61,.06);border-color:#bbf7d0"><div class="detail-card-label">Monthly Profit</div><div class="detail-card-value" style="color:#15803d">${unit.profit||'\u2014'}</div></div>
+            </div>
           </div>
-        </div>
-        <div class="detail-section">
-          <h3><i class="fa-solid fa-box"></i> Product Portfolio ${hasDetail ? '<span style="font:400 10px Inter;color:#c8a96e;margin-left:4px">(click for details)</span>' : ''}</h3>
-          <ul class="product-list">${prodListHTML}</ul>
-        </div>
-        ${macHTML}${setupHTML}${workHTML}${invHTML}${fundHTML}${emiHTML}${profitHTML}
-        <div style="margin-top:auto;padding-top:14px;text-align:center">
-          <button class="btn btn-primary" onclick="window.location.href='https://www.fwfindia.org/donation#donateModal'" style="padding:10px 22px;border-radius:10px;background:#f97316;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:14px">
-            Register for this Unit <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i>
-          </button>
-        </div>
-      `;
+          <div style="text-align:center;padding:16px;background:rgba(200,169,110,.07);border-radius:8px;border:1px dashed #c8a96e;margin-top:10px">
+            <i class="fa-solid fa-file-lines" style="font-size:20px;color:#c8a96e;margin-bottom:6px;display:block"></i>
+            <p style="font:400 11px Inter,sans-serif;color:#8b7355;margin:0">Detailed project report coming soon.</p>
+          </div>`;
+      } else {
+        unitPage.innerHTML = `
+          <div class="prj-prod-badge"><i class="fa-solid fa-layer-group"></i> ${unit.name}</div>
+          <h2>${prodName}</h2>
+          <p class="unit-subtitle">${project.name} &middot; ${unit.space} &middot; ${unit.workers} workers</p>
+          ${macHTML}${setupHTML}${workHTML}${invHTML}${fundHTML}${emiHTML}${profitHTML}
+          <div style="margin-top:auto;padding-top:10px;text-align:center">
+            <button onclick="window.location.href='https://www.fwfindia.org/donation#donateModal'" style="padding:9px 20px;border-radius:9px;background:#f97316;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:13px">
+              Register for this Unit <i class="fa-solid fa-arrow-right" style="margin-left:5px"></i>
+            </button>
+          </div>`;
+      }
       allPageElements.push(unitPage);
-      pages.push({type:'unit',title:unit.name,unitIndex:idx});
+      pages.push({type:'product',title:prodName});
     });
+
+    // CTA last page
+    const ctaPage = document.createElement('div');
+    ctaPage.className = 'booklet-page booklet-cta';
+    ctaPage.innerHTML = `
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c8a96e,#a0845c);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:20px">🚀</div>
+        <h2>Submit Your Business Idea</h2>
+        <p class="cta-sub">Have a product or manufacturing idea? Share it with FWF admins — we'll review and help you get started.</p>
+      </div>
+      <form id="prjIdeaForm" onsubmit="submitPrjIdea(event)">
+        <div class="cta-row">
+          <div><label>Your Name *</label><input name="name" type="text" placeholder="Full name" required></div>
+          <div><label>Phone *</label><input name="phone" type="tel" placeholder="Mobile" required></div>
+        </div>
+        <div><label>Email</label><input name="email" type="email" placeholder="your@email.com"></div>
+        <div class="cta-row">
+          <div><label>Project Name *</label><input name="projectName" type="text" placeholder="e.g. Herbal Soap Unit" required></div>
+          <div><label>Category *</label>
+            <select name="category" required>
+              <option value="">Select…</option>
+              <option>Healthcare & Hygiene</option>
+              <option>Food & Agro Processing</option>
+              <option>Textiles & Apparel</option>
+              <option>Education & Stationery</option>
+              <option>Home & Kitchen</option>
+              <option>Beauty & Wellness</option>
+              <option>Handicrafts & Artisans</option>
+              <option>Other</option>
+            </select></div>
+        </div>
+        <div class="cta-row">
+          <div><label>Setup Cost Estimate</label><input name="setupCost" placeholder="e.g. ₹3,50,000"></div>
+          <div><label>Monthly Profit Estimate</label><input name="profitEstimate" placeholder="e.g. ₹25,000"></div>
+        </div>
+        <div><label>Description *</label><textarea name="description" placeholder="Brief description of your idea, products, target market…" required></textarea></div>
+        <div><label>Upload PDF / Image</label>
+          <div class="cta-upload" onclick="document.getElementById('prjIdeaFile').click()">
+            📎 Click to attach PDF or image (max 5 MB)
+            <div class="cta-fname" id="prjFileName"></div>
+          </div>
+          <input type="file" id="prjIdeaFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="document.getElementById('prjFileName').textContent=this.files[0]?.name||''">
+        </div>
+        <button type="submit" class="cta-btn" id="prjCtaBtn">📩 Submit Proposal to FWF Admins</button>
+      </form>
+      <div class="cta-ok" id="prjCtaOk">✅ Proposal submitted! Our team will contact you within 2–3 working days.</div>
+    `;
+    allPageElements.push(ctaPage);
+    pages.push({type:'cta',title:'Submit Idea'});
 
     // If odd number of pages, add a blank page at end
     if(allPageElements.length % 2 !== 0){
@@ -2255,6 +2336,41 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     if (e && e.target !== document.getElementById('prjModalOv')) return;
     document.getElementById('prjModalOv').classList.remove('open');
     document.body.style.overflow = '';
+  }
+
+  async function submitPrjIdea(e) {
+    e.preventDefault();
+    const btn = document.getElementById('prjCtaBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Submitting…';
+    const form = document.getElementById('prjIdeaForm');
+    const data = Object.fromEntries(new FormData(form));
+    const fileInput = document.getElementById('prjIdeaFile');
+    let fileData = null;
+    if (fileInput.files[0]) {
+      fileData = await new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = ev => resolve({ name: fileInput.files[0].name, data: ev.target.result });
+        reader.readAsDataURL(fileInput.files[0]);
+      });
+    }
+    const payload = {
+      name: data.name, email: data.email || 'not provided', phone: data.phone,
+      message: `📋 BUSINESS IDEA PROPOSAL\n\nProject: ${data.projectName}\nCategory: ${data.category}\nSetup Cost: ${data.setupCost||'N/A'}\nProfit Estimate: ${data.profitEstimate||'N/A'}\n\nDescription:\n${data.description}`,
+      subject: `[FWF Business Idea] ${data.projectName} – ${data.category}`,
+      ...(fileData ? { attachment: fileData } : {})
+    };
+    try {
+      const res = await fetch('/api/contact', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if (res.ok) {
+        form.style.display = 'none';
+        document.getElementById('prjCtaOk').style.display = 'block';
+      } else throw new Error();
+    } catch {
+      btn.disabled = false;
+      btn.textContent = '📩 Submit Proposal to FWF Admins';
+      alert('Submit failed. Please email admin@fwfindia.org directly.');
+    }
   }
   </script>
 </body>

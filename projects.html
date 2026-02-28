@@ -678,6 +678,46 @@ header{margin:28px 0;position:sticky;top:18px;z-index:1000}
 .product-list{list-style:none;margin:0;padding:0}
 .product-list li{background:transparent;border-left:2px solid #c8a96e;padding:6px 12px;margin-bottom:4px;border-radius:0;font:400 13px "Inter",sans-serif;color:#3a2f20}
 .product-list li::before{content:"✦";color:#c8a96e;font-size:10px;margin-right:8px}
+/* ── Breakdown rows ── */
+.bd-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(200,169,110,.2);font:400 12px "Inter",sans-serif;color:#5d4e37}
+.bd-total{display:flex;justify-content:space-between;padding:6px 10px;margin-top:5px;background:rgba(200,169,110,.15);border-radius:6px;font:700 12px "Inter",sans-serif;color:#3a2f20;border:1px solid rgba(200,169,110,.35)}
+.inv-row{display:flex;justify-content:space-between;padding:6px 10px;background:rgba(248,244,235,.7);border-radius:6px;font:400 12px "Inter",sans-serif;color:#5d4e37;margin-bottom:4px}
+.inv-grand{display:flex;justify-content:space-between;padding:8px 12px;background:#5d4e37;border-radius:7px;color:#fff;font:700 13px "Inter",sans-serif;margin-top:4px}
+.fund-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.fund-box{padding:10px 8px;border-radius:8px;text-align:center}
+.fund-pct{font-size:20px;font-weight:800;margin-bottom:2px}
+.fund-lbl{font-size:10px;font-weight:600;margin-bottom:3px}
+.fund-amt{font-size:12px;font-weight:700}
+.fund-total-row{display:flex;justify-content:space-between;padding:8px 12px;background:#3d2e1a;border-radius:7px;color:#e8dcc8;font:700 12px "Inter",sans-serif}
+.emi-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.emi-item{padding:8px;background:rgba(248,244,235,.7);border:1px solid #e8dcc8;border-radius:7px;text-align:center}
+.emi-item.hl{background:#f0fdf4;border:1.5px solid #22c55e}
+.emi-lbl{font:600 10px "Inter",sans-serif;color:#8b7355;text-transform:uppercase;margin-bottom:3px}
+.emi-val{font:700 13px "Inter",sans-serif;color:#3a2f20}
+.emi-item.hl .emi-val{color:#15803d;font-size:15px}
+.profit-badge{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #22c55e;border-radius:8px}
+.profit-lbl{font:600 11px "Inter",sans-serif;color:#166534}
+.profit-val{font:800 16px "Inter",sans-serif;color:#15803d}
+.prj-sec-title{font:700 13px "Georgia",serif;color:#5d4e37;margin:12px 0 7px;display:flex;align-items:center;gap:6px}
+.prj-sec-title i{color:#c8a96e}
+.product-list li.has-detail{cursor:pointer;transition:background .15s,border-color .15s;border-radius:0 6px 6px 0}
+.product-list li.has-detail::after{content:" ↗";font-size:10px;opacity:.6}
+.product-list li.has-detail:hover,.product-list li.has-detail:active{background:rgba(200,169,110,.18);border-color:#a0845c}
+/* Product detail modal */
+.prj-modal-ov{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
+.prj-modal-ov.open{display:flex}
+.prj-modal{background:#faf6ef;width:100%;max-width:560px;max-height:90dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:prjSlideUp .35s cubic-bezier(.32,1,.32,1);border:1px solid #e8dcc8}
+@keyframes prjSlideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.prj-modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid #e8dcc8;flex-shrink:0;background:#f4ede0}
+.prj-modal-hdr h2{font:700 16px "Georgia",serif;color:#3d2e1a;flex:1;margin-right:10px}
+.prj-modal-cls{width:32px;height:32px;border:none;cursor:pointer;background:#e8dcc8;border-radius:50%;font-size:15px;display:flex;align-items:center;justify-content:center;color:#5d4e37}
+.prj-modal-cls:hover{background:#d4c5ab}
+.prj-modal-body{overflow-y:auto;flex:1;padding:14px 18px 40px;-webkit-overflow-scrolling:touch}
+.prj-ov{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.prj-ov-item{background:rgba(248,244,235,.9);border:1px solid #e8dcc8;border-radius:8px;padding:8px 6px;text-align:center}
+.prj-ov-lbl{font:600 9px "Inter",sans-serif;color:#8b7355;text-transform:uppercase;margin-bottom:3px}
+.prj-ov-val{font:700 11px "Inter",sans-serif;color:#3a2f20}
+@media(min-width:769px){.prj-modal-ov{align-items:center}.prj-modal{border-radius:16px;max-height:85vh;animation:prjScaleIn .28s cubic-bezier(.32,1,.32,1)}@keyframes prjScaleIn{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}.prj-ov{grid-template-columns:repeat(4,1fr)}}
 
 /* ===========================
    EVENING THEME
@@ -1250,9 +1290,27 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
       impacts:["Employment","Women Empowerment","Health"],
       units:[
         {name:"MediSan Liquids Unit", space:"~260 sqft", workers:"4", profit:"₹60k–90k/m",
+          capacity:"500–800 L/day", production:"5,000–8,000 bottles/month",
+          setup:"₹7,50,000", working:"₹2,00,000", upfront:"₹75,000",
+          machinery:{total:"₹2,85,000", items:[{name:"Mixing Tank (SS 300L)",cost:"₹85,500"},{name:"Stirrer/Agitator",cost:"₹38,000"},{name:"Storage Tank",cost:"₹47,500"},{name:"Semi-Auto Filling Machine",cost:"₹66,500"},{name:"Weighing Machine",cost:"₹9,500"},{name:"Sealing Machine",cost:"₹15,200"},{name:"Misc. Tools & Installation",cost:"₹22,800"}]},
+          setupBreakdown:{total:"₹85,500", items:[{name:"Shop Setup & Electrical",cost:"₹57,000"},{name:"Trade License",cost:"₹9,500"},{name:"GST Registration",cost:"₹3,800"},{name:"MSME Registration",cost:"₹1,900"},{name:"Branding & Label Design",cost:"₹13,300"}]},
+          workingBreakdown:{total:"₹1,99,500", items:[{name:"Surfactants (SLES etc.)",cost:"₹66,500"},{name:"Fragrance & Color",cost:"₹19,000"},{name:"Preservatives & Additives",cost:"₹15,200"},{name:"Bottles & Caps",cost:"₹76,000"},{name:"Labels & Packaging",cost:"₹22,800"}]},
+          funding:{beneficiary:"50%",beneficiaryAmt:"₹2,85,000",ngoLoan:"50%",ngoLoanAmt:"₹2,85,000",totalProject:"₹5,70,000"},
+          emi:{loanAmount:"₹2,85,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹2,375"},
+          profitDetail:"₹60,000 – ₹90,000 / month",
           products:[
             {name:"Handwash (gel/foam)"},{name:"Antiseptic liquid"},{name:"Hand rub (70% IPA)"},{name:"Disinfectant surface spray"}
           ]},
+        {name:"Antiseptic Liquid Unit", space:"~225 sqft", workers:"2–3", profit:"₹35k–80k/m",
+          capacity:"400–600 L/day", production:"4,000–6,000 bottles/month",
+          setup:"₹8,70,000", working:"₹5,40,000", upfront:"₹87,000",
+          machinery:{total:"₹2,35,000", items:[{name:"SS Mixing Tank (300L)",cost:"₹75,000"},{name:"Stirrer/Agitator Motor",cost:"₹30,000"},{name:"Storage Tank",cost:"₹35,000"},{name:"Semi-Auto Filling Machine",cost:"₹55,000"},{name:"Testing & Measuring Equipment",cost:"₹20,000"},{name:"Installation & Fittings",cost:"₹20,000"}]},
+          setupBreakdown:{total:"₹95,000", items:[{name:"Shop Interior & Electrical Setup",cost:"₹50,000"},{name:"Trade License & Local Authority Fees",cost:"₹10,000"},{name:"GST Registration",cost:"₹3,000"},{name:"MSME Registration",cost:"₹2,000"},{name:"Branding, Logo & Label Design",cost:"₹15,000"},{name:"Initial Marketing Expense",cost:"₹15,000"}]},
+          workingBreakdown:{total:"₹5,40,000", items:[{name:"Active Ingredients (₹70k × 3)",cost:"₹2,10,000"},{name:"Bottles & Caps (₹60k × 3)",cost:"₹1,80,000"},{name:"Labels & Packaging (₹20k × 3)",cost:"₹60,000"},{name:"Preservatives & Misc. Chemicals (₹30k × 3)",cost:"₹90,000"}]},
+          funding:{beneficiary:"50%",beneficiaryAmt:"₹4,35,000",ngoLoan:"50%",ngoLoanAmt:"₹4,35,000",totalProject:"₹8,70,000"},
+          emi:{loanAmount:"₹4,35,000",tenure:"120 months",moratorium:"1 Year",monthlyEMI:"₹3,625"},
+          profitDetail:"₹35,000 – ₹80,000 / month",
+          products:[{name:"Antiseptic liquid"},{name:"Disinfectant surface spray"}]},
         {name:"FreshWipe Converting Unit", space:"~240 sqft", workers:"4", profit:"₹40k–65k/m",
           products:[{name:"Hygiene wet wipes"},{name:"Alcohol wipes"},{name:"Surface wipes (multipurpose)"}]},
         {name:"MedBand Unit", space:"~220 sqft", workers:"3", profit:"₹25k–40k/m",
@@ -1482,7 +1540,7 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
   /* Project-level cost ranges for finance block */
   const COSTS = {
-    "suraksha":{setup:"₹1.2–1.8L",working:"₹0.30–0.50L",upfront:"₹10k–25k"},
+    "suraksha":{setup:"₹5.70–8.70L",working:"₹1.5–5.5L",upfront:"₹57k–87k"},
     "swachh-bharat":{setup:"₹1.0–1.8L",working:"₹0.25–0.45L",upfront:"₹10k–20k"},
     "happy-meal":{setup:"₹1.3–1.8L",working:"₹0.25–0.45L",upfront:"₹12k–25k"},
     "green-energy":{setup:"₹2.4–6.0L",working:"₹0.60–1.50L",upfront:"₹25k–60k"},
@@ -1722,10 +1780,104 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
     pages.push({type:'index',title:'Index'});
 
     // Pages 4+: Unit Details
+    if (!window._prjUnitMap) window._prjUnitMap = {};
     project.units.forEach((unit, idx) => {
+      const uKey = unit.name.replace(/[^a-z0-9]/gi,'_');
+      window._prjUnitMap[uKey] = unit;
+
       const unitPage = document.createElement('div');
       unitPage.className = 'booklet-page unit-detail-page';
-      const costs = COSTS[project.key] || {setup:"\u2014",working:"\u2014",upfront:"\u2014"};
+      const fallback = COSTS[project.key] || {setup:'\u2014',working:'\u2014',upfront:'\u2014'};
+      const hasDetail = !!(unit.machinery || unit.setupBreakdown || unit.workingBreakdown || unit.funding);
+
+      // Machinery section
+      const macHTML = unit.machinery ? `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-cogs"></i> Machinery &amp; Equipment</h3>
+          ${unit.machinery.items.map(i=>`<div class="bd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
+          <div class="bd-total"><span>Total Machinery</span><span>${unit.machinery.total}</span></div>
+        </div>` : '';
+
+      // Setup section
+      const setupHTML = unit.setupBreakdown ? `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-building"></i> Setup &amp; Registration</h3>
+          ${unit.setupBreakdown.items.map(i=>`<div class="bd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
+          <div class="bd-total"><span>Total Setup</span><span>${unit.setupBreakdown.total}</span></div>
+        </div>` : '';
+
+      // Working capital section
+      const workHTML = unit.workingBreakdown ? `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-cubes"></i> Working Capital (3 Months)</h3>
+          ${unit.workingBreakdown.items.map(i=>`<div class="bd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
+          <div class="bd-total"><span>Total Working Capital</span><span>${unit.workingBreakdown.total}</span></div>
+        </div>` : '';
+
+      // Investment summary
+      const invHTML = hasDetail ? `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-table"></i> Total Project Investment</h3>
+          ${unit.machinery ? `<div class="inv-row"><span>Machinery &amp; Equipment</span><strong>${unit.machinery.total}</strong></div>` : ''}
+          ${unit.setupBreakdown ? `<div class="inv-row"><span>Setup &amp; Registration</span><strong>${unit.setupBreakdown.total}</strong></div>` : ''}
+          ${unit.workingBreakdown ? `<div class="inv-row"><span>Working Capital (3 Months)</span><strong>${unit.workingBreakdown.total}</strong></div>` : ''}
+          <div class="inv-grand"><span>Grand Total</span><span>${unit.funding ? unit.funding.totalProject : (unit.setup || fallback.setup)}</span></div>
+        </div>` : `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-indian-rupee-sign"></i> Financial Requirements</h3>
+          <div class="detail-grid">
+            <div class="detail-card"><div class="detail-card-label">Project Start Cost</div><div class="detail-card-value">${unit.setup||fallback.setup}</div></div>
+            <div class="detail-card"><div class="detail-card-label">Working Capital</div><div class="detail-card-value">${unit.working||fallback.working}</div></div>
+            <div class="detail-card"><div class="detail-card-label">Beneficiary Upfront</div><div class="detail-card-value">${unit.upfront||fallback.upfront}</div></div>
+          </div>
+        </div>`;
+
+      // Funding section
+      const fundHTML = unit.funding ? `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-handshake"></i> Funding Structure (50:50 NGO)</h3>
+          <div class="fund-grid">
+            <div class="fund-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0">
+              <div class="fund-pct" style="color:#15803d">${unit.funding.beneficiary}</div>
+              <div class="fund-lbl" style="color:#166534">Beneficiary Share</div>
+              <div class="fund-amt" style="color:#15803d">${unit.funding.beneficiaryAmt}</div>
+            </div>
+            <div class="fund-box" style="background:#fef3c7;border:1.5px solid #fde68a">
+              <div class="fund-pct" style="color:#b45309">${unit.funding.ngoLoan}</div>
+              <div class="fund-lbl" style="color:#92400e">NGO Loan (0% Interest)</div>
+              <div class="fund-amt" style="color:#b45309">${unit.funding.ngoLoanAmt}</div>
+            </div>
+          </div>
+          <div class="fund-total-row"><span>Total Project Cost</span><span>${unit.funding.totalProject}</span></div>
+        </div>` : '';
+
+      // EMI section
+      const emiHTML = unit.emi ? `
+        <div class="detail-section">
+          <h3 class="prj-sec-title"><i class="fa-solid fa-calculator"></i> EMI Details</h3>
+          <div class="emi-grid">
+            <div class="emi-item"><div class="emi-lbl">Loan Amount</div><div class="emi-val">${unit.emi.loanAmount}</div></div>
+            <div class="emi-item"><div class="emi-lbl">Tenure</div><div class="emi-val">${unit.emi.tenure}</div></div>
+            <div class="emi-item"><div class="emi-lbl">Moratorium</div><div class="emi-val">${unit.emi.moratorium}</div></div>
+            <div class="emi-item hl"><div class="emi-lbl">Monthly EMI</div><div class="emi-val">${unit.emi.monthlyEMI}</div></div>
+          </div>
+        </div>` : '';
+
+      // Profit section
+      const profitHTML = (unit.profitDetail || unit.profit) ? `
+        <div class="detail-section">
+          <div class="profit-badge"><span class="profit-lbl">Estimated Monthly Profit</span><span class="profit-val">${unit.profitDetail || unit.profit}</span></div>
+        </div>` : '';
+
+      // Product list (clickable if detailed data available)
+      const prodListHTML = (unit.products||[]).map(p => {
+        if (hasDetail) {
+          const safeN = p.name.replace(/'/g,"\\'");
+          return `<li class="has-detail" onclick="showPrjProdDetail('${safeN}','${uKey}')">${p.name}</li>`;
+        }
+        return `<li>${p.name}</li>`;
+      }).join('');
+
       unitPage.innerHTML = `
         <h2>${unit.name}</h2>
         <p class="unit-subtitle">${project.name} &middot; Unit ${idx+1} of ${project.units.length}</p>
@@ -1734,24 +1886,15 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
           <div class="detail-grid">
             <div class="detail-card"><div class="detail-card-label">Space Required</div><div class="detail-card-value">${unit.space||'\u2014'}</div></div>
             <div class="detail-card"><div class="detail-card-label">Workforce</div><div class="detail-card-value">${unit.workers||'\u2014'} workers</div></div>
-            <div class="detail-card"><div class="detail-card-label">Monthly Profit</div><div class="detail-card-value">${unit.profit||'\u2014'}</div></div>
+            ${unit.capacity ? `<div class="detail-card"><div class="detail-card-label">Capacity</div><div class="detail-card-value">${unit.capacity}</div></div>` : `<div class="detail-card"><div class="detail-card-label">Monthly Profit</div><div class="detail-card-value">${unit.profit||'\u2014'}</div></div>`}
             <div class="detail-card"><div class="detail-card-label">Products</div><div class="detail-card-value">${(unit.products||[]).length} items</div></div>
           </div>
         </div>
         <div class="detail-section">
-          <h3><i class="fa-solid fa-indian-rupee-sign"></i> Financial Requirements</h3>
-          <div class="detail-grid">
-            <div class="detail-card"><div class="detail-card-label">Project Start Cost</div><div class="detail-card-value">${costs.setup}</div></div>
-            <div class="detail-card"><div class="detail-card-label">Working Capital</div><div class="detail-card-value">${costs.working}</div></div>
-            <div class="detail-card"><div class="detail-card-label">Beneficiary Upfront</div><div class="detail-card-value">${costs.upfront}</div></div>
-          </div>
+          <h3><i class="fa-solid fa-box"></i> Product Portfolio ${hasDetail ? '<span style="font:400 10px Inter;color:#c8a96e;margin-left:4px">(click for details)</span>' : ''}</h3>
+          <ul class="product-list">${prodListHTML}</ul>
         </div>
-        <div class="detail-section">
-          <h3><i class="fa-solid fa-box"></i> Product Portfolio</h3>
-          <ul class="product-list">
-            ${(unit.products||[]).map(p => `<li>${p.name}</li>`).join('')}
-          </ul>
-        </div>
+        ${macHTML}${setupHTML}${workHTML}${invHTML}${fundHTML}${emiHTML}${profitHTML}
         <div style="margin-top:auto;padding-top:14px;text-align:center">
           <button class="btn btn-primary" onclick="window.location.href='https://www.fwfindia.org/donation#donateModal'" style="padding:10px 22px;border-radius:10px;background:#f97316;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:14px">
             Register for this Unit <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i>
@@ -2037,5 +2180,82 @@ footer .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
 
 })();
 </script>
+  <!-- Product Detail Modal (projects.html) -->
+  <div class="prj-modal-ov" id="prjModalOv" onclick="closePrjModal(event)">
+    <div class="prj-modal" id="prjModal">
+      <div class="prj-modal-hdr">
+        <h2 id="prjModalTitle">Product Details</h2>
+        <button class="prj-modal-cls" onclick="closePrjModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="prj-modal-body" id="prjModalBody"></div>
+    </div>
+  </div>
+  <script>
+  function showPrjProdDetail(productName, uKey) {
+    const unit = (window._prjUnitMap || {})[uKey];
+    if (!unit) return;
+    document.getElementById('prjModalTitle').textContent = productName;
+    let h = '<div class="prj-ov">';
+    h += `<div class="prj-ov-item"><div class="prj-ov-lbl">Space</div><div class="prj-ov-val">${unit.space}</div></div>`;
+    if (unit.capacity) h += `<div class="prj-ov-item"><div class="prj-ov-lbl">Capacity</div><div class="prj-ov-val">${unit.capacity}</div></div>`;
+    h += `<div class="prj-ov-item"><div class="prj-ov-lbl">Manpower</div><div class="prj-ov-val">${unit.workers} workers</div></div>`;
+    if (unit.production) h += `<div class="prj-ov-item"><div class="prj-ov-lbl">Production</div><div class="prj-ov-val">${unit.production}</div></div>`;
+    h += '</div>';
+    if (unit.machinery?.items) {
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-cogs"></i> Machinery &amp; Equipment</div>';
+      unit.machinery.items.forEach(i => { h += `<div class="bd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`; });
+      h += `<div class="bd-total"><span>Total Machinery</span><span>${unit.machinery.total}</span></div>`;
+    }
+    if (unit.setupBreakdown?.items) {
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-building"></i> Setup &amp; Registration</div>';
+      unit.setupBreakdown.items.forEach(i => { h += `<div class="bd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`; });
+      h += `<div class="bd-total"><span>Total Setup</span><span>${unit.setupBreakdown.total}</span></div>`;
+    }
+    if (unit.workingBreakdown?.items) {
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-cubes"></i> Working Capital (3 Months)</div>';
+      unit.workingBreakdown.items.forEach(i => { h += `<div class="bd-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`; });
+      h += `<div class="bd-total"><span>Total Working Capital</span><span>${unit.workingBreakdown.total}</span></div>`;
+    }
+    if (unit.machinery || unit.setupBreakdown || unit.workingBreakdown) {
+      const grand = unit.funding ? unit.funding.totalProject : unit.setup;
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-table"></i> Total Project Investment</div>';
+      if (unit.machinery)        h += `<div class="inv-row"><span>Machinery &amp; Equipment</span><strong>${unit.machinery.total}</strong></div>`;
+      if (unit.setupBreakdown)   h += `<div class="inv-row"><span>Setup &amp; Registration</span><strong>${unit.setupBreakdown.total}</strong></div>`;
+      if (unit.workingBreakdown) h += `<div class="inv-row"><span>Working Capital (3 Months)</span><strong>${unit.workingBreakdown.total}</strong></div>`;
+      h += `<div class="inv-grand"><span>Grand Total Project Cost</span><span>${grand}</span></div>`;
+    }
+    if (unit.funding) {
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-handshake"></i> Funding Structure (50:50 NGO)</div>';
+      h += '<div class="fund-grid">';
+      h += `<div class="fund-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0"><div class="fund-pct" style="color:#15803d">${unit.funding.beneficiary}</div><div class="fund-lbl" style="color:#166534">Beneficiary Share</div><div class="fund-amt" style="color:#15803d">${unit.funding.beneficiaryAmt}</div></div>`;
+      h += `<div class="fund-box" style="background:#fef3c7;border:1.5px solid #fde68a"><div class="fund-pct" style="color:#b45309">${unit.funding.ngoLoan}</div><div class="fund-lbl" style="color:#92400e">NGO Loan (0% Interest)</div><div class="fund-amt" style="color:#b45309">${unit.funding.ngoLoanAmt}</div></div>`;
+      h += '</div>';
+      h += `<div class="fund-total-row"><span>Total Project Cost</span><span>${unit.funding.totalProject}</span></div>`;
+    }
+    if (unit.emi) {
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-calculator"></i> EMI Details</div>';
+      h += '<div class="emi-grid">';
+      h += `<div class="emi-item"><div class="emi-lbl">Loan Amount</div><div class="emi-val">${unit.emi.loanAmount}</div></div>`;
+      h += `<div class="emi-item"><div class="emi-lbl">Tenure</div><div class="emi-val">${unit.emi.tenure}</div></div>`;
+      h += `<div class="emi-item"><div class="emi-lbl">Moratorium</div><div class="emi-val">${unit.emi.moratorium}</div></div>`;
+      h += `<div class="emi-item hl"><div class="emi-lbl">Monthly EMI</div><div class="emi-val">${unit.emi.monthlyEMI}</div></div>`;
+      h += '</div>';
+    }
+    if (unit.profitDetail || unit.profit) {
+      const pStr = unit.profitDetail || unit.profit;
+      h += '<div class="prj-sec-title"><i class="fa-solid fa-chart-line"></i> Estimated Monthly Profit</div>';
+      h += `<div class="profit-badge"><span class="profit-lbl">Monthly Profit</span><span class="profit-val">${pStr}</span></div>`;
+      h += '<p style="font-size:10px;color:#8b7355;margin-top:6px">EMI is easily manageable from net monthly profit.</p>';
+    }
+    document.getElementById('prjModalBody').innerHTML = h;
+    document.getElementById('prjModalOv').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePrjModal(e) {
+    if (e && e.target !== document.getElementById('prjModalOv')) return;
+    document.getElementById('prjModalOv').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  </script>
 </body>
 </html>

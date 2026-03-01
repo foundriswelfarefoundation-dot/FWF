@@ -2133,7 +2133,7 @@ async function sendTestEmail() {
   if (!email) { result.innerHTML = '<span style="color:#ef4444">Email daalo pehle</span>'; return; }
   result.innerHTML = '<span style="color:#6b7280"><i class="fa-solid fa-spinner fa-spin"></i> Sending...</span>';
   try {
-    const data = await AUTH.api('/api/admin/test-email', { method: 'POST', body: JSON.stringify({ to: email }) });
+    const data = await AUTH.api('/api/admin/test-email', { method: 'POST', body: { to: email } });
     result.innerHTML = '<span style="color:#10b981"><i class="fa-solid fa-check-circle"></i> Email sent! Inbox check karo.</span>';
   } catch(e) {
     result.innerHTML = `<span style="color:#ef4444"><i class="fa-solid fa-circle-xmark"></i> Failed: ${e.message}</span>`;

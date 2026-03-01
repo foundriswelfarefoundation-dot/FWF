@@ -2934,13 +2934,18 @@ app.post('/api/admin/test-email', auth('admin'), async (req, res) => {
   const { to } = req.body || {};
   const target = to || req.user?.email;
   if (!target) return res.status(400).json({ error: 'Provide a "to" email in body' });
+
+  // Pre-flight env check
+  if (!process.env.RESEND_API_KEY) return res.status(500).json({ ok: false, error: 'RESEND_API_KEY is not set in Railway variables' });
+  if (!process.env.MAIL_FROM)      return res.status(500).json({ ok: false, error: 'MAIL_FROM is not set in Railway variables' });
+
   try {
     const transporter = getTransporter();
     await transporter.sendMail({
       from: process.env.MAIL_FROM,
       to: target,
       subject: '✅ FWF Email Test — Resend is working!',
-      html: `<p>This is a test email sent from FWF backend at <strong>${new Date().toISOString()}</strong>.<br>If you received this, Resend is configured correctly.</p>`
+      html: `<p>This is a test email sent from FWF backend at <strong>${new Date().toISOString()}</strong>.<br>If you received this, Resend is configured correctly.<br>Reply-To: ${process.env.REPLY_TO_EMAIL || 'not set'}</p>`
     });
     res.json({ ok: true, message: `Test email sent to ${target}` });
   } catch (e) {

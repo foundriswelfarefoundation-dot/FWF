@@ -174,11 +174,13 @@
     .header.header--light .lang-switch button.active{color:#111827}
 
     nav a.btn-join, nav a.btn-donate{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      height:44px; padding:0 22px; border-radius:999px; font-weight:800; letter-spacing:.09em;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+      height:52px; padding:0 16px; border-radius:14px; font-weight:800; letter-spacing:.04em;
       border:2px solid transparent; color:#fff; box-shadow:0 8px 18px rgba(2,6,23,.25);
       transition:background .15s, box-shadow .15s, transform .1s, filter .15s;
     }
+    nav a.btn-join i, nav a.btn-donate i{font-size:16px;line-height:1}
+    nav a.btn-join span, nav a.btn-donate span{font-size:10px;font-weight:700;letter-spacing:.06em;line-height:1;opacity:.92}
     nav a.btn-join{background:linear-gradient(90deg,var(--gC),var(--gD))}
     nav a.btn-donate{background:linear-gradient(90deg,var(--gE),var(--gF))}
     nav a.btn-join:hover, nav a.btn-donate:hover{transform:translateY(-2px);filter:brightness(1.06) saturate(1.05);box-shadow:0 18px 40px rgba(34,211,238,.28)}
@@ -361,17 +363,19 @@
     }
     /* Login Button */
     .nav-login-btn{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:9px 20px;border-radius:12px;
+      display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+      padding:6px 14px;border-radius:12px;height:52px;
       border:1.5px solid rgba(255,255,255,.4);
       background:rgba(255,255,255,.1);color:#fff;
-      font-weight:700;font-size:14px;text-decoration:none;
+      font-weight:700;text-decoration:none;
       transition:.18s;flex-shrink:0;white-space:nowrap;
     }
+    .nav-login-btn i{font-size:16px;line-height:1}
+    .nav-login-btn .login-text{font-size:10px;font-weight:700;letter-spacing:.06em;line-height:1;opacity:.92}
     .nav-login-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.65)}
     .header--light .nav-login-btn{background:#1e3a8a;border-color:transparent;color:#fff}
     .header--light .nav-login-btn:hover{background:#1e4fd4}
-    @media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:9px 13px}}
+    @media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:6px 10px}}
   </style>
 </head>
 <body>
@@ -388,9 +392,9 @@
         </ul>
         <!-- CTA buttons and language switch remain right aligned -->
         <div class="navRight">
-          <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i> <span class="login-text">Login</span></a>
-          <a class="btn-join" href="https://www.fwfindia.org/donation#donateModal"><i class="fa-solid fa-user-plus"></i> <span data-i18n="nav.join">Join</span></a>
-          <a class="btn-donate" href="https://www.fwfindia.org/donation#donateModal"><i class="fa-solid fa-hand-holding-heart"></i> <span data-i18n="nav.donate">Donate</span></a>
+          <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i><span class="login-text">Login</span></a>
+          <a class="btn-join" href="https://www.fwfindia.org/donation#donateModal"><i class="fa-solid fa-user-plus"></i><span data-i18n="nav.join">Join</span></a>
+          <a class="btn-donate" href="https://www.fwfindia.org/donation#donateModal"><i class="fa-solid fa-hand-holding-heart"></i><span data-i18n="nav.donate">Donate</span></a>
           <div class="lang-switch" role="group" aria-label="Language switch">
             <button id="btn-hi" type="button">HI</button><div class="lang-sep"></div>
             <button id="btn-en" type="button" class="active">EN</button>

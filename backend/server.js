@@ -27,7 +27,7 @@ import Quiz from './models/Quiz.js';
 import QuizParticipation from './models/QuizParticipation.js';
 import ReferralClick from './models/ReferralClick.js';
 import DonationOtp from './models/DonationOtp.js';
-import { send80GReceipt, sendMemberWelcome, sendSupporterWelcome, sendDonationConfirmation, sendAdminAlert } from './lib/mailer.js';
+import { getTransporter, send80GReceipt, sendMemberWelcome, sendSupporterWelcome, sendDonationConfirmation, sendAdminAlert } from './lib/mailer.js';
 import { sendWhatsAppCredentials, sendWhatsAppDonation } from './lib/msg91.js';
 
 dotenv.config();
@@ -2929,6 +2929,26 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// ─── TEST EMAIL (admin only) ─────────────────────────────────────────────────
+app.post('/api/admin/test-email', auth('admin'), async (req, res) => {
+  const { to } = req.body || {};
+  const target = to || req.user?.email;
+  if (!target) return res.status(400).json({ error: 'Provide a "to" email in body' });
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM,
+      to: target,
+      subject: '✅ FWF Email Test — Resend is working!',
+      html: `<p>This is a test email sent from FWF backend at <strong>${new Date().toISOString()}</strong>.<br>If you received this, Resend is configured correctly.</p>`
+    });
+    res.json({ ok: true, message: `Test email sent to ${target}` });
+  } catch (e) {
+    console.error('Test email error:', e);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // Start server
 async function startServer() {
   await connectDB();
@@ -2937,6 +2957,11 @@ async function startServer() {
     console.log(`🚀 FWF backend running on http://localhost:${PORT}`);
     console.log(`📦 Database: MongoDB Atlas`);
     console.log(`🌐 Site served from: ${siteRoot}`);
+    // ── Email config check ──
+    const resendKey = process.env.RESEND_API_KEY;
+    const mailFrom  = process.env.MAIL_FROM;
+    console.log(`📧 RESEND_API_KEY : ${resendKey  ? '✅ SET (' + resendKey.slice(0,8) + '...)' : '❌ MISSING'}`);
+    console.log(`📧 MAIL_FROM      : ${mailFrom   ? '✅ ' + mailFrom : '❌ MISSING'}`);
   });
 }
 

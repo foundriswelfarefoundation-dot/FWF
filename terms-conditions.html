@@ -103,6 +103,9 @@
   .warn{background:var(--warn);color:var(--warn-text);border:1px solid #f59e0b}
   footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
   @media (max-width:560px){ .quick{gap:6px} }
+  .nav-login-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:12px;background:#1e3a8a;color:#fff;font-weight:700;font-size:14px;text-decoration:none;transition:.18s;flex-shrink:0;white-space:nowrap}
+  .nav-login-btn:hover{background:#1e4fd4}
+  @media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:9px 11px}}
 </style>
 </head>
 <body>
@@ -130,6 +133,7 @@
       <button id="btn-en" type="button">EN</button>
     </div>
   </div>
+  <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i> <span class="login-text">Login</span></a>
   <button class="navToggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
 </div>
 </header>

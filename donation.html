@@ -95,6 +95,9 @@
     .lang-switch button{border:0;background:transparent;padding:0 12px;height:100%;display:inline-flex;align-items:center;font-weight:900;letter-spacing:.08em;cursor:pointer;color:#475569}
     .lang-switch button.active{background:linear-gradient(90deg,#60a5fa22,#a78bfa22);color:#111827}
     .lang-sep{width:1px;background:#e2e8f0}
+    .nav-login-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:12px;background:#1e3a8a;color:#fff;font-weight:700;font-size:14px;text-decoration:none;transition:.18s;flex-shrink:0;white-space:nowrap}
+    .nav-login-btn:hover{background:#1e4fd4}
+    @media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:9px 11px}}
     .navToggle{display:none;height:42px;width:42px;border-radius:10px;border:1px solid #dbe3f3;background:#fff;cursor:pointer;align-items:center;justify-content:center;font-size:18px}
     @media (max-width:880px){
       .navToggle{display:inline-flex}
@@ -245,6 +248,7 @@
       </div>
     </div>
 
+    <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i> <span class="login-text">Login</span></a>
     <button class="navToggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
   </div>
 </header>

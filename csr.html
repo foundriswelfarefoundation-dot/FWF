@@ -886,6 +886,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .downArrow i { font-size:20px; }
 @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
 @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.25)} 70%{box-shadow:0 0 0 14px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+.nav-login-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:12px;background:#1e3a8a;color:#fff;font-weight:700;font-size:14px;text-decoration:none;transition:.18s;flex-shrink:0;white-space:nowrap}
+.nav-login-btn:hover{background:#1e4fd4}
+@media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:9px 11px}}
   </style>
 </head>
 <body>
@@ -915,6 +918,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         <button id="btn-en" type="button">EN</button>
       </div>
     </div>
+    <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i> <span class="login-text">Login</span></a>
     <button class="navToggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
   </div>
   </header>

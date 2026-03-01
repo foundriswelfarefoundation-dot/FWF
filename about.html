@@ -211,6 +211,9 @@
       background:linear-gradient(90deg,#60a5fa22,#a78bfa22);color:#111827;
     }
     .lang-sep {width:1px;background:#334155}
+    .nav-login-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:12px;background:#1e3a8a;color:#fff;font-weight:700;font-size:14px;text-decoration:none;transition:.18s;flex-shrink:0;white-space:nowrap}
+    .nav-login-btn:hover{background:#1e4fd4}
+    @media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:9px 13px}}
     .footer-modern {
       background: linear-gradient(120deg,#181f2a 60%,#1e293b 100%);
       color: #e5e7eb;
@@ -353,6 +356,7 @@
           <li><a href="/about">About Us</a></li>
         </ul>
       </nav>
+      <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i> <span class="login-text">Login</span></a>
       <div class="lang-switch" role="group" aria-label="Language switch">
         <button id="btn-hi" type="button">HI</button><div class="lang-sep"></div>
         <button id="btn-en" type="button" class="active">EN</button>

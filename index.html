@@ -359,6 +359,19 @@
       .mainNavCenter ul { justify-content: center; }
       .mainNavCenter .navRight { margin-left: 0; margin-top: 10px; }
     }
+    /* Login Button */
+    .nav-login-btn{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:9px 20px;border-radius:12px;
+      border:1.5px solid rgba(255,255,255,.4);
+      background:rgba(255,255,255,.1);color:#fff;
+      font-weight:700;font-size:14px;text-decoration:none;
+      transition:.18s;flex-shrink:0;white-space:nowrap;
+    }
+    .nav-login-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.65)}
+    .header--light .nav-login-btn{background:#1e3a8a;border-color:transparent;color:#fff}
+    .header--light .nav-login-btn:hover{background:#1e4fd4}
+    @media(max-width:600px){.nav-login-btn .login-text{display:none}.nav-login-btn{padding:9px 13px}}
   </style>
 </head>
 <body>
@@ -375,6 +388,7 @@
         </ul>
         <!-- CTA buttons and language switch remain right aligned -->
         <div class="navRight">
+          <a class="nav-login-btn" href="/member-login"><i class="fa-solid fa-right-to-bracket"></i> <span class="login-text">Login</span></a>
           <a class="btn-join" href="https://www.fwfindia.org/donation#donateModal" data-i18n="nav.join">Join</a>
           <a class="btn-donate" href="https://www.fwfindia.org/donation#donateModal" data-i18n="nav.donate">Donate</a>
           <div class="lang-switch" role="group" aria-label="Language switch">

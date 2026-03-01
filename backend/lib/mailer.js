@@ -5,7 +5,7 @@ if (!cached) cached = global._backendMailer = { client: null };
 
 // ─── shared helpers ───────────────────────────────────────────────────────────
 const SITE = 'https://www.fwfindia.org';
-const SUPPORT_EMAIL = () => process.env.SUPPORT_EMAIL || process.env.SMTP_USER || 'info@fwfindia.org';
+const SUPPORT_EMAIL = () => process.env.REPLY_TO_EMAIL || process.env.SUPPORT_EMAIL || process.env.SMTP_USER || 'info@fwfindia.org';
 
 function emailFooter(accentColor = '#E87722') {
   return `
@@ -36,7 +36,11 @@ export function getTransporter() {
   // Expose sendMail() shim so all existing call sites work unchanged
   cached.client = {
     sendMail: async ({ from, to, subject, html, text }) => {
-      const { data, error } = await resend.emails.send({ from, to, subject, html, text });
+      const replyTo = process.env.REPLY_TO_EMAIL;
+      const { data, error } = await resend.emails.send({
+        from, to, subject, html, text,
+        ...(replyTo ? { reply_to: replyTo } : {})
+      });
       if (error) throw new Error(`Resend error: ${JSON.stringify(error)}`);
       return data;
     }

@@ -2039,6 +2039,7 @@ function renderMembers(list){
     <td>
       <button class="btn-icon" title="View" onclick="viewMember('${m.member_id}')"><i class="fa-solid fa-eye"></i></button>
       <button class="btn-icon" title="Toggle status" onclick="toggleMember('${m.member_id}')"><i class="fa-solid fa-toggle-${m.membership_active?'on':'off'}"></i></button>
+      <button class="btn-icon" title="Delete Member" onclick="deleteMember('${m.member_id}','${(m.name||'').replace(/'/g,"\\'")}')" style="color:var(--danger)"><i class="fa-solid fa-trash"></i></button>
     </td>
   </tr>`).join('');
 }
@@ -2061,6 +2062,15 @@ async function toggleMember(memberId){
     notify(`${memberId} is now ${r.membership_active ? 'active' : 'inactive'}`,'success');
     loadMembers();
   } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+async function deleteMember(memberId, name){
+  if(!confirm(`⚠️ DELETE member "${name}" (${memberId})?\n\nThis will permanently delete the member and all their associated data (points, referrals, orders, etc.).\nThis action cannot be undone.`)) return;
+  try{
+    await AUTH.api('/api/admin/member/' + memberId, {method:'DELETE'});
+    notify(`Member ${memberId} deleted`, 'success');
+    loadMembers();
+  } catch(e){ notify(e.message||'Delete failed','error'); }
 }
 
 async function viewMember(memberId){
@@ -2317,6 +2327,7 @@ function renderDonations(list){
       <td>
         <button class="btn-icon" title="View KYC Details" onclick="openDonDetail('${d.donation_id}')"><i class="fa-solid fa-eye"></i></button>
         ${d.receipt_issued ? '<i class="fa-solid fa-file-invoice" style="color:#059669;margin-left:4px" title="80G Receipt Issued"></i>' : ''}
+        <button class="btn-icon" title="Delete Donation" onclick="deleteDonation('${d.donation_id}','${(d.donor_name||'Anonymous').replace(/'/g,"\\'")}'" style="color:var(--danger)"><i class="fa-solid fa-trash"></i></button>
       </td>
     </tr>`;
   }).join('');
@@ -2325,6 +2336,15 @@ function renderDonations(list){
 // Search & filter
 document.getElementById('donSearch')?.addEventListener('input', loadDonations);
 document.getElementById('donKycFilter')?.addEventListener('change', loadDonations);
+
+async function deleteDonation(donationId, donorName){
+  if(!confirm(`⚠️ DELETE donation from "${donorName}" (${donationId})?\n\nThis action cannot be undone.`)) return;
+  try{
+    await AUTH.api('/api/admin/donation/' + donationId, {method:'DELETE'});
+    notify('Donation deleted', 'success');
+    loadDonations();
+  } catch(e){ notify(e.message||'Delete failed','error'); }
+}
 
 // Open donation KYC detail modal
 async function openDonDetail(donationId){

@@ -1543,6 +1543,25 @@ app.post('/api/admin/toggle-member', auth('admin'), async (req, res) => {
   res.json({ ok: true, membership_active: u.membership_active ? 1 : 0 });
 });
 
+// Admin: delete member (and all associated data)
+app.delete('/api/admin/member/:memberId', auth('admin'), async (req, res) => {
+  const u = await User.findOne({ member_id: req.params.memberId, role: 'member' });
+  if (!u) return res.status(404).json({ error: 'Member not found' });
+  await Promise.all([
+    PointsLedger.deleteMany({ user_id: u._id }),
+    Referral.deleteMany({ $or: [{ referrer_id: u._id }, { referred_user_id: u._id }] }),
+    QuizTicket.deleteMany({ $or: [{ seller_id: u._id }, { buyer_id: u._id }] }),
+    MembershipFee.deleteMany({ user_id: u._id }),
+    Order.deleteMany({ user_id: u._id }),
+    SupportTicket.deleteMany({ user_id: u._id }),
+    TaskCompletion.deleteMany({ user_id: u._id }),
+    SocialPost.deleteMany({ user_id: u._id }),
+    QuizParticipation.deleteMany({ user_id: u._id }),
+  ]);
+  await User.deleteOne({ _id: u._id });
+  res.json({ ok: true, message: `Member ${req.params.memberId} deleted` });
+});
+
 // Admin: search members
 app.get('/api/admin/search-members', auth('admin'), async (req, res) => {
   const q = req.query.q || '';
@@ -1640,6 +1659,13 @@ app.post('/api/admin/donation-kyc/:donationId', auth('admin'), async (req, res) 
   if (receipt_issued !== undefined) update.receipt_issued = !!receipt_issued;
   await Donation.updateOne({ donation_id: req.params.donationId }, { $set: update });
   res.json({ ok: true, message: 'Donation updated' });
+});
+
+// Admin: delete donation
+app.delete('/api/admin/donation/:donationId', auth('admin'), async (req, res) => {
+  const result = await Donation.deleteOne({ donation_id: req.params.donationId });
+  if (result.deletedCount === 0) return res.status(404).json({ error: 'Donation not found' });
+  res.json({ ok: true, message: 'Donation deleted' });
 });
 
 // Admin: get all referrals

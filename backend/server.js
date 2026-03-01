@@ -505,13 +505,30 @@ app.get('/api/debug/user/:memberId', (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
+// Helper: precise duplicate-check error
+async function checkDuplicateUser(email, mobile) {
+  const emailUser = email ? await User.findOne({ email }) : null;
+  const mobileUser = mobile ? await User.findOne({ mobile }) : null;
+  if (!emailUser && !mobileUser) return null;
+  const msgs = [];
+  if (emailUser) {
+    const role = emailUser.role === 'member' ? 'Member' : emailUser.role === 'supporter' ? 'Supporter' : emailUser.role;
+    msgs.push(`Email "${email}" is already registered as ${role} (ID: ${emailUser.member_id})`);
+  }
+  if (mobileUser) {
+    const role = mobileUser.role === 'member' ? 'Member' : mobileUser.role === 'supporter' ? 'Supporter' : mobileUser.role;
+    msgs.push(`Mobile "${mobile}" is already registered as ${role} (ID: ${mobileUser.member_id})`);
+  }
+  return msgs.join(' | ') + '. Please login with your existing credentials.';
+}
+
 // Simulate join payment
 app.post('/api/pay/simulate-join', internalAuth, async (req, res) => {
   const { name, mobile, email } = req.body;
   if (!name || !mobile) return res.status(400).json({ error: 'name & mobile required' });
 
-  const exists = await User.findOne({ $or: [{ mobile }, ...(email ? [{ email }] : [])] });
-  if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+  const dupError = await checkDuplicateUser(email, mobile);
+  if (dupError) return res.status(400).json({ error: dupError });
 
   const memberId = await nextMemberId();
   const plain = randPass();
@@ -559,16 +576,8 @@ app.post('/api/pay/register-supporter', async (req, res) => {
     if (!name || !email) return res.status(400).json({ error: 'Name and email are required' });
 
     // Check if already registered
-    const orCond = [{ email }];
-    if (mobile) orCond.push({ mobile });
-    const exists = await User.findOne({ $or: orCond });
-    if (exists) {
-      const matchField = exists.email === email ? 'email' : 'mobile';
-      const roleLabel = exists.role === 'member' ? 'Member' : exists.role === 'supporter' ? 'Supporter' : exists.role;
-      return res.status(400).json({ 
-        error: `This ${matchField} is already registered as ${roleLabel} (ID: ${exists.member_id}). Please login with your existing credentials.` 
-      });
-    }
+    const dupError = await checkDuplicateUser(email, mobile);
+    if (dupError) return res.status(400).json({ error: dupError });
 
     const supporterId = await nextSupporterId();
     const plain = randPass();
@@ -622,11 +631,8 @@ app.post('/api/pay/register-supporter', async (req, res) => {
 app.post('/api/pay/check-member', async (req, res) => {
   const { mobile, email } = req.body || {};
   if (!mobile && !email) return res.status(400).json({ error: 'mobile or email required' });
-  const orCond = [];
-  if (mobile) orCond.push({ mobile });
-  if (email) orCond.push({ email });
-  const exists = await User.findOne({ $or: orCond }).select('_id').lean();
-  if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+  const dupError = await checkDuplicateUser(email, mobile);
+  if (dupError) return res.status(400).json({ error: dupError });
   res.json({ ok: true });
 });
 
@@ -637,11 +643,8 @@ app.post('/api/pay/create-subscription', async (req, res) => {
 
     // Pre-check: reject if mobile/email already registered (before any payment)
     if (mobile || email) {
-      const orCond = [];
-      if (mobile) orCond.push({ mobile });
-      if (email) orCond.push({ email });
-      const exists = await User.findOne({ $or: orCond });
-      if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+      const dupError = await checkDuplicateUser(email, mobile);
+      if (dupError) return res.status(400).json({ error: dupError });
     }
 
     // Get or create a monthly plan (cache plan_id in env or DB)
@@ -807,8 +810,8 @@ app.post('/api/pay/membership', async (req, res) => {
     }
 
     // Check if user already exists
-    const exists = await User.findOne({ $or: [{ mobile }, { email }] });
-    if (exists) return res.status(400).json({ error: 'mobile/email already registered' });
+    const dupError = await checkDuplicateUser(email, mobile);
+    if (dupError) return res.status(400).json({ error: dupError });
 
     // Register member
     const memberId = await nextMemberId();

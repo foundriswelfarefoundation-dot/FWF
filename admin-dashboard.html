@@ -519,6 +519,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <button class="nav-item" data-page="members">
       <i class="fa-solid fa-users"></i> Members
     </button>
+    <button class="nav-item" data-page="supporters">
+      <i class="fa-solid fa-hand-holding-heart"></i> Supporters
+    </button>
     <button class="nav-item" data-page="csr">
       <i class="fa-solid fa-handshake"></i> CSR Partners
     </button>
@@ -591,7 +594,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="s-label">Total Points Issued</div>
         <div class="s-value" id="hPoints">0</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" style="cursor:pointer" onclick="switchPage('supporters')">
         <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
         <div class="s-label">Donations Collected</div>
         <div class="s-value" id="hDonations">₹0</div>
@@ -675,16 +678,68 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
-  <!-- ===================== PAYMENTS PAGE (Fees + Donations) ===================== -->
-  <div class="page" id="page-payments">
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="pay-fees-tab">Membership Fees</button>
-      <button class="tab-btn" data-tab="pay-donations-tab">Donations</button>
+  <!-- ===================== SUPPORTERS PAGE ===================== -->
+  <div class="page" id="page-supporters">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
+        <div class="s-label">Total Donated</div>
+        <div class="s-value" id="donTotalAmt">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
+        <div class="s-label">Total Donors</div>
+        <div class="s-value" id="donTotalCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="s-label">KYC Pending</div>
+        <div class="s-value" id="donKycPending">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-red"><i class="fa-solid fa-gem"></i></div>
+        <div class="s-label">High-Value (≥50k)</div>
+        <div class="s-value" id="donHighValue">0</div>
+      </div>
     </div>
 
-    <!-- ── Membership Fees Tab ─────────────────────────────────── -->
-    <div class="tab-content active" id="pay-fees-tab">
-      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="search-bar">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="donSearch" placeholder="Search by name, email, mobile, PAN, DON ID...">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
+        <select id="donKycFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
+          <option value="">All KYC</option>
+          <option value="not_required">Not Required</option>
+          <option value="otp_verified">OTP Verified</option>
+          <option value="pending_docs">Pending Docs</option>
+          <option value="doc_verified">Docs Verified</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadDonations()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <h3><i class="fa-solid fa-hand-holding-heart"></i> Supporters / Donation Records <span style="font-weight:500;color:var(--text-muted);font-size:12px;margin-left:8px" id="donCountLabel"></span></h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>DON ID</th><th>Donor</th><th>Amount</th><th>PAN</th><th>KYC</th><th>OTP</th><th>Member</th><th>Payment ID</th><th>Date</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="donationsAdminBody">
+            <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAYMENTS PAGE ===================== -->
+  <div class="page" id="page-payments">
+
+    <!-- Membership Fees -->
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card">
           <div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
           <div class="s-label">Total Collected</div>
@@ -739,64 +794,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </table>
         </div>
       </div>
-    </div>
 
-    <!-- ── Donations Tab ─────────────────────────────────────────── -->
-    <div class="tab-content" id="pay-donations-tab">
-      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
-        <div class="stat-card">
-          <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
-          <div class="s-label">Total Donated</div>
-          <div class="s-value" id="donTotalAmt">₹0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
-          <div class="s-label">Total Donors</div>
-          <div class="s-value" id="donTotalCount">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-icon s-amber"><i class="fa-solid fa-shield-halved"></i></div>
-          <div class="s-label">KYC Pending</div>
-          <div class="s-value" id="donKycPending">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-icon s-red"><i class="fa-solid fa-gem"></i></div>
-          <div class="s-label">High-Value (≥50k)</div>
-          <div class="s-value" id="donHighValue">0</div>
-        </div>
-      </div>
-
-      <div class="grid-2" style="margin-bottom:16px">
-        <div class="search-bar">
-          <i class="fa-solid fa-search"></i>
-          <input type="text" id="donSearch" placeholder="Search by name, email, mobile, PAN, DON ID...">
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
-          <select id="donKycFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
-            <option value="">All KYC</option>
-            <option value="not_required">Not Required</option>
-            <option value="otp_verified">OTP Verified</option>
-            <option value="pending_docs">Pending Docs</option>
-            <option value="doc_verified">Docs Verified</option>
-          </select>
-          <button class="btn btn-ghost" onclick="loadDonations()"><i class="fa-solid fa-refresh"></i> Refresh</button>
-        </div>
-      </div>
-
-      <div class="content-card">
-        <h3><i class="fa-solid fa-hand-holding-heart"></i> Donation Transactions</h3>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr>
-              <th>DON ID</th><th>Donor</th><th>Amount</th><th>PAN</th><th>KYC</th><th>OTP</th><th>Member</th><th>Payment ID</th><th>Date</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="donationsAdminBody">
-              <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ===================== CSR PARTNERS PAGE ===================== -->
@@ -1826,9 +1824,10 @@ function switchPage(page, updateHash = true){
 
   if(page === 'posts')       loadSocialPosts();
   if(page === 'members')     loadMembers();
+  if(page === 'supporters')  loadDonations();
   if(page === 'csr')         loadCSRPartners();
   if(page === 'support')     loadSupportTickets();
-  if(page === 'payments')    { loadMembershipFees(); loadDonations(); }
+  if(page === 'payments')    loadMembershipFees();
   if(page === 'points')      loadPointsActivity();
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
@@ -2303,6 +2302,8 @@ function kycBadge(status, otpVerified){
 }
 
 function renderDonations(list){
+  const countEl = document.getElementById('donCountLabel');
+  if(countEl) countEl.textContent = `(${list.length})`;
   const tb = document.getElementById('donationsAdminBody');
   if(!list.length){ tb.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fa-solid fa-hand-holding-heart"></i><p>No donations found</p></td></tr>'; return; }
   tb.innerHTML = list.map(d => {

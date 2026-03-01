@@ -1,18 +1,43 @@
 import mongoose from 'mongoose';
 
 const quizTicketSchema = new mongoose.Schema({
+  // Seller (FWF member who generated the link)
   seller_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  buyer_name: String,
-  buyer_contact: String,
+  seller_support_id: { type: String, unique: true, sparse: true }, // FWF-ST-XXXXX
+
+  // Quiz reference
+  quiz_ref: { type: String, index: true },          // quiz_id string e.g. "M2506"
+  quiz_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
+
+  // Shareable token for the buyer link
+  token: { type: String, unique: true, index: true },
+
+  // Buyer info (filled when seller generates link)
+  buyer_name: { type: String },
+  buyer_contact: { type: String },
+  buyer_email: { type: String },
+
+  // Status tracking
+  ticket_status: {
+    type: String,
+    enum: ['pending', 'converted'],  // pending = link not yet used; converted = buyer paid
+    default: 'pending'
+  },
+
   ticket_price: { type: Number, default: 100 },
   points_earned: { type: Number, default: 0 },
+
+  // Filled on conversion
+  participation_id: { type: mongoose.Schema.Types.ObjectId, ref: 'QuizParticipation' },
+  converted_at: { type: Date },
+
   sold_at: { type: Date, default: Date.now }
-}, { 
+}, {
   timestamps: { createdAt: 'sold_at', updatedAt: false }
 });
 
-// Indexes
 quizTicketSchema.index({ seller_id: 1, sold_at: -1 });
+quizTicketSchema.index({ quiz_ref: 1, seller_id: 1 });
 quizTicketSchema.index({ sold_at: -1 });
 
 export default mongoose.model('QuizTicket', quizTicketSchema);

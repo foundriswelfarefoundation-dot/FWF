@@ -40,7 +40,8 @@
     { "source": "/api/member/:path*",     "destination": "https://fwf-production.up.railway.app/api/member/:path*" },
     { "source": "/api/admin/:path*",      "destination": "https://fwf-production.up.railway.app/api/admin/:path*" },
     { "source": "/api/pay/:path*",        "destination": "https://fwf-production.up.railway.app/api/pay/:path*" },
-    { "source": "/api/referral/:path*",   "destination": "https://fwf-production.up.railway.app/api/referral/:path*" }
+    { "source": "/api/referral/:path*",   "destination": "https://fwf-production.up.railway.app/api/referral/:path*" },
+    { "source": "/api/quiz-ticket/:path*","destination": "https://fwf-production.up.railway.app/api/quiz-ticket/:path*" }
   ],
   "headers": [
     {

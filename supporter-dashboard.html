@@ -953,6 +953,51 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
+  <!-- ═══════ QUIZ SELL TICKET MODAL ═══════ -->
+  <div class="modal" id="quizSellModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto">
+      <div id="sellModalHeader" style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:20px 22px 16px;position:relative">
+        <div style="position:absolute;top:0;right:0;width:90px;height:90px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent);pointer-events:none"></div>
+        <button onclick="document.getElementById('quizSellModal').style.display='none'" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">&times;</button>
+        <div style="font-size:28px;margin-bottom:6px">🎫</div>
+        <h3 style="color:#fff;margin:0 0 3px;font-size:17px;font-weight:900">Quiz Ticket Sell करें</h3>
+        <p id="sellModalSubtitle" style="color:rgba(255,255,255,.85);font-size:12px;margin:0"></p>
+      </div>
+      <div id="sellStep1" style="padding:22px 22px 24px">
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;line-height:1.5">खरीदार की जानकारी भरें। एक unique quiz link generate होगी।</p>
+        <div style="display:grid;gap:12px">
+          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">खरीदार का पूरा नाम *</label><input type="text" id="sellBuyerName" class="form-input" placeholder="Full name" style="width:100%;box-sizing:border-box"></div>
+          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">मोबाइल नंबर *</label><input type="tel" id="sellBuyerMobile" class="form-input" placeholder="10-digit mobile" maxlength="10" style="width:100%;box-sizing:border-box"></div>
+          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">Email (optional)</label><input type="email" id="sellBuyerEmail" class="form-input" placeholder="buyer@email.com" style="width:100%;box-sizing:border-box"></div>
+        </div>
+        <div style="background:#fff8f0;border:1px solid #fcd9a0;border-radius:10px;padding:11px 13px;margin-top:14px;font-size:11px;color:#b45309;line-height:1.6"><i class="fa-solid fa-circle-info"></i> Link generate होने के बाद खरीदार खुद payment करेगा। आपको <strong>10% commission points</strong> मिलेंगे।</div>
+        <button id="generateLinkBtn" onclick="generateSellLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><i class="fa-solid fa-link"></i> Generate Quiz Link</button>
+      </div>
+      <div id="sellStep2" style="display:none;padding:22px 22px 24px">
+        <div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:8px">🎉</div><h4 style="font-weight:900;color:var(--text-primary);margin:0 0 4px">Link Ready!</h4><p style="font-size:12px;color:var(--text-muted)">इस link को खरीदार के साथ share करें</p></div>
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px 16px;margin-bottom:14px;text-align:center"><div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Support ID</div><div id="sellSupportId" style="font-size:18px;font-weight:900;color:#166534;font-family:monospace;letter-spacing:1px"></div></div>
+        <div style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 16px;margin-bottom:14px"><div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Quiz Link</div><div style="display:flex;gap:8px;align-items:center"><input id="generatedSellLink" readonly style="flex:1;border:none;background:transparent;font-size:12px;color:var(--text-primary);font-family:monospace;outline:none;min-width:0" value=""><button onclick="copySellLink()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-copy"></i> Copy</button></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <button onclick="shareSellLink('whatsapp')" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:10px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+          <button onclick="shareSellLink('telegram')" style="background:linear-gradient(135deg,#0088cc,#0066aa);color:#fff;border:none;border-radius:10px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-brands fa-telegram"></i> Telegram</button>
+        </div>
+        <button onclick="sellAnotherTicket()" style="width:100%;background:#f1f5f9;color:var(--text-primary);border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> दूसरा Ticket Sell करें</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ QUIZ ENROLL SUCCESS MODAL ═══════ -->
+  <div class="modal" id="quizEnrollSuccessModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:24px 22px 20px;text-align:center;color:#fff"><div style="font-size:52px;margin-bottom:8px">🎓</div><h3 style="margin:0 0 4px;font-size:20px;font-weight:900">Enrollment Successful!</h3><p style="margin:0;font-size:12px;opacity:.85">आपने successfully enroll कर लिया है</p></div>
+      <div style="padding:22px 22px 24px;text-align:center">
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:16px;margin-bottom:16px"><div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Participation ID</div><div id="enrollSuccessId" style="font-size:20px;font-weight:900;color:#166534;font-family:monospace;letter-spacing:1.5px"></div><div style="font-size:11px;color:#15803d;margin-top:4px">Screenshot लेकर सहेज लें</div></div>
+        <p id="enrollSuccessPoints" style="font-size:13px;color:var(--accent);font-weight:700;margin:0 0 16px"></p>
+        <button onclick="document.getElementById('quizEnrollSuccessModal').style.display='none'" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:12px;padding:12px 32px;font-size:14px;font-weight:800;cursor:pointer">Done 🎉</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== HELP & SUPPORT ===================== -->
   <div class="page" id="page-support">
     <div class="grid-2">
@@ -2283,9 +2328,27 @@ async function submitTaskSelfie(){
 
 // --- QUIZ GAMES ---
 const tierConfig = {
-  monthly:     { color:'#3b82f6', gradient:'linear-gradient(135deg,#3b82f6,#2563eb)', label:'Monthly', emoji:'🗓️', fee:100 },
-  half_yearly: { color:'#8b5cf6', gradient:'linear-gradient(135deg,#8b5cf6,#7c3aed)', label:'Half-Yearly', emoji:'📅', fee:500 },
-  yearly:      { color:'#e11d48', gradient:'linear-gradient(135deg,#e11d48,#be123c)', label:'Yearly', emoji:'🏆', fee:1000 }
+  monthly: {
+    color: '#3b82f6', gradient: 'linear-gradient(135deg,#3b82f6,#2563eb)',
+    label: 'Monthly', emoji: '🗓️', fee: 100,
+    programName: 'Udaan Scholarship',
+    scholarshipAmount: 5000,
+    purpose: 'महिलाओं के कौशल विकास व स्वरोजगार सहयोग हेतु'
+  },
+  half_yearly: {
+    color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+    label: 'Half-Yearly', emoji: '📅', fee: 500,
+    programName: 'Saksham Program',
+    scholarshipAmount: 25000,
+    purpose: 'महिला नेतृत्व क्षमता व व्यावसायिक विकास सहयोग'
+  },
+  yearly: {
+    color: '#e11d48', gradient: 'linear-gradient(135deg,#e11d48,#be123c)',
+    label: 'Yearly', emoji: '🏆', fee: 1000,
+    programName: 'Divya Yatra Sahyog',
+    scholarshipAmount: 50000,
+    purpose: 'उद्यम स्थापना व जीवन परिवर्तन यात्रा सहयोग'
+  }
 };
 const gameTypeIcons = {
   mcq:         { icon:'fa-solid fa-list-check', label:'MCQ Quiz', color:'#3b82f6' },
@@ -2323,35 +2386,59 @@ function renderQuizCards(quizzes){
 
   grid.innerHTML = quizzes.map(q => {
     const tc = tierConfig[q.type] || tierConfig.monthly;
-    const gt = gameTypeIcons[q.game_type] || gameTypeIcons.mcq;
-    const endDate = new Date(q.end_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short'});
+    const endDate = new Date(q.end_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
     const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
-    const participants = q.total_participants || 0;
-    const prizePool = q.prize_pool || (q.entry_fee * participants * 0.7);
+    const schAmt = q.prizes?.first || tc.scholarshipAmount;
+
     return `
-      <div class="quiz-game-card" data-tier="${q.type}" style="position:relative;border-radius:18px;overflow:hidden;background:#fff;border:1.5px solid ${tc.color}22;box-shadow:0 4px 20px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s">
-        <div style="background:${tc.gradient};padding:16px 18px 14px;color:#fff;position:relative">
-          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none"></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:800;letter-spacing:.5px">${tc.emoji} ${tc.label.toUpperCase()}</span>
-            <span style="background:rgba(255,255,255,.2);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:700"><i class="${gt.icon}"></i> ${gt.label}</span>
+      <div class="quiz-game-card" data-tier="${q.type}" style="position:relative;border-radius:18px;overflow:hidden;background:#fff;border:1.5px solid ${tc.color}22;box-shadow:0 4px 24px rgba(0,0,0,.07);transition:transform .18s,box-shadow .18s">
+        <!-- Header -->
+        <div style="background:${tc.gradient};padding:20px 20px 16px;color:#fff;position:relative;overflow:hidden">
+          <div style="position:absolute;top:-20px;right:-20px;width:110px;height:110px;background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 70%);pointer-events:none"></div>
+          <span style="display:inline-block;background:rgba(255,255,255,.22);padding:3px 12px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.6px;margin-bottom:10px">${tc.emoji} ${tc.label.toUpperCase()} SCHOLARSHIP</span>
+          <div style="font-size:19px;font-weight:900;line-height:1.2;margin-bottom:4px">${tc.programName}</div>
+          <div style="display:flex;align-items:baseline;gap:4px;margin:6px 0 4px">
+            <span style="font-size:11px;opacity:.8;font-weight:600">छात्रवृत्ति राशि</span>
+            <span style="font-size:28px;font-weight:900;letter-spacing:-.5px">₹${schAmt.toLocaleString('en-IN')}</span>
           </div>
-          <h4 style="margin:6px 0 4px;font-size:16px;font-weight:900;line-height:1.3;color:#fff">${q.title}</h4>
-          <div style="display:flex;gap:12px;font-size:11px;opacity:.8;font-weight:600;margin-top:4px">
-            <span>Last Date: ${endDate}</span>
-            <span>Result: ${resultDate}</span>
-          </div>
+          <p style="font-size:11px;opacity:.82;margin:0;line-height:1.5">${tc.purpose}</p>
         </div>
-        <div style="padding:14px 18px 16px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-            <div><div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Entry Fee</div><div style="font-size:18px;font-weight:900;color:${tc.color}">₹${q.entry_fee}</div></div>
-            <div style="text-align:center"><div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Players</div><div style="font-size:18px;font-weight:900">${participants}</div></div>
-            <div style="text-align:right"><div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Prize Pool</div><div style="font-size:18px;font-weight:900;color:var(--success)">₹${fmtN(prizePool)}</div></div>
+        <!-- Body -->
+        <div style="padding:14px 18px 18px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="background:${tc.color}08;border:1px solid ${tc.color}22;border-radius:10px;padding:9px 12px">
+              <div style="font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">📅 Last Date</div>
+              <div style="font-size:13px;font-weight:800;color:var(--text-primary)">${endDate}</div>
+            </div>
+            <div style="background:#fef3c708;border:1px solid #fde68a;border-radius:10px;padding:9px 12px">
+              <div style="font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">🏆 Result Date</div>
+              <div style="font-size:13px;font-weight:800;color:#92400e">${resultDate}</div>
+            </div>
           </div>
-          ${q.enrolled ? 
-            (q.played ? `<button class="btn btn-ghost" style="width:100%;justify-content:center" disabled><i class="fa-solid fa-check"></i> Already Played</button>` :
-            `<button class="btn" style="width:100%;justify-content:center;background:${tc.gradient};color:#fff;border:none;font-weight:800" onclick="openQuizPlay('${q._id}')"><i class="fa-solid fa-play"></i> Play Now</button>`) :
-            `<button class="btn" style="width:100%;justify-content:center;background:${tc.gradient};color:#fff;border:none;font-weight:800" onclick="enrollInQuiz('${q._id}', ${q.entry_fee}, '${q.type}')"><i class="fa-solid fa-ticket"></i> Join — ₹${q.entry_fee}</button>`}
+          <p style="text-align:center;font-size:11px;color:var(--text-muted);margin:0 0 12px">Entry Fee: <strong style="color:${tc.color}">₹${q.entry_fee}</strong> &nbsp;|&nbsp; प्रश्नोत्तरी भाग लेकर छात्रवृत्ति जीतें</p>
+          ${q.enrolled ? `
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+              <div>
+                <div style="color:#166534;font-weight:800;font-size:13px">✅ Enrolled</div>
+                <div style="color:#15803d;font-size:10px;font-family:monospace">${q.enrollment?.enrollment_number || ''}</div>
+              </div>
+              ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ?
+                `<button onclick="openQuizPlay('${q.quiz_id}')" style="background:${tc.gradient};color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer"><i class="fa-solid fa-play"></i> Play</button>` : ''}
+              ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:#166534;font-weight:700">Submitted ✅</span>' : ''}
+            </div>
+            <button onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:12px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <i class="fa-solid fa-share-nodes"></i> Sell Ticket — Share करें
+            </button>
+          ` : `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})" style="background:${tc.gradient};color:#fff;border:none;border-radius:12px;padding:11px 8px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+                <i class="fa-solid fa-graduation-cap"></i> Participate
+              </button>
+              <button onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:12px;padding:11px 8px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+                <i class="fa-solid fa-share-nodes"></i> Sell
+              </button>
+            </div>
+          `}
         </div>
       </div>`;
   }).join('');
@@ -2369,26 +2456,45 @@ function filterQuizTier(tier){
   renderQuizCards(filtered);
 }
 
-async function enrollInQuiz(quizId, fee, type){
+async function enrollInQuiz(quizId, title, fee){
+  if(!confirm(`"${title}" में enroll करें?\nEntry Fee: ₹${fee}\n\nPayment proceed करें?`)) return;
   try {
-    const tc = tierConfig[type] || tierConfig.monthly;
-    const orderRes = await AUTH.api('/api/pay/create-order', { method:'POST', body:{ amount: fee, purpose: 'quiz_enrollment', quiz_id: quizId } });
-    if(!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
-    const rzp = new Razorpay({
-      key: orderRes.razorpayKeyId,
-      order_id: orderRes.orderId,
-      amount: fee * 100,
-      currency: 'INR',
-      name: 'FWF Fund Raiser',
-      description: `${tc.emoji} ${tc.label} Quiz`,
-      theme: { color: tc.color },
-      handler: async function(response){
-        const enrollRes = await AUTH.api('/api/member/quiz-enroll', { method:'POST', body:{ quiz_id: quizId, payment_id: response.razorpay_payment_id, order_id: response.razorpay_order_id, signature: response.razorpay_signature } });
-        if(enrollRes.ok){ notify('Enrolled! You can now play.','success'); eventsLoaded = false; loadEventsPage(); }
-        else notify(enrollRes.error || 'Enrollment failed','error');
-      }
+    const orderRes = await AUTH.api('/api/pay/create-order', {
+      method: 'POST',
+      body: { amount: fee, receipt: `quiz_${quizId}_${Date.now()}`, notes: { type: 'quiz', quizId } }
     });
-    rzp.open();
+    if(!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
+    const opt = {
+      key: orderRes.key,
+      amount: orderRes.order.amount,
+      currency: 'INR',
+      name: 'FWF Scholarship Quiz',
+      description: title,
+      order_id: orderRes.order.id,
+      theme: { color: '#E87722' },
+      handler: async function(response){
+        const urlParams = new URLSearchParams(window.location.search);
+        const referred_by = urlParams.get('ref') || '';
+        const enrollRes = await AUTH.api('/api/member/quiz-enroll', {
+          method: 'POST',
+          body: {
+            quiz_id: quizId,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            referred_by
+          }
+        });
+        if(enrollRes.ok){
+          document.getElementById('enrollSuccessId').textContent = enrollRes.enrollment_number || '';
+          document.getElementById('enrollSuccessPoints').textContent = enrollRes.points_earned ? `+${enrollRes.points_earned} FWF Points credited! 🌟` : '';
+          document.getElementById('quizEnrollSuccessModal').style.display = 'flex';
+          eventsLoaded = false; loadEventsPage();
+        } else { notify(enrollRes.error || 'Enrollment failed','error'); }
+      },
+      prefill: { name: userData?.user?.name || '' }
+    };
+    const rzp = new Razorpay(opt); rzp.open();
   } catch(e){ notify(e.message || 'Failed','error'); }
 }
 
@@ -2464,6 +2570,64 @@ async function openQuizPlay(quizId){
     renderQuestion();
   } catch(e){ notify(e.message || 'Quiz load failed','error'); }
 }
+
+// ─── QUIZ SELL TICKET FUNCTIONS ───────────────────────────────
+let _sellQuizId = '', _sellQuizTitle = '', _sellQuizFee = 0, _sellProgramName = '';
+
+function openSellModal(quizId, quizTitle, fee, programName){
+  _sellQuizId = quizId; _sellQuizTitle = quizTitle; _sellQuizFee = fee; _sellProgramName = programName;
+  document.getElementById('sellModalSubtitle').textContent = `${programName} — ₹${fee} Entry`;
+  document.getElementById('sellBuyerName').value = '';
+  document.getElementById('sellBuyerMobile').value = '';
+  document.getElementById('sellBuyerEmail').value = '';
+  document.getElementById('sellStep1').style.display = 'block';
+  document.getElementById('sellStep2').style.display = 'none';
+  document.getElementById('quizSellModal').style.display = 'flex';
+}
+
+async function generateSellLink(){
+  const buyerName = document.getElementById('sellBuyerName').value.trim();
+  const buyerMobile = document.getElementById('sellBuyerMobile').value.trim();
+  const buyerEmail = document.getElementById('sellBuyerEmail').value.trim();
+  if(!buyerName){ notify('खरीदार का नाम दर्ज करें','error'); return; }
+  if(!/^\d{10}$/.test(buyerMobile)){ notify('10-digit mobile number दर्ज करें','error'); return; }
+  const btn = document.getElementById('generateLinkBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+  try {
+    const res = await AUTH.api('/api/member/quiz/generate-ticket', {
+      method: 'POST',
+      body: { quiz_id: _sellQuizId, buyer_name: buyerName, buyer_contact: buyerMobile, buyer_email: buyerEmail }
+    });
+    if(!res.ok) throw new Error(res.error || 'Link generate नहीं हो सका');
+    document.getElementById('sellSupportId').textContent = res.support_id;
+    document.getElementById('generatedSellLink').value = res.link;
+    document.getElementById('sellStep1').style.display = 'none';
+    document.getElementById('sellStep2').style.display = 'block';
+  } catch(e){ notify(e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-link"></i> Generate Quiz Link'; }
+}
+
+function copySellLink(){
+  const val = document.getElementById('generatedSellLink').value;
+  if(val){ navigator.clipboard.writeText(val); notify('Link copied! 📋','success'); }
+}
+
+function shareSellLink(platform){
+  const link = document.getElementById('generatedSellLink').value;
+  const tc = Object.values(tierConfig).find(t => t.programName === _sellProgramName) || {};
+  const text = `🎓 FWF ${_sellProgramName} में भाग लें और ₹${(tc.scholarshipAmount||0).toLocaleString('en-IN')} छात्रवृत्ति जीतें!\nEntry: ₹${_sellQuizFee}\n${link}`;
+  if(platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+  else if(platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+}
+
+function sellAnotherTicket(){
+  document.getElementById('sellStep1').style.display = 'block';
+  document.getElementById('sellStep2').style.display = 'none';
+  document.getElementById('sellBuyerName').value = '';
+  document.getElementById('sellBuyerMobile').value = '';
+  document.getElementById('sellBuyerEmail').value = '';
+}
+// ──────────────────────────────────────────────────────────────
 
 async function loadMyActivities(){
   try {

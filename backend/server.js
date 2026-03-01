@@ -2676,6 +2676,216 @@ app.get('/api/member/quiz-results/:quizId', auth('member'), async (req, res) => 
 });
 
 // ========================
+// QUIZ SELL TICKET APIs
+// ========================
+
+// Generate sell ticket link (member sells to a buyer)
+app.post('/api/member/quiz/generate-ticket', auth(['member','supporter']), async (req, res) => {
+  try {
+    const { quiz_id, buyer_name, buyer_contact, buyer_email } = req.body;
+    if (!quiz_id || !buyer_name || !buyer_contact) {
+      return res.status(400).json({ error: 'quiz_id, buyer_name, buyer_contact required' });
+    }
+
+    const quiz = await Quiz.findOne({ quiz_id, status: { $in: ['upcoming', 'active'] } })
+      .select('quiz_id title type entry_fee end_date result_date prizes').lean();
+    if (!quiz) return res.status(404).json({ error: 'Quiz नहीं मिला या enrollment बंद है' });
+
+    // Generate token and support ID
+    const token = crypto.randomBytes(16).toString('hex');
+    const supportNum = Math.floor(10000 + Math.random() * 90000);
+    const supportId = `FWF-ST-${supportNum}`;
+
+    const ticket = await QuizTicket.create({
+      seller_id: req.user.uid,
+      seller_support_id: supportId,
+      quiz_ref: quiz.quiz_id,
+      quiz_id: null,
+      token,
+      buyer_name,
+      buyer_contact,
+      buyer_email: buyer_email || null,
+      ticket_price: quiz.entry_fee,
+      ticket_status: 'pending'
+    });
+
+    const seller = await User.findById(req.user.uid).select('name member_id').lean();
+    const link = `${process.env.FRONTEND_URL || req.protocol + '://' + req.get('host')}/quiz-ticket?token=${token}`;
+
+    res.json({
+      ok: true,
+      ticket_id: ticket._id,
+      support_id: supportId,
+      token,
+      link,
+      quiz_title: quiz.title,
+      entry_fee: quiz.entry_fee
+    });
+  } catch (err) {
+    captureError(err, { context: 'generate-quiz-ticket' });
+    res.status(500).json({ error: 'Ticket generation failed: ' + err.message });
+  }
+});
+
+// Public: Get ticket info for buyer
+app.get('/api/quiz-ticket/:token', async (req, res) => {
+  try {
+    const ticket = await QuizTicket.findOne({ token: req.params.token }).lean();
+    if (!ticket) return res.status(404).json({ error: 'Invalid or expired ticket link' });
+    if (ticket.ticket_status === 'converted') {
+      return res.status(400).json({ error: 'यह link पहले ही use हो चुकी है', converted: true });
+    }
+
+    const quiz = await Quiz.findOne({ quiz_id: ticket.quiz_ref })
+      .select('quiz_id title description type entry_fee end_date result_date status prizes').lean();
+    if (!quiz || !['upcoming','active'].includes(quiz.status)) {
+      return res.status(404).json({ error: 'Quiz अब available नहीं है' });
+    }
+
+    const seller = await User.findById(ticket.seller_id).select('name member_id').lean();
+
+    const tierConfig = {
+      monthly:     { programName: 'Udaan Scholarship', scholarshipAmount: 5000 },
+      half_yearly: { programName: 'Saksham Program',   scholarshipAmount: 25000 },
+      yearly:      { programName: 'Divya Yatra Sahyog', scholarshipAmount: 50000 }
+    };
+    const tc = tierConfig[quiz.type] || {};
+
+    res.json({
+      ok: true,
+      ticket: {
+        token: ticket.token,
+        buyer_name: ticket.buyer_name,
+        buyer_contact: ticket.buyer_contact,
+        ticket_price: ticket.ticket_price,
+        support_id: ticket.seller_support_id,
+        seller_name: seller?.name || 'FWF Member',
+        seller_member_id: seller?.member_id || ''
+      },
+      quiz: {
+        ...quiz,
+        program_name: tc.programName || quiz.title,
+        scholarship_amount: (quiz.prizes?.first) || tc.scholarshipAmount || 0,
+        end_date_fmt: new Date(quiz.end_date).toLocaleDateString('hi-IN', {day:'numeric',month:'long',year:'numeric'}),
+        result_date_fmt: new Date(quiz.result_date).toLocaleDateString('hi-IN', {day:'numeric',month:'long',year:'numeric'})
+      }
+    });
+  } catch (err) {
+    captureError(err, { context: 'quiz-ticket-get' });
+    res.status(500).json({ error: 'Ticket load failed' });
+  }
+});
+
+// Public: Create Razorpay order for buyer
+app.post('/api/quiz-ticket/:token/create-order', async (req, res) => {
+  try {
+    const ticket = await QuizTicket.findOne({ token: req.params.token, ticket_status: 'pending' }).lean();
+    if (!ticket) return res.status(404).json({ error: 'Invalid or already used ticket' });
+
+    const order = await razorpay.orders.create({
+      amount: ticket.ticket_price * 100,
+      currency: 'INR',
+      receipt: `qt_${ticket._id}_${Date.now()}`
+    });
+
+    res.json({ ok: true, order, key: process.env.RAZORPAY_KEY_ID });
+  } catch (err) {
+    captureError(err, { context: 'quiz-ticket-order' });
+    res.status(500).json({ error: 'Order creation failed' });
+  }
+});
+
+// Public: Buyer payment verify + enroll
+app.post('/api/quiz-ticket/:token/enroll', async (req, res) => {
+  try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    if (!razorpay_payment_id) return res.status(400).json({ error: 'Payment details required' });
+
+    const ticket = await QuizTicket.findOne({ token: req.params.token, ticket_status: 'pending' });
+    if (!ticket) return res.status(404).json({ error: 'Invalid or already used ticket' });
+
+    // Verify payment
+    if (razorpay_order_id && razorpay_signature) {
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      const generated = crypto.createHmac('sha256', keySecret)
+        .update(razorpay_order_id + '|' + razorpay_payment_id).digest('hex');
+      if (generated !== razorpay_signature) {
+        return res.status(400).json({ error: 'Payment verification failed' });
+      }
+    }
+
+    const quiz = await Quiz.findOne({ quiz_id: ticket.quiz_ref, status: { $in: ['upcoming','active'] } });
+    if (!quiz) return res.status(404).json({ error: 'Quiz अब available नहीं है' });
+
+    // Generate enrollment number for buyer
+    const randomDigits = Math.floor(10000 + Math.random() * 90000);
+    const enrollmentNumber = `FWF-${quiz.quiz_id}-${randomDigits}`;
+
+    // Create participation for buyer (buyer is anonymous — stored with buyer contact)
+    const participation = await QuizParticipation.create({
+      quiz_id: quiz._id,
+      quiz_ref: quiz.quiz_id,
+      user_id: ticket.seller_id, // linked to seller's account for tracking; buyer is external
+      member_id: ticket.buyer_contact,
+      name: ticket.buyer_name,
+      enrollment_number: enrollmentNumber,
+      payment_id: razorpay_payment_id,
+      amount_paid: ticket.ticket_price,
+      referrer_id: ticket.seller_id,
+      status: 'enrolled'
+    });
+
+    // Update quiz participant count
+    await Quiz.updateOne({ _id: quiz._id }, {
+      $inc: { total_participants: 1, total_collection: ticket.ticket_price }
+    });
+
+    // Award 10% commission points to seller
+    const commissionPoints = amountToPoints(ticket.ticket_price * (QUIZ_TICKET_POINTS_PERCENT / 100));
+    if (commissionPoints > 0) {
+      await User.updateOne({ _id: ticket.seller_id }, {
+        $inc: {
+          'wallet.points_balance': commissionPoints,
+          'wallet.points_from_quiz': commissionPoints,
+          'wallet.total_points_earned': commissionPoints
+        },
+        'wallet.updated_at': new Date()
+      });
+      await PointsLedger.create({
+        user_id: ticket.seller_id,
+        points: commissionPoints,
+        type: 'quiz',
+        description: `Quiz ticket sold to ${ticket.buyer_name} — ${quiz.title} → ${commissionPoints} pts`,
+        reference_id: ticket._id
+      });
+    }
+
+    // Mark ticket as converted
+    await QuizTicket.updateOne({ _id: ticket._id }, {
+      ticket_status: 'converted',
+      points_earned: commissionPoints,
+      participation_id: participation._id,
+      converted_at: new Date()
+    });
+
+    addBreadcrumb('quiz-ticket', 'Ticket converted', {
+      seller: ticket.seller_id, buyer: ticket.buyer_name, quiz: quiz.quiz_id
+    });
+
+    res.json({
+      ok: true,
+      enrollment_number: enrollmentNumber,
+      support_id: ticket.seller_support_id,
+      quiz_title: quiz.title,
+      message: `🎓 Enrollment successful! Participation ID: ${enrollmentNumber}`
+    });
+  } catch (err) {
+    captureError(err, { context: 'quiz-ticket-enroll' });
+    res.status(500).json({ error: 'Enrollment failed: ' + err.message });
+  }
+});
+
+// ========================
 // REFERRAL TRACKING APIs
 // ========================
 

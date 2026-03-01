@@ -560,6 +560,65 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 .qc-sell-full:hover{filter:brightness(1.06);transform:translateY(-1px)}
 
 /* ==============================
+   QUIZ TIER SECTIONS
+   ============================== */
+.quiz-tier-section{
+  margin-bottom:28px;border-radius:24px;overflow:hidden;
+  background:#fff;border:1px solid #f1f5f9;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.quiz-tier-inner{
+  display:grid;grid-template-columns:1fr 1fr;min-height:380px;
+}
+.quiz-tier-illust{
+  position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:36px 28px;
+  overflow:hidden;
+}
+.quiz-tier-illust::before{
+  content:'';position:absolute;inset:0;opacity:.07;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.qti-emoji{font-size:72px;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.12));animation:qti-float 3s ease-in-out infinite}
+@keyframes qti-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.qti-title{font-size:24px;font-weight:900;color:#fff;text-align:center;line-height:1.2;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.qti-sub{font-size:13px;color:rgba(255,255,255,.85);text-align:center;line-height:1.5;max-width:220px}
+.qti-badge{
+  margin-top:14px;display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.18);backdrop-filter:blur(8px);
+  padding:6px 16px;border-radius:100px;
+  font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px;
+  border:1px solid rgba(255,255,255,.2);
+}
+.qti-decorA{
+  position:absolute;top:-30px;right:-30px;width:120px;height:120px;
+  border-radius:50%;border:2px solid rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.qti-decorB{
+  position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;
+  border-radius:50%;background:rgba(255,255,255,.06);
+  pointer-events:none;
+}
+.quiz-tier-card-wrap{
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  background:#f8fafc;
+}
+.quiz-tier-card-wrap .quiz-card-modern{
+  width:100%;max-width:380px;
+}
+@media(max-width:900px){
+  .quiz-tier-inner{grid-template-columns:1fr}
+  .quiz-tier-illust{padding:28px 20px 20px;min-height:auto}
+  .qti-emoji{font-size:52px}
+  .qti-title{font-size:20px}
+  .quiz-tier-card-wrap{padding:0 16px 20px}
+}
+@media(max-width:640px){
+  .quiz-tier-card-wrap .quiz-card-modern{max-width:100%}
+}
+
+/* ==============================
    MODAL
    ============================== */
 .modal{
@@ -988,18 +1047,12 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
 
     <div style="margin-bottom:24px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <h3 style="font-size:15px;font-weight:800;margin:0"><i class="fa-solid fa-trophy" style="color:#e5a100"></i> Fund Raiser Games</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <h3 style="font-size:17px;font-weight:900;margin:0;display:flex;align-items:center;gap:8px"><i class="fa-solid fa-trophy" style="color:#e5a100"></i> Fund Raiser Scholarship Games</h3>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
-        <button class="game-chip active" data-tier="all" onclick="filterQuizTier('all')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🎯 All Games</button>
-        <button class="game-chip" data-tier="monthly" onclick="filterQuizTier('monthly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #3b82f6;background:transparent;color:#3b82f6;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🗓️ Monthly ₹100</button>
-        <button class="game-chip" data-tier="half_yearly" onclick="filterQuizTier('half_yearly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #8b5cf6;background:transparent;color:#8b5cf6;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">📅 Half-Yearly ₹500</button>
-        <button class="game-chip" data-tier="yearly" onclick="filterQuizTier('yearly')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1.5px solid #e11d48;background:transparent;color:#e11d48;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s">🏆 Yearly ₹1000</button>
-      </div>
-      <div id="quizGamesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
-        <div class="skeleton-loader" style="height:220px;border-radius:16px"></div>
-        <div class="skeleton-loader" style="height:220px;border-radius:16px"></div>
+      <div id="quizSectionsContainer">
+        <div class="skeleton-loader" style="height:320px;border-radius:24px;margin-bottom:20px"></div>
+        <div class="skeleton-loader" style="height:320px;border-radius:24px;margin-bottom:20px"></div>
       </div>
       <div id="quizEmptyState" style="display:none;text-align:center;padding:40px 20px">
         <div style="font-size:48px;margin-bottom:12px">🎮</div>
@@ -2508,85 +2561,122 @@ async function loadActiveQuizzes(){
   }
 }
 
+const tierIllustration = {
+  monthly: {
+    emoji: '📚',
+    illustTitle: 'Udaan Scholarship',
+    illustSub: 'हर महीने ₹100 Entry Fee से भाग लें और ₹3,000–₹5,000 की छात्रवृत्ति जीतें!',
+    badgeText: '🗓️ हर महीने मौका',
+    bg: 'linear-gradient(135deg,#1e40af,#3b82f6)'
+  },
+  half_yearly: {
+    emoji: '🎯',
+    illustTitle: 'Saksham Program',
+    illustSub: '₹500 Entry Fee से ₹25,000 तक की छात्रवृत्ति — महिला सशक्तिकरण के लिए।',
+    badgeText: '📅 6 महीने में 1 बार',
+    bg: 'linear-gradient(135deg,#6d28d9,#8b5cf6)'
+  },
+  yearly: {
+    emoji: '🏆',
+    illustTitle: 'Divya Yatra Sahyog',
+    illustSub: '₹1,000 Entry Fee — ₹50,000 से ₹1,00,000 छात्रवृत्ति, जीवन बदलने का मौका!',
+    badgeText: '🏆 साल का सबसे बड़ा',
+    bg: 'linear-gradient(135deg,#9f1239,#e11d48)'
+  }
+};
+
 function renderQuizCards(quizzes){
-  const grid = document.getElementById('quizGamesGrid');
+  const container = document.getElementById('quizSectionsContainer');
   const empty = document.getElementById('quizEmptyState');
-  if(!quizzes.length){ grid.style.display = 'none'; empty.style.display = 'block'; return; }
-  grid.style.display = 'grid';
+  if(!quizzes.length){ container.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  grid.innerHTML = quizzes.map(q => {
+  // Group by type
+  const grouped = {};
+  quizzes.forEach(q => { grouped[q.type] = q; });
+
+  const typeOrder = ['monthly','half_yearly','yearly'];
+  container.innerHTML = typeOrder.filter(t => grouped[t]).map(type => {
+    const q = grouped[type];
     const tc = tierConfig[q.type] || tierConfig.monthly;
+    const ti = tierIllustration[q.type] || tierIllustration.monthly;
     const endDate = new Date(q.end_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
     const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
     const schAmt = q.prizes?.first || tc.scholarshipAmount;
 
     return `
-      <div class="quiz-card-modern" data-tier="${q.type}">
-        <div class="qc-accent" style="background:${tc.gradient}"></div>
-        <!-- Header -->
-        <div class="qc-header" style="background:${tc.gradient}">
-          <div class="qc-badge">${tc.emoji} ${tc.label.toUpperCase()} SCHOLARSHIP</div>
-          <div class="qc-program">${tc.programName}</div>
-          <div class="qc-amount-row">
-            <span class="qc-amount-label">छात्रवृत्ति राशि</span>
-            <span class="qc-amount">₹${schAmt.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="qc-purpose">${tc.purpose}</div>
+    <div class="quiz-tier-section">
+      <div class="quiz-tier-inner">
+        <!-- Left: Illustration -->
+        <div class="quiz-tier-illust" style="background:${ti.bg}">
+          <div class="qti-decorA"></div>
+          <div class="qti-decorB"></div>
+          <div class="qti-emoji">${ti.emoji}</div>
+          <div class="qti-title">${ti.illustTitle}</div>
+          <div class="qti-sub">${ti.illustSub}</div>
+          <div class="qti-badge">${ti.badgeText}</div>
         </div>
-        <!-- Body -->
-        <div class="qc-body">
-          <div class="qc-info-grid">
-            <div class="qc-info-item">
-              <div class="qc-info-label"><i class="fa-regular fa-calendar"></i> Last Date</div>
-              <div class="qc-info-value">${endDate}</div>
-            </div>
-            <div class="qc-info-item">
-              <div class="qc-info-label"><i class="fa-solid fa-trophy" style="color:#d97706"></i> Result Date</div>
-              <div class="qc-info-value result">${resultDate}</div>
-            </div>
-          </div>
-          <div class="qc-fee-bar">
-            Entry Fee: <strong style="color:${tc.color}">₹${q.entry_fee}</strong> &nbsp;·&nbsp; प्रश्नोत्तरी भाग लेकर छात्रवृत्ति जीतें
-          </div>
-          ${q.enrolled ? `
-            <div class="qc-enrolled-box">
-              <div class="qc-enrolled-info">
-                <div class="qc-enrolled-label">✅ Enrolled</div>
-                <div class="qc-enrolled-id">${q.enrollment?.enrollment_number || ''}</div>
+        <!-- Right: Quiz Card -->
+        <div class="quiz-tier-card-wrap">
+          <div class="quiz-card-modern" data-tier="${q.type}">
+            <div class="qc-accent" style="background:${tc.gradient}"></div>
+            <div class="qc-header" style="background:${tc.gradient}">
+              <div class="qc-badge">${tc.emoji} ${tc.label.toUpperCase()} SCHOLARSHIP</div>
+              <div class="qc-program">${tc.programName}</div>
+              <div class="qc-amount-row">
+                <span class="qc-amount-label">छात्रवृत्ति राशि</span>
+                <span class="qc-amount">₹${schAmt.toLocaleString('en-IN')}</span>
               </div>
-              ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ?
-                `<button class="qc-btn-play" style="background:${tc.gradient}" onclick="openQuizPlay('${q.quiz_id}')"><i class="fa-solid fa-play"></i> Play</button>` : ''}
-              ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:#166534;font-weight:700">Submitted ✅</span>' : ''}
+              <div class="qc-purpose">${tc.purpose}</div>
             </div>
-            <button class="qc-sell-full" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
-              <i class="fa-solid fa-share-nodes"></i> Sell Ticket — Share करें
-            </button>
-          ` : `
-            <div class="qc-actions">
-              <button class="qc-btn qc-btn-participate" style="background:${tc.gradient}" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})">
-                <i class="fa-solid fa-graduation-cap"></i> Participate
-              </button>
-              <button class="qc-btn qc-btn-sell" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
-                <i class="fa-solid fa-share-nodes"></i> Sell
-              </button>
+            <div class="qc-body">
+              <div class="qc-info-grid">
+                <div class="qc-info-item">
+                  <div class="qc-info-label"><i class="fa-regular fa-calendar"></i> Last Date</div>
+                  <div class="qc-info-value">${endDate}</div>
+                </div>
+                <div class="qc-info-item">
+                  <div class="qc-info-label"><i class="fa-solid fa-trophy" style="color:#d97706"></i> Result Date</div>
+                  <div class="qc-info-value result">${resultDate}</div>
+                </div>
+              </div>
+              <div class="qc-fee-bar">
+                Entry Fee: <strong style="color:${tc.color}">₹${q.entry_fee}</strong> &nbsp;·&nbsp; प्रश्नोत्तरी भाग लेकर छात्रवृत्ति जीतें
+              </div>
+              ${q.enrolled ? `
+                <div class="qc-enrolled-box">
+                  <div class="qc-enrolled-info">
+                    <div class="qc-enrolled-label">✅ Enrolled</div>
+                    <div class="qc-enrolled-id">${q.enrollment?.enrollment_number || ''}</div>
+                  </div>
+                  ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ?
+                    `<button class="qc-btn-play" style="background:${tc.gradient}" onclick="openQuizPlay('${q.quiz_id}')"><i class="fa-solid fa-play"></i> Play</button>` : ''}
+                  ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:#166534;font-weight:700">Submitted ✅</span>' : ''}
+                </div>
+                <button class="qc-sell-full" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
+                  <i class="fa-solid fa-share-nodes"></i> Sell Ticket — Share करें
+                </button>
+              ` : `
+                <div class="qc-actions">
+                  <button class="qc-btn qc-btn-participate" style="background:${tc.gradient}" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})">
+                    <i class="fa-solid fa-graduation-cap"></i> Participate
+                  </button>
+                  <button class="qc-btn qc-btn-sell" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
+                    <i class="fa-solid fa-share-nodes"></i> Sell
+                  </button>
+                </div>
+              `}
             </div>
-          `}
+          </div>
         </div>
-      </div>`;
+      </div>
+    </div>`;
   }).join('');
 }
 
 function filterQuizTier(tier){
-  document.querySelectorAll('.game-chip').forEach(c => {
-    c.classList.remove('active');
-    c.style.background = 'transparent';
-    c.style.color = c.style.borderColor;
-  });
-  const active = document.querySelector(`.game-chip[data-tier="${tier}"]`);
-  if(active){ active.classList.add('active'); active.style.background = active.style.borderColor; active.style.color = '#fff'; }
-  const filtered = tier === 'all' ? allQuizzesCache : allQuizzesCache.filter(q => q.type === tier);
-  renderQuizCards(filtered);
+  // No longer needed since sections show all tiers, but kept for compatibility
+  renderQuizCards(tier === 'all' ? allQuizzesCache : allQuizzesCache.filter(q => q.type === tier));
 }
 
 async function enrollInQuiz(quizId, title, fee){
@@ -2625,7 +2715,7 @@ async function enrollInQuiz(quizId, title, fee){
           eventsLoaded = false; loadEventsPage();
         } else { notify(enrollRes.error || 'Enrollment failed','error'); }
       },
-      prefill: { name: userData?.user?.name || '' }
+      prefill: { name: memberData?.user?.name || '' }
     };
     const rzp = new Razorpay(opt); rzp.open();
   } catch(e){ notify(e.message || 'Failed','error'); }

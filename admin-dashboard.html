@@ -594,7 +594,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="s-label">Total Points Issued</div>
         <div class="s-value" id="hPoints">0</div>
       </div>
-      <div class="stat-card" style="cursor:pointer" onclick="switchPage('supporters')">
+      <div class="stat-card" style="cursor:pointer" onclick="switchPage('payments')">
         <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
         <div class="s-label">Donations Collected</div>
         <div class="s-value" id="hDonations">₹0</div>
@@ -603,6 +603,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
 
     <div class="stats-row">
+      <div class="stat-card" style="cursor:pointer" onclick="switchPage('supporters')">
+        <div class="s-icon s-green"><i class="fa-solid fa-people-group"></i></div>
+        <div class="s-label">Supporters (Volunteers)</div>
+        <div class="s-value" id="hSupporters">0</div>
+      </div>
       <div class="stat-card">
         <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
         <div class="s-label">Referrals</div>
@@ -680,55 +685,41 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== SUPPORTERS PAGE ===================== -->
   <div class="page" id="page-supporters">
-    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
       <div class="stat-card">
-        <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
-        <div class="s-label">Total Donated</div>
-        <div class="s-value" id="donTotalAmt">₹0</div>
+        <div class="s-icon s-green"><i class="fa-solid fa-people-group"></i></div>
+        <div class="s-label">Total Supporters</div>
+        <div class="s-value" id="supTotalCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
-        <div class="s-label">Total Donors</div>
-        <div class="s-value" id="donTotalCount">0</div>
+        <div class="s-icon s-blue"><i class="fa-solid fa-user-check"></i></div>
+        <div class="s-label">Active</div>
+        <div class="s-value" id="supActiveCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="s-icon s-amber"><i class="fa-solid fa-shield-halved"></i></div>
-        <div class="s-label">KYC Pending</div>
-        <div class="s-value" id="donKycPending">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-icon s-red"><i class="fa-solid fa-gem"></i></div>
-        <div class="s-label">High-Value (≥50k)</div>
-        <div class="s-value" id="donHighValue">0</div>
+        <div class="s-icon s-amber"><i class="fa-solid fa-user-clock"></i></div>
+        <div class="s-label">Inactive</div>
+        <div class="s-value" id="supInactiveCount">0</div>
       </div>
     </div>
 
     <div class="grid-2" style="margin-bottom:16px">
       <div class="search-bar">
         <i class="fa-solid fa-search"></i>
-        <input type="text" id="donSearch" placeholder="Search by name, email, mobile, PAN, DON ID...">
+        <input type="text" id="supporterSearch" placeholder="Search by name, ID, mobile, email...">
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
-        <select id="donKycFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
-          <option value="">All KYC</option>
-          <option value="not_required">Not Required</option>
-          <option value="otp_verified">OTP Verified</option>
-          <option value="pending_docs">Pending Docs</option>
-          <option value="doc_verified">Docs Verified</option>
-        </select>
-        <button class="btn btn-ghost" onclick="loadDonations()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+        <button class="btn btn-ghost" onclick="loadSupporters()"><i class="fa-solid fa-refresh"></i> Refresh</button>
       </div>
     </div>
 
     <div class="content-card">
-      <h3><i class="fa-solid fa-hand-holding-heart"></i> Supporters / Donation Records <span style="font-weight:500;color:var(--text-muted);font-size:12px;margin-left:8px" id="donCountLabel"></span></h3>
+      <h3><i class="fa-solid fa-people-group"></i> Supporter Volunteers <span style="font-weight:500;color:var(--text-muted);font-size:12px;margin-left:8px" id="supporterCountLabel">(0)</span></h3>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr>
-            <th>DON ID</th><th>Donor</th><th>Amount</th><th>PAN</th><th>KYC</th><th>OTP</th><th>Member</th><th>Payment ID</th><th>Date</th><th>Actions</th>
-          </tr></thead>
-          <tbody id="donationsAdminBody">
-            <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
+          <thead><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Email</th><th>Project / Message</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="supportersBody">
+            <tr><td colspan="8" class="empty-state"><p>Loading...</p></td></tr>
           </tbody>
         </table>
       </div>
@@ -737,9 +728,14 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== PAYMENTS PAGE ===================== -->
   <div class="page" id="page-payments">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="pay-fees-tab">Membership Fees</button>
+      <button class="tab-btn" data-tab="pay-donations-tab">Donors / Donations</button>
+    </div>
 
-    <!-- Membership Fees -->
-    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+    <!-- Membership Fees Tab -->
+    <div class="tab-content active" id="pay-fees-tab">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card">
           <div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
           <div class="s-label">Total Collected</div>
@@ -794,8 +790,62 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </table>
         </div>
       </div>
+    </div> <!-- /pay-fees-tab -->
 
-  </div>
+    <!-- Donors / Donations Tab -->
+    <div class="tab-content" id="pay-donations-tab">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="s-icon s-pink"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <div class="s-label">Total Donated</div>
+          <div class="s-value" id="donTotalAmt">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div>
+          <div class="s-label">Total Donors</div>
+          <div class="s-value" id="donTotalCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-amber"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="s-label">KYC Pending</div>
+          <div class="s-value" id="donKycPending">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-icon s-red"><i class="fa-solid fa-gem"></i></div>
+          <div class="s-label">High-Value (≥50k)</div>
+          <div class="s-value" id="donHighValue">0</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="search-bar">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" id="donSearch" placeholder="Search by name, email, mobile, PAN, DON ID...">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center">
+          <select id="donKycFilter" class="form-input" style="width:auto;padding:8px 12px;font-size:12px">
+            <option value="">All KYC</option>
+            <option value="not_required">Not Required</option>
+            <option value="otp_verified">OTP Verified</option>
+            <option value="pending_docs">Pending Docs</option>
+            <option value="doc_verified">Docs Verified</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadDonations()"><i class="fa-solid fa-refresh"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="content-card">
+        <h3><i class="fa-solid fa-hand-holding-heart"></i> Donor / Donation Records</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>DON ID</th><th>Donor</th><th>Amount</th><th>PAN</th><th>KYC</th><th>OTP</th><th>Member</th><th>Payment ID</th><th>Date</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="donationsAdminBody">
+              <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div> <!-- /pay-donations-tab -->
 
   <!-- ===================== CSR PARTNERS PAGE ===================== -->
   <div class="page" id="page-csr">
@@ -1928,6 +1978,7 @@ async function loadDashboard(){
   try {
     const data = await AUTH.api('/api/admin/overview');
     const t = data.totals;
+    document.getElementById('hSupporters').textContent = fmtN(t.supporters || 0);
     document.getElementById('hMembers').textContent = fmtN(t.members);
     document.getElementById('hActive').textContent = fmtN(t.active_members);
     document.getElementById('hPoints').textContent = fmtN(t.total_points);
@@ -2110,6 +2161,73 @@ async function viewMember(memberId){
     }
     content.innerHTML = html;
   } catch(e){ content.innerHTML = '<div class="empty-state"><p>Failed to load member details</p></div>'; }
+}
+
+/* ============================================
+   SUPPORTERS (Volunteers)
+   ============================================ */
+let allSupporters = [];
+
+async function loadSupporters(){
+  try{
+    const d = await AUTH.api('/api/admin/supporters');
+    allSupporters = d.supporters || [];
+    const active = allSupporters.filter(s => s.membership_active).length;
+    document.getElementById('supTotalCount').textContent = fmtN(allSupporters.length);
+    document.getElementById('supActiveCount').textContent = fmtN(active);
+    document.getElementById('supInactiveCount').textContent = fmtN(allSupporters.length - active);
+    renderSupporters(allSupporters);
+  } catch(e){ notify('Failed to load supporters','error'); }
+}
+
+function renderSupporters(list){
+  document.getElementById('supporterCountLabel').textContent = `(${list.length})`;
+  const tbody = document.getElementById('supportersBody');
+  if(!list.length){
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fa-solid fa-people-group"></i><p>No supporters registered yet</p></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(s => `<tr>
+    <td style="font-weight:700;color:var(--accent)">${s.member_id}</td>
+    <td style="font-weight:700">${s.name||'—'}</td>
+    <td>${s.mobile||'—'}</td>
+    <td>${s.email||'—'}</td>
+    <td style="font-size:12px;color:var(--text-muted);max-width:200px">${s.bio||'—'}</td>
+    <td>${s.membership_active ? statusBadge('active') : statusBadge('inactive')}</td>
+    <td style="color:var(--text-muted)">${fmtDate(s.created_at)}</td>
+    <td>
+      <button class="btn-icon" title="Toggle status" onclick="toggleSupporter('${s.member_id}')"><i class="fa-solid fa-toggle-${s.membership_active?'on':'off'}"></i></button>
+      <button class="btn-icon" title="Delete Supporter" onclick="deleteSupporter('${s.member_id}','${(s.name||'').replace(/'/g,"\\\'")}')" style="color:var(--danger)"><i class="fa-solid fa-trash"></i></button>
+    </td>
+  </tr>`).join('');
+}
+
+document.getElementById('supporterSearch').addEventListener('input', function(){
+  const q = this.value.toLowerCase().trim();
+  if(!q){ renderSupporters(allSupporters); return; }
+  renderSupporters(allSupporters.filter(s =>
+    (s.name||'').toLowerCase().includes(q) ||
+    (s.member_id||'').toLowerCase().includes(q) ||
+    (s.mobile||'').includes(q) ||
+    (s.email||'').toLowerCase().includes(q)
+  ));
+});
+
+async function toggleSupporter(memberId){
+  try{
+    const r = await AUTH.api('/api/admin/toggle-member',{method:'POST',body:{memberId}});
+    notify(`${memberId} is now ${r.membership_active ? 'active' : 'inactive'}`,'success');
+    loadSupporters();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+async function deleteSupporter(memberId, name){
+  if(!confirm(`⚠️ DELETE supporter "${name}" (${memberId})?\n\nThis action cannot be undone.`)) return;
+  try{
+    await AUTH.api('/api/admin/supporter/' + memberId, {method:'DELETE'});
+    notify(`Supporter ${memberId} deleted`, 'success');
+    loadSupporters();
+  } catch(e){ notify(e.message||'Delete failed','error'); }
 }
 
 /* ============================================
@@ -2302,8 +2420,6 @@ function kycBadge(status, otpVerified){
 }
 
 function renderDonations(list){
-  const countEl = document.getElementById('donCountLabel');
-  if(countEl) countEl.textContent = `(${list.length})`;
   const tb = document.getElementById('donationsAdminBody');
   if(!list.length){ tb.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fa-solid fa-hand-holding-heart"></i><p>No donations found</p></td></tr>'; return; }
   tb.innerHTML = list.map(d => {

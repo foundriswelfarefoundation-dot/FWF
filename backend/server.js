@@ -1455,7 +1455,7 @@ app.post('/api/member/apply-wallet', auth('member'), async (req, res) => {
 
 // Admin overview
 app.get('/api/admin/overview', auth('admin'), async (req, res) => {
-  const [members, activeMembers, walletAgg, donationsCount, donationsSum, referralsTotal, referralsActive, ticketsSold] = await Promise.all([
+  const [members, activeMembers, walletAgg, donationsCount, donationsSum, referralsTotal, referralsActive, ticketsSold, supportersCount] = await Promise.all([
     User.countDocuments({ role: 'member' }),
     User.countDocuments({ role: 'member', membership_active: true }),
     User.aggregate([{ $match: { role: 'member' } }, { $group: { _id: null, total: { $sum: '$wallet.total_points_earned' } } }]),
@@ -1463,7 +1463,8 @@ app.get('/api/admin/overview', auth('admin'), async (req, res) => {
     Donation.aggregate([{ $group: { _id: null, total: { $sum: '$amount' } } }]),
     Referral.countDocuments(),
     Referral.countDocuments({ status: 'active' }),
-    QuizTicket.countDocuments()
+    QuizTicket.countDocuments(),
+    User.countDocuments({ role: 'supporter' })
   ]);
 
   let csrPartners = 0, supportTickets = 0, pendingFees = 0, totalFeeCollected = 0;
@@ -1478,6 +1479,7 @@ app.get('/api/admin/overview', auth('admin'), async (req, res) => {
   const totals = {
     members,
     active_members: activeMembers,
+    supporters: supportersCount,
     total_points: walletAgg[0]?.total || 0,
     total_donations_count: donationsCount,
     total_donations_amount: donationsSum[0]?.total || 0,
@@ -1560,6 +1562,27 @@ app.delete('/api/admin/member/:memberId', auth('admin'), async (req, res) => {
   ]);
   await User.deleteOne({ _id: u._id });
   res.json({ ok: true, message: `Member ${req.params.memberId} deleted` });
+});
+
+// Admin: get all supporters (volunteer signups)
+app.get('/api/admin/supporters', auth('admin'), async (req, res) => {
+  const supporters = await User.find({ role: 'supporter' }).sort({ created_at: -1 })
+    .select('member_id name mobile email membership_active bio referral_code created_at').lean();
+  res.json({ ok: true, supporters, total: supporters.length });
+});
+
+// Admin: delete supporter
+app.delete('/api/admin/supporter/:supporterId', auth('admin'), async (req, res) => {
+  const u = await User.findOne({ member_id: req.params.supporterId, role: 'supporter' });
+  if (!u) return res.status(404).json({ error: 'Supporter not found' });
+  await Promise.all([
+    PointsLedger.deleteMany({ user_id: u._id }),
+    SupportTicket.deleteMany({ user_id: u._id }),
+    SocialPost.deleteMany({ user_id: u._id }),
+    TaskCompletion.deleteMany({ user_id: u._id }),
+  ]);
+  await User.deleteOne({ _id: u._id });
+  res.json({ ok: true, message: `Supporter ${req.params.supporterId} deleted` });
 });
 
 // Admin: search members

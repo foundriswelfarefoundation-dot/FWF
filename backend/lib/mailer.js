@@ -378,7 +378,7 @@ export async function sendDonationConfirmation({ name, email, amount, donationId
  * Send a simple admin notification email.
  */
 export async function sendAdminAlert({ subject, rows = [], extra = '' }) {
-  const to = process.env.SMTP_USER;
+  const to = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
   if (!to) return;
   const transporter = getTransporter();
   const tableRows = rows.map(([k, v]) =>

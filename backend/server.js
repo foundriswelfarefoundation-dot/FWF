@@ -562,7 +562,13 @@ app.post('/api/pay/register-supporter', async (req, res) => {
     const orCond = [{ email }];
     if (mobile) orCond.push({ mobile });
     const exists = await User.findOne({ $or: orCond });
-    if (exists) return res.status(400).json({ error: 'This email/mobile is already registered. Please login with your existing credentials.' });
+    if (exists) {
+      const matchField = exists.email === email ? 'email' : 'mobile';
+      const roleLabel = exists.role === 'member' ? 'Member' : exists.role === 'supporter' ? 'Supporter' : exists.role;
+      return res.status(400).json({ 
+        error: `This ${matchField} is already registered as ${roleLabel} (ID: ${exists.member_id}). Please login with your existing credentials.` 
+      });
+    }
 
     const supporterId = await nextSupporterId();
     const plain = randPass();

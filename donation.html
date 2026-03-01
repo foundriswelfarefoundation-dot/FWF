@@ -1185,7 +1185,13 @@
           <h3 style="color:#10b981;margin:0 0 8px">Welcome, Supporter!</h3>
           <p style="color:#374151;margin:0 0 16px">Your Supporter ID is:</p>
           <div style="background:#f0fdf4;border:2px solid #10b981;border-radius:10px;padding:16px;font-size:1.4rem;font-weight:800;color:#059669;letter-spacing:1px;margin-bottom:16px">${data.supporterId}</div>
-          <p style="color:#6b7280;font-size:0.9rem;margin:0 0 20px"><i class="fa-solid fa-envelope"></i> Login credentials have been sent to your email.</p>
+          ${data.emailSent
+            ? `<p style="color:#6b7280;font-size:0.9rem;margin:0 0 20px"><i class="fa-solid fa-envelope" style="color:#10b981"></i> Login credentials have been sent to your email.</p>`
+            : `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 14px;margin-bottom:16px;text-align:left">
+                <p style="margin:0 0 6px;color:#92400e;font-weight:700;font-size:0.9rem"><i class="fa-solid fa-triangle-exclamation"></i> Email could not be sent automatically.</p>
+                <p style="margin:0;color:#78350f;font-size:0.85rem">Please note your Supporter ID <strong>${data.supporterId}</strong> and contact us at <a href="mailto:info@fwfindia.org" style="color:#92400e">info@fwfindia.org</a> to receive your login credentials.</p>
+               </div>`
+          }
           <a href="/login" class="btn-primary" style="display:inline-block;text-decoration:none;padding:12px 32px;border-radius:8px"><i class="fa-solid fa-right-to-bracket"></i> Login Now</a>
         </div>`;
     } catch(err) {

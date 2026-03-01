@@ -597,10 +597,15 @@ app.post('/api/pay/register-supporter', async (req, res) => {
       wallet: {}
     });
 
-    // Send supporter welcome email (non-blocking)
-    sendSupporterWelcome({ name, email, supporterId, password: plain, project })
-      .then(() => console.log(`✅ Supporter welcome email sent → ${email}`))
-      .catch(e => console.error('⚠️ Supporter welcome email failed:', e.message));
+    // Send supporter welcome email (await so we can report success/failure)
+    let emailSent = false;
+    try {
+      await sendSupporterWelcome({ name, email, supporterId, password: plain, project });
+      emailSent = true;
+      console.log(`✅ Supporter welcome email sent → ${email}`);
+    } catch (e) {
+      console.error(`⚠️ Supporter welcome email FAILED → ${email} | Error: ${e.message}`, e);
+    }
 
     // Send WhatsApp credentials (non-blocking)
     if (mobile) {
@@ -611,11 +616,11 @@ app.post('/api/pay/register-supporter', async (req, res) => {
     // Admin alert (non-blocking)
     sendAdminAlert({
       subject: `New Supporter Registered: ${supporterId} — ${name}`,
-      rows: [['Supporter ID', supporterId], ['Name', name], ['Email', email], ['Mobile', mobile || '—'], ['Project', project || '—'], ['Message', message || '—']]
+      rows: [['Supporter ID', supporterId], ['Name', name], ['Email', email], ['Mobile', mobile || '—'], ['Project', project || '—'], ['Message', message || '—'], ['Email Sent', emailSent ? 'Yes ✅' : 'FAILED ❌']]
     }).catch(() => {});
 
-    addBreadcrumb('registration', 'New supporter registered', { supporterId, name, email });
-    res.json({ ok: true, supporterId, message: `Registration successful! Your Supporter ID is ${supporterId}. Check your email for login credentials.` });
+    addBreadcrumb('registration', 'New supporter registered', { supporterId, name, email, emailSent });
+    res.json({ ok: true, supporterId, emailSent, message: `Registration successful! Your Supporter ID is ${supporterId}.` });
   } catch (err) {
     console.error('Supporter registration error:', err);
     captureError(err, { context: 'supporter-registration' });

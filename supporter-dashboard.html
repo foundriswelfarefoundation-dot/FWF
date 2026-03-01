@@ -2614,25 +2614,16 @@ async function loadActiveQuizzes(){
 
 const tierIllustration = {
   monthly: {
-    emoji: '📚',
-    illustTitle: 'Udaan Scholarship',
-    illustSub: 'हर महीने ₹100 Entry Fee से भाग लें और ₹3,000–₹5,000 की छात्रवृत्ति जीतें!',
-    badgeText: '🗓️ हर महीने मौका',
-    bg: 'linear-gradient(135deg,#1e40af,#3b82f6)'
+    bg: 'linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#1e40af 100%)',
+    badgeText: 'MONTHLY PROGRAM'
   },
   half_yearly: {
-    emoji: '🎯',
-    illustTitle: 'Saksham Program',
-    illustSub: '₹500 Entry Fee से ₹25,000 तक की छात्रवृत्ति — महिला सशक्तिकरण के लिए।',
-    badgeText: '📅 6 महीने में 1 बार',
-    bg: 'linear-gradient(135deg,#6d28d9,#8b5cf6)'
+    bg: 'linear-gradient(135deg,#1f0a3f 0%,#4c1d95 50%,#6d28d9 100%)',
+    badgeText: 'HALF-YEARLY PROGRAM'
   },
   yearly: {
-    emoji: '🏆',
-    illustTitle: 'Divya Yatra Sahyog',
-    illustSub: '₹1,000 Entry Fee — ₹50,000 से ₹1,00,000 छात्रवृत्ति, जीवन बदलने का मौका!',
-    badgeText: '🏆 साल का सबसे बड़ा',
-    bg: 'linear-gradient(135deg,#9f1239,#e11d48)'
+    bg: 'linear-gradient(135deg,#1a3a1a 0%,#3d4a1f 50%,#4a5a28 100%)',
+    badgeText: 'ANNUAL PROGRAM'
   }
 };
 
@@ -2656,70 +2647,65 @@ function renderQuizCards(quizzes){
     const schAmt = q.prizes?.first || tc.scholarshipAmount;
 
     return `
-    <div class="quiz-tier-section">
-      <div class="quiz-tier-inner">
-        <!-- Left: Illustration -->
-        <div class="quiz-tier-illust" style="background:${ti.bg}">
-          <div class="qti-decorA"></div>
-          <div class="qti-decorB"></div>
-          <div class="qti-emoji">${ti.emoji}</div>
-          <div class="qti-title">${ti.illustTitle}</div>
-          <div class="qti-sub">${ti.illustSub}</div>
-          <div class="qti-badge">${ti.badgeText}</div>
-        </div>
-        <!-- Right: Quiz Card -->
-        <div class="quiz-tier-card-wrap">
-          <div class="quiz-card-modern" data-tier="${q.type}">
-            <div class="qc-accent" style="background:${tc.gradient}"></div>
-            <div class="qc-header" style="background:${tc.gradient}">
-              <div class="qc-badge">${tc.emoji} ${tc.label.toUpperCase()} SCHOLARSHIP</div>
-              <div class="qc-program">${tc.programName}</div>
-              <div class="qc-amount-row">
-                <span class="qc-amount-label">छात्रवृत्ति राशि</span>
-                <span class="qc-amount">₹${schAmt.toLocaleString('en-IN')}</span>
-              </div>
-              <div class="qc-purpose">${tc.purpose}</div>
-            </div>
-            <div class="qc-body">
-              <div class="qc-info-grid">
-                <div class="qc-info-item">
-                  <div class="qc-info-label"><i class="fa-regular fa-calendar"></i> Last Date</div>
-                  <div class="qc-info-value">${endDate}</div>
-                </div>
-                <div class="qc-info-item">
-                  <div class="qc-info-label"><i class="fa-solid fa-trophy" style="color:#d97706"></i> Result Date</div>
-                  <div class="qc-info-value result">${resultDate}</div>
-                </div>
-              </div>
-              <div class="qc-fee-bar">
-                Entry Fee: <strong style="color:${tc.color}">₹${q.entry_fee}</strong> &nbsp;·&nbsp; प्रश्नोत्तरी भाग लेकर छात्रवृत्ति जीतें
-              </div>
-              ${q.enrolled ? `
-                <div class="qc-enrolled-box">
-                  <div class="qc-enrolled-info">
-                    <div class="qc-enrolled-label">✅ Enrolled</div>
-                    <div class="qc-enrolled-id">${q.enrollment?.enrollment_number || ''}</div>
-                  </div>
-                  ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ?
-                    `<button class="qc-btn-play" style="background:${tc.gradient}" onclick="openQuizPlay('${q.quiz_id}')"><i class="fa-solid fa-play"></i> Play</button>` : ''}
-                  ${q.enrollment?.quiz_submitted ? '<span style="font-size:11px;color:#166534;font-weight:700">Submitted ✅</span>' : ''}
-                </div>
-                <button class="qc-sell-full" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
-                  <i class="fa-solid fa-share-nodes"></i> Sell Ticket — Share करें
-                </button>
-              ` : `
-                <div class="qc-actions">
-                  <button class="qc-btn qc-btn-participate" style="background:${tc.gradient}" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})">
-                    <i class="fa-solid fa-graduation-cap"></i> Participate
-                  </button>
-                  <button class="qc-btn qc-btn-sell" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
-                    <i class="fa-solid fa-share-nodes"></i> Sell
-                  </button>
-                </div>
-              `}
-            </div>
+    <div class="qc-beautiful" data-tier="${q.type}">
+      <div class="qcb-bg" style="background:${ti.bg}">
+        <div class="qcb-badge">${ti.badgeText}</div>
+        <div class="qcb-title">${tc.programName}</div>
+        <div class="qcb-desc">${tc.purpose}</div>
+        <div class="qcb-reward-pill">
+          <div class="qcb-reward-icon">🎓</div>
+          <div>
+            <div class="qcb-reward-amount">₹${schAmt.toLocaleString('en-IN')}</div>
+            <div class="qcb-reward-label">Scholarship Amount</div>
           </div>
         </div>
+        <div class="qcb-bottom">
+          <div>Entry Fee: <strong>₹${q.entry_fee}</strong></div>
+          <div>प्रश्नोत्तरी भाग लेकर छात्रवृत्ति जीतें</div>
+        </div>
+      </div>
+      <div class="qcb-content">
+        <div class="qcb-dates">
+          <div class="qcb-date-box">
+            <div class="qcb-date-label"><i class="fa-regular fa-calendar"></i> Last Date</div>
+            <div class="qcb-date-value">${endDate}</div>
+          </div>
+          <div class="qcb-date-box">
+            <div class="qcb-date-label"><i class="fa-solid fa-trophy"></i> Result Date</div>
+            <div class="qcb-date-value">${resultDate}</div>
+          </div>
+        </div>
+        <div class="qcb-ticket">
+          <div class="qcb-ticket-label">Entry Fee / Ticket Price</div>
+          <div class="qcb-ticket-price">₹${q.entry_fee}</div>
+          <div class="qcb-ticket-sub">Secure your spot now</div>
+        </div>
+        ${q.enrolled ? `
+          <div style="padding:14px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;text-align:center;margin-top:8px">
+            <div style="font-size:11px;color:#22c55e;font-weight:800">✅ ENROLLED</div>
+            <div style="font-size:12px;color:#86efac;margin-top:4px">${q.enrollment?.enrollment_number || ''}</div>
+          </div>
+          ${q.enrollment && !q.enrollment.quiz_submitted && q.status === 'active' ?
+            `<button class="qcb-btn" style="background:${tc.gradient};color:#fff;margin-top:8px;width:100%" onclick="openQuizPlay('${q.quiz_id}')">
+              <i class="fa-solid fa-play"></i> Play Quiz
+            </button>` : ''}
+          ${q.enrollment?.quiz_submitted ? 
+            `<div style="padding:12px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:12px;text-align:center;margin-top:8px;font-size:12px;color:#22c55e;font-weight:700">
+              ✅ Quiz Submitted
+            </div>` : ''}
+          <button class="qcb-btn" style="background:#f59e0b;color:#fff;margin-top:8px;width:100%" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
+            <i class="fa-solid fa-share-nodes"></i> Sell Ticket
+          </button>
+        ` : `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+            <button class="qcb-btn" style="background:${tc.gradient};color:#fff" onclick="enrollInQuiz('${q.quiz_id}','${q.title}',${q.entry_fee})">
+              <i class="fa-solid fa-graduation-cap"></i> Participate
+            </button>
+            <button class="qcb-btn" style="background:#f59e0b;color:#fff" onclick="openSellModal('${q.quiz_id}','${q.title}',${q.entry_fee},'${tc.programName}')">
+              <i class="fa-solid fa-share-nodes"></i> Sell
+            </button>
+          </div>
+        `}
       </div>
     </div>`;
   }).join('');

@@ -655,6 +655,16 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </table>
       </div>
     </div>
+    <div class="content-card" style="margin-top:16px">
+      <h3><i class="fa-solid fa-envelope-circle-check"></i> Email System Test</h3>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <input type="email" id="testEmailAddr" placeholder="Enter email to test" style="flex:1;min-width:220px;padding:10px 14px;border:1px solid var(--brd);border-radius:8px;font-size:14px">
+        <button onclick="sendTestEmail()" style="padding:10px 22px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">
+          <i class="fa-solid fa-paper-plane"></i> Send Test Email
+        </button>
+        <span id="testEmailResult" style="font-size:13px;font-weight:600"></span>
+      </div>
+    </div>
   </div>
 
   <!-- ===================== MEMBERS PAGE ===================== -->
@@ -2114,6 +2124,20 @@ async function toggleMember(memberId){
     notify(`${memberId} is now ${r.membership_active ? 'active' : 'inactive'}`,'success');
     loadMembers();
   } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+async function sendTestEmail() {
+  const emailInput = document.getElementById('testEmailAddr');
+  const result = document.getElementById('testEmailResult');
+  const email = emailInput.value.trim();
+  if (!email) { result.innerHTML = '<span style="color:#ef4444">Email daalo pehle</span>'; return; }
+  result.innerHTML = '<span style="color:#6b7280"><i class="fa-solid fa-spinner fa-spin"></i> Sending...</span>';
+  try {
+    const data = await AUTH.api('/api/admin/test-email', { method: 'POST', body: JSON.stringify({ to: email }) });
+    result.innerHTML = '<span style="color:#10b981"><i class="fa-solid fa-check-circle"></i> Email sent! Inbox check karo.</span>';
+  } catch(e) {
+    result.innerHTML = `<span style="color:#ef4444"><i class="fa-solid fa-circle-xmark"></i> Failed: ${e.message}</span>`;
+  }
 }
 
 async function deleteMember(memberId, name){

@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="/assets/images/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
 /* ==============================
    CSS VARIABLES (Supporter Green Theme)
@@ -176,6 +177,128 @@ a{color:inherit;text-decoration:none}
 .s-green{ background:linear-gradient(135deg,#0a8f3f,#10b981); }
 .s-amber{ background:linear-gradient(135deg,#d97706,#f59e0b); }
 .s-purple{ background:linear-gradient(135deg,#7c3aed,#8b5cf6); }
+.s-blue{ background:#1a73e8; }
+
+/* ==============================
+   WALLET SINGLE PAGE - APP STYLE
+   ============================== */
+.wallet-single-section{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow-card);
+}
+.wallet-section-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:16px;
+  font-weight:900;
+  padding:18px 20px 0;
+  margin:0;
+  color:var(--text-primary);
+}
+.wallet-section-header i{ font-size:18px; }
+.app-tabs{
+  display:flex;
+  gap:0;
+  overflow-x:auto;
+  padding:12px 16px 0;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.app-tabs::-webkit-scrollbar{ display:none; }
+.app-tab{
+  flex:1;
+  min-width:0;
+  padding:12px 6px 14px;
+  border:none;
+  background:transparent;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-family:inherit;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  position:relative;
+  transition:color .2s;
+  text-align:center;
+  white-space:nowrap;
+}
+.app-tab::after{
+  content:'';
+  position:absolute;
+  bottom:0;
+  left:20%;
+  right:20%;
+  height:3px;
+  border-radius:3px 3px 0 0;
+  background:transparent;
+  transition:all .25s;
+}
+.app-tab:hover{ color:var(--text-primary); }
+.app-tab.active{ color:var(--accent); }
+.app-tab.active::after{ background:var(--accent); left:10%; right:10%; }
+.app-tab .tab-icon{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  background:var(--bg-1);
+  color:var(--text-muted);
+  transition:all .25s;
+}
+.app-tab.active .tab-icon{
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(16,185,129,.3);
+  transform:scale(1.05);
+}
+.app-tab .tab-label{ font-size:10px; line-height:1.2; }
+.app-tab-divider{ height:1px; background:var(--card-border); margin:0; }
+.app-tab-body{ padding:18px 20px 20px; animation:tabSlideIn .3s ease; }
+@keyframes tabSlideIn{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* Modal header/body/actions */
+.modal-header{
+  padding:20px 24px 16px;
+  border-bottom:1px solid var(--card-border);
+  background:var(--bg-1);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.modal-header h3{ font-size:16px; font-weight:800; margin:0; display:flex; align-items:center; gap:8px; }
+.modal-body{ padding:20px 24px; }
+.modal-actions{ padding:16px 24px; border-top:1px solid var(--card-border); display:flex; gap:10px; justify-content:flex-end; }
+.modal-close{
+  width:32px; height:32px; border-radius:50%;
+  background:var(--bg-1); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; color:var(--text-muted); transition:.2s;
+}
+.modal-close:hover{ background:var(--danger); color:#fff; }
+.form-row{ display:flex; gap:12px; flex-wrap:wrap; }
+.form-row .form-group{ flex:1; min-width:140px; }
+
+@media(max-width:560px){
+  .app-tab .tab-label{ font-size:9px; }
+  .app-tab .tab-icon{ width:32px; height:32px; font-size:13px; }
+  .app-tab{ padding:10px 4px 12px; }
+  .wallet-single-section{ border-radius:14px; margin-bottom:14px; }
+  .wallet-section-header{ font-size:14px; padding:14px 14px 0; }
+  .form-row{ flex-direction:column; }
+  .modal-header{ padding:16px 18px 14px; }
+  .modal-body{ padding:16px 18px; }
+  .modal-actions{ padding:14px 18px; }
+}
 
 /* ==============================
    CONTENT CARDS
@@ -504,6 +627,14 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <i class="fa-solid fa-calendar-days"></i> Events & Activities
     </button>
 
+    <div class="nav-divider">Wallet</div>
+    <button class="nav-item" data-page="wallet">
+      <i class="fa-solid fa-wallet"></i> Wallet
+    </button>
+    <button class="nav-item" data-page="referral">
+      <i class="fa-solid fa-user-plus"></i> Referral & Earn
+    </button>
+
     <div class="nav-divider">More</div>
     <button class="nav-item" data-page="support">
       <i class="fa-solid fa-headset"></i> Help & Support
@@ -540,8 +671,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <div style="font-size:20px;font-weight:900;color:var(--text-primary);margin-bottom:8px" id="welcomeName">Welcome, Supporter!</div>
           <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Empowering women through skills, welfare & self-employment.</div>
           <div class="account-actions">
-            <button class="account-action-btn" onclick="switchPage('feed')">
-              <i class="fa-solid fa-book-open"></i> Social Book
+            <button class="account-action-btn" onclick="switchPage('wallet')">
+              <i class="fa-solid fa-wallet"></i> Wallet
+            </button>
+            <button class="account-action-btn" onclick="switchPage('referral')">
+              <i class="fa-solid fa-user-plus"></i> Referral
             </button>
             <button class="account-action-btn" onclick="switchPage('events')">
               <i class="fa-solid fa-calendar-days"></i> Events
@@ -889,6 +1023,331 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
+  <!-- ===================== WALLET ===================== -->
+  <div class="page" id="page-wallet">
+    <div class="stats-row" style="margin-bottom:24px">
+      <div class="stat-card">
+        <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
+        <div class="s-label">Total Points</div>
+        <div class="s-value" id="walletTotalPoints">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-green"><i class="fa-solid fa-wallet"></i></div>
+        <div class="s-label">Wallet Balance</div>
+        <div class="s-value" id="walletBalance">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon s-amber"><i class="fa-solid fa-arrow-up"></i></div>
+        <div class="s-label">Total Earned</div>
+        <div class="s-value" id="walletTotalEarned">0</div>
+      </div>
+    </div>
+
+    <!-- Payments Section -->
+    <div class="wallet-single-section" style="margin-bottom:24px">
+      <h3 class="wallet-section-header"><i class="fa-solid fa-credit-card" style="color:var(--accent)"></i> Payments</h3>
+      <div class="app-tabs">
+        <button class="app-tab active" data-group="wact" data-target="wtab-donations">
+          <div class="tab-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <span class="tab-label">Donations</span>
+        </button>
+        <button class="app-tab" data-group="wact" data-target="wtab-membership">
+          <div class="tab-icon"><i class="fa-solid fa-credit-card"></i></div>
+          <span class="tab-label">Membership</span>
+        </button>
+      </div>
+      <div class="app-tab-divider"></div>
+      <div class="app-tab-body" id="wtab-donations">
+        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> My Donation History</h4>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Donor</th><th>Amount</th><th>Points</th><th>Date</th></tr></thead>
+            <tbody id="myDonationsBody">
+              <tr><td colspan="4" class="empty-state"><p>No donations yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="app-tab-body" id="wtab-membership" style="display:none">
+        <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-credit-card" style="color:var(--info)"></i> Membership Fees & Invoices</h4>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Txn ID</th></tr></thead>
+            <tbody id="membershipFeesBody">
+              <tr><td colspan="4" class="empty-state"><p>No records yet</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Points Section -->
+    <div class="wallet-single-section" id="section-points">
+      <h3 class="wallet-section-header" style="padding-bottom:18px"><i class="fa-solid fa-star" style="color:var(--accent)"></i> Points Management</h3>
+      <div class="app-tab-divider"></div>
+      <div style="padding:18px 20px 20px">
+        <div class="stats-row" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="s-icon s-purple"><i class="fa-solid fa-star"></i></div>
+            <div class="s-label">Total Points</div>
+            <div class="s-value" id="wPoints">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-icon s-green"><i class="fa-solid fa-hand-holding-heart"></i></div>
+            <div class="s-label">From Donations</div>
+            <div class="s-value" id="wDonPts">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-icon s-blue"><i class="fa-solid fa-user-plus"></i></div>
+            <div class="s-label">From Referrals</div>
+            <div class="s-value" id="wRefPts">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-icon s-amber"><i class="fa-solid fa-ticket"></i></div>
+            <div class="s-label">From Quiz</div>
+            <div class="s-value" id="wQuizPts">0</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="content-card" style="background:var(--accent);color:#fff;border:none">
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;padding:10px">
+              <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px">
+                <i class="fa-solid fa-gift"></i>
+              </div>
+              <h4 style="margin:0;font-size:17px;font-weight:800">Redeem Points</h4>
+              <p style="font-size:12px;opacity:.9;margin:0">Convert your points to support social causes</p>
+              <button class="btn" onclick="openRedeemModal()" style="background:#fff;color:var(--accent);font-weight:700;margin-top:4px">
+                <i class="fa-solid fa-arrow-right"></i> Start Redeeming
+              </button>
+            </div>
+          </div>
+          <div class="content-card">
+            <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-chart-pie"></i> Points Summary</h4>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+                <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-hand-holding-heart" style="color:var(--success)"></i> Donations</span>
+                <span style="font-weight:900;color:var(--success)" id="pointsDonSummary">0 pts</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+                <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-user-plus" style="color:var(--info)"></i> Referrals</span>
+                <span style="font-weight:900;color:var(--info)" id="pointsRefSummary">0 pts</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-1);border-radius:8px">
+                <span style="font-size:12px;font-weight:700;color:var(--text-secondary)"><i class="fa-solid fa-ticket" style="color:var(--warning)"></i> Quiz Tickets</span>
+                <span style="font-weight:900;color:var(--warning)" id="pointsQuizSummary">0 pts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card" style="margin-top:16px">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-clock-rotate-left"></i> Points History</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Type</th><th>Points</th><th>Description</th><th>Date</th></tr></thead>
+              <tbody id="pointsHistoryBody">
+                <tr><td colspan="4" class="empty-state"><p>No points earned yet</p></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Redeem Modal -->
+  <div class="modal" id="redeemModal">
+    <div class="modal-content" style="max-width:520px">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gift"></i> Redeem Points for Social Cause</h3>
+        <button class="modal-close" onclick="closeModal('redeemModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--accent-soft);padding:14px;border-radius:10px;margin-bottom:16px;text-align:center">
+          <div style="font-size:12px;color:var(--text-muted);font-weight:700">Available Points</div>
+          <div style="font-size:32px;font-weight:900;color:var(--accent)" id="availPointsDisplay">0</div>
+        </div>
+        <div class="form-group">
+          <label>Points to Redeem</label>
+          <input type="number" class="form-input" id="redeemPointsInput" placeholder="Enter points" min="1">
+        </div>
+        <div class="form-group">
+          <label>Social Cause</label>
+          <select class="form-input" id="socialCauseSelect">
+            <option value="">Select a cause</option>
+            <option value="Scholarship">Scholarship Program</option>
+            <option value="Tree Plantation">Tree Plantation Drive</option>
+            <option value="Food Distribution">Food Distribution</option>
+            <option value="Health Camp">Health Camp Support</option>
+            <option value="Women Empowerment">Women Empowerment Fund</option>
+            <option value="Clean Water">Clean Water Initiative</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('redeemModal')">Cancel</button>
+        <button class="btn btn-success" id="submitRedeemBtn" onclick="submitRedeemRequest()"><i class="fa-solid fa-check"></i> Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== REFERRAL & EARN ===================== -->
+  <div class="page" id="page-referral">
+    <div class="wallet-single-section" style="margin-bottom:24px">
+      <h3 class="wallet-section-header"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
+
+      <!-- Referral Code Bar -->
+      <div style="margin:14px 20px 0;background:var(--accent-light);border:1px solid rgba(16,185,129,.3);border-radius:var(--radius-md);padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <h4 style="margin:0 0 4px;font-size:13px;color:var(--accent-dark)"><i class="fa-solid fa-link"></i> Your Referral Code</h4>
+            <p style="font-size:11px;color:var(--accent);margin:0">Share with friends to earn points!</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" class="form-input" id="refCode" readonly style="font-weight:900;font-size:15px;text-align:center;max-width:180px;background:#fff;padding:8px 12px">
+            <button class="btn btn-ghost" onclick="copyRefCode()" style="background:#fff;padding:8px 12px"><i class="fa-solid fa-copy"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Cards Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:18px 20px 4px">
+
+        <!-- Add Supporter -->
+        <div onclick="openActionModal('addSupporter')" style="background:#fff;border:1.5px solid #c8f7db;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(10,143,63,.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#34d366,#0a8f3f);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-hands-helping" style="color:#fff;font-size:18px"></i>
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Supporter</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Bring a new supporter on board and earn 10% referral points.</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:#0a8f3f;font-size:11px"></i>
+          </div>
+        </div>
+
+        <!-- Record Donation -->
+        <div onclick="openActionModal('donation')" style="background:#fff;border:1.5px solid #dbeafe;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(26,115,232,.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#4f9ef8,#1a73e8);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-hand-holding-heart" style="color:#fff;font-size:18px"></i>
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#1a73e8;background:rgba(26,115,232,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Record Donation</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Record a donation you collected and earn 10% as reward points.</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:#1a73e8;font-size:11px"></i>
+          </div>
+        </div>
+
+        <!-- Sell Quiz Ticket -->
+        <div onclick="openActionModal('sellTicket')" style="background:#fff;border:1.5px solid #fef3c7;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(229,161,0,.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="width:46px;height:46px;background:linear-gradient(135deg,#fbbf24,#e5a100);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <i class="fa-solid fa-ticket" style="color:#fff;font-size:18px"></i>
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#b45309;background:rgba(180,83,9,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Sell Quiz Ticket</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Sold a quiz ticket? Record it and earn 10% of the ticket price.</p>
+          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#fffbeb;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <i class="fa-solid fa-arrow-right" style="color:#e5a100;font-size:11px"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Referral Tracking Table -->
+      <div style="padding:4px 20px 20px">
+        <div style="border-top:1px solid var(--card-border);padding-top:16px;margin-top:10px">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-list"></i> My Referrals</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="referralsBody">
+                <tr><td colspan="5" class="empty-state"><p>No referrals yet</p></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Add Supporter ============ -->
+  <div id="modalAddSupporter" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="background:linear-gradient(135deg,#34d366,#0a8f3f);padding:20px 24px 16px;position:relative">
+        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hands-helping"></i> Add Supporter</h3>
+        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10% back</strong> of the supporter's joining amount as points!</p>
+        <button onclick="closeActionModal('addSupporter')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div style="padding:22px 24px 24px">
+        <div id="spStep1">
+          <div style="display:grid;gap:12px">
+            <div class="form-group" style="margin:0"><label>Supporter Name *</label><input type="text" class="form-input" id="spName" placeholder="Full name"></div>
+            <div class="form-group" style="margin:0"><label>Mobile / Email *</label><input type="text" class="form-input" id="spContact" placeholder="Phone or email"></div>
+            <div class="form-group" style="margin:0"><label>Joining Amount (₹) *</label><input type="number" class="form-input" id="spAmount" placeholder="e.g. 500" min="1" value="500"></div>
+            <div class="form-group" style="margin:0"><label>Notes (optional)</label><input type="text" class="form-input" id="spNotes" placeholder="e.g. Corporate, Local leader"></div>
+          </div>
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#166534">
+            <i class="fa-solid fa-circle-info"></i> You earn <strong>10%</strong> of the supporter's payment as reward points. e.g. ₹500 → <strong>5 points</strong>.
+          </div>
+          <button id="spPayBtn" onclick="startSupporterPayment()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+            <i class="fa-solid fa-lock"></i> Proceed to Payment
+          </button>
+        </div>
+        <div id="spStep2" style="display:none;text-align:center">
+          <div style="font-size:40px;margin-bottom:8px">🎉</div>
+          <h4 style="color:var(--success);font-size:16px;font-weight:800;margin-bottom:4px">Supporter Added!</h4>
+          <p id="spResultPoints" style="color:var(--text-muted);font-size:13px;margin-bottom:16px"></p>
+          <button onclick="closeActionModal('addSupporter')" style="background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Record Donation ============ -->
+  <div id="modalDonation" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);padding:20px 24px 16px;position:relative">
+        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hand-holding-heart"></i> Record Donation</h3>
+        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the donated amount as reward points</p>
+        <button onclick="closeActionModal('donation')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div style="padding:22px 24px 24px;display:grid;gap:12px">
+        <div class="form-group" style="margin:0"><label>Donation Amount (₹) *</label><input type="number" class="form-input" id="donAmount" placeholder="e.g. 1000" min="1"></div>
+        <div class="form-group" style="margin:0"><label>Donor Name *</label><input type="text" class="form-input" id="donName" placeholder="Donor's name"></div>
+        <div class="form-group" style="margin:0"><label>Donor Contact</label><input type="text" class="form-input" id="donContact" placeholder="Phone or email"></div>
+        <button id="donBtn" onclick="submitDonation()" style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
+          <i class="fa-solid fa-plus"></i> Record Donation
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Sell Quiz Ticket ============ -->
+  <div id="modalSellTicket" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="background:linear-gradient(135deg,#fbbf24,#e5a100);padding:20px 24px 16px;position:relative">
+        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-ticket"></i> Sell Quiz Ticket</h3>
+        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the ticket price as reward points</p>
+        <button onclick="closeActionModal('sellTicket')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div style="padding:22px 24px 24px;display:grid;gap:12px">
+        <div class="form-group" style="margin:0"><label>Buyer Name *</label><input type="text" class="form-input" id="tickBuyer" placeholder="Buyer's full name"></div>
+        <div class="form-group" style="margin:0"><label>Buyer Contact</label><input type="text" class="form-input" id="tickContact" placeholder="Phone or email"></div>
+        <div class="form-group" style="margin:0"><label>Ticket Price (₹)</label><input type="number" class="form-input" id="tickPrice" value="100" min="1"></div>
+        <button id="tickBtn" onclick="submitTicket()" style="background:linear-gradient(135deg,#fbbf24,#e5a100);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
+          <i class="fa-solid fa-plus"></i> Record Ticket Sale
+        </button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ======== MOBILE BOTTOM NAV ======== -->
@@ -896,7 +1355,8 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   <div class="nav-row">
     <button class="bnav active" data-page="home"><i class="fa-solid fa-house"></i><span>Home</span></button>
     <button class="bnav" data-page="feed"><i class="fa-solid fa-book-open"></i><span>Social</span></button>
-    <button class="bnav" data-page="events"><i class="fa-solid fa-calendar-days"></i><span>Events</span></button>
+    <button class="bnav" data-page="wallet"><i class="fa-solid fa-wallet"></i><span>Wallet</span></button>
+    <button class="bnav" data-page="referral"><i class="fa-solid fa-user-plus"></i><span>Referral</span></button>
     <button class="bnav" data-page="profile"><i class="fa-solid fa-user"></i><span>Profile</span></button>
   </div>
 </nav>
@@ -966,6 +1426,8 @@ const pageTitles = {
   profile: '<i class="fa-solid fa-id-card"></i> Profile & ID Card',
   feed: '<i class="fa-solid fa-book-open"></i> Social Book',
   events: '<i class="fa-solid fa-calendar-days"></i> Events & Activities',
+  wallet: '<i class="fa-solid fa-wallet"></i> Wallet',
+  referral: '<i class="fa-solid fa-user-plus"></i> Referral & Earn',
   support: '<i class="fa-solid fa-headset"></i> Help & Support'
 };
 
@@ -987,9 +1449,11 @@ function switchPage(page, updateHash = true){
     history.pushState({ page }, '', location.pathname + (page === 'home' ? '' : '#' + page));
   }
 
-  if(page === 'support') loadMyTickets();
-  if(page === 'profile') loadProfile();
-  if(page === 'events')  loadEventsPage();
+  if(page === 'wallet')      loadWallet();
+  if(page === 'referral')    loadReferral();
+  if(page === 'support')     loadMyTickets();
+  if(page === 'profile')     loadProfile();
+  if(page === 'events')      loadEventsPage();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -1161,6 +1625,264 @@ function populateProfile(data){
 
 function loadProfile(){
   if(memberData) populateProfile(memberData);
+}
+
+/* ============================================
+   APP-STYLE TABS
+   ============================================ */
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.app-tab');
+  if(!tab) return;
+  const group = tab.dataset.group;
+  const target = tab.dataset.target;
+  if(!group || !target) return;
+  document.querySelectorAll(`.app-tab[data-group="${group}"]`).forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const section = tab.closest('.wallet-single-section');
+  if(section) section.querySelectorAll('.app-tab-body').forEach(b => b.style.display = 'none');
+  const targetEl = document.getElementById(target);
+  if(targetEl) targetEl.style.display = 'block';
+});
+
+/* ============================================
+   WALLET
+   ============================================ */
+async function loadWallet(){
+  try{
+    const data = memberData || await AUTH.api('/api/member/me');
+    memberData = data;
+    const w = data.wallet || {};
+    const totalPts = w.points_balance || w.total_points_earned || 0;
+
+    document.getElementById('walletTotalPoints').textContent = fmtN(totalPts);
+    document.getElementById('walletBalance').textContent = '₹' + fmtN(w.balance_inr || 0);
+    document.getElementById('walletTotalEarned').textContent = fmtN(w.total_points_earned || 0);
+
+    document.getElementById('wPoints').textContent = fmtN(totalPts);
+    document.getElementById('wDonPts').textContent = fmtN(w.points_from_donations);
+    document.getElementById('wRefPts').textContent = fmtN(w.points_from_referrals);
+    document.getElementById('wQuizPts').textContent = fmtN(w.points_from_quiz);
+
+    document.getElementById('pointsDonSummary').textContent = fmtN(w.points_from_donations) + ' pts';
+    document.getElementById('pointsRefSummary').textContent = fmtN(w.points_from_referrals) + ' pts';
+    document.getElementById('pointsQuizSummary').textContent = fmtN(w.points_from_quiz) + ' pts';
+
+    const pts = data.recentPoints || [];
+    const ptBody = document.getElementById('pointsHistoryBody');
+    if(pts.length){
+      ptBody.innerHTML = pts.map(p => `<tr>
+        <td>${statusBadge(p.type)}</td>
+        <td style="font-weight:800;color:var(--success)">+${p.points}</td>
+        <td style="font-size:12px">${p.description||'—'}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(p.created_at)}</td>
+      </tr>`).join('');
+    }
+
+    const dons = data.recentDonations || [];
+    const donBody = document.getElementById('myDonationsBody');
+    if(dons.length){
+      donBody.innerHTML = dons.map(d => `<tr>
+        <td>${d.donor_name || 'Anonymous'}</td>
+        <td style="font-weight:800">₹${fmtN(d.amount)}</td>
+        <td style="color:var(--success);font-weight:700">+${d.points_earned}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(d.created_at)}</td>
+      </tr>`).join('');
+    }
+
+    const fees = data.membershipFees || [];
+    const feeBody = document.getElementById('membershipFeesBody');
+    if(fees.length){
+      feeBody.innerHTML = fees.map(f => `<tr>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(f.created_at)}</td>
+        <td style="font-weight:800">₹${fmtN(f.amount)}</td>
+        <td>${statusBadge(f.status)}</td>
+        <td style="font-size:12px">${f.txn_id || '—'}</td>
+      </tr>`).join('');
+    }
+  } catch(e){ notify('Failed to load wallet', 'error'); }
+}
+
+/* ============================================
+   REFERRAL
+   ============================================ */
+async function loadReferral(){
+  try{
+    const data = memberData || await AUTH.api('/api/member/me');
+    memberData = data;
+    document.getElementById('refCode').value = data.user?.referral_code || 'N/A';
+
+    const refs = data.referrals || [];
+    const refBody = document.getElementById('referralsBody');
+    if(refs.length){
+      refBody.innerHTML = refs.map(r => `<tr>
+        <td style="font-weight:700">${r.referred_name || '—'}</td>
+        <td style="font-weight:800">₹${fmtN(r.amount)}</td>
+        <td style="color:var(--success);font-weight:700">+${r.points_earned}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(r.created_at)}</td>
+      </tr>`).join('');
+    }
+  } catch(e){ notify('Failed to load referral data', 'error'); }
+}
+
+function copyRefCode(){
+  const code = document.getElementById('refCode').value;
+  navigator.clipboard.writeText(code).then(() => notify('Referral code copied!', 'success')).catch(() => {});
+}
+
+/* ============================================
+   ACTION MODALS
+   ============================================ */
+const actionModalMap = {
+  addSupporter: 'modalAddSupporter',
+  donation:     'modalDonation',
+  sellTicket:   'modalSellTicket'
+};
+function openActionModal(key){
+  const el = document.getElementById(actionModalMap[key]);
+  if(!el) return;
+  el.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  if(key === 'addSupporter'){
+    document.getElementById('spStep1').style.display = 'block';
+    document.getElementById('spStep2').style.display = 'none';
+    document.getElementById('spName').value = '';
+    document.getElementById('spContact').value = '';
+    document.getElementById('spAmount').value = '500';
+    document.getElementById('spNotes').value = '';
+    const btn = document.getElementById('spPayBtn');
+    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment'; }
+  }
+}
+function closeActionModal(key){
+  const el = document.getElementById(actionModalMap[key]);
+  if(el) el.style.display = 'none';
+  document.body.style.overflow = '';
+}
+Object.values(actionModalMap).forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', e => {
+    if(e.target === el) closeActionModal(Object.keys(actionModalMap).find(k => actionModalMap[k] === id));
+  });
+});
+
+/* ============================================
+   ADD SUPPORTER (Razorpay + 10% points)
+   ============================================ */
+async function startSupporterPayment(){
+  const name    = document.getElementById('spName').value.trim();
+  const contact = document.getElementById('spContact').value.trim();
+  const amount  = parseFloat(document.getElementById('spAmount').value);
+  const notes   = document.getElementById('spNotes').value.trim();
+  if(!name || !contact) return notify('Enter supporter name and contact', 'warning');
+  if(!amount || amount < 1) return notify('Enter a valid joining amount', 'warning');
+  const btn = document.getElementById('spPayBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order...';
+  try{
+    const order = await AUTH.api('/api/pay/create-order', { method:'POST', body:{ amount, type:'supporter', notes:{ supporter: name } } });
+    const options = {
+      key: order.key, amount: order.order.amount, currency: order.order.currency,
+      name: 'FWF — Supporter Joining', description: `Supporter: ${name}`, order_id: order.order.id,
+      handler: async function(resp){
+        try{
+          const result = await AUTH.api('/api/pay/supporter', { method:'POST', body:{
+            supporterName: name, supporterContact: contact, supporterNotes: notes, amount,
+            razorpay_payment_id: resp.razorpay_payment_id,
+            razorpay_order_id: resp.razorpay_order_id,
+            razorpay_signature: resp.razorpay_signature
+          }});
+          document.getElementById('spResultPoints').textContent = result.message || `Supporter added! You earned ${result.pointsEarned} points.`;
+          document.getElementById('spStep1').style.display = 'none';
+          document.getElementById('spStep2').style.display = 'block';
+          memberData = null; loadWallet();
+        } catch(e){ notify('Payment received but failed to record — contact support: ' + e.message, 'warning'); }
+      },
+      prefill: { name: memberData?.user?.name || '', contact },
+      theme: { color: '#10b981' },
+      modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment'; } }
+    };
+    new Razorpay(options).open();
+  } catch(e){
+    notify('Could not initiate payment: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment';
+  }
+}
+
+/* ============================================
+   RECORD DONATION
+   ============================================ */
+async function submitDonation(){
+  const amount = parseFloat(document.getElementById('donAmount').value);
+  if(!amount || amount <= 0) return notify('Enter valid donation amount', 'warning');
+  const btn = document.getElementById('donBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
+  try{
+    const r = await AUTH.api('/api/member/record-donation', { method:'POST', body:{
+      amount,
+      donorName: document.getElementById('donName').value.trim(),
+      donorContact: document.getElementById('donContact').value.trim()
+    }});
+    notify(r.message || `Donation recorded! +${r.pointsEarned} points`, 'success');
+    document.getElementById('donAmount').value = '';
+    document.getElementById('donName').value = '';
+    document.getElementById('donContact').value = '';
+    closeActionModal('donation');
+    memberData = null; loadWallet();
+  } catch(e){ notify(e.message || 'Failed', 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Record Donation'; }
+}
+
+/* ============================================
+   SELL TICKET
+   ============================================ */
+async function submitTicket(){
+  const buyerName = document.getElementById('tickBuyer').value.trim();
+  if(!buyerName) return notify('Enter buyer name', 'warning');
+  const btn = document.getElementById('tickBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
+  try{
+    const r = await AUTH.api('/api/member/sell-ticket', { method:'POST', body:{
+      buyerName,
+      buyerContact: document.getElementById('tickContact').value.trim(),
+      ticketPrice: parseFloat(document.getElementById('tickPrice').value) || 100
+    }});
+    notify(r.message || `Ticket recorded! +${r.pointsEarned} points`, 'success');
+    document.getElementById('tickBuyer').value = '';
+    document.getElementById('tickContact').value = '';
+    closeActionModal('sellTicket');
+    memberData = null; loadWallet();
+  } catch(e){ notify(e.message || 'Failed', 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Record Ticket Sale'; }
+}
+
+/* ============================================
+   REDEEM
+   ============================================ */
+function openRedeemModal(){
+  const pts = memberData?.wallet?.points_balance || memberData?.wallet?.total_points_earned || 0;
+  document.getElementById('availPointsDisplay').textContent = pts;
+  openModal('redeemModal');
+}
+async function submitRedeemRequest(){
+  const points = parseFloat(document.getElementById('redeemPointsInput').value);
+  const cause  = document.getElementById('socialCauseSelect').value;
+  if(!points || points <= 0) return notify('Enter valid points amount', 'warning');
+  const availPts = memberData?.wallet?.points_balance || memberData?.wallet?.total_points_earned || 0;
+  if(points > availPts) return notify(`Insufficient points! You have ${availPts} points`, 'warning');
+  if(!cause) return notify('Select a social cause', 'warning');
+  const btn = document.getElementById('submitRedeemBtn');
+  btn.disabled = true;
+  try{
+    await AUTH.api('/api/member/redeem-points', { method:'POST', body:{ points, cause } });
+    notify('Redemption request submitted!', 'success');
+    closeModal('redeemModal');
+    memberData = null; loadWallet();
+  } catch(e){ notify(e.message || 'Redemption failed', 'error'); }
+  finally { btn.disabled = false; }
 }
 
 /* ============================================

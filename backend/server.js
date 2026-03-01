@@ -27,6 +27,7 @@ import Quiz from './models/Quiz.js';
 import QuizParticipation from './models/QuizParticipation.js';
 import ReferralClick from './models/ReferralClick.js';
 import DonationOtp from './models/DonationOtp.js';
+import PaymentLink from './models/PaymentLink.js';
 import { getTransporter, send80GReceipt, sendMemberWelcome, sendSupporterWelcome, sendDonationConfirmation, sendAdminAlert } from './lib/mailer.js';
 import { sendWhatsAppCredentials, sendWhatsAppDonation } from './lib/msg91.js';
 
@@ -2951,6 +2952,239 @@ app.post('/api/admin/test-email', auth('admin'), async (req, res) => {
   } catch (e) {
     console.error('Test email error:', e);
     res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAYMENT LINK ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Generate a unique link_id like  PL-FWFM001-x7k2  */
+function genLinkId(memberId) {
+  const slug = memberId.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+  const rand = Math.random().toString(36).substring(2, 7);
+  return `PL-${slug}-${rand}`;
+}
+
+// Create a new shareable payment link
+app.post('/api/member/create-payment-link', auth(['member', 'supporter']), async (req, res) => {
+  try {
+    const { type, title, amount } = req.body;
+    if (!type || !['donation', 'quiz_ticket'].includes(type))
+      return res.status(400).json({ error: 'type must be donation or quiz_ticket' });
+
+    const user = await User.findById(req.user.uid).select('name member_id').lean();
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Limit to 5 active links per user
+    const activeCount = await PaymentLink.countDocuments({ created_by: req.user.uid, active: true });
+    if (activeCount >= 5)
+      return res.status(400).json({ error: 'Maximum 5 active links allowed. Deactivate an existing link first.' });
+
+    let link_id;
+    // Ensure uniqueness
+    let tries = 0;
+    do {
+      link_id = genLinkId(user.member_id);
+      tries++;
+    } while ((await PaymentLink.findOne({ link_id }).lean()) && tries < 10);
+
+    const preset = type === 'quiz_ticket' ? (Number(amount) || QUIZ_TICKET_PRICE) : (amount ? Number(amount) : null);
+
+    const link = await PaymentLink.create({
+      link_id,
+      created_by: req.user.uid,
+      member_id: user.member_id,
+      member_name: user.name,
+      type,
+      title: title?.trim() || (type === 'donation' ? 'Donation for FWF' : 'Quiz Ticket'),
+      amount: preset
+    });
+
+    const baseUrl = process.env.SITE_URL || 'https://www.fwfindia.org';
+    res.json({ ok: true, linkId: link_id, url: `${baseUrl}/pay/${link_id}`, link });
+  } catch (err) {
+    captureError(err, { context: 'create-payment-link' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List my payment links
+app.get('/api/member/payment-links', auth(['member', 'supporter']), async (req, res) => {
+  try {
+    const links = await PaymentLink.find({ created_by: req.user.uid })
+      .sort({ created_at: -1 }).lean();
+    const baseUrl = process.env.SITE_URL || 'https://www.fwfindia.org';
+    const result = links.map(l => ({ ...l, url: `${baseUrl}/pay/${l.link_id}` }));
+    res.json({ ok: true, links: result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deactivate a link
+app.delete('/api/member/payment-link/:linkId', auth(['member', 'supporter']), async (req, res) => {
+  try {
+    const { linkId } = req.params;
+    const link = await PaymentLink.findOne({ link_id: linkId, created_by: req.user.uid });
+    if (!link) return res.status(404).json({ error: 'Link not found' });
+    link.active = false;
+    await link.save();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PUBLIC: get link details (no auth) ──
+app.get('/api/pay/link/:linkId', async (req, res) => {
+  try {
+    const link = await PaymentLink.findOne({ link_id: req.params.linkId }).lean();
+    if (!link) return res.status(404).json({ error: 'Payment link not found' });
+    if (!link.active) return res.status(410).json({ error: 'This payment link has been deactivated' });
+    res.json({
+      ok: true,
+      linkId: link.link_id,
+      type: link.type,
+      title: link.title,
+      memberName: link.member_name,
+      memberId: link.member_id,
+      amount: link.amount,
+      paymentCount: link.payment_count,
+      totalCollected: link.total_collected
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PUBLIC: create a Razorpay order for a payment link ──
+app.post('/api/pay/link/:linkId/order', async (req, res) => {
+  try {
+    const link = await PaymentLink.findOne({ link_id: req.params.linkId, active: true }).lean();
+    if (!link) return res.status(404).json({ error: 'Payment link not found or inactive' });
+
+    const amount = link.amount || Number(req.body.amount);
+    if (!amount || amount < 1) return res.status(400).json({ error: 'Valid amount required' });
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount * 100),
+      currency: 'INR',
+      receipt: `pl_${link.link_id}_${Date.now()}`,
+      notes: { link_id: link.link_id, type: link.type, member_id: link.member_id }
+    });
+    res.json({ ok: true, order, key: process.env.RAZORPAY_KEY_ID, amount });
+  } catch (err) {
+    captureError(err, { context: 'pay-link-order' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── PUBLIC: verify payment & credit creator ──
+app.post('/api/pay/link/:linkId/confirm', async (req, res) => {
+  try {
+    const link = await PaymentLink.findOne({ link_id: req.params.linkId, active: true });
+    if (!link) return res.status(404).json({ error: 'Payment link not found or inactive' });
+
+    const {
+      razorpay_payment_id, razorpay_order_id, razorpay_signature,
+      payerName, payerEmail, payerMobile, amount
+    } = req.body;
+
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature)
+      return res.status(400).json({ error: 'Payment details required' });
+
+    // Verify Razorpay signature
+    const expected = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(razorpay_order_id + '|' + razorpay_payment_id)
+      .digest('hex');
+    if (expected !== razorpay_signature)
+      return res.status(400).json({ ok: false, error: 'Payment verification failed' });
+
+    const numAmount = link.amount || Number(amount);
+    const creator = await User.findById(link.created_by).lean();
+    if (!creator) return res.status(404).json({ error: 'Link creator not found' });
+
+    // Points = 10% of amount
+    const pointsRupees = numAmount * (DONATION_POINTS_PERCENT / 100);
+    const points = amountToPoints(pointsRupees);
+    const pointsField = link.type === 'quiz_ticket' ? 'points_from_quiz' : 'points_from_donations';
+    const ledgerType  = link.type === 'quiz_ticket' ? 'quiz' : 'donation';
+
+    // Credit points to link creator
+    await User.updateOne({ _id: link.created_by }, {
+      $inc: {
+        [`wallet.${pointsField}`]:        points,
+        'wallet.points_balance':           points,
+        'wallet.total_points_earned':      points
+      },
+      'wallet.updated_at': new Date()
+    });
+
+    await PointsLedger.create({
+      user_id: link.created_by,
+      points,
+      type: ledgerType,
+      description: `Payment link ${link.link_id}: ₹${numAmount} via ${payerName || 'visitor'} → ${points} pts`
+    });
+
+    // Record in appropriate collection
+    if (link.type === 'donation') {
+      const donationId = await nextDonationId();
+      await Donation.create({
+        donation_id:  donationId,
+        member_id:    link.created_by,
+        amount:       numAmount,
+        points_earned: points,
+        donor_name:   payerName  || 'Anonymous',
+        donor_email:  payerEmail || null,
+        donor_mobile: payerMobile || null,
+        source:       'payment_link',
+        payment_id:   razorpay_payment_id,
+        order_id:     razorpay_order_id,
+        kyc_status:   'not_required'
+      });
+    } else {
+      await QuizTicket.create({
+        seller_id:     link.created_by,
+        buyer_name:    payerName    || null,
+        buyer_contact: payerMobile  || payerEmail || null,
+        ticket_price:  numAmount,
+        points_earned: points
+      });
+    }
+
+    // Update link stats
+    await PaymentLink.updateOne({ _id: link._id }, {
+      $inc: { payment_count: 1, total_collected: numAmount, total_points_earned: points }
+    });
+
+    addBreadcrumb('payment', 'PaymentLink paid', { linkId: link.link_id, amount: numAmount, type: link.type });
+
+    // Non-blocking: send thank-you email to payer
+    if (payerEmail) {
+      sendDonationConfirmation({
+        name: payerName || 'Supporter',
+        email: payerEmail,
+        amount: numAmount,
+        donationId: link.link_id,
+        paymentId: razorpay_payment_id,
+        recurring: false,
+        pointsEarned: 0
+      }).catch(e => console.error('PaymentLink confirmation email failed:', e.message));
+    }
+
+    res.json({
+      ok: true,
+      transactionId: razorpay_payment_id,
+      message: `Payment of ₹${numAmount} received! ${creator.name} has been credited ${points} points.`,
+      pointsEarned: points,
+      memberName: link.member_name
+    });
+  } catch (err) {
+    captureError(err, { context: 'pay-link-confirm' });
+    res.status(500).json({ error: err.message });
   }
 });
 

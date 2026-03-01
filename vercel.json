@@ -34,6 +34,7 @@
     { "source": "/csr-login",             "destination": "/csr-login" },
     { "source": "/csr-dashboard",         "destination": "/csr-dashboard" },
     { "source": "/store",                  "destination": "/store" },
+    { "source": "/pay/:linkId",            "destination": "/pay-link.html" },
     { "source": "/api/store/:path*",      "destination": "https://fwf-production.up.railway.app/api/store/:path*" },
     { "source": "/api/auth/:path*",       "destination": "https://fwf-production.up.railway.app/api/auth/:path*" },
     { "source": "/api/member/:path*",     "destination": "https://fwf-production.up.railway.app/api/member/:path*" },

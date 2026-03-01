@@ -1584,6 +1584,66 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== REFERRAL & EARN ===================== -->
   <div class="page" id="page-referral">
+
+    <!-- ============ MY PAYMENT LINKS ============ -->
+    <div class="wallet-single-section" style="margin-bottom:24px">
+      <h3 class="wallet-section-header"><i class="fa-solid fa-link" style="color:var(--accent)"></i> My Payment Links</h3>
+
+      <!-- Info strip -->
+      <div style="margin:14px 20px 0;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#1d4ed8;margin:0 0 2px"><i class="fa-solid fa-circle-info"></i> Shareable Payment Links</p>
+          <p style="font-size:11px;color:#3b82f6;margin:0">Create links for Donation or Quiz Ticket — share with anyone — earn <strong>10% as reward points</strong> on each payment!</p>
+        </div>
+        <button class="btn" onclick="openCreateLinkModal()" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;font-size:13px;padding:9px 16px;border-radius:10px;white-space:nowrap">
+          <i class="fa-solid fa-plus"></i> Create New Link
+        </button>
+      </div>
+
+      <!-- Links table -->
+      <div style="padding:16px 20px 20px 20px">
+        <div id="payLinksLoading" style="text-align:center;padding:18px;color:#94a3b8;font-size:13px"><i class="fa fa-spinner fa-spin"></i> Loading…</div>
+        <div id="payLinksEmpty" style="display:none;text-align:center;padding:24px;color:#94a3b8;font-size:13px">
+          <i class="fa-solid fa-link" style="font-size:28px;margin-bottom:8px;opacity:.3"></i><br>No payment links yet. Create one above!
+        </div>
+        <div id="payLinksGrid" style="display:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
+      </div>
+    </div>
+
+    <!-- ============ MODAL: Create Payment Link ============ -->
+    <div id="modalCreateLink" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+        <div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);padding:20px 24px 16px;position:relative">
+          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-link"></i> Create Payment Link</h3>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Share & earn 10% reward on every payment</p>
+          <button onclick="closeCreateLinkModal()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+        </div>
+        <div style="padding:22px 24px 24px;display:grid;gap:14px">
+          <div class="form-group" style="margin:0">
+            <label>Link Type *</label>
+            <select class="form-input" id="clType" onchange="updateClForm()">
+              <option value="donation">Donation Collection</option>
+              <option value="quiz_ticket">Quiz Ticket Sale</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Title / Description *</label>
+            <input type="text" class="form-input" id="clTitle" placeholder="e.g. Donate for Women's Skill Fund">
+          </div>
+          <div class="form-group" id="clAmountGroup" style="margin:0">
+            <label><span id="clAmountLabel">Amount (₹)</span> <span style="color:#94a3b8;font-size:11px">— leave blank for flexible</span></label>
+            <input type="number" class="form-input" id="clAmount" placeholder="Leave blank = donor decides" min="1">
+          </div>
+          <div style="display:flex;gap:10px;padding-top:4px">
+            <button class="btn btn-ghost" onclick="closeCreateLinkModal()" style="flex:1">Cancel</button>
+            <button class="btn" onclick="createPaymentLink()" id="clBtn" style="flex:2;background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff">
+              <i class="fa-solid fa-check"></i> Create Link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ==================== SECTION 2: REFERRALS & ACTIONS ==================== -->
     <div class="wallet-single-section" style="margin-bottom:24px">
       <h3 class="wallet-section-header"><i class="fa-solid fa-user-plus" style="color:var(--accent)"></i> Referrals & Actions</h3>
@@ -3614,6 +3674,9 @@ async function loadReferral(){
     // Load affiliate dashboard
     await loadAffiliateDashboard();
 
+    // Load payment links
+    loadPaymentLinks();
+
   } catch(e){ notify('Failed to load referral data','error'); }
 }
 
@@ -4908,6 +4971,106 @@ async function loadAffiliateDashboard(){
       </tr>`).join('');
     }
   } catch(e){ console.error('Affiliate load err:', e); }
+}
+
+/* ============================================
+   PAYMENT LINKS
+   ============================================ */
+async function loadPaymentLinks(){
+  try{
+    const res = await AUTH.api('/api/member/payment-links');
+    const links = res.links || [];
+    document.getElementById('payLinksLoading').style.display = 'none';
+    const grid = document.getElementById('payLinksGrid');
+    const empty = document.getElementById('payLinksEmpty');
+    if(!links.length){ empty.style.display = 'block'; grid.style.display = 'none'; return; }
+    empty.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = links.map(l => {
+      const typeIcon  = l.type === 'quiz_ticket' ? 'fa-ticket' : 'fa-hand-holding-heart';
+      const typeColor = l.type === 'quiz_ticket' ? '#b45309' : '#1d4ed8';
+      const typeBg    = l.type === 'quiz_ticket' ? '#fef9c3' : '#dbeafe';
+      const shortUrl  = `${location.origin}/pay/${l.link_id}`;
+      return `
+      <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px;position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <span style="background:${typeBg};color:${typeColor};font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px">
+            <i class="fa-solid ${typeIcon}"></i> ${l.type === 'quiz_ticket' ? 'Quiz Ticket' : 'Donation'}
+          </span>
+          <button onclick="deletePayLink('${l.link_id}')" title="Deactivate" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px;padding:2px 4px">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+        <h4 style="font-size:14px;font-weight:800;color:#0f172a;margin:0 0 4px;line-height:1.4">${l.title}</h4>
+        <p style="font-size:12px;color:#64748b;margin:0 0 12px">${l.amount ? '₹'+l.amount.toLocaleString('en-IN')+' fixed' : 'Flexible amount'}</p>
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:900;color:#1e3a8a">${l.payment_count||0}</div>
+            <div style="font-size:10px;color:#94a3b8">Payments</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:900;color:#16a34a">₹${(l.total_collected||0).toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:#94a3b8">Collected</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:16px;font-weight:900;color:var(--accent)">${l.total_points_earned||0}</div>
+            <div style="font-size:10px;color:#94a3b8">Points Earned</div>
+          </div>
+        </div>
+        <button onclick="copyPayLink('${shortUrl}')" style="width:100%;padding:9px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;">
+          <i class="fa-regular fa-copy"></i> Copy Link
+        </button>
+      </div>`;
+    }).join('');
+  } catch(e){ console.error('Payment links error',e); document.getElementById('payLinksLoading').style.display = 'none'; }
+}
+
+function openCreateLinkModal(){
+  const m = document.getElementById('modalCreateLink');
+  m.style.display = 'flex';
+  document.getElementById('clTitle').value = '';
+  document.getElementById('clAmount').value = '';
+  updateClForm();
+}
+function closeCreateLinkModal(){ document.getElementById('modalCreateLink').style.display = 'none'; }
+function updateClForm(){
+  const t = document.getElementById('clType').value;
+  if(t === 'quiz_ticket'){
+    document.getElementById('clAmountLabel').textContent = 'Amount (₹)';
+    document.getElementById('clAmount').value = '100';
+    document.getElementById('clAmount').readOnly = true;
+  } else {
+    document.getElementById('clAmountLabel').textContent = 'Amount (₹)';
+    document.getElementById('clAmount').readOnly = false;
+  }
+}
+async function createPaymentLink(){
+  const type   = document.getElementById('clType').value;
+  const title  = document.getElementById('clTitle').value.trim();
+  const amtVal = document.getElementById('clAmount').value;
+  const amount = amtVal ? parseFloat(amtVal) : null;
+  if(!title) return notify('Please enter a title','error');
+  const btn = document.getElementById('clBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating…';
+  try{
+    const res = await AUTH.api('/api/member/create-payment-link',{method:'POST',body:JSON.stringify({type,title,amount})});
+    if(!res.ok && !res.link_id) throw new Error(res.error || 'Failed');
+    notify('Payment link created!','success');
+    closeCreateLinkModal();
+    loadPaymentLinks();
+  } catch(e){ notify(e.message||'Could not create link','error'); }
+  finally{ btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Create Link'; }
+}
+function copyPayLink(url){
+  navigator.clipboard.writeText(url).then(()=> notify('Link copied!','success')).catch(()=> notify('Could not copy','error'));
+}
+async function deletePayLink(linkId){
+  if(!confirm('Deactivate this payment link? Payments using this link will stop.')) return;
+  try{
+    await AUTH.api(`/api/member/payment-link/${linkId}`,{method:'DELETE'});
+    notify('Link deactivated','success');
+    loadPaymentLinks();
+  } catch(e){ notify('Could not deactivate','error'); }
 }
 
 /* ============================================

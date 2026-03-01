@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pay via FWF Member Link</title>
+<link rel="icon" href="/assets/images/logo.png">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#e8f4fd 0%,#f0f8ff 40%,#e8f0fe 100%);
+  padding:20px;
+}
+
+/* ─── Card ─── */
+.card{
+  background:#fff;border-radius:24px;
+  box-shadow:0 24px 80px rgba(30,58,138,.12),0 8px 32px rgba(30,58,138,.08);
+  width:100%;max-width:500px;overflow:hidden;
+}
+
+/* ─── Header ─── */
+.card-header{
+  background:linear-gradient(135deg,#1e3a8a 0%,#3b82f6 60%,#06b6d4 100%);
+  padding:28px 32px 24px;text-align:center;position:relative;
+}
+.card-header .logo{
+  width:52px;height:52px;border-radius:14px;
+  background:rgba(255,255,255,.15);padding:8px;
+  display:inline-block;margin-bottom:12px;
+}
+.card-header h2{color:#fff;font-size:20px;font-weight:800;margin-bottom:4px}
+.card-header p{color:rgba(255,255,255,.8);font-size:13px}
+
+/* ─── Member info banner ─── */
+.member-band{
+  background:#f0f9ff;border-bottom:1px solid #bae6fd;
+  padding:14px 24px;display:flex;align-items:center;gap:14px;
+}
+.member-avatar{
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,#1e3a8a,#3b82f6);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;font-weight:800;flex-shrink:0;
+}
+.member-band .info h4{font-size:14px;font-weight:800;color:#0f172a;margin-bottom:1px}
+.member-band .info p{font-size:12px;color:#475569}
+
+/* ─── Tag pill ─── */
+.type-tag{
+  margin:20px 24px 0;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700;
+}
+.type-tag.donation{background:#dbeafe;color:#1d4ed8}
+.type-tag.quiz_ticket{background:#fef9c3;color:#b45309}
+
+/* ─── Body ─── */
+.card-body{padding:18px 24px 28px}
+
+.section-title{
+  font-size:12px;font-weight:700;color:#64748b;
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;
+}
+
+.amount-display{
+  background:linear-gradient(135deg,#eff6ff,#fff);
+  border:1.5px solid #bfdbfe;border-radius:14px;
+  padding:16px 20px;margin-bottom:20px;text-align:center;
+}
+.amount-display .label{font-size:12px;color:#3b82f6;font-weight:700;margin-bottom:4px}
+.amount-display .amount{font-size:32px;font-weight:900;color:#1e3a8a}
+.amount-display .sub{font-size:11px;color:#64748b;margin-top:2px}
+
+/* ─── Form ─── */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px}
+.form-input{
+  width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;
+  border-radius:10px;font-family:inherit;font-size:14px;
+  color:#0f172a;background:#f8fafc;outline:none;
+  transition:border-color .15s,background .15s;
+}
+.form-input:focus{border-color:#3b82f6;background:#fff}
+.form-input.invalid{border-color:#ef4444}
+
+/* ─── Pay button ─── */
+.pay-btn{
+  width:100%;padding:15px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#1e3a8a,#3b82f6);
+  color:#fff;font-family:inherit;font-size:15px;font-weight:800;
+  cursor:pointer;transition:.2s;display:flex;align-items:center;
+  justify-content:center;gap:9px;margin-top:20px;
+}
+.pay-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(59,130,246,.35)}
+.pay-btn:disabled{opacity:.65;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ─── Security note ─── */
+.secure-note{
+  text-align:center;margin-top:14px;
+  font-size:11px;color:#94a3b8;display:flex;align-items:center;
+  justify-content:center;gap:5px;
+}
+
+/* ─── SUCCESS state ─── */
+#successState{display:none}
+.success-icon-wrap{text-align:center;padding:28px 0 10px;position:relative}
+.success-dot{
+  position:absolute;width:8px;height:8px;border-radius:50%;
+  animation:dot-float 3s ease-in-out infinite;
+}
+.success-dot.d1{background:#f472b6;top:24px;left:calc(50% - 60px);animation-delay:0s}
+.success-dot.d2{background:#60a5fa;top:18px;left:calc(50% + 44px);animation-delay:.4s}
+.success-dot.d3{background:#fbbf24;top:56px;left:calc(50% + 64px);animation-delay:.8s}
+.success-dot.d4{background:#a78bfa;top:60px;left:calc(50% - 74px);animation-delay:1.2s}
+@keyframes dot-float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.success-checkmark{
+  width:68px;height:68px;border-radius:18px;
+  background:linear-gradient(135deg,#1e3a8a,#3b82f6);
+  display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 30px rgba(59,130,246,.35);
+}
+.success-checkmark i{color:#fff;font-size:28px}
+
+.success-heading{font-size:20px;font-weight:800;color:#16a34a;text-align:center;margin:16px 0 6px}
+.success-sub{font-size:13px;color:#475569;text-align:center;margin-bottom:20px;line-height:1.6}
+
+.detail-row{
+  background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;
+  padding:14px 18px;margin-bottom:12px;
+}
+.detail-row .dr-label{font-size:11px;color:#64748b;font-weight:700;margin-bottom:3px}
+.detail-row .dr-value{font-size:14px;font-weight:800;color:#0f172a}
+.detail-row .dr-value.accent{color:#2563eb;font-size:13px;word-break:break-all}
+
+/* Copy link row */
+.copy-row{
+  background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;
+  padding:14px 18px;margin-bottom:20px;
+}
+.copy-row .cr-label{font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:6px}
+.copy-row .cr-link{
+  font-size:12px;color:#1d4ed8;font-family:monospace;
+  word-break:break-all;margin-bottom:10px;
+}
+.copy-row .copy-btn{
+  width:100%;padding:10px;border:none;border-radius:9px;
+  background:linear-gradient(90deg,#3b82f6,#1e3a8a);
+  color:#fff;font-family:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:.2s;
+}
+.copy-btn:hover{opacity:.9}
+.copy-btn.copied{background:linear-gradient(90deg,#22c55e,#16a34a)}
+
+/* Home button */
+.home-btn{
+  display:block;text-align:center;padding:13px;
+  background:#0f172a;color:#fff;border-radius:12px;
+  font-weight:800;font-size:14px;text-decoration:none;
+  transition:.2s;
+}
+.home-btn:hover{background:#1e293b}
+
+/* ─── Error state ─── */
+#errorState{display:none;padding:40px 24px;text-align:center}
+#errorState i{font-size:40px;color:#ef4444;margin-bottom:14px}
+#errorState h3{color:#0f172a;font-size:18px;margin-bottom:8px}
+#errorState p{color:#64748b;font-size:13px}
+
+/* ─── Skeleton loader ─── */
+#loadingState{padding:40px 24px;text-align:center;color:#94a3b8}
+.skeleton{background:#f1f5f9;border-radius:8px;animation:sk 1.2s ease infinite alternate}
+@keyframes sk{from{opacity:.6}to{opacity:1}}
+.sk-h{height:20px;border-radius:6px;margin:8px auto}
+
+/* ─── Toast ─── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#0f172a;color:#fff;padding:11px 20px;border-radius:12px;
+  font-size:13px;font-weight:600;z-index:9999;transition:.3s;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+</style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+
+  <!-- Loading -->
+  <div id="loadingState" style="padding:48px 24px;text-align:center">
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.7s linear infinite"></div>
+    </div>
+    <p style="color:#94a3b8;font-size:14px">Loading payment details…</p>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+  </div>
+
+  <!-- Error -->
+  <div id="errorState">
+    <div style="text-align:center;padding:48px 24px">
+      <i class="fa-solid fa-triangle-exclamation" style="font-size:44px;color:#ef4444;margin-bottom:16px"></i>
+      <h3 id="errTitle" style="color:#0f172a;font-size:18px;margin-bottom:8px">Link Not Found</h3>
+      <p id="errMsg" style="color:#64748b;font-size:14px;margin-bottom:24px">This payment link is invalid or has been deactivated.</p>
+      <a href="/" class="home-btn">Back to Home</a>
+    </div>
+  </div>
+
+  <!-- Payment form (shown once link is loaded) -->
+  <div id="paymentState" style="display:none">
+    <div class="card-header">
+      <img class="logo" src="/assets/images/logo.png" alt="FWF">
+      <h2>FWF Payment</h2>
+      <p id="hdrSubtitle">Secure payment via Razorpay</p>
+    </div>
+
+    <!-- Member band -->
+    <div class="member-band">
+      <div class="member-avatar" id="memberInitial">F</div>
+      <div class="info">
+        <h4 id="memberNameDisplay">Loading…</h4>
+        <p id="memberIdDisplay">Member ID</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Link type tag -->
+      <span class="type-tag" id="typeTag">
+        <i class="fa-solid fa-hand-holding-heart"></i>
+        <span id="typeLabel">Donation</span>
+      </span>
+
+      <!-- Title -->
+      <p id="linkTitle" style="font-size:14px;color:#374151;margin:10px 0 16px;line-height:1.6"></p>
+
+      <!-- Amount (fixed or free input) -->
+      <div id="fixedAmount" class="amount-display" style="display:none">
+        <div class="label">Amount to Pay</div>
+        <div class="amount">₹<span id="fixedAmtVal">—</span></div>
+        <div class="sub">All payments are secure & encrypted</div>
+      </div>
+
+      <div id="flexAmount" style="display:none;margin-bottom:16px">
+        <div class="form-group">
+          <label>Enter Amount (₹) *</label>
+          <input type="number" class="form-input" id="customAmount" placeholder="e.g. 500" min="1" style="font-size:18px;font-weight:800">
+        </div>
+      </div>
+
+      <!-- Payer details -->
+      <div style="border-top:1px solid #f1f5f9;padding-top:16px;margin-top:0">
+        <div class="section-title">Your Details</div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" class="form-input" id="payerName" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label>Mobile Number *</label>
+          <input type="tel" class="form-input" id="payerMobile" placeholder="10-digit mobile" maxlength="10" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label>Email (optional, for receipt)</label>
+          <input type="email" class="form-input" id="payerEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <button class="pay-btn" id="payBtn" onclick="startPayment()">
+        <i class="fa-solid fa-lock"></i>
+        <span id="payBtnLabel">Pay Now</span>
+      </button>
+
+      <div class="secure-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        Secured by Razorpay · 256-bit SSL Encryption
+      </div>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div id="successState">
+    <div class="card-body">
+      <div class="success-icon-wrap">
+        <span class="success-dot d1"></span>
+        <span class="success-dot d2"></span>
+        <span class="success-dot d3"></span>
+        <span class="success-dot d4"></span>
+        <div class="success-checkmark"><i class="fa-solid fa-check"></i></div>
+      </div>
+
+      <h2 class="success-heading">Thank you for Trusting Us</h2>
+      <p class="success-sub">
+        Your <strong id="successTypeLabel">'Donation'</strong> has been sent successfully.<br>
+        Please note the Transaction ID for your records.
+      </p>
+
+      <div class="detail-row">
+        <div class="dr-label">Transaction ID</div>
+        <div class="dr-value accent" id="txnId">—</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="dr-label">Amount Paid</div>
+        <div class="dr-value" id="successAmt">—</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="dr-label">Credited to Member</div>
+        <div class="dr-value" id="successMember">—</div>
+      </div>
+
+      <div class="copy-row" id="shareLinkRow">
+        <div class="cr-label"><i class="fa-solid fa-share-nodes"></i> Share this Payment Link</div>
+        <div class="cr-link" id="shareLinkUrl">https://www.fwfindia.org/pay/…</div>
+        <button class="copy-btn" id="copyShareBtn" onclick="copyShareLink()">
+          <i class="fa-regular fa-copy"></i> Click here to copy payment link
+        </button>
+      </div>
+
+      <a href="/" class="home-btn">
+        <i class="fa-solid fa-house" style="margin-right:6px"></i> Back to Home Page
+      </a>
+    </div>
+  </div>
+
+</div><!-- /card -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = '';  // same origin (Vercel proxies to Railway)
+
+  // Extract linkId from the path: /pay/PL-fwfm001-abc12
+  const linkId = location.pathname.split('/pay/')[1]?.split('/')[0] || new URLSearchParams(location.search).get('link');
+
+  let linkData = null;
+
+  async function loadLink() {
+    if (!linkId) return showError('Invalid Link', 'No payment link ID found in the URL.');
+
+    try {
+      const resp = await fetch(`${API}/api/pay/link/${linkId}`);
+      const data = await resp.json();
+
+      if (!resp.ok) return showError(resp.status === 410 ? 'Link Deactivated' : 'Link Not Found', data.error || 'This payment link is not available.');
+
+      linkData = data;
+      renderPaymentForm(data);
+    } catch (e) {
+      showError('Connection Error', 'Could not load payment details. Please try again.');
+    }
+  }
+
+  function renderPaymentForm(d) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('paymentState').style.display = 'block';
+
+    // Header
+    document.getElementById('hdrSubtitle').textContent =
+      d.type === 'quiz_ticket' ? 'Secure quiz ticket purchase' : 'Secure donation collection';
+
+    // Member
+    const initial = (d.memberName || 'F')[0].toUpperCase();
+    document.getElementById('memberInitial').textContent = initial;
+    document.getElementById('memberNameDisplay').textContent = d.memberName || 'FWF Member';
+    document.getElementById('memberIdDisplay').textContent = d.memberId || '';
+
+    // Type tag
+    const tag = document.getElementById('typeTag');
+    tag.className = `type-tag ${d.type}`;
+    tag.querySelector('i').className = d.type === 'quiz_ticket'
+      ? 'fa-solid fa-ticket' : 'fa-solid fa-hand-holding-heart';
+    document.getElementById('typeLabel').textContent =
+      d.type === 'quiz_ticket' ? 'Quiz Ticket' : 'Donation';
+
+    // Title
+    document.getElementById('linkTitle').textContent = d.title || '';
+
+    // Amount
+    if (d.amount) {
+      document.getElementById('fixedAmtVal').textContent = d.amount.toLocaleString('en-IN');
+      document.getElementById('fixedAmount').style.display = 'block';
+      document.getElementById('payBtnLabel').textContent = `Pay ₹${d.amount.toLocaleString('en-IN')}`;
+    } else {
+      document.getElementById('flexAmount').style.display = 'block';
+    }
+
+    // Share link in success state pre-fill
+    const pageUrl = location.href.split('?')[0];
+    document.getElementById('shareLinkUrl').textContent = pageUrl;
+  }
+
+  function showError(title, msg) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('errTitle').textContent = title;
+    document.getElementById('errMsg').textContent = msg;
+  }
+
+  async function startPayment() {
+    const name   = document.getElementById('payerName').value.trim();
+    const mobile = document.getElementById('payerMobile').value.trim();
+    const email  = document.getElementById('payerEmail').value.trim();
+    let amount   = linkData?.amount;
+
+    if (!amount) {
+      amount = parseFloat(document.getElementById('customAmount').value);
+      if (!amount || amount < 1) return showToast('Enter a valid amount', 'error');
+    }
+    if (!name) return showToast('Please enter your name', 'error');
+    if (!mobile || !/^\d{10}$/.test(mobile)) return showToast('Enter a valid 10-digit mobile', 'error');
+
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order…';
+
+    try {
+      const orderRes = await fetch(`${API}/api/pay/link/${linkId}/order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+      });
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) throw new Error(orderData.error || 'Order creation failed');
+
+      btn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>Pay ₹${amount.toLocaleString('en-IN')}</span>`;
+      btn.disabled = false;
+
+      const options = {
+        key:        orderData.key,
+        amount:     orderData.order.amount,
+        currency:   'INR',
+        name:       'FWF — Foundation for Women\'s Future',
+        description: linkData.type === 'quiz_ticket' ? `Quiz Ticket — ${linkData.title}` : `Donation — ${linkData.title}`,
+        image:      '/assets/images/logo.png',
+        order_id:   orderData.order.id,
+        prefill:    { name, contact: mobile, email },
+        theme:      { color: '#1e3a8a' },
+        handler: async function(response) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Confirming…';
+          try {
+            const confirmRes = await fetch(`${API}/api/pay/link/${linkId}/confirm`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_signature:  response.razorpay_signature,
+                payerName:   name,
+                payerEmail:  email,
+                payerMobile: mobile,
+                amount
+              })
+            });
+            const confirmData = await confirmRes.json();
+            if (!confirmRes.ok) throw new Error(confirmData.error || 'Confirmation failed');
+
+            showSuccess({ txnId: response.razorpay_payment_id, amount, memberName: linkData.memberName });
+          } catch(e) {
+            showToast(e.message || 'Confirmation failed. Contact support.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ₹${amount.toLocaleString('en-IN')}`;
+          }
+        },
+        modal: { ondismiss: () => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ₹${amount.toLocaleString('en-IN')}`;
+        }}
+      };
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', e => showToast('Payment failed: ' + (e.error?.description || 'Unknown'), 'error'));
+      rzp.open();
+    } catch(e) {
+      showToast(e.message || 'Could not start payment', 'error');
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-lock"></i> Pay ₹${amount ? amount.toLocaleString('en-IN') : 'Now'}`;
+    }
+  }
+
+  function showSuccess({ txnId, amount, memberName }) {
+    document.getElementById('paymentState').style.display = 'none';
+    document.getElementById('successState').style.display = 'block';
+
+    const typeLabel = linkData?.type === 'quiz_ticket' ? 'Quiz Ticket Purchase' : 'Donation';
+    document.getElementById('successTypeLabel').textContent = `'${typeLabel}'`;
+    document.getElementById('txnId').textContent = txnId;
+    document.getElementById('successAmt').textContent = `₹${Number(amount).toLocaleString('en-IN')}`;
+    document.getElementById('successMember').textContent = memberName || 'FWF Member';
+    document.getElementById('shareLinkUrl').textContent = location.href.split('?')[0];
+  }
+
+  function copyShareLink() {
+    const url = location.href.split('?')[0];
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.getElementById('copyShareBtn');
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+      showToast('Payment link copied!', 'success');
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="fa-regular fa-copy"></i> Click here to copy payment link';
+      }, 2500);
+    });
+  }
+
+  /* Toast */
+  function showToast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast show ${type}`;
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+  }
+
+  // Boot
+  loadLink();
+</script>
+</body>
+</html>

@@ -847,6 +847,8 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div> <!-- /pay-donations-tab -->
 
+  </div> <!-- /page-payments -->
+
   <!-- ===================== CSR PARTNERS PAGE ===================== -->
   <div class="page" id="page-csr">
     <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
@@ -1874,10 +1876,10 @@ function switchPage(page, updateHash = true){
 
   if(page === 'posts')       loadSocialPosts();
   if(page === 'members')     loadMembers();
-  if(page === 'supporters')  loadDonations();
+  if(page === 'supporters')  loadSupporters();
   if(page === 'csr')         loadCSRPartners();
   if(page === 'support')     loadSupportTickets();
-  if(page === 'payments')    loadMembershipFees();
+  if(page === 'payments')    { loadMembershipFees(); loadDonations(); }
   if(page === 'points')      loadPointsActivity();
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();

@@ -394,7 +394,7 @@ body::before{
     <!-- Step 2: Enter OTP and New Password -->
     <div class="modal-step" id="step2">
       <h2 class="modal-title">Verify OTP</h2>
-      <p class="modal-subtitle">Enter the 6-digit OTP sent to <strong id="maskedEmail"></strong></p>
+      <p class="modal-subtitle">Enter the 6-digit OTP sent to <strong id="maskedEmail"></strong><span id="maskedMobileWrap" style="display:none"> &amp; SMS <strong id="maskedMobile"></strong></span></p>
       
       <form id="resetPasswordForm">
         <div class="otp-inputs">
@@ -539,6 +539,12 @@ document.getElementById('requestOtpForm').addEventListener('submit', async (e) =
     
     currentMemberId = memberId;
     document.getElementById('maskedEmail').textContent = data.email;
+    if (data.mobile) {
+      document.getElementById('maskedMobile').textContent = data.mobile;
+      document.getElementById('maskedMobileWrap').style.display = 'inline';
+    } else {
+      document.getElementById('maskedMobileWrap').style.display = 'none';
+    }
     FWF_Notify.toast(data.message, 'success');
     showStep(2);
     startTimer();

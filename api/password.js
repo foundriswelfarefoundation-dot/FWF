@@ -119,8 +119,9 @@ async function handler(req, res) {
 
       return res.json({
         ok: true,
-        message: "OTP sent to your registered email",
-        email: email.replace(/(.{2})(.*)(@.*)/, "$1***$3")
+        message: "OTP sent to your registered email" + (mobile ? " & SMS" : ""),
+        email: email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
+        mobile: mobile ? String(mobile).replace(/\D/g,'').slice(-10).replace(/(\d{2})(\d+)(\d{2})/, '$1***$3') : null
       });
 
     } catch (error) {

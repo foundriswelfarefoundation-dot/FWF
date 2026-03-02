@@ -250,41 +250,9 @@ async function createAndSendReceipt({ type, userId, memberId, customerName, cust
       is_80g: !!is80g,
       status: 'generated'
     });
-    // Optionally email receipt link
+    // Optionally email receipt link — receipt URL passed to confirmation email instead
+    // (avoids double email; receiptUrl added to sendDonationConfirmation / sendMemberWelcome)
     if (customerEmail) {
-      const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
-      const receiptUrl = `${backendUrl}/receipt/${token}`;
-      const transporter = getTransporter();
-      await transporter.sendMail({
-        from: process.env.MAIL_FROM,
-        to: customerEmail,
-        subject: `FWF Receipt ${receipt_id} — ₹${total.toLocaleString('en-IN')}`,
-        html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:580px;margin:0 auto">
-  <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center">
-    <div style="font-size:36px">🧾</div>
-    <h1 style="color:#fff;margin:8px 0 0;font-size:20px">Payment Receipt</h1>
-    <p style="color:#bfdbfe;margin:4px 0 0;font-size:13px">Foundation for Women's Future (FWF)</p>
-  </div>
-  <div style="padding:28px 32px;border:1px solid #e2e8f0;border-top:none">
-    <p style="color:#374151;font-size:15px">Dear <strong>${customerName}</strong>,</p>
-    <p style="color:#6b7280;font-size:14px">Thank you for your payment. Here is your official receipt.</p>
-    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:20px 0">
-      <tr style="background:#f8fafc"><td style="padding:10px 14px;color:#6b7280;font-weight:600;width:40%">Receipt No.</td><td style="padding:10px 14px;font-weight:700;font-family:monospace">${receipt_id}</td></tr>
-      <tr><td style="padding:10px 14px;color:#6b7280;font-weight:600">Date</td><td style="padding:10px 14px">${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</td></tr>
-      ${memberId ? `<tr style="background:#f8fafc"><td style="padding:10px 14px;color:#6b7280;font-weight:600">Member ID</td><td style="padding:10px 14px;font-family:monospace">${memberId}</td></tr>` : ''}
-      <tr${memberId ? '' : ' style="background:#f8fafc"'}><td style="padding:10px 14px;color:#6b7280;font-weight:600">Amount Paid</td><td style="padding:10px 14px;font-weight:800;color:#166534;font-size:16px">₹${total.toLocaleString('en-IN')}</td></tr>
-      ${razorpayPaymentId ? `<tr style="background:#f8fafc"><td style="padding:10px 14px;color:#6b7280;font-weight:600">Payment ID</td><td style="padding:10px 14px;font-family:monospace;font-size:12px">${razorpayPaymentId}</td></tr>` : ''}
-    </table>
-    <div style="text-align:center;margin:24px 0">
-      <a href="${receiptUrl}" style="background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:13px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px;display:inline-block">📄 View / Download Receipt</a>
-    </div>
-    <p style="color:#9ca3af;font-size:11px;text-align:center">This link is valid permanently. You can print from the receipt page.</p>
-  </div>
-  <div style="background:#f9fafb;padding:16px 32px;border-radius:0 0 12px 12px;border:1px solid #e2e8f0;border-top:none;text-align:center">
-    <p style="color:#9ca3af;font-size:11px;margin:0"><strong style="color:#1e40af">Foundris Welfare Foundation (FWF)</strong> · www.fwfindia.org</p>
-  </div>
-</div>`
-      }).catch(e => console.error('⚠️ Receipt email failed:', e.message));
       await Receipt.updateOne({ _id: receipt._id }, { status: 'sent', email_sent: true, email_sent_at: new Date() });
     }
     // Sync to Zoho Books (non-blocking)
@@ -985,14 +953,10 @@ app.post('/api/pay/membership', async (req, res) => {
 
     addBreadcrumb('payment', 'Membership payment successful', { memberId, paymentId: razorpay_payment_id, subscriptionId: razorpay_subscription_id });
 
-    // Send member welcome email (non-blocking)
-    sendMemberWelcome({ name, email, memberId, password: plain, mobile })
-      .then(() => console.log(`✅ Member welcome email sent → ${email}`))
-      .catch(e => console.error('⚠️ Member welcome email failed:', e.message));
-
-    // Generate & email membership fee receipt (non-blocking)
+    // Generate membership receipt first so we can include URL in welcome email
     const newUser2 = await User.findOne({ member_id: memberId }).select('_id').lean();
-    createAndSendReceipt({
+    const memberBackendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+    const memberRcpt = await createAndSendReceipt({
       type: 'membership',
       userId: newUser2?._id,
       memberId,
@@ -1006,7 +970,15 @@ app.post('/api/pay/membership', async (req, res) => {
       razorpaySubscriptionId: razorpay_subscription_id,
       referenceId: memberId,
       description: 'FWF Membership Joining Fee'
-    }).then(r => r && console.log(`🧾 Membership receipt created: ${r.receipt_id}`));
+    });
+    const memberReceiptUrl = memberRcpt ? `${memberBackendUrl}/receipt/${memberRcpt.token}` : null;
+    if (memberRcpt) console.log(`🧾 Membership receipt created: ${memberRcpt.receipt_id}`);
+    if (memberRcpt) syncReceiptToZoho(memberRcpt.toObject ? memberRcpt.toObject() : memberRcpt).catch(() => {});
+
+    // Send member welcome email with receipt link (non-blocking)
+    sendMemberWelcome({ name, email, memberId, password: plain, mobile, receiptUrl: memberReceiptUrl })
+      .then(() => console.log(`✅ Member welcome email sent → ${email}`))
+      .catch(e => console.error('⚠️ Member welcome email failed:', e.message));
 
     // Admin alert (non-blocking)
     sendAdminAlert({
@@ -1121,8 +1093,8 @@ app.post('/api/pay/donation', async (req, res) => {
     const donationRecord = await Donation.create(donationData);
     addBreadcrumb('payment', 'Donation recorded', { donationId, amount: numAmount, kycRequired, otpVerified });
 
-    // Generate donation receipt (non-blocking)
-    createAndSendReceipt({
+    const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+    const rcpt = await createAndSendReceipt({
       type: 'donation',
       userId: user?._id,
       memberId: user?.member_id || null,
@@ -1139,7 +1111,11 @@ app.post('/api/pay/donation', async (req, res) => {
       referenceId: donationId,
       is80g: !!(want80g && pan),
       description: `Donation ₹${numAmount}${recurring ? ' (Recurring)' : ''}`
-    }).then(r => r && console.log(`🧾 Donation receipt created: ${r.receipt_id}`));
+    });
+    const receiptUrl = rcpt ? `${backendUrl}/receipt/${rcpt.token}` : null;
+    if (rcpt) console.log(`🧾 Donation receipt created: ${rcpt.receipt_id}`);
+    // Sync receipt to Zoho (non-blocking)
+    if (rcpt) syncReceiptToZoho(rcpt.toObject ? rcpt.toObject() : rcpt).catch(err => console.warn('⚠️ Zoho sync:', err.message));
 
     // Send 80G receipt email if donor opted in and has PAN + email
     let receipt80GSent = false;
@@ -1163,8 +1139,8 @@ app.post('/api/pay/donation', async (req, res) => {
       }
     }
 
-    // Always send donation confirmation email if email provided (separate from 80G)
-    if (email && !receipt80GSent) {
+    // Always send donation confirmation email with receipt link
+    if (email) {
       sendDonationConfirmation({
         name: name || 'Donor',
         email,
@@ -1172,7 +1148,8 @@ app.post('/api/pay/donation', async (req, res) => {
         donationId,
         paymentId: razorpay_payment_id,
         recurring: !!recurring,
-        pointsEarned: donationData.points_earned || 0
+        pointsEarned: donationData.points_earned || 0,
+        receiptUrl
       })
         .then(() => console.log(`✅ Donation confirmation email sent → ${email}`))
         .catch(e => console.error('⚠️ Donation confirmation email failed:', e.message));

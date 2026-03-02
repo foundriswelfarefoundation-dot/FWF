@@ -158,7 +158,7 @@ export async function send80GReceipt({ donationId, name, email, pan, address, am
 /**
  * Send welcome email to a newly registered member with login credentials.
  */
-export async function sendMemberWelcome({ name, email, memberId, password, mobile = '' }) {
+export async function sendMemberWelcome({ name, email, memberId, password, mobile = '', receiptUrl = null }) {
   if (!email) return;
   const transporter = getTransporter();
   const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -213,6 +213,12 @@ export async function sendMemberWelcome({ name, email, memberId, password, mobil
             Login to Dashboard →
           </a>
         </div>
+
+        ${receiptUrl ? `
+        <div style="text-align:center;margin:0 0 20px">
+          <a href="${receiptUrl}" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;text-decoration:none;padding:13px 28px;border-radius:10px;font-weight:700;font-size:14px">📄 View / Download Receipt</a>
+          <p style="color:#9ca3af;font-size:11px;margin:8px 0 0">Your membership receipt — printable as PDF. Valid permanently.</p>
+        </div>` : ''}
 
         <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px">
           <p style="margin:0;color:#92400e;font-size:12px;font-weight:600">
@@ -301,7 +307,7 @@ export async function sendSupporterWelcome({ name, email, supporterId, password,
 /**
  * Send donation receipt / thank-you email to donor (always, regardless of 80G).
  */
-export async function sendDonationConfirmation({ name, email, amount, donationId, paymentId, recurring = false, pointsEarned = 0 }) {
+export async function sendDonationConfirmation({ name, email, amount, donationId, paymentId, recurring = false, pointsEarned = 0, receiptUrl = null }) {
   if (!email) return;
   const transporter = getTransporter();
   const formatted = Number(amount).toLocaleString('en-IN');
@@ -360,6 +366,11 @@ export async function sendDonationConfirmation({ name, email, amount, donationId
         </div>
 
         <!-- CTA -->
+        ${receiptUrl ? `
+        <div style="text-align:center;margin-bottom:16px">
+          <a href="${receiptUrl}" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;text-decoration:none;padding:12px 26px;border-radius:10px;font-weight:700;font-size:14px">📄 View / Download Receipt</a>
+          <p style="color:#9ca3af;font-size:11px;margin:8px 0 0">Click to view, print or save as PDF. Valid permanently.</p>
+        </div>` : ''}
         <div style="text-align:center;margin-bottom:20px">
           <a href="${SITE}/donation" style="display:inline-block;background:linear-gradient(135deg,#be185d,#ec4899);color:#fff;text-decoration:none;padding:12px 30px;border-radius:50px;font-size:14px;font-weight:800">
             Donate Again →
@@ -367,8 +378,8 @@ export async function sendDonationConfirmation({ name, email, amount, donationId
         </div>
 
         <p style="color:#9ca3af;font-size:12px;text-align:center;margin:0">
-          If you need an 80G tax receipt, please contact us at 
-          <a href="mailto:${SUPPORT_EMAIL()}" style="color:#be185d">${SUPPORT_EMAIL()}</a> with your PAN details.
+          ${receiptUrl ? '' : 'If you need an 80G tax receipt, please contact us at <a href="mailto:${SUPPORT_EMAIL()}" style="color:#be185d">${SUPPORT_EMAIL()}</a> with your PAN details.'}
+          ${receiptUrl ? 'For an 80G tax certificate, please contact us at <a href="mailto:${SUPPORT_EMAIL()}" style="color:#be185d">${SUPPORT_EMAIL()}</a> with your PAN details.' : ''}
         </p>
       </div>
 

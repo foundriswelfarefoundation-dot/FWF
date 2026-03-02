@@ -482,7 +482,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
+      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -3062,6 +3062,69 @@ app.get('/api/admin/quizzes', auth('admin'), async (req, res) => {
   }
 });
 
+// Admin: Full quiz detail (questions + stats)
+app.get('/api/admin/quiz/:quizId/detail', auth('admin'), async (req, res) => {
+  try {
+    const quiz = await Quiz.findOne({ quiz_id: req.params.quizId }).lean();
+    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+    const participantCount = await QuizParticipation.countDocuments({ quiz_ref: quiz.quiz_id });
+    const submittedCount  = await QuizParticipation.countDocuments({ quiz_ref: quiz.quiz_id, quiz_submitted: true });
+    const paidCount       = await QuizParticipation.countDocuments({ quiz_ref: quiz.quiz_id, payment_status: 'paid' });
+    // Answer distribution per question
+    const participations  = await QuizParticipation.find({ quiz_ref: quiz.quiz_id, quiz_submitted: true }).select('answers score').lean();
+    const questionStats   = (quiz.questions || []).map(q => {
+      const dist = [0, 0, 0, 0];
+      participations.forEach(p => {
+        const ans = (p.answers || []).find(a => a.q_no === q.q_no);
+        if (ans && typeof ans.selected === 'number') dist[ans.selected] = (dist[ans.selected] || 0) + 1;
+      });
+      return { q_no: q.q_no, question: q.question, options: q.options, correct_answer: q.correct_answer, distribution: dist };
+    });
+    const scores = participations.map(p => p.score || 0);
+    const avgScore = scores.length ? (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1) : 0;
+    res.json({ ok: true, quiz, stats: { participantCount, submittedCount, paidCount, avgScore, questionStats } });
+  } catch (err) {
+    captureError(err, { context: 'admin-quiz-detail' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: List participants for a quiz
+app.get('/api/admin/quiz/:quizId/participants', auth('admin'), async (req, res) => {
+  try {
+    const { page = 1, limit = 50, search = '', status = '' } = req.query;
+    const quiz = await Quiz.findOne({ quiz_id: req.params.quizId }).select('quiz_id title type entry_fee prizes status winners').lean();
+    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+    const filter = { quiz_ref: quiz.quiz_id };
+    if (status) filter.status = status;
+    if (search) filter.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { member_id: { $regex: search, $options: 'i' } },
+      { enrollment_number: { $regex: search, $options: 'i' } }
+    ];
+    const total = await QuizParticipation.countDocuments(filter);
+    const participants = await QuizParticipation.find(filter)
+      .sort({ created_at: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .select('name member_id enrollment_number payment_id amount_paid payment_status score quiz_submitted submitted_at status prize_won created_at answers')
+      .lean();
+    // Revenue stats
+    const allPaid = await QuizParticipation.find({ quiz_ref: quiz.quiz_id, payment_status: 'paid' }).select('amount_paid score quiz_submitted').lean();
+    const totalCollection = allPaid.reduce((s, p) => s + (p.amount_paid || 0), 0);
+    const submittedCount  = allPaid.filter(p => p.quiz_submitted).length;
+    res.json({
+      ok: true, quiz,
+      participants,
+      pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / limit) },
+      stats: { total: allPaid.length, totalCollection, submittedCount, avgScore: allPaid.length ? (allPaid.reduce((s,p)=>s+(p.score||0),0)/allPaid.length).toFixed(1) : 0 }
+    });
+  } catch (err) {
+    captureError(err, { context: 'admin-quiz-participants' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin: Manually trigger quiz auto-create
 app.post('/api/admin/quiz-auto-create', auth('admin'), async (req, res) => {
   try {
@@ -3125,6 +3188,13 @@ let demoSchedulerInterval = null;
 app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
   try {
     const now = new Date();
+    // demoHours: 0 = fast (30/60/90 min), 24 = 24h/26h/28h, custom (hours)
+    const demoHours = Number(req.body.demoHours || 0);
+    const isHours24 = demoHours >= 1;
+    const minsM  = isHours24 ? demoHours * 60            : 30;
+    const minsH  = isHours24 ? (demoHours + 2) * 60      : 60;
+    const minsY  = isHours24 ? (demoHours + 4) * 60      : 90;
+    const resGap = isHours24 ? 60                         : 5; // result declared X min after end
 
     // Fake participant names
     const fakeNames = [
@@ -3143,13 +3213,13 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
       {
         quiz_id: `DEMO-M${Date.now()}`,
         title: '🧪 DEMO Monthly Quiz',
-        description: 'Test demo — ends in 30 minutes',
+        description: `Test demo — ends in ${minsM} min`,
         type: 'monthly',
         game_type: 'mcq',
         entry_fee: 100,
         start_date: now,
-        end_date: new Date(now.getTime() + 30 * 60 * 1000), // 30 min
-        result_date: new Date(now.getTime() + 35 * 60 * 1000), // 35 min (5 min after end)
+        end_date: new Date(now.getTime() + minsM * 60 * 1000),
+        result_date: new Date(now.getTime() + (minsM + resGap) * 60 * 1000),
         status: 'active',
         prizes: { first: 5000, second: 2000, third: 1000 },
         questions: [
@@ -3161,13 +3231,13 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
       {
         quiz_id: `DEMO-H${Date.now()}`,
         title: '🧪 DEMO Half-Yearly Quiz',
-        description: 'Test demo — ends in 1 hour',
+        description: `Test demo — ends in ${minsH} min`,
         type: 'half_yearly',
         game_type: 'general',
         entry_fee: 500,
         start_date: now,
-        end_date: new Date(now.getTime() + 60 * 60 * 1000), // 1 hour
-        result_date: new Date(now.getTime() + 65 * 60 * 1000), // 65 min
+        end_date: new Date(now.getTime() + minsH * 60 * 1000),
+        result_date: new Date(now.getTime() + (minsH + resGap) * 60 * 1000),
         status: 'active',
         prizes: { first: 25000, second: 10000, third: 5000 },
         questions: [
@@ -3178,13 +3248,13 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
       {
         quiz_id: `DEMO-Y${Date.now()}`,
         title: '🧪 DEMO Annual Quiz',
-        description: 'Test demo — ends in 1.5 hours',
+        description: `Test demo — ends in ${minsY} min`,
         type: 'yearly',
         game_type: 'mcq',
         entry_fee: 1000,
         start_date: now,
-        end_date: new Date(now.getTime() + 90 * 60 * 1000), // 1.5 hours
-        result_date: new Date(now.getTime() + 95 * 60 * 1000), // 95 min
+        end_date: new Date(now.getTime() + minsY * 60 * 1000),
+        result_date: new Date(now.getTime() + (minsY + resGap) * 60 * 1000),
         status: 'active',
         prizes: { first: 50000, second: 25000, third: 10000 },
         questions: [
@@ -3199,7 +3269,8 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
     // Add random fake participants to each quiz
     const participations = [];
     for (const quiz of created) {
-      const numFake = 5 + Math.floor(Math.random() * 16); // 5 to 20 participants
+      const maxFake = Number(req.body.fakeCount || 15);
+      const numFake = Math.max(5, Math.min(maxFake, 50)); // clamped 5-50 participants
       const shuffled = [...fakeNames].sort(() => Math.random() - 0.5).slice(0, numFake);
       
       for (let i = 0; i < shuffled.length; i++) {
@@ -3238,7 +3309,8 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
 
     await QuizParticipation.insertMany(participations);
 
-    // Start fast scheduler (every 1 min) for demo
+    // Start fast scheduler for demo
+    const tickMs = isHours24 ? 5 * 60 * 1000 : 60 * 1000; // 5min for 24h, 1min for fast
     if (demoSchedulerInterval) clearInterval(demoSchedulerInterval);
     demoSchedulerInterval = setInterval(async () => {
       console.log('⚡ Demo scheduler tick...');
@@ -3250,14 +3322,14 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
         demoSchedulerInterval = null;
         console.log('✅ Demo complete — all quizzes drawn! Fast scheduler stopped.');
       }
-    }, 60 * 1000); // every 1 minute
-    console.log('⚡ Demo fast scheduler started (every 1 min)');
+    }, tickMs);
+    console.log(`⚡ Demo fast scheduler started (every ${tickMs/60000} min)`);
 
     const summary = created.map(q => ({
       quiz_id: q.quiz_id,
       type: q.type,
-      ends_in: q.type === 'monthly' ? '30 min' : q.type === 'half_yearly' ? '1 hour' : '1.5 hours',
-      result_in: q.type === 'monthly' ? '35 min' : q.type === 'half_yearly' ? '65 min' : '95 min',
+      ends_in: q.type === 'monthly' ? `${minsM} min` : q.type === 'half_yearly' ? `${minsH} min` : `${minsY} min`,
+      result_in: q.type === 'monthly' ? `${minsM + resGap} min` : q.type === 'half_yearly' ? `${minsH + resGap} min` : `${minsY + resGap} min`,
       participants: participations.filter(p => p.quiz_ref === q.quiz_id).length
     }));
 

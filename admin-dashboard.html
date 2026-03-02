@@ -1507,6 +1507,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== FUND RAISER / QUIZ MANAGEMENT ===================== -->
   <div class="page" id="page-fundraiser">
+    <!-- Stats Row -->
     <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
       <div class="stat-card"><div class="s-icon s-blue"><i class="fa-solid fa-gamepad"></i></div><div class="s-label">Active Quizzes</div><div class="s-value" id="frStatActive">0</div></div>
       <div class="stat-card"><div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div><div class="s-label">Pending Draw</div><div class="s-value" id="frStatPending">0</div></div>
@@ -1514,84 +1515,215 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <div class="stat-card"><div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div><div class="s-label">Total Participants</div><div class="s-value" id="frStatParticipants">0</div></div>
     </div>
 
-    <!-- Action Buttons -->
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="triggerAutoCreate()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">
-        <i class="fa-solid fa-plus"></i> Auto-Create Quizzes
+    <!-- Tab Bar -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--brd,#e2e8f0);padding-bottom:0;flex-wrap:wrap">
+      <button class="fr-tab fr-tab-active" onclick="switchFRTab('overview')" id="frTab-overview" style="padding:9px 18px;border:none;background:none;font-weight:700;font-size:13px;cursor:pointer;border-bottom:3px solid #3b82f6;color:#3b82f6;margin-bottom:-2px">
+        <i class="fa-solid fa-bolt"></i> Overview
       </button>
-      <button class="btn btn-primary" onclick="triggerAutoDraw()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">
-        <i class="fa-solid fa-dice"></i> Run Auto-Draw
+      <button class="fr-tab" onclick="switchFRTab('quizzes')" id="frTab-quizzes" style="padding:9px 18px;border:none;background:none;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#64748b;margin-bottom:-2px">
+        <i class="fa-solid fa-list"></i> All Quizzes
       </button>
-      <button class="btn btn-ghost" onclick="loadFundRaiser()" style="padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px">
-        <i class="fa-solid fa-refresh"></i> Refresh
+      <button class="fr-tab" onclick="switchFRTab('results')" id="frTab-results" style="padding:9px 18px;border:none;background:none;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#64748b;margin-bottom:-2px">
+        <i class="fa-solid fa-trophy"></i> Results History
       </button>
-      <span id="frLastRefresh" style="font-size:11px;color:#94a3b8;align-self:center;margin-left:auto"></span>
+      <button class="fr-tab" onclick="switchFRTab('demo')" id="frTab-demo" style="padding:9px 18px;border:none;background:none;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#f59e0b;margin-bottom:-2px">
+        <i class="fa-solid fa-flask"></i> Demo Mode
+      </button>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <button onclick="triggerAutoCreate()" style="background:#3b82f6;border:none;color:#fff;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px"><i class="fa-solid fa-plus"></i> Auto-Create</button>
+        <button onclick="triggerAutoDraw()" style="background:#f59e0b;border:none;color:#fff;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px"><i class="fa-solid fa-dice"></i> Auto-Draw</button>
+        <button onclick="loadFundRaiser()" style="background:transparent;border:1px solid var(--brd,#e2e8f0);color:var(--text-muted,#64748b);padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px"><i class="fa-solid fa-refresh"></i></button>
+        <span id="frLastRefresh" style="font-size:11px;color:#94a3b8"></span>
+      </div>
     </div>
 
-    <!-- ========= DEMO TEST PANEL ========= -->
-    <div class="content-card" id="demoPanel" style="margin-bottom:20px;border:2px dashed #f59e0b;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%)">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <span style="font-size:28px">🧪</span>
-        <div>
-          <h3 style="margin:0;color:#fbbf24;font-size:16px">Demo / Test Mode</h3>
-          <p style="margin:0;color:#c4b5fd;font-size:12px">Monthly=30min, Half-Yearly=1hr, Annual=1.5hr — Auto result 5 min after end</p>
+    <!-- TAB: OVERVIEW -->
+    <div id="frSection-overview">
+      <!-- Active Quizzes -->
+      <div class="content-card" style="margin-bottom:16px">
+        <h3><i class="fa-solid fa-bolt" style="color:#3b82f6"></i> Active Quizzes</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Fee</th><th>Prize 1st</th><th>End Date</th><th>Result Date</th><th>Enrolled</th><th>Collection</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="frActiveBody"><tr><td colspan="11" class="empty-state"><p>Loading...</p></td></tr></tbody>
+          </table>
         </div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <button id="btnDemoStart" onclick="startDemo()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">
-          <i class="fa-solid fa-play"></i> Start Demo
-        </button>
-        <button id="btnDemoStop" onclick="stopDemo()" style="background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;display:none">
-          <i class="fa-solid fa-stop"></i> Stop & Cleanup
-        </button>
-        <button id="btnDemoRefresh" onclick="refreshDemoStatus()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;display:none">
-          <i class="fa-solid fa-sync"></i> Refresh Status
-        </button>
-        <span id="demoStatusBadge" style="display:none;background:#fbbf24;color:#1e1b4b;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">RUNNING</span>
-      </div>
-      <!-- Demo Live Tracker -->
-      <div id="demoTracker" style="display:none;margin-top:16px">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px" id="demoCardsGrid"></div>
-        <div id="demoLog" style="margin-top:12px;max-height:200px;overflow-y:auto;background:rgba(0,0,0,.3);border-radius:8px;padding:10px;font-family:monospace;font-size:11px;color:#a5b4fc"></div>
+      <!-- Pending Draw -->
+      <div class="content-card">
+        <h3><i class="fa-solid fa-clock" style="color:#f59e0b"></i> Pending Draw</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Enrolled</th><th>Collection</th><th>Result Date</th><th>Actions</th></tr></thead>
+            <tbody id="frPendingBody"><tr><td colspan="7" class="empty-state"><p>No pending draws</p></td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Active Quizzes -->
-    <div class="content-card" style="margin-bottom:16px">
-      <h3><i class="fa-solid fa-bolt" style="color:#3b82f6"></i> Active Quizzes</h3>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Entry Fee</th><th>Prize (1st)</th><th>End Date</th><th>Result Date</th><th>Participants</th><th>Collection</th><th>Status</th></tr></thead>
-          <tbody id="frActiveBody">
-            <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
-          </tbody>
-        </table>
+    <!-- TAB: ALL QUIZZES -->
+    <div id="frSection-quizzes" style="display:none">
+      <div class="content-card">
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="frQuizSearch" placeholder="Search by ID or title..." class="form-input" style="width:220px;font-size:13px" oninput="filterAllQuizzes()">
+          <select id="frQuizFilterType" class="form-input" style="width:140px;font-size:13px" onchange="filterAllQuizzes()">
+            <option value="">All Types</option>
+            <option value="monthly">Monthly</option>
+            <option value="half_yearly">Half-Yearly</option>
+            <option value="yearly">Annual</option>
+          </select>
+          <select id="frQuizFilterStatus" class="form-input" style="width:150px;font-size:13px" onchange="filterAllQuizzes()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="closed">Closed</option>
+            <option value="result_declared">Result Declared</option>
+          </select>
+          <span id="frQuizCount" style="font-size:12px;color:#64748b;margin-left:auto"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Status</th><th>Fee</th><th>Prizes</th><th>Start</th><th>End</th><th>Result</th><th>Enrolled</th><th>Collection</th><th>Actions</th></tr></thead>
+            <tbody id="frAllQuizzesBody"><tr><td colspan="12" class="empty-state"><p>Loading...</p></td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Pending Draw -->
-    <div class="content-card" style="margin-bottom:16px">
-      <h3><i class="fa-solid fa-clock" style="color:#f59e0b"></i> Pending Draw</h3>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>Actions</th></tr></thead>
-          <tbody id="frPendingBody">
-            <tr><td colspan="5" class="empty-state"><p>No pending draws</p></td></tr>
-          </tbody>
-        </table>
+    <!-- TAB: RESULTS HISTORY -->
+    <div id="frSection-results" style="display:none">
+      <div class="content-card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>🥇 1st Place</th><th>🥈 2nd Place</th><th>🥉 3rd Place</th><th>Total Paid Out</th><th>Actions</th></tr></thead>
+            <tbody id="frResultsBody"><tr><td colspan="9" class="empty-state"><p>No results yet</p></td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Recent Results -->
-    <div class="content-card">
-      <h3><i class="fa-solid fa-trophy" style="color:#22c55e"></i> Recent Results</h3>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>Winner #1</th><th>Winner #2</th><th>Winner #3</th></tr></thead>
-          <tbody id="frResultsBody">
-            <tr><td colspan="7" class="empty-state"><p>No results yet</p></td></tr>
-          </tbody>
+    <!-- TAB: DEMO MODE -->
+    <div id="frSection-demo" style="display:none">
+      <div class="content-card" style="border:2px dashed #f59e0b;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+          <span style="font-size:32px">🧪</span>
+          <div>
+            <h3 style="margin:0;color:#fbbf24;font-size:18px">Demo / Test Mode</h3>
+            <p style="margin:0;color:#c4b5fd;font-size:13px">Create demo quizzes with fake participants for data analysis & testing</p>
+          </div>
+        </div>
+
+        <!-- Duration Config -->
+        <div style="background:rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:16px">
+          <p style="color:#e2e8f0;font-weight:700;margin:0 0 12px;font-size:13px">⏱️ Select Demo Duration</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label style="cursor:pointer">
+              <input type="radio" name="demoDuration" value="0" checked onchange="updateDemoTimingInfo()">
+              <span style="background:#6366f1;color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;margin-left:4px">⚡ Quick (30/60/90 min)</span>
+            </label>
+            <label style="cursor:pointer">
+              <input type="radio" name="demoDuration" value="24" onchange="updateDemoTimingInfo()">
+              <span style="background:#0ea5e9;color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;margin-left:4px">🕐 24-Hour Analysis</span>
+            </label>
+            <label style="cursor:pointer">
+              <input type="radio" name="demoDuration" value="custom" onchange="updateDemoTimingInfo()">
+              <span style="background:#8b5cf6;color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;margin-left:4px">🔧 Custom</span>
+            </label>
+          </div>
+          <div id="customDemoInput" style="display:none;margin-top:10px">
+            <input type="number" id="customDemoHours" min="1" max="72" value="24" placeholder="Hours (1-72)" class="form-input" style="width:180px;font-size:13px" oninput="updateDemoTimingInfo()">
+            <span style="color:#94a3b8;font-size:12px;margin-left:8px">hours for Monthly (HY+2h, Annual+4h)</span>
+          </div>
+          <div id="demoTimingInfo" style="margin-top:12px;color:#a5b4fc;font-size:12px;line-height:1.8"></div>
+        </div>
+
+        <!-- Participant count config -->
+        <div style="background:rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:16px">
+          <p style="color:#e2e8f0;font-weight:700;margin:0 0 12px;font-size:13px">👥 Fake Participants per Quiz</p>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="range" id="demoFakeCount" min="5" max="50" value="15" oninput="document.getElementById('demoFakeCountVal').textContent=this.value" style="width:200px">
+            <span id="demoFakeCountVal" style="color:#fbbf24;font-weight:800;font-size:18px">15</span>
+            <span style="color:#94a3b8;font-size:12px">participants</span>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button id="btnDemoStart" onclick="startDemo()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;padding:12px 26px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">
+            <i class="fa-solid fa-play"></i> Start Demo
+          </button>
+          <button id="btnDemoStop" onclick="stopDemo()" style="background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;padding:12px 26px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;display:none">
+            <i class="fa-solid fa-stop"></i> Stop & Cleanup
+          </button>
+          <button id="btnDemoRefresh" onclick="refreshDemoStatus()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;display:none">
+            <i class="fa-solid fa-sync"></i> Refresh
+          </button>
+          <span id="demoStatusBadge" style="display:none;background:#fbbf24;color:#1e1b4b;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800">RUNNING</span>
+        </div>
+
+        <!-- Live Tracker -->
+        <div id="demoTracker" style="display:none;margin-top:20px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px" id="demoCardsGrid"></div>
+          <div id="demoLog" style="margin-top:14px;max-height:220px;overflow-y:auto;background:rgba(0,0,0,.35);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;color:#a5b4fc;line-height:1.8"></div>
+        </div>
+      </div>
+
+      <!-- Demo Analysis Note -->
+      <div class="content-card" style="border-left:4px solid #0ea5e9">
+        <h4 style="margin:0 0 8px;color:#0ea5e9"><i class="fa-solid fa-chart-line"></i> 24-Hour Data Analysis Mode</h4>
+        <p style="color:#64748b;font-size:13px;margin:0">Use <strong>24-Hour</strong> mode to simulate real participant behavior over a full day. Demo quizzes appear in Active Quizzes and Pending Draw tables. You can click <strong>View Participants</strong> anytime to inspect all enrolled members, their scores, and payment status. All demo data is labelled <code>DEMO-*</code> and can be cleaned up via Stop & Cleanup.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ DETAIL MODAL ===== -->
+  <div id="modalQuizDetail" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;overflow-y:auto;padding:20px">
+    <div style="max-width:780px;margin:40px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+      <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:22px 28px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 id="qdTitle" style="margin:0;color:#fff;font-size:20px">Quiz Detail</h2>
+          <p id="qdSubtitle" style="margin:4px 0 0;color:#bfdbfe;font-size:13px"></p>
+        </div>
+        <button onclick="closeQuizDetail()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <div style="padding:24px" id="qdBody">Loading...</div>
+    </div>
+  </div>
+
+  <!-- ===== PARTICIPANTS MODAL ===== -->
+  <div id="modalParticipants" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;overflow-y:auto;padding:20px">
+    <div style="max-width:1000px;margin:40px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+      <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:22px 28px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 id="pModalTitle" style="margin:0;color:#fff;font-size:20px">Participants</h2>
+          <p id="pModalSubtitle" style="margin:4px 0 0;color:#ddd6fe;font-size:13px"></p>
+        </div>
+        <button onclick="closeParticipantsModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <!-- Stats Bar -->
+      <div id="pModalStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid #e2e8f0"></div>
+      <!-- Search + Filter -->
+      <div style="padding:14px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#f8fafc;border-bottom:1px solid #e2e8f0">
+        <input type="text" id="pSearch" placeholder="Search name / ID / enrollment..." class="form-input" style="width:280px;font-size:13px" oninput="searchParticipants()">
+        <select id="pFilterStatus" class="form-input" style="width:150px;font-size:13px" onchange="searchParticipants()">
+          <option value="">All Status</option>
+          <option value="enrolled">Enrolled</option>
+          <option value="submitted">Submitted</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+        <button onclick="exportParticipantsCSV()" style="background:#22c55e;border:none;color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;margin-left:auto"><i class="fa-solid fa-download"></i> Export CSV</button>
+      </div>
+      <!-- Table -->
+      <div style="padding:0 24px 24px;overflow-x:auto">
+        <table class="data-table" style="min-width:800px">
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Member ID</th><th>Enrollment No.</th>
+            <th>Payment</th><th>Status</th><th>Score</th><th>Submitted</th><th>Enrolled On</th>
+          </tr></thead>
+          <tbody id="pModalBody"><tr><td colspan="9" class="empty-state"><p>Loading...</p></td></tr></tbody>
         </table>
+        <div id="pModalPagination" style="display:flex;justify-content:center;gap:8px;margin-top:14px"></div>
       </div>
     </div>
   </div>
@@ -3138,86 +3270,345 @@ const COST_FIELDS = [
 ];
 
 // ═══════════════════════════════════════════
-// FUND RAISER / QUIZ MANAGEMENT
+// FUND RAISER / QUIZ MANAGEMENT — Extended
 // ═══════════════════════════════════════════
+let frAllQuizzesCache = [];
+let pCurrentQuizId = '';
+let pCurrentPage = 1;
+let pParticipantsCache = [];
+
+/* ---------- TABS ---------- */
+function switchFRTab(tab) {
+  ['overview','quizzes','results','demo'].forEach(t => {
+    document.getElementById(`frSection-${t}`).style.display = t === tab ? '' : 'none';
+    const btn = document.getElementById(`frTab-${t}`);
+    if(t === tab){
+      btn.style.borderBottom = t === 'demo' ? '3px solid #f59e0b' : '3px solid #3b82f6';
+      btn.style.color = t === 'demo' ? '#f59e0b' : '#3b82f6';
+      btn.style.fontWeight = '700';
+    } else {
+      btn.style.borderBottom = '3px solid transparent';
+      btn.style.color = '#64748b';
+      btn.style.fontWeight = '600';
+    }
+  });
+  if(tab === 'quizzes') loadAllQuizzesList();
+  if(tab === 'results') loadResultsHistory();
+}
+
+/* ---------- HELPER BADGES ---------- */
+function frTypeBadge(type) {
+  const map = { monthly:'#3b82f6', half_yearly:'#8b5cf6', yearly:'#f59e0b' };
+  const lbl = { monthly:'Monthly', half_yearly:'Half-Yearly', yearly:'Annual' };
+  const c = map[type] || '#64748b';
+  return `<span style="background:${c}22;color:${c};padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid ${c}44">${lbl[type]||type}</span>`;
+}
+function frStatusBadge(s) {
+  const map = { active:['#dcfce7','#166534'], upcoming:['#dbeafe','#1e40af'], closed:['#fef3c7','#92400e'], result_declared:['#d1fae5','#065f46'] };
+  const [bg,c] = map[s] || ['#f1f5f9','#475569'];
+  return `<span style="background:${bg};color:${c};padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">${s.replace('_',' ').toUpperCase()}</span>`;
+}
+function fmtDt(d){ return d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'; }
+function fmtDate(d){ return d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'; }
+
+/* ---------- MAIN LOAD ---------- */
 async function loadFundRaiser(){
   try {
     const data = await AUTH.api('/api/admin/quiz-scheduler-status');
     if(!data.ok) throw new Error(data.error || 'Failed');
-
-    // Stats
-    document.getElementById('frStatActive').textContent = data.summary.active;
-    document.getElementById('frStatPending').textContent = data.summary.pendingDraw;
-    document.getElementById('frStatDeclared').textContent = data.summary.recentDrawn;
-    const totalP = data.activeQuizzes.reduce((s,q) => s + (q.total_participants||0), 0);
+    document.getElementById('frStatActive').textContent      = data.summary.active;
+    document.getElementById('frStatPending').textContent     = data.summary.pendingDraw;
+    document.getElementById('frStatDeclared').textContent    = data.summary.recentDrawn;
+    const totalP = data.activeQuizzes.reduce((s,q)=>s+(q.total_participants||0),0);
     document.getElementById('frStatParticipants').textContent = totalP;
-    document.getElementById('frLastRefresh').textContent = 'Server: ' + new Date(data.serverTime).toLocaleString('en-IN');
+    document.getElementById('frLastRefresh').textContent = 'Updated: ' + new Date(data.serverTime).toLocaleTimeString('en-IN');
 
     // Active quizzes table
     const ab = document.getElementById('frActiveBody');
-    if(data.activeQuizzes.length === 0){
-      ab.innerHTML = '<tr><td colspan="10" class="empty-state"><p>No active quizzes</p></td></tr>';
-    } else {
-      ab.innerHTML = data.activeQuizzes.map(q => {
-        const typeBadge = q.type === 'monthly' ? '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Monthly</span>'
-          : q.type === 'half_yearly' ? '<span style="background:#ede9fe;color:#6d28d9;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Half-Yearly</span>'
-          : '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Annual</span>';
-        const statusBadge = q.status === 'active' ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Active</span>'
-          : '<span style="background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">' + q.status + '</span>';
-        return `<tr>
-          <td style="font-family:monospace;font-weight:700">${q.quiz_id}</td>
-          <td>${q.title}</td>
-          <td>${typeBadge}</td>
-          <td>₹${q.entry_fee}</td>
+    ab.innerHTML = data.activeQuizzes.length === 0
+      ? '<tr><td colspan="11" class="empty-state"><p>No active quizzes</p></td></tr>'
+      : data.activeQuizzes.map(q => `<tr>
+          <td style="font-family:monospace;font-weight:700;font-size:11px">${q.quiz_id}</td>
+          <td style="font-weight:600">${q.title}</td>
+          <td>${frTypeBadge(q.type)}</td>
+          <td style="font-weight:700">₹${q.entry_fee}</td>
           <td style="font-weight:800;color:#166534">₹${(q.prizes?.first||0).toLocaleString('en-IN')}</td>
-          <td>${new Date(q.end_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
-          <td>${new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
-          <td style="font-weight:700">${q.total_participants||0}</td>
-          <td>₹${(q.total_collection||0).toLocaleString('en-IN')}</td>
-          <td>${statusBadge}</td>
-        </tr>`;
-      }).join('');
-    }
+          <td style="font-size:12px">${fmtDate(q.end_date)}</td>
+          <td style="font-size:12px">${fmtDate(q.result_date)}</td>
+          <td style="font-weight:700;color:#6366f1">${q.total_participants||0}</td>
+          <td style="font-weight:700">₹${(q.total_collection||0).toLocaleString('en-IN')}</td>
+          <td>${frStatusBadge(q.status)}</td>
+          <td style="white-space:nowrap">
+            <button onclick="openQuizDetail('${q.quiz_id}')" style="background:#dbeafe;color:#1e40af;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px">📋 Detail</button>
+            <button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">👥 Members</button>
+          </td>
+        </tr>`).join('');
 
     // Pending draw table
     const pb = document.getElementById('frPendingBody');
-    if(data.pendingDraw.length === 0){
-      pb.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No pending draws</p></td></tr>';
-    } else {
-      pb.innerHTML = data.pendingDraw.map(q => `<tr>
-        <td style="font-family:monospace;font-weight:700">${q.quiz_id}</td>
-        <td>${q.title}</td>
-        <td>${q.type}</td>
-        <td>${new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
-        <td><button onclick="manualDraw('${q.quiz_id}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:6px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px"><i class="fa-solid fa-dice"></i> Draw Now</button></td>
-      </tr>`).join('');
-    }
-
-    // Recent results table
-    const rb = document.getElementById('frResultsBody');
-    if(data.recentResults.length === 0){
-      rb.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No results yet</p></td></tr>';
-    } else {
-      rb.innerHTML = data.recentResults.map(q => {
-        const w = q.winners || [];
-        const w1 = w[0] ? `<span style="color:#166534;font-weight:700">${w[0].name}</span><br><small>₹${(w[0].prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
-        const w2 = w[1] ? `<span style="color:#1e40af;font-weight:600">${w[1].name}</span><br><small>₹${(w[1].prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
-        const w3 = w[2] ? `<span style="color:#92400e;font-weight:600">${w[2].name}</span><br><small>₹${(w[2].prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
-        return `<tr>
-          <td style="font-family:monospace;font-weight:700">${q.quiz_id}</td>
+    pb.innerHTML = data.pendingDraw.length === 0
+      ? '<tr><td colspan="7" class="empty-state"><p>No pending draws</p></td></tr>'
+      : data.pendingDraw.map(q => `<tr>
+          <td style="font-family:monospace;font-weight:700;font-size:11px">${q.quiz_id}</td>
           <td>${q.title}</td>
-          <td>${q.type}</td>
-          <td>${new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
-          <td>${w1}</td>
-          <td>${w2}</td>
-          <td>${w3}</td>
+          <td>${frTypeBadge(q.type)}</td>
+          <td style="font-weight:700;color:#6366f1">${q.total_participants||0}</td>
+          <td style="font-weight:700">₹${(q.total_collection||0).toLocaleString('en-IN')}</td>
+          <td style="color:#ef4444;font-weight:700">${fmtDt(q.result_date)}</td>
+          <td style="white-space:nowrap">
+            <button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px">👥 Members</button>
+            <button onclick="manualDraw('${q.quiz_id}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px">🎲 Draw Now</button>
+          </td>
+        </tr>`).join('');
+  } catch(err){
+    console.error('Fund Raiser load error:', err);
+  }
+}
+
+/* ---------- ALL QUIZZES LIST ---------- */
+async function loadAllQuizzesList(){
+  document.getElementById('frAllQuizzesBody').innerHTML = '<tr><td colspan="12" class="empty-state"><p>Loading...</p></td></tr>';
+  try {
+    const data = await AUTH.api('/api/admin/quizzes');
+    if(!data.ok) throw new Error(data.error);
+    frAllQuizzesCache = data.quizzes || [];
+    filterAllQuizzes();
+  } catch(err){
+    document.getElementById('frAllQuizzesBody').innerHTML = `<tr><td colspan="12" class="empty-state"><p style="color:#ef4444">Error: ${err.message}</p></td></tr>`;
+  }
+}
+
+function filterAllQuizzes(){
+  const s = (document.getElementById('frQuizSearch')?.value||'').toLowerCase();
+  const t = document.getElementById('frQuizFilterType')?.value || '';
+  const st = document.getElementById('frQuizFilterStatus')?.value || '';
+  let list = frAllQuizzesCache.filter(q =>
+    (!s || q.quiz_id.toLowerCase().includes(s) || q.title.toLowerCase().includes(s)) &&
+    (!t || q.type === t) &&
+    (!st || q.status === st)
+  );
+  document.getElementById('frQuizCount').textContent = `${list.length} quiz${list.length!==1?'es':''}`;
+  document.getElementById('frAllQuizzesBody').innerHTML = list.length === 0
+    ? '<tr><td colspan="12" class="empty-state"><p>No quizzes found</p></td></tr>'
+    : list.map(q => `<tr>
+        <td style="font-family:monospace;font-weight:700;font-size:11px">${q.quiz_id}</td>
+        <td style="font-weight:600;max-width:180px;word-break:break-word">${q.title}</td>
+        <td>${frTypeBadge(q.type)}</td>
+        <td>${frStatusBadge(q.status)}</td>
+        <td>₹${q.entry_fee||0}</td>
+        <td style="font-size:11px;line-height:1.6">🥇₹${(q.prizes?.first||0).toLocaleString('en-IN')}<br>🥈₹${(q.prizes?.second||0).toLocaleString('en-IN')}<br>🥉₹${(q.prizes?.third||0).toLocaleString('en-IN')}</td>
+        <td style="font-size:11px">${fmtDate(q.start_date)}</td>
+        <td style="font-size:11px">${fmtDate(q.end_date)}</td>
+        <td style="font-size:11px">${fmtDate(q.result_date)}</td>
+        <td style="font-weight:700;color:#6366f1">${q.total_participants||0}</td>
+        <td style="font-weight:700">₹${(q.total_collection||0).toLocaleString('en-IN')}</td>
+        <td style="white-space:nowrap">
+          <button onclick="openQuizDetail('${q.quiz_id}')" style="background:#dbeafe;color:#1e40af;border:none;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:3px">📋</button>
+          <button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:3px">👥</button>
+          ${q.status === 'closed' || (q.status === 'active' && new Date(q.result_date) < new Date()) ? `<button onclick="manualDraw('${q.quiz_id}')" style="background:#fef3c7;color:#92400e;border:none;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🎲</button>` : ''}
+        </td>
+      </tr>`).join('');
+}
+
+/* ---------- RESULTS HISTORY ---------- */
+async function loadResultsHistory(){
+  document.getElementById('frResultsBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>Loading...</p></td></tr>';
+  try {
+    const data = await AUTH.api('/api/admin/quiz-scheduler-status');
+    if(!data.ok) throw new Error(data.error);
+    const results = data.recentResults || [];
+    if(results.length === 0){
+      document.getElementById('frResultsBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>No results declared yet</p></td></tr>';
+      return;
+    }
+    document.getElementById('frResultsBody').innerHTML = results.map(q => {
+      const w = q.winners || [];
+      const paid = (w.reduce((s,ww)=>s+(ww.prize_amount||0),0)).toLocaleString('en-IN');
+      const wHtml = (rank, cls) => {
+        const ww = w[rank-1];
+        return ww ? `<span style="font-weight:700${cls ? ';color:'+cls : ''}">${ww.name}</span><br><small style="color:#64748b">Score:${ww.score} • ₹${(ww.prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
+      };
+      return `<tr>
+        <td style="font-family:monospace;font-weight:700;font-size:11px">${q.quiz_id}</td>
+        <td style="font-weight:600">${q.title}</td>
+        <td>${frTypeBadge(q.type)}</td>
+        <td style="font-size:12px">${fmtDate(q.result_date)}</td>
+        <td>${wHtml(1,'#166534')}</td>
+        <td>${wHtml(2,'#1e40af')}</td>
+        <td>${wHtml(3,'#92400e')}</td>
+        <td style="font-weight:700;color:#166534">₹${paid}</td>
+        <td><button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">👥 Members</button></td>
+      </tr>`;
+    }).join('');
+  } catch(err){
+    document.getElementById('frResultsBody').innerHTML = `<tr><td colspan="9" class="empty-state"><p style="color:#ef4444">Error: ${err.message}</p></td></tr>`;
+  }
+}
+
+/* ---------- QUIZ DETAIL MODAL ---------- */
+async function openQuizDetail(quizId){
+  document.getElementById('modalQuizDetail').style.display = '';
+  document.getElementById('qdTitle').textContent = 'Loading...';
+  document.getElementById('qdSubtitle').textContent = '';
+  document.getElementById('qdBody').innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p>Loading quiz details...</p></div>';
+  try {
+    const data = await AUTH.api(`/api/admin/quiz/${quizId}/detail`);
+    if(!data.ok) throw new Error(data.error);
+    const q = data.quiz;
+    const s = data.stats;
+    document.getElementById('qdTitle').textContent = q.title;
+    document.getElementById('qdSubtitle').textContent = `${q.quiz_id} • ${q.type} • ${q.status?.toUpperCase()}`;
+    document.getElementById('qdBody').innerHTML = `
+      <!-- Info Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+        ${[
+          ['Fee',`₹${q.entry_fee||0}`,'#3b82f6'],
+          ['🥇 Prize',`₹${(q.prizes?.first||0).toLocaleString('en-IN')}`,'#22c55e'],
+          ['Enrolled',s.participantCount,'#6366f1'],
+          ['Paid',s.paidCount,'#f59e0b'],
+          ['Submitted',s.submittedCount,'#0ea5e9'],
+          ['Avg Score',s.avgScore,'#8b5cf6'],
+          ['Collection',`₹${(q.total_collection||0).toLocaleString('en-IN')}`,'#ec4899'],
+          ['Status',q.status?.replace('_',' '),'#64748b']
+        ].map(([l,v,c])=>`<div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0">
+          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px">${l}</div>
+          <div style="font-size:18px;font-weight:800;color:${c};margin-top:4px">${v}</div>
+        </div>`).join('')}
+      </div>
+      <!-- Dates -->
+      <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div><div style="font-size:11px;color:#64748b;font-weight:600">START DATE</div><div style="font-weight:700;font-size:13px">${fmtDt(q.start_date)}</div></div>
+        <div><div style="font-size:11px;color:#64748b;font-weight:600">END DATE</div><div style="font-weight:700;font-size:13px">${fmtDt(q.end_date)}</div></div>
+        <div><div style="font-size:11px;color:#64748b;font-weight:600">RESULT DATE</div><div style="font-weight:700;font-size:13px;color:#ef4444">${fmtDt(q.result_date)}</div></div>
+      </div>
+      <!-- Winners -->
+      ${q.winners?.length ? `<div style="margin-bottom:20px">
+        <h4 style="margin:0 0 12px;font-size:14px;color:#166534"><i class="fa-solid fa-trophy"></i> Winners</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+          ${q.winners.map(w=>`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px">
+            <div style="font-weight:800;font-size:13px">#${w.rank} ${w.name}</div>
+            <div style="font-size:11px;color:#64748b">${w.member_id||''}</div>
+            <div style="font-size:12px;color:#166534;font-weight:700;margin-top:4px">₹${(w.prize_amount||0).toLocaleString('en-IN')} • Score: ${w.score}</div>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+      <!-- Questions -->
+      <h4 style="margin:0 0 12px;font-size:14px"><i class="fa-solid fa-question-circle" style="color:#3b82f6"></i> Questions (${(q.questions||[]).length})</h4>
+      ${(s.questionStats||[]).map((qs,i)=>{
+        const total = qs.distribution.reduce((a,b)=>a+b,0)||1;
+        return `<div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #e2e8f0">
+          <div style="font-weight:700;font-size:13px;margin-bottom:10px">Q${i+1}. ${qs.question}</div>
+          <div style="display:grid;gap:6px">
+            ${(qs.options||[]).map((opt,j)=>`
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;background:${j===qs.correct_answer?'#dcfce7':'#f1f5f9'};border:1px solid ${j===qs.correct_answer?'#4ade80':'#e2e8f0'};border-radius:6px;padding:6px 10px;font-size:12px;display:flex;justify-content:space-between">
+                  <span>${j===qs.correct_answer?'✅ ':''}${opt}</span>
+                  <span style="font-weight:700;color:#64748b">${qs.distribution[j]||0} (${Math.round((qs.distribution[j]||0)/total*100)}%)</span>
+                </div>
+                <div style="width:80px;background:#e2e8f0;border-radius:4px;height:8px;overflow:hidden"><div style="height:100%;background:${j===qs.correct_answer?'#22c55e':'#94a3b8'};width:${Math.round((qs.distribution[j]||0)/total*100)}%"></div></div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')||'<p style="color:#94a3b8;font-size:13px">No questions data</p>'}
+      <div style="text-align:right;margin-top:16px">
+        <button onclick="openParticipants('${quizId}')" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;margin-right:8px">👥 View All Participants</button>
+        <button onclick="closeQuizDetail()" style="background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;padding:10px 18px;border-radius:10px;font-weight:600;cursor:pointer">Close</button>
+      </div>`;
+  } catch(err){
+    document.getElementById('qdBody').innerHTML = `<p style="color:#ef4444">${err.message}</p>`;
+  }
+}
+function closeQuizDetail(){ document.getElementById('modalQuizDetail').style.display = 'none'; }
+
+/* ---------- PARTICIPANTS MODAL ---------- */
+async function openParticipants(quizId, page=1){
+  pCurrentQuizId = quizId;
+  pCurrentPage = page;
+  document.getElementById('modalParticipants').style.display = '';
+  document.getElementById('pModalTitle').textContent = 'Participants — ' + quizId;
+  document.getElementById('pModalSubtitle').textContent = 'Loading...';
+  document.getElementById('pModalBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p><i class="fa-solid fa-spinner fa-spin"></i> Loading...</p></td></tr>';
+  document.getElementById('pModalStats').innerHTML = '';
+  await loadParticipantsPage(quizId, page);
+}
+
+async function loadParticipantsPage(quizId, page=1){
+  const search = document.getElementById('pSearch')?.value || '';
+  const status = document.getElementById('pFilterStatus')?.value || '';
+  try {
+    const qs = new URLSearchParams({ page, limit: 50, search, status });
+    const data = await AUTH.api(`/api/admin/quiz/${quizId}/participants?${qs}`);
+    if(!data.ok) throw new Error(data.error);
+    pParticipantsCache = data.participants || [];
+    
+    document.getElementById('pModalTitle').textContent = data.quiz.title;
+    document.getElementById('pModalSubtitle').textContent = `${data.quiz.quiz_id} • ${data.quiz.type} • Entry: ₹${data.quiz.entry_fee}`;
+
+    // Stats bar
+    document.getElementById('pModalStats').innerHTML = [
+      ['Total Enrolled', data.stats.total, '#6366f1'],
+      ['Total Collection', '₹'+(data.stats.totalCollection||0).toLocaleString('en-IN'), '#22c55e'],
+      ['Submitted Quiz', data.stats.submittedCount, '#0ea5e9'],
+      ['Avg Score', data.stats.avgScore, '#f59e0b']
+    ].map(([l,v,c])=>`<div style="padding:14px 20px;text-align:center;border-right:1px solid #e2e8f0">
+      <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase">${l}</div>
+      <div style="font-size:20px;font-weight:800;color:${c};margin-top:4px">${v}</div>
+    </div>`).join('');
+
+    // Table
+    const ps = data.participants;
+    if(ps.length === 0){
+      document.getElementById('pModalBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>No participants found</p></td></tr>';
+    } else {
+      const offset = (page-1)*50;
+      document.getElementById('pModalBody').innerHTML = ps.map((p,i)=>{
+        const payBadge = p.payment_status === 'paid'
+          ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">PAID</span>'
+          : '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">'+(p.payment_status||'pending').toUpperCase()+'</span>';
+        const stBadge = p.status === 'won'
+          ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">🏆 WON</span>'
+          : p.quiz_submitted
+            ? '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">✅ SUBMITTED</span>'
+            : '<span style="background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">ENROLLED</span>';
+        return `<tr>
+          <td style="color:#94a3b8">${offset+i+1}</td>
+          <td style="font-weight:700">${p.name||'—'}</td>
+          <td style="font-family:monospace;font-size:11px">${p.member_id||'—'}</td>
+          <td style="font-family:monospace;font-size:11px;word-break:break-word">${p.enrollment_number||'—'}</td>
+          <td>${payBadge}${p.amount_paid?' <small style="color:#64748b">₹'+p.amount_paid+'</small>':''}</td>
+          <td>${stBadge}</td>
+          <td style="font-weight:700;text-align:center;color:${p.score>0?'#1e40af':'#94a3b8'}">${p.score||0}</td>
+          <td style="font-size:11px;color:#64748b">${p.submitted_at ? new Date(p.submitted_at).toLocaleString('en-IN') : '—'}</td>
+          <td style="font-size:11px;color:#64748b">${p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN') : '—'}</td>
         </tr>`;
       }).join('');
     }
+
+    // Pagination
+    const pg = data.pagination;
+    let paginHtml = '';
+    for(let i=1; i<=pg.pages; i++){
+      paginHtml += `<button onclick="loadParticipantsPage('${quizId}',${i})" style="padding:6px 12px;border-radius:6px;border:1px solid #e2e8f0;font-weight:${i===pg.page?800:600};background:${i===pg.page?'#6366f1':'#fff'};color:${i===pg.page?'#fff':'#475569'};cursor:pointer">${i}</button>`;
+    }
+    document.getElementById('pModalPagination').innerHTML = paginHtml;
   } catch(err){
-    console.error('Fund Raiser load error:', err);
-    document.getElementById('frActiveBody').innerHTML = '<tr><td colspan="10" class="empty-state"><p style="color:var(--danger)">Error loading data: '+err.message+'</p></td></tr>';
+    document.getElementById('pModalBody').innerHTML = `<tr><td colspan="9" class="empty-state"><p style="color:#ef4444">Error: ${err.message}</p></td></tr>`;
   }
+}
+
+function searchParticipants(){ loadParticipantsPage(pCurrentQuizId, 1); }
+function closeParticipantsModal(){ document.getElementById('modalParticipants').style.display = 'none'; pCurrentQuizId=''; }
+
+function exportParticipantsCSV(){
+  if(!pParticipantsCache.length){ alert('No data to export'); return; }
+  const rows = [['#','Name','Member ID','Enrollment','Payment Status','Amount','Status','Score','Submitted At','Enrolled On']];
+  pParticipantsCache.forEach((p,i)=>{
+    rows.push([i+1, p.name||'', p.member_id||'', p.enrollment_number||'', p.payment_status||'', p.amount_paid||0, p.status||'', p.score||0,
+      p.submitted_at ? new Date(p.submitted_at).toLocaleString() : '', p.created_at ? new Date(p.created_at).toLocaleString() : '']);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = `participants_${pCurrentQuizId}_${Date.now()}.csv`; a.click();
 }
 
 async function triggerAutoCreate(){
@@ -3225,11 +3616,9 @@ async function triggerAutoCreate(){
   try {
     const data = await AUTH.api('/api/admin/quiz-auto-create', { method: 'POST' });
     if(!data.ok) throw new Error(data.error || 'Failed');
-    alert('✅ ' + data.message + '\\nActive quizzes: ' + data.quizzes.length);
+    alert('✅ ' + (data.message||'Done'));
     loadFundRaiser();
-  } catch(err){
-    alert('❌ Error: ' + err.message);
-  }
+  } catch(err){ alert('❌ Error: ' + err.message); }
 }
 
 async function triggerAutoDraw(){
@@ -3237,11 +3626,9 @@ async function triggerAutoDraw(){
   try {
     const data = await AUTH.api('/api/admin/quiz-auto-draw', { method: 'POST' });
     if(!data.ok) throw new Error(data.error || 'Failed');
-    alert('✅ ' + data.message + '\\nRecent results: ' + data.recentResults.length);
+    alert('✅ ' + (data.message||'Done'));
     loadFundRaiser();
-  } catch(err){
-    alert('❌ Error: ' + err.message);
-  }
+  } catch(err){ alert('❌ Error: ' + err.message); }
 }
 
 async function manualDraw(quizId){
@@ -3251,13 +3638,32 @@ async function manualDraw(quizId){
     if(!data.ok) throw new Error(data.error || 'Failed');
     alert('✅ Result declared for ' + quizId);
     loadFundRaiser();
-  } catch(err){
-    alert('❌ Error: ' + err.message);
-  }
+  } catch(err){ alert('❌ Error: ' + err.message); }
 }
 
-// ======== DEMO / TEST MODE ========
+/* ---------- DEMO MODE ---------- */
 let demoRefreshTimer = null;
+
+function updateDemoTimingInfo(){
+  const radios = document.querySelectorAll('input[name="demoDuration"]');
+  let val = '0';
+  radios.forEach(r => { if(r.checked) val = r.value; });
+  const custInp = document.getElementById('customDemoInput');
+  custInp.style.display = val === 'custom' ? '' : 'none';
+  let minsM, minsH, minsY, resGap;
+  if(val === '0'){ minsM=30; minsH=60; minsY=90; resGap=5; }
+  else if(val === '24'){ minsM=24*60; minsH=26*60; minsY=28*60; resGap=60; }
+  else {
+    const h = Number(document.getElementById('customDemoHours')?.value||24);
+    minsM=h*60; minsH=(h+2)*60; minsY=(h+4)*60; resGap=60;
+  }
+  const fmt = m => m >= 60 ? `${m/60}h` : `${m}min`;
+  document.getElementById('demoTimingInfo').innerHTML =
+    `📅 <b>Monthly:</b> Ends in <b>${fmt(minsM)}</b> • Result <b>${fmt(minsM+resGap)}</b> after start<br>` +
+    `📅 <b>Half-Yearly:</b> Ends in <b>${fmt(minsH)}</b> • Result <b>${fmt(minsH+resGap)}</b> after start<br>` +
+    `📅 <b>Annual:</b> Ends in <b>${fmt(minsY)}</b> • Result <b>${fmt(minsY+resGap)}</b> after start<br>` +
+    `⚡ Scheduler checks every <b>${val==='0'?'1 min':'5 min'}</b>`;
+}
 
 function demoLog(msg){
   const log = document.getElementById('demoLog');
@@ -3268,7 +3674,7 @@ function demoLog(msg){
 
 function buildDemoCard(q){
   const colors = { monthly:'#3b82f6', half_yearly:'#8b5cf6', yearly:'#f59e0b' };
-  const labels = { monthly:'Monthly (30 min)', half_yearly:'Half-Yearly (1 hr)', yearly:'Annual (1.5 hr)' };
+  const labels = { monthly:'Monthly', half_yearly:'Half-Yearly', yearly:'Annual' };
   const c = colors[q.type] || '#64748b';
   let statusHtml = '';
   if(q.status === 'result_declared'){
@@ -3277,15 +3683,16 @@ function buildDemoCard(q){
   } else if(q.ends_in === 'ENDED'){
     statusHtml = `<div style="background:#78350f;color:#fbbf24;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">⏳ ${q.result_in}</div>`;
   } else {
-    statusHtml = `<div style="background:rgba(255,255,255,.1);color:#e2e8f0;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;margin-top:6px">⏱️ Ends in ${q.ends_in} · Result ${q.result_in}</div>`;
+    statusHtml = `<div style="background:rgba(255,255,255,.1);color:#e2e8f0;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;margin-top:6px">⏱️ Ends ${q.ends_in} • Result ${q.result_in}</div>`;
   }
   return `<div style="background:linear-gradient(135deg,${c}22,${c}11);border:1px solid ${c}55;border-radius:12px;padding:14px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="color:${c};font-weight:800;font-size:13px">${labels[q.type]||q.type}</span>
-      <span style="background:${c};color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">${q.status.toUpperCase()}</span>
+      <span style="background:${c};color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">${q.status?.toUpperCase()}</span>
     </div>
-    <div style="color:#cbd5e1;font-size:11px">${q.participants} participants · ₹${q.collection.toLocaleString('en-IN')} collected</div>
+    <div style="color:#cbd5e1;font-size:11px">${q.participants} participants • ₹${q.collection.toLocaleString('en-IN')} collected</div>
     ${statusHtml}
+    <button onclick="openParticipants('${q.quiz_id}')" style="margin-top:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#e2e8f0;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;width:100%">👥 View Participants</button>
   </div>`;
 }
 
@@ -3293,74 +3700,53 @@ async function refreshDemoStatus(){
   try {
     const data = await AUTH.api('/api/admin/quiz-demo-status');
     if(!data.ok) throw new Error(data.error);
-    
     const grid = document.getElementById('demoCardsGrid');
-    if(data.quizzes.length === 0){
-      grid.innerHTML = '<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">No demo quizzes found</div>';
-      setDemoUI(false);
-      return;
-    }
+    if(data.quizzes.length === 0){ setDemoUI(false); return; }
     grid.innerHTML = data.quizzes.map(q => buildDemoCard(q)).join('');
-
-    // Check if all done
     const allDone = data.quizzes.every(q => q.status === 'result_declared');
-    if(allDone){
-      demoLog('🎉 All demo quizzes completed! Results declared for all tiers.');
-      setDemoUI(false);
-    }
-
-    // Update running status
-    if(data.demoRunning){
-      document.getElementById('demoStatusBadge').textContent = 'RUNNING';
-      document.getElementById('demoStatusBadge').style.background = '#fbbf24';
-    } else if(allDone){
-      document.getElementById('demoStatusBadge').textContent = 'COMPLETED';
-      document.getElementById('demoStatusBadge').style.background = '#4ade80';
-    }
-
-    // Also refresh main tables
+    if(allDone){ demoLog('🎉 All demo quizzes completed!'); setDemoUI(false); }
+    if(data.demoRunning) document.getElementById('demoStatusBadge').textContent = 'RUNNING';
+    else if(allDone) document.getElementById('demoStatusBadge').textContent = 'COMPLETED';
     loadFundRaiser();
-  } catch(err){
-    demoLog('❌ Error: ' + err.message);
-  }
+  } catch(err){ demoLog('❌ ' + err.message); }
 }
 
 function setDemoUI(running){
-  document.getElementById('btnDemoStart').style.display = running ? 'none' : '';
-  document.getElementById('btnDemoStop').style.display = running ? '' : 'none';
-  document.getElementById('btnDemoRefresh').style.display = running ? '' : 'none';
+  document.getElementById('btnDemoStart').style.display  = running ? 'none' : '';
+  document.getElementById('btnDemoStop').style.display   = running ? '' : 'none';
+  document.getElementById('btnDemoRefresh').style.display= running ? '' : 'none';
   document.getElementById('demoStatusBadge').style.display = running ? '' : 'none';
-  document.getElementById('demoTracker').style.display = running ? '' : 'none';
+  document.getElementById('demoTracker').style.display   = running ? '' : 'none';
   if(running && !demoRefreshTimer){
-    demoRefreshTimer = setInterval(refreshDemoStatus, 15000); // refresh every 15s
+    demoRefreshTimer = setInterval(refreshDemoStatus, 15000);
   }
-  if(!running && demoRefreshTimer){
-    clearInterval(demoRefreshTimer);
-    demoRefreshTimer = null;
-  }
+  if(!running && demoRefreshTimer){ clearInterval(demoRefreshTimer); demoRefreshTimer = null; }
 }
 
 async function startDemo(){
-  if(!confirm('Start Fund Raiser Demo?\n\n• Monthly quiz: 30 min\n• Half-Yearly: 1 hour\n• Annual: 1.5 hours\n\nResults auto-declared 5 min after each ends.\nRandom participants will be added.')) return;
-  
+  const radios = document.querySelectorAll('input[name="demoDuration"]');
+  let demoVal = '0';
+  radios.forEach(r => { if(r.checked) demoVal = r.value; });
+  let demoHours = 0;
+  if(demoVal === '24') demoHours = 24;
+  else if(demoVal === 'custom') demoHours = Number(document.getElementById('customDemoHours')?.value||24);
+  const fakeCount = document.getElementById('demoFakeCount')?.value || 15;
+  const durLabel = demoHours === 0 ? 'Quick (30/60/90 min)' : demoHours + ' hours';
+  if(!confirm(`Start Fund Raiser Demo?\n\nDuration: ${durLabel}\nFake participants: ~${fakeCount} per quiz\n\nAll demo data will be labelled DEMO-*`)) return;
   document.getElementById('btnDemoStart').disabled = true;
   document.getElementById('btnDemoStart').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Starting...';
   document.getElementById('demoLog').innerHTML = '';
-  
   try {
-    const data = await AUTH.api('/api/admin/quiz-demo-start', { method:'POST' });
+    const data = await AUTH.api('/api/admin/quiz-demo-start', { method:'POST', body: JSON.stringify({ demoHours, fakeCount: Number(fakeCount) }) });
     if(!data.ok) throw new Error(data.error);
-    
-    demoLog('✅ Demo started! ' + data.totalParticipants + ' random participants added.');
-    data.quizzes.forEach(q => {
-      demoLog(`📋 ${q.type}: ends in ${q.ends_in}, result in ${q.result_in} (${q.participants} participants)`);
-    });
-    
+    demoLog(`✅ Demo started! ${data.totalParticipants} participants added.`);
+    data.quizzes.forEach(q => demoLog(`📋 ${q.type}: ends in ${q.ends_in}, result in ${q.result_in} (${q.participants} participants)`));
     setDemoUI(true);
     refreshDemoStatus();
-    loadFundRaiser();
+    switchFRTab('overview'); // show overview after start
+    setTimeout(()=>switchFRTab('demo'),100);
   } catch(err){
-    alert('❌ Error starting demo: ' + err.message);
+    alert('❌ Error: ' + err.message);
     demoLog('❌ Failed: ' + err.message);
   } finally {
     document.getElementById('btnDemoStart').disabled = false;
@@ -3369,31 +3755,26 @@ async function startDemo(){
 }
 
 async function stopDemo(){
-  if(!confirm('Stop demo and delete all demo quizzes?')) return;
+  if(!confirm('Stop demo and delete all demo quizzes & participants?')) return;
   try {
     const data = await AUTH.api('/api/admin/quiz-demo-stop', { method:'POST' });
     if(!data.ok) throw new Error(data.error);
-    demoLog('🛑 Demo stopped. Deleted ' + data.deleted.quizzes + ' quizzes, ' + data.deleted.participations + ' participations.');
+    demoLog(`🛑 Stopped. Deleted ${data.deleted.quizzes} quizzes, ${data.deleted.participations} participations.`);
     setDemoUI(false);
     document.getElementById('demoCardsGrid').innerHTML = '';
     loadFundRaiser();
-  } catch(err){
-    alert('❌ Error: ' + err.message);
-  }
+  } catch(err){ alert('❌ Error: ' + err.message); }
 }
 
-// On page load, check if demo is running
 async function checkDemoOnLoad(){
   try {
     const data = await AUTH.api('/api/admin/quiz-demo-status');
     if(data.ok && data.quizzes.length > 0){
       const allDone = data.quizzes.every(q => q.status === 'result_declared');
-      if(data.demoRunning || !allDone){
-        setDemoUI(true);
-        refreshDemoStatus();
-      }
+      if(data.demoRunning || !allDone){ setDemoUI(true); refreshDemoStatus(); }
     }
   } catch(e){}
+  updateDemoTimingInfo();
 }
 
 // ═══════════════════════════════════════════
@@ -3472,6 +3853,11 @@ function resetAllCostOverrides() {
 /* ============================================
    INIT
    ============================================ */
+// Close modals on backdrop click
+document.addEventListener('click', e => {
+  if(e.target.id === 'modalQuizDetail') closeQuizDetail();
+  if(e.target.id === 'modalParticipants') closeParticipantsModal();
+});
 loadDashboard();
 </script>
 </body>

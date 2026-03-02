@@ -2545,21 +2545,27 @@ const tierConfig = {
     label: 'Monthly', emoji: '🗓️', fee: 100,
     programName: 'Udaan Scholarship',
     scholarshipAmount: 5000,
-    purpose: 'महिलाओं के कौशल विकास व स्वरोजगार सहयोग हेतु'
+    purpose: 'To boost your skill development.',
+    fallbackEndDate: '31 Mar 2026',
+    fallbackResultDate: '10 Apr 2026'
   },
   half_yearly: {
     color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#7c3aed)',
     label: 'Half-Yearly', emoji: '📅', fee: 500,
     programName: 'Saksham Program',
     scholarshipAmount: 25000,
-    purpose: 'महिला नेतृत्व क्षमता व व्यावसायिक विकास सहयोग'
+    purpose: 'To support women leadership and professional development.',
+    fallbackEndDate: '30 Sep 2026',
+    fallbackResultDate: '15 Oct 2026'
   },
   yearly: {
     color: '#e11d48', gradient: 'linear-gradient(135deg,#e11d48,#be123c)',
     label: 'Yearly', emoji: '🏆', fee: 1000,
     programName: 'Divya Yatra Sahyog',
     scholarshipAmount: 50000,
-    purpose: 'उद्यम स्थापना व जीवन परिवर्तन यात्रा सहयोग'
+    purpose: 'To support enterprise setup and life transformation journey.',
+    fallbackEndDate: '31 Dec 2026',
+    fallbackResultDate: '15 Jan 2027'
   }
 };
 const gameTypeIcons = {
@@ -2642,8 +2648,10 @@ function renderQuizCards(quizzes){
     const q = grouped[type];
     const tc = tierConfig[q.type] || tierConfig.monthly;
     const ti = tierIllustration[q.type] || tierIllustration.monthly;
-    const endDate = new Date(q.end_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
-    const resultDate = new Date(q.result_date).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric'});
+    const rawEnd = q.end_date ? new Date(q.end_date) : null;
+    const rawResult = q.result_date ? new Date(q.result_date) : null;
+    const endDate = (rawEnd && !isNaN(rawEnd)) ? rawEnd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : (tc.fallbackEndDate || '—');
+    const resultDate = (rawResult && !isNaN(rawResult)) ? rawResult.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : (tc.fallbackResultDate || '—');
     const schAmt = q.prizes?.first || tc.scholarshipAmount;
 
     return `
@@ -2661,7 +2669,7 @@ function renderQuizCards(quizzes){
         </div>
         <div class="qcb-bottom">
           <div>Entry Fee: <strong>₹${q.entry_fee}</strong></div>
-          <div>प्रश्नोत्तरी भाग लेकर छात्रवृत्ति जीतें</div>
+          <div>Participate in quiz to win scholarship</div>
         </div>
       </div>
       <div class="qcb-content">
@@ -2674,11 +2682,6 @@ function renderQuizCards(quizzes){
             <div class="qcb-date-label"><i class="fa-solid fa-trophy"></i> Result Date</div>
             <div class="qcb-date-value">${resultDate}</div>
           </div>
-        </div>
-        <div class="qcb-ticket">
-          <div class="qcb-ticket-label">Entry Fee / Ticket Price</div>
-          <div class="qcb-ticket-price">₹${q.entry_fee}</div>
-          <div class="qcb-ticket-sub">Secure your spot now</div>
         </div>
         ${q.enrolled ? `
           <div style="padding:14px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;text-align:center;margin-top:8px">

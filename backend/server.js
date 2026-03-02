@@ -482,7 +482,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
+      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -3059,6 +3059,62 @@ app.get('/api/admin/quizzes', auth('admin'), async (req, res) => {
     res.json({ ok: true, quizzes });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch quizzes' });
+  }
+});
+
+// Admin: Manually trigger quiz auto-create
+app.post('/api/admin/quiz-auto-create', auth('admin'), async (req, res) => {
+  try {
+    await autoCreateQuizzes();
+    const quizzes = await Quiz.find({ status: { $in: ['upcoming', 'active'] } })
+      .sort({ type: 1 }).select('quiz_id title type status start_date end_date result_date entry_fee prizes total_participants').lean();
+    res.json({ ok: true, message: 'Auto-create ran successfully', quizzes });
+  } catch (err) {
+    captureError(err, { context: 'admin-quiz-auto-create' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Manually trigger result draw
+app.post('/api/admin/quiz-auto-draw', auth('admin'), async (req, res) => {
+  try {
+    await autoDrawResults();
+    const drawn = await Quiz.find({ status: 'result_declared' })
+      .sort({ result_date: -1 }).limit(10)
+      .select('quiz_id title type status winners result_date').lean();
+    res.json({ ok: true, message: 'Auto-draw ran successfully', recentResults: drawn });
+  } catch (err) {
+    captureError(err, { context: 'admin-quiz-auto-draw' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Quiz scheduler health check
+app.get('/api/admin/quiz-scheduler-status', auth('admin'), async (req, res) => {
+  try {
+    const now = new Date();
+    const activeQuizzes = await Quiz.find({ status: { $in: ['upcoming', 'active'] } })
+      .select('quiz_id title type status start_date end_date result_date entry_fee prizes total_participants total_collection').lean();
+    const closedPending = await Quiz.find({ status: 'closed', 'winners.0': { $exists: false } })
+      .select('quiz_id title type result_date').lean();
+    const recentResults = await Quiz.find({ status: 'result_declared' })
+      .sort({ result_date: -1 }).limit(5)
+      .select('quiz_id title type winners result_date').lean();
+    
+    res.json({
+      ok: true,
+      serverTime: now.toISOString(),
+      activeQuizzes,
+      pendingDraw: closedPending,
+      recentResults,
+      summary: {
+        active: activeQuizzes.length,
+        pendingDraw: closedPending.length,
+        recentDrawn: recentResults.length
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

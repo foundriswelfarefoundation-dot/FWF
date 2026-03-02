@@ -549,6 +549,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <button class="nav-item" data-page="funds">
       <i class="fa-solid fa-piggy-bank"></i> Funds & Loans
     </button>
+    <button class="nav-item" data-page="fundraiser">
+      <i class="fa-solid fa-trophy"></i> Fund Raiser
+    </button>
     <button class="nav-item" data-page="reports">
       <i class="fa-solid fa-chart-bar"></i> Reports
     </button>
@@ -1502,6 +1505,69 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <div id="costEditorGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
   </div>
 
+  <!-- ===================== FUND RAISER / QUIZ MANAGEMENT ===================== -->
+  <div class="page" id="page-fundraiser">
+    <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="s-icon s-blue"><i class="fa-solid fa-gamepad"></i></div><div class="s-label">Active Quizzes</div><div class="s-value" id="frStatActive">0</div></div>
+      <div class="stat-card"><div class="s-icon s-amber"><i class="fa-solid fa-clock"></i></div><div class="s-label">Pending Draw</div><div class="s-value" id="frStatPending">0</div></div>
+      <div class="stat-card"><div class="s-icon s-green"><i class="fa-solid fa-trophy"></i></div><div class="s-label">Results Declared</div><div class="s-value" id="frStatDeclared">0</div></div>
+      <div class="stat-card"><div class="s-icon s-purple"><i class="fa-solid fa-users"></i></div><div class="s-label">Total Participants</div><div class="s-value" id="frStatParticipants">0</div></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="triggerAutoCreate()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">
+        <i class="fa-solid fa-plus"></i> Auto-Create Quizzes
+      </button>
+      <button class="btn btn-primary" onclick="triggerAutoDraw()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">
+        <i class="fa-solid fa-dice"></i> Run Auto-Draw
+      </button>
+      <button class="btn btn-ghost" onclick="loadFundRaiser()" style="padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px">
+        <i class="fa-solid fa-refresh"></i> Refresh
+      </button>
+      <span id="frLastRefresh" style="font-size:11px;color:#94a3b8;align-self:center;margin-left:auto"></span>
+    </div>
+
+    <!-- Active Quizzes -->
+    <div class="content-card" style="margin-bottom:16px">
+      <h3><i class="fa-solid fa-bolt" style="color:#3b82f6"></i> Active Quizzes</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Entry Fee</th><th>Prize (1st)</th><th>End Date</th><th>Result Date</th><th>Participants</th><th>Collection</th><th>Status</th></tr></thead>
+          <tbody id="frActiveBody">
+            <tr><td colspan="10" class="empty-state"><p>Loading...</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pending Draw -->
+    <div class="content-card" style="margin-bottom:16px">
+      <h3><i class="fa-solid fa-clock" style="color:#f59e0b"></i> Pending Draw</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>Actions</th></tr></thead>
+          <tbody id="frPendingBody">
+            <tr><td colspan="5" class="empty-state"><p>No pending draws</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Results -->
+    <div class="content-card">
+      <h3><i class="fa-solid fa-trophy" style="color:#22c55e"></i> Recent Results</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>Winner #1</th><th>Winner #2</th><th>Winner #3</th></tr></thead>
+          <tbody id="frResultsBody">
+            <tr><td colspan="7" class="empty-state"><p>No results yet</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== SOCIAL POSTS APPROVAL ===================== -->
   <div class="page" id="page-posts">
     <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
@@ -1860,7 +1926,8 @@ const pageTitles = {
   funds: '<i class="fa-solid fa-piggy-bank"></i> Fund & Loan Management',
   reports: '<i class="fa-solid fa-chart-bar"></i> Reports & Analytics',
   settings: '<i class="fa-solid fa-gear"></i> Website & Settings',
-  projectcosts: '<i class="fa-solid fa-indian-rupee-sign"></i> Project Cost Manager'
+  projectcosts: '<i class="fa-solid fa-indian-rupee-sign"></i> Project Cost Manager',
+  fundraiser: '<i class="fa-solid fa-trophy"></i> Fund Raiser Quiz Management'
 };
 
 function switchPage(page, updateHash = true){
@@ -1894,6 +1961,7 @@ function switchPage(page, updateHash = true){
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
   if(page === 'projectcosts') renderCostEditor();
+  if(page === 'fundraiser')  loadFundRaiser();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -3042,6 +3110,127 @@ const COST_FIELDS = [
 ];
 
 function renderCostEditor() {
+
+// ═══════════════════════════════════════════
+// FUND RAISER / QUIZ MANAGEMENT
+// ═══════════════════════════════════════════
+async function loadFundRaiser(){
+  try {
+    const data = await AUTH.api('/api/admin/quiz-scheduler-status');
+    if(!data.ok) throw new Error(data.error || 'Failed');
+
+    // Stats
+    document.getElementById('frStatActive').textContent = data.summary.active;
+    document.getElementById('frStatPending').textContent = data.summary.pendingDraw;
+    document.getElementById('frStatDeclared').textContent = data.summary.recentDrawn;
+    const totalP = data.activeQuizzes.reduce((s,q) => s + (q.total_participants||0), 0);
+    document.getElementById('frStatParticipants').textContent = totalP;
+    document.getElementById('frLastRefresh').textContent = 'Server: ' + new Date(data.serverTime).toLocaleString('en-IN');
+
+    // Active quizzes table
+    const ab = document.getElementById('frActiveBody');
+    if(data.activeQuizzes.length === 0){
+      ab.innerHTML = '<tr><td colspan="10" class="empty-state"><p>No active quizzes</p></td></tr>';
+    } else {
+      ab.innerHTML = data.activeQuizzes.map(q => {
+        const typeBadge = q.type === 'monthly' ? '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Monthly</span>'
+          : q.type === 'half_yearly' ? '<span style="background:#ede9fe;color:#6d28d9;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Half-Yearly</span>'
+          : '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Annual</span>';
+        const statusBadge = q.status === 'active' ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">Active</span>'
+          : '<span style="background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">' + q.status + '</span>';
+        return `<tr>
+          <td style="font-family:monospace;font-weight:700">${q.quiz_id}</td>
+          <td>${q.title}</td>
+          <td>${typeBadge}</td>
+          <td>₹${q.entry_fee}</td>
+          <td style="font-weight:800;color:#166534">₹${(q.prizes?.first||0).toLocaleString('en-IN')}</td>
+          <td>${new Date(q.end_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+          <td>${new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+          <td style="font-weight:700">${q.total_participants||0}</td>
+          <td>₹${(q.total_collection||0).toLocaleString('en-IN')}</td>
+          <td>${statusBadge}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Pending draw table
+    const pb = document.getElementById('frPendingBody');
+    if(data.pendingDraw.length === 0){
+      pb.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No pending draws</p></td></tr>';
+    } else {
+      pb.innerHTML = data.pendingDraw.map(q => `<tr>
+        <td style="font-family:monospace;font-weight:700">${q.quiz_id}</td>
+        <td>${q.title}</td>
+        <td>${q.type}</td>
+        <td>${new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+        <td><button onclick="manualDraw('${q.quiz_id}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:6px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px"><i class="fa-solid fa-dice"></i> Draw Now</button></td>
+      </tr>`).join('');
+    }
+
+    // Recent results table
+    const rb = document.getElementById('frResultsBody');
+    if(data.recentResults.length === 0){
+      rb.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No results yet</p></td></tr>';
+    } else {
+      rb.innerHTML = data.recentResults.map(q => {
+        const w = q.winners || [];
+        const w1 = w[0] ? `<span style="color:#166534;font-weight:700">${w[0].name}</span><br><small>₹${(w[0].prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
+        const w2 = w[1] ? `<span style="color:#1e40af;font-weight:600">${w[1].name}</span><br><small>₹${(w[1].prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
+        const w3 = w[2] ? `<span style="color:#92400e;font-weight:600">${w[2].name}</span><br><small>₹${(w[2].prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
+        return `<tr>
+          <td style="font-family:monospace;font-weight:700">${q.quiz_id}</td>
+          <td>${q.title}</td>
+          <td>${q.type}</td>
+          <td>${new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+          <td>${w1}</td>
+          <td>${w2}</td>
+          <td>${w3}</td>
+        </tr>`;
+      }).join('');
+    }
+  } catch(err){
+    console.error('Fund Raiser load error:', err);
+    document.getElementById('frActiveBody').innerHTML = '<tr><td colspan="10" class="empty-state"><p style="color:var(--danger)">Error loading data: '+err.message+'</p></td></tr>';
+  }
+}
+
+async function triggerAutoCreate(){
+  if(!confirm('Auto-create quizzes for current period?')) return;
+  try {
+    const data = await AUTH.api('/api/admin/quiz-auto-create', { method: 'POST' });
+    if(!data.ok) throw new Error(data.error || 'Failed');
+    alert('✅ ' + data.message + '\\nActive quizzes: ' + data.quizzes.length);
+    loadFundRaiser();
+  } catch(err){
+    alert('❌ Error: ' + err.message);
+  }
+}
+
+async function triggerAutoDraw(){
+  if(!confirm('Run auto-draw for all quizzes past result date?')) return;
+  try {
+    const data = await AUTH.api('/api/admin/quiz-auto-draw', { method: 'POST' });
+    if(!data.ok) throw new Error(data.error || 'Failed');
+    alert('✅ ' + data.message + '\\nRecent results: ' + data.recentResults.length);
+    loadFundRaiser();
+  } catch(err){
+    alert('❌ Error: ' + err.message);
+  }
+}
+
+async function manualDraw(quizId){
+  if(!confirm('Draw results for quiz ' + quizId + '?')) return;
+  try {
+    const data = await AUTH.api('/api/admin/quiz-draw/' + quizId, { method: 'POST' });
+    if(!data.ok) throw new Error(data.error || 'Failed');
+    alert('✅ Result declared for ' + quizId);
+    loadFundRaiser();
+  } catch(err){
+    alert('❌ Error: ' + err.message);
+  }
+}
+
+// ═══════════════════════════════════════════
   const projectKey = document.getElementById('costProjectSelect').value;
   const grid = document.getElementById('costEditorGrid');
   const units = UNIT_DEFAULTS[projectKey];

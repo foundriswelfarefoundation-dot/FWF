@@ -3398,10 +3398,261 @@ app.post('/api/pay/link/:linkId/confirm', async (req, res) => {
   }
 });
 
+// ══════════════════════════════════════════════════════════════
+// AUTO QUIZ MANAGEMENT — Automated creation + result draw
+// ══════════════════════════════════════════════════════════════
+
+// Quiz templates for auto-creation
+const quizTemplates = {
+  monthly: {
+    titlePrefix: 'Monthly GK Challenge',
+    description: 'Monthly general knowledge quiz — win scholarships!',
+    game_type: 'mcq',
+    entry_fee: 100,
+    prizes: { first: 5000, second: 2000, third: 1000 },
+    questions: [
+      { q_no: 1, question: 'भारत की राजधानी क्या है?', options: ['मुंबई', 'दिल्ली', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 },
+      { q_no: 2, question: 'गंगा नदी कहाँ से निकलती है?', options: ['गंगोत्री', 'यमुनोत्री', 'केदारनाथ', 'बद्रीनाथ'], correct_answer: 0, points: 1 },
+      { q_no: 3, question: 'भारत का सबसे बड़ा राज्य कौन सा है?', options: ['मध्य प्रदेश', 'उत्तर प्रदेश', 'राजस्थान', 'महाराष्ट्र'], correct_answer: 2, points: 1 },
+      { q_no: 4, question: 'हमारे राष्ट्रीय ध्वज में कितने रंग हैं?', options: ['2', '3', '4', '5'], correct_answer: 1, points: 1 },
+      { q_no: 5, question: 'भारत के पहले राष्ट्रपति कौन थे?', options: ['महात्मा गांधी', 'जवाहरलाल नेहरू', 'डॉ. राजेंद्र प्रसाद', 'सरदार पटेल'], correct_answer: 2, points: 1 },
+      { q_no: 6, question: 'TAJ MAHAL किसने बनवाया था?', options: ['अकबर', 'शाहजहाँ', 'जहाँगीर', 'औरंगज़ेब'], correct_answer: 1, points: 1 },
+      { q_no: 7, question: 'भारत का राष्ट्रीय खेल कौन सा है?', options: ['क्रिकेट', 'कबड्डी', 'हॉकी', 'फुटबॉल'], correct_answer: 2, points: 1 },
+      { q_no: 8, question: 'सूरज किस दिशा में उगता है?', options: ['पश्चिम', 'उत्तर', 'दक्षिण', 'पूर्व'], correct_answer: 3, points: 1 },
+      { q_no: 9, question: '1 किलोमीटर में कितने मीटर होते हैं?', options: ['100', '500', '1000', '10000'], correct_answer: 2, points: 1 },
+      { q_no: 10, question: 'भारत का सबसे लंबा नदी पुल कौन सा है?', options: ['हावड़ा ब्रिज', 'भूपेन हजारिका सेतु', 'महात्मा गांधी सेतु', 'राजीव गांधी सेतु'], correct_answer: 1, points: 1 }
+    ]
+  },
+  half_yearly: {
+    titlePrefix: 'Half-Yearly Mega Quiz',
+    description: 'Half-yearly mega quiz — big prizes!',
+    game_type: 'general',
+    entry_fee: 500,
+    prizes: { first: 25000, second: 10000, third: 5000 },
+    questions: [
+      { q_no: 1, question: 'विश्व का सबसे बड़ा महासागर कौन सा है?', options: ['अटलांटिक', 'हिंद महासागर', 'प्रशांत महासागर', 'आर्कटिक'], correct_answer: 2, points: 1 },
+      { q_no: 2, question: 'भारतीय संविधान कब लागू हुआ?', options: ['15 Aug 1947', '26 Jan 1950', '2 Oct 1949', '26 Nov 1949'], correct_answer: 1, points: 1 },
+      { q_no: 3, question: 'पृथ्वी सूर्य का चक्कर कितने दिन में लगाती है?', options: ['365', '360', '366', '364'], correct_answer: 0, points: 1 },
+      { q_no: 4, question: 'विश्व का सबसे ऊँचा पर्वत शिखर कौन सा है?', options: ['K2', 'कंचनजंगा', 'माउंट एवरेस्ट', 'मकालू'], correct_answer: 2, points: 1 },
+      { q_no: 5, question: 'RBI का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 }
+    ]
+  },
+  yearly: {
+    titlePrefix: 'Yearly Grand Championship',
+    description: 'Annual grand championship — win big!',
+    game_type: 'mcq',
+    entry_fee: 1000,
+    prizes: { first: 50000, second: 25000, third: 10000 },
+    questions: [
+      { q_no: 1, question: 'भारत रत्न पुरस्कार कब शुरू हुआ?', options: ['1950', '1952', '1954', '1956'], correct_answer: 2, points: 1 },
+      { q_no: 2, question: 'ISRO का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'बेंगलुरु', 'हैदराबाद'], correct_answer: 2, points: 1 },
+      { q_no: 3, question: 'भारतीय रुपये का चिह्न (₹) किसने डिज़ाइन किया?', options: ['डी. उदय कुमार', 'रघुराम राजन', 'अमर्त्य सेन', 'ए.पी.जे. अब्दुल कलाम'], correct_answer: 0, points: 1 },
+      { q_no: 4, question: 'विश्व का सबसे बड़ा देश (क्षेत्रफल) कौन सा है?', options: ['चीन', 'अमेरिका', 'कनाडा', 'रूस'], correct_answer: 3, points: 1 },
+      { q_no: 5, question: 'पहला कंप्यूटर वायरस कौन सा था?', options: ['ILOVEYOU', 'Creeper', 'Brain', 'MyDoom'], correct_answer: 1, points: 1 }
+    ]
+  }
+};
+
+// Auto-create quiz for next period if not exists
+async function autoCreateQuizzes() {
+  try {
+    const now = new Date();
+    const yr = now.getFullYear();
+    const mo = now.getMonth(); // 0-based
+
+    // --- Monthly Quiz ---
+    const monthId = `M${String(yr).slice(2)}${String(mo+1).padStart(2,'0')}`;
+    const existsMonthly = await Quiz.findOne({ quiz_id: monthId });
+    if (!existsMonthly) {
+      const monthStart = new Date(yr, mo, 1);
+      const monthEnd = new Date(yr, mo+1, 0); // last day
+      const monthResult = new Date(yr, mo+1, 10); // 10th of next month
+      const t = quizTemplates.monthly;
+      await Quiz.create({
+        quiz_id: monthId,
+        title: `${t.titlePrefix} — ${new Date(yr, mo).toLocaleString('en',{month:'long'})} ${yr}`,
+        description: t.description,
+        type: 'monthly',
+        game_type: t.game_type,
+        entry_fee: t.entry_fee,
+        start_date: monthStart,
+        end_date: monthEnd,
+        result_date: monthResult,
+        status: 'active',
+        prizes: t.prizes,
+        questions: t.questions
+      });
+      console.log(`✅ Auto-created monthly quiz: ${monthId}`);
+    }
+
+    // --- Half-Yearly Quiz ---
+    const half = mo < 6 ? 'H1' : 'H2';
+    const halfId = `H${String(yr).slice(2)}${half}`;
+    const existsHalf = await Quiz.findOne({ quiz_id: halfId });
+    if (!existsHalf) {
+      const halfStart = mo < 6 ? new Date(yr, 0, 1) : new Date(yr, 6, 1);
+      const halfEnd = mo < 6 ? new Date(yr, 5, 30) : new Date(yr, 11, 31);
+      const halfResult = mo < 6 ? new Date(yr, 6, 10) : new Date(yr+1, 0, 10);
+      const t = quizTemplates.half_yearly;
+      await Quiz.create({
+        quiz_id: halfId,
+        title: `${t.titlePrefix} — ${half === 'H1' ? 'Jan-Jun' : 'Jul-Dec'} ${yr}`,
+        description: t.description,
+        type: 'half_yearly',
+        game_type: t.game_type,
+        entry_fee: t.entry_fee,
+        start_date: halfStart,
+        end_date: halfEnd,
+        result_date: halfResult,
+        status: 'active',
+        prizes: t.prizes,
+        questions: t.questions
+      });
+      console.log(`✅ Auto-created half-yearly quiz: ${halfId}`);
+    }
+
+    // --- Yearly Quiz ---
+    const yearId = `Y${String(yr).slice(2)}`;
+    const existsYearly = await Quiz.findOne({ quiz_id: yearId });
+    if (!existsYearly) {
+      const yearStart = new Date(yr, 0, 1);
+      const yearEnd = new Date(yr, 11, 31);
+      const yearResult = new Date(yr+1, 0, 10);
+      const t = quizTemplates.yearly;
+      await Quiz.create({
+        quiz_id: yearId,
+        title: `${t.titlePrefix} ${yr}`,
+        description: t.description,
+        type: 'yearly',
+        game_type: t.game_type,
+        entry_fee: t.entry_fee,
+        start_date: yearStart,
+        end_date: yearEnd,
+        result_date: yearResult,
+        status: 'active',
+        prizes: t.prizes,
+        questions: t.questions
+      });
+      console.log(`✅ Auto-created yearly quiz: ${yearId}`);
+    }
+  } catch(err) {
+    console.error('❌ Auto-create quizzes error:', err.message);
+    captureError(err, { context: 'auto-create-quizzes' });
+  }
+}
+
+// Auto-draw results: random winner selection on result_date
+async function autoDrawResults() {
+  try {
+    const now = new Date();
+    // Find quizzes where result_date has passed and status is still 'active' or 'closed'
+    const readyQuizzes = await Quiz.find({
+      result_date: { $lte: now },
+      status: { $in: ['active', 'closed'] },
+      'winners.0': { $exists: false } // no winners yet
+    });
+
+    for (const quiz of readyQuizzes) {
+      // Close enrollment first
+      if (quiz.status === 'active') {
+        quiz.status = 'closed';
+      }
+
+      // Get all participants
+      const participants = await QuizParticipation.find({
+        quiz_ref: quiz.quiz_id,
+        payment_status: 'paid'
+      }).lean();
+
+      if (participants.length === 0) {
+        quiz.status = 'result_declared';
+        quiz.winners = [];
+        await quiz.save();
+        console.log(`📋 Quiz ${quiz.quiz_id}: No participants, result declared (no winners)`);
+        continue;
+      }
+
+      // Sort by score (if quiz submitted) then random for ties
+      const scored = participants.map(p => ({
+        ...p,
+        score: p.score || 0,
+        random: Math.random()
+      }));
+      scored.sort((a, b) => b.score - a.score || a.random - b.random);
+
+      // Pick top 3 winners
+      const prizeRanks = [
+        { rank: 1, amount: quiz.prizes?.first || 0 },
+        { rank: 2, amount: quiz.prizes?.second || 0 },
+        { rank: 3, amount: quiz.prizes?.third || 0 }
+      ];
+      
+      const winners = [];
+      for (let i = 0; i < Math.min(3, scored.length); i++) {
+        const p = scored[i];
+        const user = await User.findById(p.user_id).lean();
+        winners.push({
+          rank: prizeRanks[i].rank,
+          user_id: p.user_id,
+          member_id: user?.member_id || p.member_id || '',
+          name: user?.name || p.name || 'Unknown',
+          enrollment_number: p.enrollment_number || '',
+          prize_amount: prizeRanks[i].amount,
+          score: p.score || 0
+        });
+
+        // Credit prize to winner's points ledger
+        if (prizeRanks[i].amount > 0 && user) {
+          await PointsLedger.create({
+            user_id: user._id,
+            type: 'quiz_prize',
+            points: prizeRanks[i].amount,
+            description: `🏆 Quiz Prize (Rank #${prizeRanks[i].rank}) — ${quiz.title}`,
+            reference_id: quiz.quiz_id
+          });
+          // Update user wallet
+          await User.findByIdAndUpdate(user._id, {
+            $inc: { wallet_balance: prizeRanks[i].amount, lifetime_earned: prizeRanks[i].amount }
+          });
+        }
+      }
+
+      quiz.winners = winners;
+      quiz.status = 'result_declared';
+      await quiz.save();
+      console.log(`🏆 Quiz ${quiz.quiz_id}: Result declared! Winners: ${winners.map(w => w.name).join(', ')}`);
+    }
+
+    // Also close quizzes past end_date that are still 'active'
+    await Quiz.updateMany(
+      { end_date: { $lt: now }, status: 'active' },
+      { $set: { status: 'closed' } }
+    );
+  } catch(err) {
+    console.error('❌ Auto-draw results error:', err.message);
+    captureError(err, { context: 'auto-draw-results' });
+  }
+}
+
+// Schedule: Run every hour
+function startQuizScheduler() {
+  // Run immediately on start
+  autoCreateQuizzes();
+  autoDrawResults();
+  
+  // Then every hour (3600000 ms)
+  setInterval(() => {
+    autoCreateQuizzes();
+    autoDrawResults();
+  }, 60 * 60 * 1000);
+  console.log('⏰ Quiz scheduler started (runs every hour)');
+}
+
 // Start server
 async function startServer() {
   await connectDB();
   await seedData();
+  startQuizScheduler();
   app.listen(PORT, () => {
     console.log(`🚀 FWF backend running on http://localhost:${PORT}`);
     console.log(`📦 Database: MongoDB Atlas`);

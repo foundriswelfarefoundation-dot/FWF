@@ -618,15 +618,14 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   display:grid;grid-template-columns:1fr 1fr;gap:12px;
 }
 .qcb-date-box{
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  background:#f8fafc;border:1px solid #e2e8f0;
   border-radius:16px;padding:16px 12px;text-align:center;
-  backdrop-filter:blur(4px);
 }
 .qcb-date-label{
   font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;
   letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:4px;
 }
-.qcb-date-value{font-size:16px;font-weight:800;color:#fff}
+.qcb-date-value{font-size:16px;font-weight:800;color:#0f172a}
 .qcb-ticket{
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
   border-radius:16px;padding:16px 14px;backdrop-filter:blur(4px);
@@ -2648,11 +2647,32 @@ function renderQuizCards(quizzes){
     const q = grouped[type];
     const tc = tierConfig[q.type] || tierConfig.monthly;
     const ti = tierIllustration[q.type] || tierIllustration.monthly;
-    const rawEnd = q.end_date ? new Date(q.end_date) : null;
-    const rawResult = q.result_date ? new Date(q.result_date) : null;
-    const endDate = (rawEnd && !isNaN(rawEnd)) ? rawEnd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : (tc.fallbackEndDate || '—');
-    const resultDate = (rawResult && !isNaN(rawResult)) ? rawResult.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : (tc.fallbackResultDate || '—');
-    const schAmt = q.prizes?.first || tc.scholarshipAmount;
+    // Auto-compute dates from API or calculate dynamically
+    const now = new Date();
+    let endDate, resultDate;
+    if(q.end_date && !isNaN(new Date(q.end_date))){
+      endDate = new Date(q.end_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else if(q.type === 'monthly'){
+      const ld = new Date(now.getFullYear(), now.getMonth()+1, 0);
+      endDate = ld.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else if(q.type === 'half_yearly'){
+      const m = now.getMonth(); const hEnd = m < 6 ? new Date(now.getFullYear(),5,30) : new Date(now.getFullYear(),11,31);
+      endDate = hEnd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else {
+      endDate = new Date(now.getFullYear(),11,31).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    }
+    if(q.result_date && !isNaN(new Date(q.result_date))){
+      resultDate = new Date(q.result_date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else if(q.type === 'monthly'){
+      const rd = new Date(now.getFullYear(), now.getMonth()+1, 10);
+      resultDate = rd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else if(q.type === 'half_yearly'){
+      const m = now.getMonth(); const hRd = m < 6 ? new Date(now.getFullYear(),6,10) : new Date(now.getFullYear()+1,0,10);
+      resultDate = hRd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    } else {
+      resultDate = new Date(now.getFullYear()+1,0,10).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    }
+    const schAmt = tc.scholarshipAmount;
 
     return `
     <div class="qc-beautiful" data-tier="${q.type}">

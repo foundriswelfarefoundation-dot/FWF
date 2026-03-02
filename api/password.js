@@ -69,9 +69,11 @@ async function handler(req, res) {
 
       // Send OTP email
       try {
+        const mailFrom = process.env.MAIL_FROM || 'FWF <noreply@fwfindia.org>';
+        console.log(`[password/forgot] Sending OTP email to ${email} from ${mailFrom} (RESEND_API_KEY set: ${!!process.env.RESEND_API_KEY})`);
         const transporter = getTransporter();
         await transporter.sendMail({
-          from: process.env.MAIL_FROM,
+          from: mailFrom,
           to: email,
           subject: "Password Reset OTP - FWF",
           html: `
@@ -104,10 +106,10 @@ async function handler(req, res) {
         });
         console.log(`[password/forgot] OTP email sent to ${email}`);
       } catch (mailErr) {
-        console.error(`[password/forgot] Email failed for ${memberId}:`, mailErr.message);
+        console.error(`[password/forgot] Email FAILED for ${memberId}:`, mailErr.message, mailErr.stack || '');
         // Delete the OTP record since we couldn't deliver it
         await PasswordReset.deleteOne({ memberId, otp }).catch(() => {});
-        return res.status(503).json({ error: "Email delivery failed. Please check your registered email address or try again later." });
+        return res.status(503).json({ error: `Email delivery failed: ${mailErr.message}` });
       }
 
       return res.json({

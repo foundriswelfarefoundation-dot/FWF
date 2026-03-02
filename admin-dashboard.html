@@ -3137,8 +3137,6 @@ const COST_FIELDS = [
   { key:'profit',         label:'Profit Range' }
 ];
 
-function renderCostEditor() {
-
 // ═══════════════════════════════════════════
 // FUND RAISER / QUIZ MANAGEMENT
 // ═══════════════════════════════════════════
@@ -3399,6 +3397,9 @@ async function checkDemoOnLoad(){
 }
 
 // ═══════════════════════════════════════════
+// PROJECT COST EDITOR
+// ═══════════════════════════════════════════
+function renderCostEditor() {
   const projectKey = document.getElementById('costProjectSelect').value;
   const grid = document.getElementById('costEditorGrid');
   const units = UNIT_DEFAULTS[projectKey];

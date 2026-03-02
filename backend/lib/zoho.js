@@ -62,12 +62,12 @@ export async function getAccessToken() {
 
 /** Generate the OAuth authorization URL for first-time connect */
 export function getAuthUrl() {
-  const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+  const siteUrl = process.env.SITE_URL || 'https://fwfindia.org';
   const params = new URLSearchParams({
     scope:         ZOHO_SCOPES,
     client_id:     process.env.ZOHO_CLIENT_ID,
     response_type: 'code',
-    redirect_uri:  `${backendUrl}/api/admin/zoho/callback`,
+    redirect_uri:  `${siteUrl}/api/admin/zoho/callback`,
     access_type:   'offline',
     prompt:        'consent',
   });
@@ -76,7 +76,7 @@ export function getAuthUrl() {
 
 /** Exchange authorization code → tokens (called once during OAuth callback) */
 export async function exchangeCodeForTokens(code) {
-  const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+  const siteUrl = process.env.SITE_URL || 'https://fwfindia.org';
   const res  = await fetch(ZOHO_TOKEN_URL, {
     method:  'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -84,7 +84,7 @@ export async function exchangeCodeForTokens(code) {
       grant_type:    'authorization_code',
       client_id:     process.env.ZOHO_CLIENT_ID,
       client_secret: process.env.ZOHO_CLIENT_SECRET,
-      redirect_uri:  `${backendUrl}/api/admin/zoho/callback`,
+      redirect_uri:  `${siteUrl}/api/admin/zoho/callback`,
       code,
     }),
   });

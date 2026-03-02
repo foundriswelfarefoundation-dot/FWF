@@ -3942,7 +3942,7 @@ async function loadZohoStatus() {
         <button onclick="zohoDisconnect()" style="padding:7px 14px;background:#fee2e2;color:#991b1b;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer"><i class="fa-solid fa-unlink"></i> Disconnect</button>`;
     } else {
       textEl.innerHTML = '<span style="color:#dc2626;font-weight:600">⚠️ Not Connected</span> &nbsp;·&nbsp; <span style="color:#9ca3af">Click Connect to link Zoho Books</span>';
-      actionsEl.innerHTML = `<a href="https://api.fwfindia.org/api/admin/zoho/auth" target="_blank" style="padding:7px 16px;background:linear-gradient(135deg,#e11d48,#f97316);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block"><i class="fa-solid fa-link"></i> Connect Zoho Books</a>`;
+      actionsEl.innerHTML = `<a href="https://fwfindia.org/api/admin/zoho/auth" target="_blank" style="padding:7px 16px;background:linear-gradient(135deg,#e11d48,#f97316);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block"><i class="fa-solid fa-link"></i> Connect Zoho Books</a>`;
     }
   } catch(err) {
     const textEl = document.getElementById('zohoStatusText');

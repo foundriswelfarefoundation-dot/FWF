@@ -223,8 +223,18 @@ a{color:inherit;text-decoration:none}
   padding:10px 12px; border-bottom:1px solid #f1f5f9;
   font-size:13px; font-weight:600; color:var(--text-secondary);
 }
-.data-table tr:hover td{ background:#f8faff; }
+.data-table tbody tr:nth-child(even) td{ background:#f8fafb; }
+.data-table tr:hover td{ background:#eef2ff; }
 .data-table tr:last-child td{ border-bottom:0; }
+/* Member hover tooltip */
+.member-hover{ position:relative; cursor:default; }
+.member-hover .member-tip{
+  display:none; position:absolute; left:0; top:100%; z-index:50;
+  background:#1e293b; color:#e2e8f0; padding:8px 12px; border-radius:8px;
+  font-size:11px; line-height:1.6; white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,.25);
+  pointer-events:none; margin-top:4px;
+}
+.member-hover:hover .member-tip{ display:block; }
 .badge{
   display:inline-flex; padding:3px 9px; border-radius:99px;
   font-size:10px; font-weight:800; white-space:nowrap;
@@ -1592,8 +1602,8 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <div style="flex:1;min-width:200px">
             <h4 style="margin:0;font-size:15px;color:#1e3a5f"><i class="fa-solid fa-wand-magic-sparkles" style="color:#6366f1"></i> Quick Actions</h4>
             <p style="margin:4px 0 0;color:#64748b;font-size:12px;line-height:1.5">
-              <b>Create Quizzes</b> — generates Monthly, Half-Yearly &amp; Annual quizzes for the current period<br>
-              <b>Draw Results</b> — picks winners for all quizzes whose result date has passed
+              <b>Create Quizzes</b> — generates Monthly, Half-Yearly &amp; Annual lucky draws for the current period (max 1 per type)<br>
+              <b>Draw Results</b> — picks 1 random lucky winner for all quizzes whose result date has passed
             </p>
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0">
@@ -1608,7 +1618,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <h3><i class="fa-solid fa-bolt" style="color:#3b82f6"></i> Active Quizzes <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:6px">Currently running — members can participate</span></h3>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Fee</th><th>Prize 1st</th><th>End Date</th><th>Result Date</th><th>Enrolled</th><th>Collection</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Fee</th><th>Prize</th><th>End Date</th><th>Result Date</th><th>Enrolled</th><th>Collection</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="frActiveBody"><tr><td colspan="11" class="empty-state"><p>Loading...</p></td></tr></tbody>
           </table>
         </div>
@@ -1629,6 +1639,13 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <div id="frSection-quizzes" style="display:none">
       <div class="content-card">
         <p style="margin:0 0 14px;color:#64748b;font-size:12px"><i class="fa-solid fa-info-circle" style="color:#3b82f6"></i> Complete list of all quizzes — search, filter by type/status, click any quiz for details or participants.</p>
+        <!-- Quick filter tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <button class="fr-filter-btn fr-filter-active" onclick="setQuizQuickFilter('')" id="frQF-all" style="padding:6px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer">All</button>
+          <button class="fr-filter-btn" onclick="setQuizQuickFilter('active')" id="frQF-active" style="padding:6px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer">Active</button>
+          <button class="fr-filter-btn" onclick="setQuizQuickFilter('closed')" id="frQF-closed" style="padding:6px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer">Closed</button>
+          <button class="fr-filter-btn" onclick="setQuizQuickFilter('result_declared')" id="frQF-result_declared" style="padding:6px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer">Results</button>
+        </div>
         <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
           <input type="text" id="frQuizSearch" placeholder="Search by ID or title..." class="form-input" style="width:220px;font-size:13px" oninput="filterAllQuizzes()">
           <select id="frQuizFilterType" class="form-input" style="width:140px;font-size:13px" onchange="filterAllQuizzes()">
@@ -1637,7 +1654,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             <option value="half_yearly">Half-Yearly</option>
             <option value="yearly">Annual</option>
           </select>
-          <select id="frQuizFilterStatus" class="form-input" style="width:150px;font-size:13px" onchange="filterAllQuizzes()">
+          <select id="frQuizFilterStatus" class="form-input" style="width:150px;font-size:13px" onchange="filterAllQuizzes()" style="display:none">
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="upcoming">Upcoming</option>
@@ -1648,7 +1665,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Status</th><th>Fee</th><th>Prizes</th><th>Start</th><th>End</th><th>Result</th><th>Enrolled</th><th>Collection</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Status</th><th>Fee</th><th>Prize</th><th>Start</th><th>End</th><th>Result</th><th>Enrolled</th><th>Collection</th><th>Actions</th></tr></thead>
             <tbody id="frAllQuizzesBody"><tr><td colspan="12" class="empty-state"><p>Loading...</p></td></tr></tbody>
           </table>
         </div>
@@ -1658,11 +1675,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <!-- TAB: RESULTS HISTORY -->
     <div id="frSection-results" style="display:none">
       <div class="content-card">
-        <p style="margin:0 0 14px;color:#64748b;font-size:12px"><i class="fa-solid fa-info-circle" style="color:#22c55e"></i> Past quizzes with declared results — see winners, scores, and prize payouts.</p>
+        <p style="margin:0 0 14px;color:#64748b;font-size:12px"><i class="fa-solid fa-info-circle" style="color:#22c55e"></i> Past quizzes with declared results — see the lucky winner and prize payout.</p>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>🥇 1st Place</th><th>🥈 2nd Place</th><th>🥉 3rd Place</th><th>Total Paid Out</th><th>Actions</th></tr></thead>
-            <tbody id="frResultsBody"><tr><td colspan="9" class="empty-state"><p>No results yet</p></td></tr></tbody>
+            <thead><tr><th>Quiz ID</th><th>Title</th><th>Type</th><th>Result Date</th><th>🎉 Lucky Winner</th><th>Prize</th><th>Participants</th><th>Actions</th></tr></thead>
+            <tbody id="frResultsBody"><tr><td colspan="8" class="empty-state"><p>No results yet</p></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -3533,6 +3550,18 @@ async function loadAllQuizzesList(){
   }
 }
 
+/* ---------- QUICK FILTER TABS ---------- */
+function setQuizQuickFilter(status){
+  document.getElementById('frQuizFilterStatus').value = status;
+  // Update button styles
+  document.querySelectorAll('.fr-filter-btn').forEach(b => {
+    b.style.background = '#fff'; b.style.color = '#475569';
+  });
+  const activeBtn = document.getElementById('frQF-' + (status || 'all'));
+  if(activeBtn){ activeBtn.style.background = '#6366f1'; activeBtn.style.color = '#fff'; }
+  filterAllQuizzes();
+}
+
 function filterAllQuizzes(){
   const s = (document.getElementById('frQuizSearch')?.value||'').toLowerCase();
   const t = document.getElementById('frQuizFilterType')?.value || '';
@@ -3551,7 +3580,7 @@ function filterAllQuizzes(){
         <td>${frTypeBadge(q.type)}</td>
         <td>${frStatusBadge(q.status)}</td>
         <td>₹${q.entry_fee||0}</td>
-        <td style="font-size:11px;line-height:1.6">🥇₹${(q.prizes?.first||0).toLocaleString('en-IN')}<br>🥈₹${(q.prizes?.second||0).toLocaleString('en-IN')}<br>🥉₹${(q.prizes?.third||0).toLocaleString('en-IN')}</td>
+        <td style="font-size:12px;font-weight:800;color:#166534">₹${(q.prizes?.first||0).toLocaleString('en-IN')}</td>
         <td style="font-size:11px">${fmtDate(q.start_date)}</td>
         <td style="font-size:11px">${fmtDate(q.end_date)}</td>
         <td style="font-size:11px">${fmtDate(q.result_date)}</td>
@@ -3567,36 +3596,35 @@ function filterAllQuizzes(){
 
 /* ---------- RESULTS HISTORY ---------- */
 async function loadResultsHistory(){
-  document.getElementById('frResultsBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>Loading...</p></td></tr>';
+  document.getElementById('frResultsBody').innerHTML = '<tr><td colspan="8" class="empty-state"><p>Loading...</p></td></tr>';
   try {
     const data = await AUTH.api('/api/admin/quiz-scheduler-status');
     if(!data.ok) throw new Error(data.error);
     const results = data.recentResults || [];
     if(results.length === 0){
-      document.getElementById('frResultsBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>No results declared yet</p></td></tr>';
+      document.getElementById('frResultsBody').innerHTML = '<tr><td colspan="8" class="empty-state"><p>No results declared yet</p></td></tr>';
       return;
     }
     document.getElementById('frResultsBody').innerHTML = results.map(q => {
       const w = q.winners || [];
-      const paid = (w.reduce((s,ww)=>s+(ww.prize_amount||0),0)).toLocaleString('en-IN');
-      const wHtml = (rank, cls) => {
-        const ww = w[rank-1];
-        return ww ? `<span style="font-weight:700${cls ? ';color:'+cls : ''}">${ww.name}</span><br><small style="color:#64748b">Score:${ww.score} • ₹${(ww.prize_amount||0).toLocaleString('en-IN')}</small>` : '—';
-      };
+      const winner = w[0];
+      const winnerHtml = winner
+        ? `<span style="font-weight:800;color:#166534">🎉 ${winner.name}</span><br><small style="color:#64748b">${winner.member_id || ''}</small>`
+        : '—';
+      const prizeHtml = winner ? `₹${(winner.prize_amount||0).toLocaleString('en-IN')}` : '—';
       return `<tr>
         <td style="font-family:monospace;font-weight:700;font-size:11px">${q.quiz_id}</td>
         <td style="font-weight:600">${q.title}</td>
         <td>${frTypeBadge(q.type)}</td>
         <td style="font-size:12px">${fmtDate(q.result_date)}</td>
-        <td>${wHtml(1,'#166534')}</td>
-        <td>${wHtml(2,'#1e40af')}</td>
-        <td>${wHtml(3,'#92400e')}</td>
-        <td style="font-weight:700;color:#166534">₹${paid}</td>
+        <td>${winnerHtml}</td>
+        <td style="font-weight:700;color:#166534">${prizeHtml}</td>
+        <td style="font-weight:700;color:#6366f1">${q.total_participants||0}</td>
         <td><button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">👥 Members</button></td>
       </tr>`;
     }).join('');
   } catch(err){
-    document.getElementById('frResultsBody').innerHTML = `<tr><td colspan="9" class="empty-state"><p style="color:#ef4444">Error: ${err.message}</p></td></tr>`;
+    document.getElementById('frResultsBody').innerHTML = `<tr><td colspan="8" class="empty-state"><p style="color:#ef4444">Error: ${err.message}</p></td></tr>`;
   }
 }
 
@@ -3636,15 +3664,19 @@ async function openQuizDetail(quizId){
         <div><div style="font-size:11px;color:#64748b;font-weight:600">END DATE</div><div style="font-weight:700;font-size:13px">${fmtDt(q.end_date)}</div></div>
         <div><div style="font-size:11px;color:#64748b;font-weight:600">RESULT DATE</div><div style="font-weight:700;font-size:13px;color:#ef4444">${fmtDt(q.result_date)}</div></div>
       </div>
-      <!-- Winners -->
+      <!-- Lucky Winner -->
       ${q.winners?.length ? `<div style="margin-bottom:20px">
-        <h4 style="margin:0 0 12px;font-size:14px;color:#166534"><i class="fa-solid fa-trophy"></i> Winners</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
-          ${q.winners.map(w=>`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:13px">#${w.rank} ${w.name}</div>
-            <div style="font-size:11px;color:#64748b">${w.member_id||''}</div>
-            <div style="font-size:12px;color:#166534;font-weight:700;margin-top:4px">₹${(w.prize_amount||0).toLocaleString('en-IN')} • Score: ${w.score}</div>
-          </div>`).join('')}
+        <h4 style="margin:0 0 12px;font-size:14px;color:#166534"><i class="fa-solid fa-trophy"></i> 🎉 Lucky Winner</h4>
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #4ade80;border-radius:14px;padding:18px;display:flex;align-items:center;gap:16px">
+          <div style="background:#22c55e;color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏆</div>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:16px;color:#166534">${q.winners[0].name}</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">${q.winners[0].member_id||''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:20px;font-weight:800;color:#166534">₹${(q.winners[0].prize_amount||0).toLocaleString('en-IN')}</div>
+            <div style="font-size:11px;color:#64748b">Prize Amount</div>
+          </div>
         </div>
       </div>` : ''}
       <!-- Questions -->
@@ -3727,7 +3759,7 @@ async function loadParticipantsPage(quizId, page=1){
             : '<span style="background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">ENROLLED</span>';
         return `<tr>
           <td style="color:#94a3b8">${offset+i+1}</td>
-          <td style="font-weight:700">${p.name||'—'}</td>
+          <td class="member-hover" style="font-weight:700;position:relative">${p.name||'—'}<div class="member-tip">📱 ${p.mobile||'N/A'}<br>📧 ${p.email||'N/A'}</div></td>
           <td style="font-family:monospace;font-size:11px">${p.member_id||'—'}</td>
           <td style="font-family:monospace;font-size:11px;word-break:break-word">${p.enrollment_number||'—'}</td>
           <td>${payBadge}${p.amount_paid?' <small style="color:#64748b">₹'+p.amount_paid+'</small>':''}</td>
@@ -3833,7 +3865,8 @@ function buildDemoCard(q){
   const c = colors[q.type] || '#64748b';
   let statusHtml = '';
   if(q.status === 'result_declared'){
-    const ws = (q.winners||[]).map(w => `<div style="font-size:11px;color:#fbbf24">🏆 #${w.rank} ${w.name} — ₹${w.prize.toLocaleString('en-IN')}</div>`).join('');
+    const w0 = (q.winners||[])[0];
+    const ws = w0 ? `<div style="font-size:11px;color:#fbbf24;margin-top:4px">🎉 Lucky Winner: ${w0.name} — ₹${(w0.prize||0).toLocaleString('en-IN')}</div>` : '';
     statusHtml = `<div style="background:#166534;color:#4ade80;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">✅ RESULT DECLARED</div>${ws}`;
   } else if(q.ends_in === 'ENDED'){
     statusHtml = `<div style="background:#78350f;color:#fbbf24;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">⏳ ${q.result_in}</div>`;

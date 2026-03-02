@@ -3122,52 +3122,48 @@ app.post('/api/admin/quiz-draw/:quizId', auth('admin'), async (req, res) => {
     if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
     if (quiz.status === 'result_declared') return res.status(400).json({ error: 'Results already declared' });
 
-    // Get all participants who submitted
-    const participants = await QuizParticipation.find({ quiz_id: quiz._id, quiz_submitted: true })
-      .sort({ score: -1 }).lean();
+    // Get all paid participants (lucky draw — no score needed)
+    const participants = await QuizParticipation.find({ quiz_id: quiz._id, payment_status: 'paid' }).lean();
 
-    if (participants.length === 0) return res.status(400).json({ error: 'No submissions yet' });
+    if (participants.length === 0) return res.status(400).json({ error: 'No paid participants yet' });
 
-    // Pick winners (top 3 by score, tie-break random)
-    const winners = [];
-    const prizes = [quiz.prizes.first || 0, quiz.prizes.second || 0, quiz.prizes.third || 0];
+    // Random lucky draw — pick 1 winner
+    const luckyIndex = Math.floor(Math.random() * participants.length);
+    const luckyOne = participants[luckyIndex];
+    const prizeAmount = quiz.prizes?.first || 0;
 
-    for (let i = 0; i < Math.min(3, participants.length); i++) {
-      const winner = participants[i];
-      winners.push({
-        rank: i + 1,
-        user_id: winner.user_id,
-        member_id: winner.member_id,
-        name: winner.name,
-        enrollment_number: winner.enrollment_number,
-        prize_amount: prizes[i],
-        score: winner.score
+    const winner = {
+      rank: 1,
+      user_id: luckyOne.user_id,
+      member_id: luckyOne.member_id,
+      name: luckyOne.name,
+      enrollment_number: luckyOne.enrollment_number,
+      prize_amount: prizeAmount,
+      score: luckyOne.score || 0
+    };
+
+    // Update winner participation
+    await QuizParticipation.updateOne({ _id: luckyOne._id }, { status: 'won', prize_won: prizeAmount });
+
+    // Credit prize to wallet
+    if (prizeAmount > 0) {
+      await User.updateOne({ _id: luckyOne.user_id }, {
+        $inc: { 'wallet.balance_inr': prizeAmount, 'wallet.lifetime_earned_inr': prizeAmount },
+        'wallet.updated_at': new Date()
       });
-
-      // Update participation status
-      await QuizParticipation.updateOne({ _id: winner._id }, { status: 'won', prize_won: prizes[i] });
-
-      // Credit prize to wallet
-      if (prizes[i] > 0) {
-        await User.updateOne({ _id: winner.user_id }, {
-          $inc: { 'wallet.balance_inr': prizes[i], 'wallet.lifetime_earned_inr': prizes[i] },
-          'wallet.updated_at': new Date()
-        });
-      }
     }
 
     // Mark others as lost
-    const winnerIds = winners.map(w => w.user_id);
     await QuizParticipation.updateMany(
-      { quiz_id: quiz._id, user_id: { $nin: winnerIds }, quiz_submitted: true },
+      { quiz_id: quiz._id, user_id: { $ne: luckyOne.user_id } },
       { status: 'lost' }
     );
 
-    quiz.winners = winners;
+    quiz.winners = [winner];
     quiz.status = 'result_declared';
     await quiz.save();
 
-    res.json({ ok: true, winners, totalParticipants: participants.length });
+    res.json({ ok: true, winners: [winner], totalParticipants: participants.length });
   } catch (err) {
     captureError(err, { context: 'admin-quiz-draw' });
     res.status(500).json({ error: 'Draw failed: ' + err.message });
@@ -3229,8 +3225,18 @@ app.get('/api/admin/quiz/:quizId/participants', auth('admin'), async (req, res) 
       .sort({ created_at: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit))
-      .select('name member_id enrollment_number payment_id amount_paid payment_status score quiz_submitted submitted_at status prize_won created_at answers')
+      .select('name member_id user_id enrollment_number payment_id amount_paid payment_status score quiz_submitted submitted_at status prize_won created_at answers')
       .lean();
+    // Enrich with user mobile & email for admin contact
+    const userIds = participants.map(p => p.user_id).filter(Boolean);
+    const users = userIds.length ? await User.find({ _id: { $in: userIds } }).select('_id mobile email').lean() : [];
+    const userMap = {};
+    users.forEach(u => { userMap[u._id.toString()] = { mobile: u.mobile, email: u.email }; });
+    participants.forEach(p => {
+      const u = p.user_id ? userMap[p.user_id.toString()] : null;
+      p.mobile = u?.mobile || '';
+      p.email = u?.email || '';
+    });
     // Revenue stats
     const allPaid = await QuizParticipation.find({ quiz_ref: quiz.quiz_id, payment_status: 'paid' }).select('amount_paid score quiz_submitted').lean();
     const totalCollection = allPaid.reduce((s, p) => s + (p.amount_paid || 0), 0);
@@ -3591,7 +3597,7 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
         end_date: new Date(now.getTime() + minsM * 60 * 1000),
         result_date: new Date(now.getTime() + (minsM + resGap) * 60 * 1000),
         status: 'active',
-        prizes: { first: 5000, second: 2000, third: 1000 },
+        prizes: { first: 5000, second: 0, third: 0 },
         questions: [
           { q_no: 1, question: 'Demo Q1: 2+2=?', options: ['3', '4', '5', '6'], correct_answer: 1, points: 1 },
           { q_no: 2, question: 'Demo Q2: Capital of India?', options: ['Mumbai', 'Delhi', 'Chennai', 'Kolkata'], correct_answer: 1, points: 1 },
@@ -3609,7 +3615,7 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
         end_date: new Date(now.getTime() + minsH * 60 * 1000),
         result_date: new Date(now.getTime() + (minsH + resGap) * 60 * 1000),
         status: 'active',
-        prizes: { first: 25000, second: 10000, third: 5000 },
+        prizes: { first: 25000, second: 0, third: 0 },
         questions: [
           { q_no: 1, question: 'Demo HY Q1: Largest ocean?', options: ['Atlantic', 'Indian', 'Pacific', 'Arctic'], correct_answer: 2, points: 1 },
           { q_no: 2, question: 'Demo HY Q2: H2O is?', options: ['Oxygen', 'Water', 'Hydrogen', 'Salt'], correct_answer: 1, points: 1 }
@@ -3626,7 +3632,7 @@ app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
         end_date: new Date(now.getTime() + minsY * 60 * 1000),
         result_date: new Date(now.getTime() + (minsY + resGap) * 60 * 1000),
         status: 'active',
-        prizes: { first: 50000, second: 25000, third: 10000 },
+        prizes: { first: 50000, second: 0, third: 0 },
         questions: [
           { q_no: 1, question: 'Demo Y Q1: First PM of India?', options: ['Gandhi', 'Nehru', 'Patel', 'Ambedkar'], correct_answer: 1, points: 1 },
           { q_no: 2, question: 'Demo Y Q2: 100 × 100 = ?', options: ['1000', '10000', '100000', '1000000'], correct_answer: 1, points: 1 }
@@ -4115,11 +4121,11 @@ app.post('/api/pay/link/:linkId/confirm', async (req, res) => {
 // Quiz templates for auto-creation
 const quizTemplates = {
   monthly: {
-    titlePrefix: 'Monthly GK Challenge',
-    description: 'Monthly general knowledge quiz — win scholarships!',
+    titlePrefix: 'Monthly Lucky Draw',
+    description: 'Monthly lucky draw — 1 random winner wins the prize!',
     game_type: 'mcq',
     entry_fee: 100,
-    prizes: { first: 5000, second: 2000, third: 1000 },
+    prizes: { first: 5000, second: 0, third: 0 },
     questions: [
       { q_no: 1, question: 'भारत की राजधानी क्या है?', options: ['मुंबई', 'दिल्ली', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 },
       { q_no: 2, question: 'गंगा नदी कहाँ से निकलती है?', options: ['गंगोत्री', 'यमुनोत्री', 'केदारनाथ', 'बद्रीनाथ'], correct_answer: 0, points: 1 },
@@ -4134,11 +4140,11 @@ const quizTemplates = {
     ]
   },
   half_yearly: {
-    titlePrefix: 'Half-Yearly Mega Quiz',
-    description: 'Half-yearly mega quiz — big prizes!',
+    titlePrefix: 'Half-Yearly Lucky Draw',
+    description: 'Half-yearly lucky draw — 1 random winner wins big!',
     game_type: 'general',
     entry_fee: 500,
-    prizes: { first: 25000, second: 10000, third: 5000 },
+    prizes: { first: 25000, second: 0, third: 0 },
     questions: [
       { q_no: 1, question: 'विश्व का सबसे बड़ा महासागर कौन सा है?', options: ['अटलांटिक', 'हिंद महासागर', 'प्रशांत महासागर', 'आर्कटिक'], correct_answer: 2, points: 1 },
       { q_no: 2, question: 'भारतीय संविधान कब लागू हुआ?', options: ['15 Aug 1947', '26 Jan 1950', '2 Oct 1949', '26 Nov 1949'], correct_answer: 1, points: 1 },
@@ -4148,11 +4154,11 @@ const quizTemplates = {
     ]
   },
   yearly: {
-    titlePrefix: 'Yearly Grand Championship',
-    description: 'Annual grand championship — win big!',
+    titlePrefix: 'Yearly Grand Lucky Draw',
+    description: 'Annual grand lucky draw — 1 lucky winner takes it all!',
     game_type: 'mcq',
     entry_fee: 1000,
-    prizes: { first: 50000, second: 25000, third: 10000 },
+    prizes: { first: 100000, second: 0, third: 0 },
     questions: [
       { q_no: 1, question: 'भारत रत्न पुरस्कार कब शुरू हुआ?', options: ['1950', '1952', '1954', '1956'], correct_answer: 2, points: 1 },
       { q_no: 2, question: 'ISRO का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'बेंगलुरु', 'हैदराबाद'], correct_answer: 2, points: 1 },
@@ -4163,17 +4169,22 @@ const quizTemplates = {
   }
 };
 
-// Auto-create quiz for next period if not exists
+// Auto-create quiz for next period if not exists (max 1 active per type)
 async function autoCreateQuizzes() {
   try {
     const now = new Date();
     const yr = now.getFullYear();
     const mo = now.getMonth(); // 0-based
 
-    // --- Monthly Quiz ---
+    // Check existing active quizzes per type
+    const activeMonthly = await Quiz.findOne({ type: 'monthly', status: { $in: ['active', 'upcoming'] } });
+    const activeHalf    = await Quiz.findOne({ type: 'half_yearly', status: { $in: ['active', 'upcoming'] } });
+    const activeYearly  = await Quiz.findOne({ type: 'yearly', status: { $in: ['active', 'upcoming'] } });
+
+    // --- Monthly Quiz (only if no active monthly exists) ---
     const monthId = `M${String(yr).slice(2)}${String(mo+1).padStart(2,'0')}`;
     const existsMonthly = await Quiz.findOne({ quiz_id: monthId });
-    if (!existsMonthly) {
+    if (!existsMonthly && !activeMonthly) {
       const monthStart = new Date(yr, mo, 1);
       const monthEnd = new Date(yr, mo+1, 0); // last day
       const monthResult = new Date(yr, mo+1, 10); // 10th of next month
@@ -4195,11 +4206,11 @@ async function autoCreateQuizzes() {
       console.log(`✅ Auto-created monthly quiz: ${monthId}`);
     }
 
-    // --- Half-Yearly Quiz ---
+    // --- Half-Yearly Quiz (only if no active half-yearly exists) ---
     const half = mo < 6 ? 'H1' : 'H2';
     const halfId = `H${String(yr).slice(2)}${half}`;
     const existsHalf = await Quiz.findOne({ quiz_id: halfId });
-    if (!existsHalf) {
+    if (!existsHalf && !activeHalf) {
       const halfStart = mo < 6 ? new Date(yr, 0, 1) : new Date(yr, 6, 1);
       const halfEnd = mo < 6 ? new Date(yr, 5, 30) : new Date(yr, 11, 31);
       const halfResult = mo < 6 ? new Date(yr, 6, 10) : new Date(yr+1, 0, 10);
@@ -4221,10 +4232,10 @@ async function autoCreateQuizzes() {
       console.log(`✅ Auto-created half-yearly quiz: ${halfId}`);
     }
 
-    // --- Yearly Quiz ---
+    // --- Yearly Quiz (only if no active yearly exists) ---
     const yearId = `Y${String(yr).slice(2)}`;
     const existsYearly = await Quiz.findOne({ quiz_id: yearId });
-    if (!existsYearly) {
+    if (!existsYearly && !activeYearly) {
       const yearStart = new Date(yr, 0, 1);
       const yearEnd = new Date(yr, 11, 31);
       const yearResult = new Date(yr+1, 0, 10);
@@ -4282,55 +4293,49 @@ async function autoDrawResults() {
         continue;
       }
 
-      // Sort by score (if quiz submitted) then random for ties
-      const scored = participants.map(p => ({
-        ...p,
-        score: p.score || 0,
-        random: Math.random()
-      }));
-      scored.sort((a, b) => b.score - a.score || a.random - b.random);
+      // Random lucky draw — pick 1 winner from paid participants
+      const luckyIndex = Math.floor(Math.random() * participants.length);
+      const luckyOne = participants[luckyIndex];
+      const prizeAmount = quiz.prizes?.first || 0;
+      const user = await User.findById(luckyOne.user_id).lean();
 
-      // Pick top 3 winners
-      const prizeRanks = [
-        { rank: 1, amount: quiz.prizes?.first || 0 },
-        { rank: 2, amount: quiz.prizes?.second || 0 },
-        { rank: 3, amount: quiz.prizes?.third || 0 }
-      ];
-      
-      const winners = [];
-      for (let i = 0; i < Math.min(3, scored.length); i++) {
-        const p = scored[i];
-        const user = await User.findById(p.user_id).lean();
-        winners.push({
-          rank: prizeRanks[i].rank,
-          user_id: p.user_id,
-          member_id: user?.member_id || p.member_id || '',
-          name: user?.name || p.name || 'Unknown',
-          enrollment_number: p.enrollment_number || '',
-          prize_amount: prizeRanks[i].amount,
-          score: p.score || 0
+      const winner = {
+        rank: 1,
+        user_id: luckyOne.user_id,
+        member_id: user?.member_id || luckyOne.member_id || '',
+        name: user?.name || luckyOne.name || 'Unknown',
+        enrollment_number: luckyOne.enrollment_number || '',
+        prize_amount: prizeAmount,
+        score: luckyOne.score || 0
+      };
+
+      // Update winner participation
+      await QuizParticipation.updateOne({ _id: luckyOne._id }, { status: 'won', prize_won: prizeAmount });
+
+      // Credit prize to winner's points ledger
+      if (prizeAmount > 0 && user) {
+        await PointsLedger.create({
+          user_id: user._id,
+          type: 'quiz_prize',
+          points: prizeAmount,
+          description: `🎉 Lucky Draw Winner — ${quiz.title}`,
+          reference_id: quiz.quiz_id
         });
-
-        // Credit prize to winner's points ledger
-        if (prizeRanks[i].amount > 0 && user) {
-          await PointsLedger.create({
-            user_id: user._id,
-            type: 'quiz_prize',
-            points: prizeRanks[i].amount,
-            description: `🏆 Quiz Prize (Rank #${prizeRanks[i].rank}) — ${quiz.title}`,
-            reference_id: quiz.quiz_id
-          });
-          // Update user wallet
-          await User.findByIdAndUpdate(user._id, {
-            $inc: { wallet_balance: prizeRanks[i].amount, lifetime_earned: prizeRanks[i].amount }
-          });
-        }
+        await User.findByIdAndUpdate(user._id, {
+          $inc: { wallet_balance: prizeAmount, lifetime_earned: prizeAmount }
+        });
       }
 
-      quiz.winners = winners;
+      // Mark others as lost
+      await QuizParticipation.updateMany(
+        { quiz_ref: quiz.quiz_id, user_id: { $ne: luckyOne.user_id } },
+        { status: 'lost' }
+      );
+
+      quiz.winners = [winner];
       quiz.status = 'result_declared';
       await quiz.save();
-      console.log(`🏆 Quiz ${quiz.quiz_id}: Result declared! Winners: ${winners.map(w => w.name).join(', ')}`);
+      console.log(`� Quiz ${quiz.quiz_id}: Lucky draw result! Winner: ${winner.name} (₹${prizeAmount})`);
     }
 
     // Also close quizzes past end_date that are still 'active'

@@ -541,7 +541,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/invoices', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/invoices', '/api/admin/invoice/:id/resend', '/api/admin/invoice/:id', '/api/admin/zoho/status', '/api/admin/zoho/sync', '/api/admin/zoho/sync/:receiptId', '/api/admin/zoho/disconnect', '/api/admin/invoice/:id', '/api/admin/zoho/status', '/api/admin/zoho/sync', '/api/admin/zoho/sync/:receiptId', '/api/admin/zoho/disconnect', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
+      admin: ['/api/admin/overview', '/api/admin/invoices', '/api/admin/invoice/:id/resend', '/api/admin/invoice/:id', '/api/admin/zoho/status', '/api/admin/zoho/sync', '/api/admin/zoho/sync/:receiptId', '/api/admin/zoho/disconnect', '/api/admin/invoice/:id', '/api/admin/zoho/status', '/api/admin/zoho/sync', '/api/admin/zoho/sync/:receiptId', '/api/admin/zoho/disconnect', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-purge-all', '/api/admin/quiz-seed', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -3559,222 +3559,139 @@ app.get('/api/admin/zoho/test', auth('admin'), async (req, res) => {
 
 // Admin: get social task stats
 
-// Admin: Start Demo Test — short timers + fake participants
-let demoSchedulerInterval = null;
-app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
+// Admin: Purge ALL quiz data (quizzes, participations, related points ledger)
+app.post('/api/admin/quiz-purge-all', auth('admin'), async (req, res) => {
   try {
-    const now = new Date();
-    // demoHours: 0 = fast (30/60/90 min), 24 = 24h/26h/28h, custom (hours)
-    const demoHours = Number(req.body.demoHours || 0);
-    const isHours24 = demoHours >= 1;
-    const minsM  = isHours24 ? demoHours * 60            : 30;
-    const minsH  = isHours24 ? (demoHours + 2) * 60      : 60;
-    const minsY  = isHours24 ? (demoHours + 4) * 60      : 90;
-    const resGap = isHours24 ? 60                         : 5; // result declared X min after end
+    const deletedQ = await Quiz.deleteMany({});
+    const deletedP = await QuizParticipation.deleteMany({});
+    const deletedPL = await PointsLedger.deleteMany({ description: { $regex: /quiz|lucky draw/i } });
+    const deletedT = await QuizTicket.deleteMany({});
+    res.json({
+      ok: true,
+      message: 'All quiz data purged.',
+      deleted: {
+        quizzes: deletedQ.deletedCount,
+        participations: deletedP.deletedCount,
+        pointsLedger: deletedPL.deletedCount,
+        tickets: deletedT.deletedCount
+      }
+    });
+  } catch (err) {
+    captureError(err, { context: 'quiz-purge-all' });
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    // Fake participant names
-    const fakeNames = [
+// Admin: Seed a quiz with N fake participants
+app.post('/api/admin/quiz-seed', auth('admin'), async (req, res) => {
+  try {
+    const { type, participantCount, result_date } = req.body;
+    const qType = type || 'monthly';
+    const numP = Math.min(Number(participantCount) || 100, 500);
+    const now = new Date();
+
+    const typeConfig = {
+      monthly:     { title: 'Monthly Lucky Draw — March 2026', fee: 100, prize: 5000 },
+      half_yearly: { title: 'Half-Yearly Lucky Draw — H1 2026', fee: 500, prize: 25000 },
+      yearly:      { title: 'Yearly Grand Lucky Draw — 2026', fee: 1000, prize: 100000 }
+    };
+    const cfg = typeConfig[qType] || typeConfig.monthly;
+
+    const resultDate = result_date ? new Date(result_date) : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const endDate = new Date(resultDate.getTime() - 60 * 60 * 1000); // 1 hour before result
+
+    const quizId = `FWF-${qType.charAt(0).toUpperCase()}${qType.slice(1).replace('_','')}` + '-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0');
+
+    const quiz = await Quiz.create({
+      quiz_id: quizId,
+      title: cfg.title,
+      description: `Lucky draw with ${numP} participants. Result on ${resultDate.toLocaleDateString('en-IN')}.`,
+      type: qType,
+      game_type: 'mcq',
+      entry_fee: cfg.fee,
+      start_date: now,
+      end_date: endDate,
+      result_date: resultDate,
+      status: 'active',
+      prizes: { first: cfg.prize, second: 0, third: 0 },
+      total_participants: numP,
+      total_collection: numP * cfg.fee,
+      questions: [
+        { q_no: 1, question: 'भारत की राजधानी क्या है?', options: ['मुम्बई', 'दिल्ली', 'चेन्नई', 'कोलकाता'], correct_answer: 1, points: 1 },
+        { q_no: 2, question: '2 + 2 = ?', options: ['3', '4', '5', '6'], correct_answer: 1, points: 1 },
+        { q_no: 3, question: 'सूर्य किस दिशा में उगता है?', options: ['पश्चिम', 'उत्तर', 'दक्षिण', 'पूर्व'], correct_answer: 3, points: 1 },
+        { q_no: 4, question: 'भारत का राष्ट्रीय पशु कौन है?', options: ['शेर', 'बाघ', 'हाथी', 'मोर'], correct_answer: 1, points: 1 },
+        { q_no: 5, question: 'गंगा नदी कहाँ से निकलती है?', options: ['अमरनाथ', 'गंगोत्री', 'केदारनाथ', 'बद्रीनाथ'], correct_answer: 1, points: 1 }
+      ]
+    });
+
+    // Generate fake participants
+    const femaleNames = [
       'Priya Sharma', 'Anita Verma', 'Sunita Devi', 'Rekha Gupta', 'Savita Singh',
       'Meena Kumari', 'Pooja Yadav', 'Kavita Pandey', 'Rani Patel', 'Geeta Mishra',
       'Suman Joshi', 'Lata Chauhan', 'Usha Tiwari', 'Nirmala Rawat', 'Kamla Dubey',
       'Bina Agarwal', 'Pushpa Soni', 'Kiran Bano', 'Seema Rathore', 'Neha Kapoor',
-      'Ritu Saxena', 'Shanti Bisht', 'Mamta Jain', 'Aarti Thakur', 'Deepa Negi'
+      'Ritu Saxena', 'Shanti Bisht', 'Mamta Jain', 'Aarti Thakur', 'Deepa Negi',
+      'Rashmi Tomar', 'Sangeeta Rana', 'Preeti Chauhan', 'Babita Kumari', 'Indu Rawat',
+      'Manisha Pandey', 'Archana Srivastava', 'Dimple Gupta', 'Komal Verma', 'Sapna Patel',
+      'Rinku Devi', 'Sonia Singh', 'Ramina Khan', 'Poonam Joshi', 'Nisha Tripathi',
+      'Kusum Devi', 'Vineeta Agrawal', 'Anjali Mishra', 'Shakuntala Devi', 'Radha Kumari',
+      'Manju Sharma', 'Saroj Yadav', 'Parvati Devi', 'Guddi Singh', 'Champa Kumari',
+      'Chandni Bano', 'Fatima Khan', 'Shabnam Begum', 'Rubina Sheikh', 'Tabassum Ali',
+      'Asha Devi', 'Leela Kumari', 'Durga Sahu', 'Meera Rajput', 'Kausalya Mahto',
+      'Sudha Mishra', 'Tulsi Devi', 'Hema Rawat', 'Shobha Sharma', 'Pramila Devi',
+      'Madhuri Thakur', 'Janki Devi', 'Bhavna Verma', 'Alka Singh', 'Sushila Kumari',
+      'Gayatri Devi', 'Hemlata Chauhan', 'Kamini Tiwari', 'Vanita Joshi', 'Pallavi Pandey',
+      'Sheetal Gupta', 'Amrita Verma', 'Payal Patel', 'Divya Mishra', 'Chanda Devi',
+      'Swati Yadav', 'Garima Sharma', 'Namrata Singh', 'Priyanshi Dubey', 'Kriti Agarwal',
+      'Tanvi Chauhan', 'Sakshi Rawat', 'Nikita Jain', 'Muskan Khan', 'Deepika Thakur',
+      'Anjali Kumari', 'Yogita Soni', 'Ranjana Devi', 'Bharti Verma', 'Anupama Singh',
+      'Radhika Sharma', 'Soniya Patel', 'Kaveri Mishra', 'Anamika Gupta', 'Tara Devi'
     ];
 
-    // Delete old demo quizzes (prefixed with DEMO-)
-    await Quiz.deleteMany({ quiz_id: { $regex: /^DEMO-/ } });
-    await QuizParticipation.deleteMany({ quiz_ref: { $regex: /^DEMO-/ } });
-
-    const demoQuizzes = [
-      {
-        quiz_id: `DEMO-M${Date.now()}`,
-        title: '🧪 DEMO Monthly Quiz',
-        description: `Test demo — ends in ${minsM} min`,
-        type: 'monthly',
-        game_type: 'mcq',
-        entry_fee: 100,
-        start_date: now,
-        end_date: new Date(now.getTime() + minsM * 60 * 1000),
-        result_date: new Date(now.getTime() + (minsM + resGap) * 60 * 1000),
-        status: 'active',
-        prizes: { first: 5000, second: 0, third: 0 },
-        questions: [
-          { q_no: 1, question: 'Demo Q1: 2+2=?', options: ['3', '4', '5', '6'], correct_answer: 1, points: 1 },
-          { q_no: 2, question: 'Demo Q2: Capital of India?', options: ['Mumbai', 'Delhi', 'Chennai', 'Kolkata'], correct_answer: 1, points: 1 },
-          { q_no: 3, question: 'Demo Q3: Sun rises in?', options: ['West', 'North', 'South', 'East'], correct_answer: 3, points: 1 }
-        ]
-      },
-      {
-        quiz_id: `DEMO-H${Date.now()}`,
-        title: '🧪 DEMO Half-Yearly Quiz',
-        description: `Test demo — ends in ${minsH} min`,
-        type: 'half_yearly',
-        game_type: 'general',
-        entry_fee: 500,
-        start_date: now,
-        end_date: new Date(now.getTime() + minsH * 60 * 1000),
-        result_date: new Date(now.getTime() + (minsH + resGap) * 60 * 1000),
-        status: 'active',
-        prizes: { first: 25000, second: 0, third: 0 },
-        questions: [
-          { q_no: 1, question: 'Demo HY Q1: Largest ocean?', options: ['Atlantic', 'Indian', 'Pacific', 'Arctic'], correct_answer: 2, points: 1 },
-          { q_no: 2, question: 'Demo HY Q2: H2O is?', options: ['Oxygen', 'Water', 'Hydrogen', 'Salt'], correct_answer: 1, points: 1 }
-        ]
-      },
-      {
-        quiz_id: `DEMO-Y${Date.now()}`,
-        title: '🧪 DEMO Annual Quiz',
-        description: `Test demo — ends in ${minsY} min`,
-        type: 'yearly',
-        game_type: 'mcq',
-        entry_fee: 1000,
-        start_date: now,
-        end_date: new Date(now.getTime() + minsY * 60 * 1000),
-        result_date: new Date(now.getTime() + (minsY + resGap) * 60 * 1000),
-        status: 'active',
-        prizes: { first: 50000, second: 0, third: 0 },
-        questions: [
-          { q_no: 1, question: 'Demo Y Q1: First PM of India?', options: ['Gandhi', 'Nehru', 'Patel', 'Ambedkar'], correct_answer: 1, points: 1 },
-          { q_no: 2, question: 'Demo Y Q2: 100 × 100 = ?', options: ['1000', '10000', '100000', '1000000'], correct_answer: 1, points: 1 }
-        ]
-      }
-    ];
-
-    const created = await Quiz.insertMany(demoQuizzes);
-
-    // Add random fake participants to each quiz
     const participations = [];
-    for (const quiz of created) {
-      const maxFake = Number(req.body.fakeCount || 15);
-      const numFake = Math.max(5, Math.min(maxFake, 50)); // clamped 5-50 participants
-      const shuffled = [...fakeNames].sort(() => Math.random() - 0.5).slice(0, numFake);
-      
-      for (let i = 0; i < shuffled.length; i++) {
-        const fakeName = shuffled[i];
-        const fakeScore = Math.floor(Math.random() * (quiz.questions.length + 1));
-        const enrollNum = `DEMO-${quiz.type.charAt(0).toUpperCase()}${Date.now()}-${String(i+1).padStart(3,'0')}`;
-        
-        participations.push({
-          quiz_id: quiz._id,
-          quiz_ref: quiz.quiz_id,
-          user_id: new mongoose.Types.ObjectId(), // fake user ID
-          member_id: `FWF-DEMO-${String(1000 + i)}`,
-          name: fakeName,
-          enrollment_number: enrollNum,
-          payment_id: `demo_pay_${Date.now()}_${i}`,
-          amount_paid: quiz.entry_fee,
-          payment_status: 'paid',
-          score: fakeScore,
-          quiz_submitted: Math.random() > 0.3, // 70% submitted
-          submitted_at: Math.random() > 0.3 ? new Date() : null,
-          status: 'enrolled',
-          answers: quiz.questions.map((q, qi) => ({
-            q_no: q.q_no,
-            selected: Math.floor(Math.random() * q.options.length),
-            is_correct: Math.floor(Math.random() * q.options.length) === q.correct_answer
-          }))
-        });
-      }
+    for (let i = 0; i < numP; i++) {
+      const fakeName = femaleNames[i % femaleNames.length] + (i >= femaleNames.length ? ` (${Math.floor(i/femaleNames.length)+1})` : '');
+      const score = Math.floor(Math.random() * 6); // 0-5
+      const enrollNum = `${quizId}-${String(i+1).padStart(4,'0')}`;
+      const joined = new Date(now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000); // random within last 7 days
 
-      // Update quiz participant count
-      await Quiz.findByIdAndUpdate(quiz._id, {
-        total_participants: shuffled.length,
-        total_collection: shuffled.length * quiz.entry_fee
+      participations.push({
+        quiz_id: quiz._id,
+        quiz_ref: quiz.quiz_id,
+        user_id: new mongoose.Types.ObjectId(),
+        member_id: `FWF-${String(100001 + i)}`,
+        name: fakeName,
+        enrollment_number: enrollNum,
+        payment_id: `pay_seed_${Date.now()}_${i}`,
+        amount_paid: cfg.fee,
+        payment_status: 'paid',
+        score,
+        quiz_submitted: true,
+        submitted_at: joined,
+        status: 'enrolled',
+        created_at: joined,
+        answers: quiz.questions.map((q, qi) => {
+          const sel = Math.floor(Math.random() * q.options.length);
+          return { q_no: q.q_no, selected: sel, is_correct: sel === q.correct_answer };
+        })
       });
     }
 
     await QuizParticipation.insertMany(participations);
 
-    // Start fast scheduler for demo
-    const tickMs = isHours24 ? 5 * 60 * 1000 : 60 * 1000; // 5min for 24h, 1min for fast
-    if (demoSchedulerInterval) clearInterval(demoSchedulerInterval);
-    demoSchedulerInterval = setInterval(async () => {
-      console.log('⚡ Demo scheduler tick...');
-      await autoDrawResults();
-      // Check if all demo quizzes are done
-      const remaining = await Quiz.countDocuments({ quiz_id: { $regex: /^DEMO-/ }, status: { $in: ['active', 'closed'] } });
-      if (remaining === 0 && demoSchedulerInterval) {
-        clearInterval(demoSchedulerInterval);
-        demoSchedulerInterval = null;
-        console.log('✅ Demo complete — all quizzes drawn! Fast scheduler stopped.');
-      }
-    }, tickMs);
-    console.log(`⚡ Demo fast scheduler started (every ${tickMs/60000} min)`);
-
-    const summary = created.map(q => ({
-      quiz_id: q.quiz_id,
-      type: q.type,
-      ends_in: q.type === 'monthly' ? `${minsM} min` : q.type === 'half_yearly' ? `${minsH} min` : `${minsY} min`,
-      result_in: q.type === 'monthly' ? `${minsM + resGap} min` : q.type === 'half_yearly' ? `${minsH + resGap} min` : `${minsY + resGap} min`,
-      participants: participations.filter(p => p.quiz_ref === q.quiz_id).length
-    }));
-
     res.json({
       ok: true,
-      message: 'Demo started! Fast scheduler running every 1 min.',
-      quizzes: summary,
-      totalParticipants: participations.length,
-      timeline: {
-        monthly_ends: demoQuizzes[0].end_date.toLocaleString(),
-        monthly_result: demoQuizzes[0].result_date.toLocaleString(),
-        half_yearly_ends: demoQuizzes[1].end_date.toLocaleString(),
-        half_yearly_result: demoQuizzes[1].result_date.toLocaleString(),
-        yearly_ends: demoQuizzes[2].end_date.toLocaleString(),
-        yearly_result: demoQuizzes[2].result_date.toLocaleString()
-      }
+      message: `Quiz "${cfg.title}" created with ${numP} participants.`,
+      quiz_id: quizId,
+      type: qType,
+      participants: numP,
+      collection: numP * cfg.fee,
+      result_date: resultDate.toISOString()
     });
   } catch (err) {
-    captureError(err, { context: 'quiz-demo-start' });
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Admin: Stop demo and cleanup
-app.post('/api/admin/quiz-demo-stop', auth('admin'), async (req, res) => {
-  try {
-    if (demoSchedulerInterval) {
-      clearInterval(demoSchedulerInterval);
-      demoSchedulerInterval = null;
-    }
-    const deletedQ = await Quiz.deleteMany({ quiz_id: { $regex: /^DEMO-/ } });
-    const deletedP = await QuizParticipation.deleteMany({ quiz_ref: { $regex: /^DEMO-/ } });
-    res.json({
-      ok: true,
-      message: 'Demo stopped and cleaned up.',
-      deleted: { quizzes: deletedQ.deletedCount, participations: deletedP.deletedCount }
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Admin: Demo status
-app.get('/api/admin/quiz-demo-status', auth('admin'), async (req, res) => {
-  try {
-    const demoQuizzes = await Quiz.find({ quiz_id: { $regex: /^DEMO-/ } })
-      .select('quiz_id title type status end_date result_date total_participants total_collection winners').lean();
-    const now = new Date();
-    const timeline = demoQuizzes.map(q => {
-      const endMs = new Date(q.end_date).getTime() - now.getTime();
-      const resMs = new Date(q.result_date).getTime() - now.getTime();
-      return {
-        quiz_id: q.quiz_id,
-        type: q.type,
-        status: q.status,
-        ends_in: endMs > 0 ? Math.ceil(endMs/60000) + ' min' : 'ENDED',
-        result_in: resMs > 0 ? Math.ceil(resMs/60000) + ' min' : (q.winners?.length ? 'DECLARED' : 'PENDING DRAW'),
-        participants: q.total_participants || 0,
-        collection: q.total_collection || 0,
-        winners: (q.winners || []).map(w => ({ rank: w.rank, name: w.name, prize: w.prize_amount }))
-      };
-    });
-    res.json({
-      ok: true,
-      demoRunning: !!demoSchedulerInterval,
-      serverTime: now.toISOString(),
-      quizzes: timeline
-    });
-  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ error: 'Quiz with this ID already exists. Purge first.' });
+    captureError(err, { context: 'quiz-seed' });
     res.status(500).json({ error: err.message });
   }
 });

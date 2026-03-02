@@ -1584,9 +1584,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <button class="fr-tab" onclick="switchFRTab('results')" id="frTab-results" style="padding:9px 18px;border:none;background:none;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#64748b;margin-bottom:-2px">
         <i class="fa-solid fa-trophy"></i> Results
       </button>
-      <button class="fr-tab" onclick="switchFRTab('demo')" id="frTab-demo" style="padding:9px 18px;border:none;background:none;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#f59e0b;margin-bottom:-2px">
-        <i class="fa-solid fa-flask"></i> Demo &amp; Testing
-      </button>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
         <button onclick="loadFundRaiser()" style="background:transparent;border:1px solid var(--brd,#e2e8f0);color:var(--text-muted,#64748b);padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px" title="Refresh data"><i class="fa-solid fa-refresh"></i></button>
         <span id="frLastRefresh" style="font-size:11px;color:#94a3b8"></span>
@@ -1685,86 +1682,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- TAB: DEMO & TESTING -->
-    <div id="frSection-demo" style="display:none">
-      <div class="content-card" style="border:2px dashed #f59e0b;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
-          <span style="font-size:32px">🧪</span>
-          <div>
-            <h3 style="margin:0;color:#fbbf24;font-size:18px">Demo &amp; Testing Lab</h3>
-            <p style="margin:0;color:#c4b5fd;font-size:13px">Create demo quizzes with fake participants for data analysis &amp; testing. All demo data is labelled <code style="color:#fbbf24;background:rgba(251,191,36,.15);padding:1px 6px;border-radius:4px">DEMO-*</code> and can be deleted anytime.</p>
-          </div>
-        </div>
 
-        <!-- Duration Config -->
-        <div style="background:rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:16px">
-          <p style="color:#e2e8f0;font-weight:700;margin:0 0 12px;font-size:13px">⏱️ Select Demo Duration</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <label style="cursor:pointer">
-              <input type="radio" name="demoDuration" value="0" checked onchange="updateDemoTimingInfo()">
-              <span style="background:#6366f1;color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;margin-left:4px">⚡ Quick (30/60/90 min)</span>
-            </label>
-            <label style="cursor:pointer">
-              <input type="radio" name="demoDuration" value="24" onchange="updateDemoTimingInfo()">
-              <span style="background:#0ea5e9;color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;margin-left:4px">🕐 24-Hour Analysis</span>
-            </label>
-            <label style="cursor:pointer">
-              <input type="radio" name="demoDuration" value="custom" onchange="updateDemoTimingInfo()">
-              <span style="background:#8b5cf6;color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;margin-left:4px">🔧 Custom</span>
-            </label>
-          </div>
-          <div id="customDemoInput" style="display:none;margin-top:10px">
-            <input type="number" id="customDemoHours" min="1" max="72" value="24" placeholder="Hours (1-72)" class="form-input" style="width:180px;font-size:13px" oninput="updateDemoTimingInfo()">
-            <span style="color:#94a3b8;font-size:12px;margin-left:8px">hours for Monthly (HY+2h, Annual+4h)</span>
-          </div>
-          <div id="demoTimingInfo" style="margin-top:12px;color:#a5b4fc;font-size:12px;line-height:1.8"></div>
-        </div>
-
-        <!-- Participant count config -->
-        <div style="background:rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:16px">
-          <p style="color:#e2e8f0;font-weight:700;margin:0 0 12px;font-size:13px">👥 Fake Participants per Quiz</p>
-          <div style="display:flex;gap:10px;align-items:center">
-            <input type="range" id="demoFakeCount" min="5" max="50" value="15" oninput="document.getElementById('demoFakeCountVal').textContent=this.value" style="width:200px">
-            <span id="demoFakeCountVal" style="color:#fbbf24;font-weight:800;font-size:18px">15</span>
-            <span style="color:#94a3b8;font-size:12px">participants</span>
-          </div>
-        </div>
-
-        <!-- Buttons -->
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <button id="btnDemoStart" onclick="startDemo()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;padding:12px 26px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">
-            <i class="fa-solid fa-play"></i> Start Demo
-          </button>
-          <button id="btnDemoStop" onclick="stopDemo()" style="background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;padding:12px 26px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;display:none">
-            <i class="fa-solid fa-stop"></i> Stop & Cleanup
-          </button>
-          <button id="btnDemoRefresh" onclick="refreshDemoStatus()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;display:none">
-            <i class="fa-solid fa-sync"></i> Refresh
-          </button>
-          <span id="demoStatusBadge" style="display:none;background:#fbbf24;color:#1e1b4b;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800">RUNNING</span>
-        </div>
-
-        <!-- Live Tracker -->
-        <div id="demoTracker" style="display:none;margin-top:20px">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px" id="demoCardsGrid"></div>
-          <div id="demoLog" style="margin-top:14px;max-height:220px;overflow-y:auto;background:rgba(0,0,0,.35);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;color:#a5b4fc;line-height:1.8"></div>
-        </div>
-      </div>
-
-      <!-- Demo How-It-Works -->
-      <div class="content-card" style="border-left:4px solid #0ea5e9">
-        <h4 style="margin:0 0 10px;color:#0ea5e9"><i class="fa-solid fa-circle-question"></i> How Demo Mode Works</h4>
-        <div style="color:#475569;font-size:13px;line-height:1.7">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">
-            <div><b>1. Choose Duration</b> — Quick mode ends in 30/60/90 min, or pick a longer duration for realistic analysis.</div>
-            <div><b>2. Set Participants</b> — Adjust the slider to add 5–50 fake participants per quiz (3 quizzes created).</div>
-            <div><b>3. Start Demo</b> — Creates Monthly, Half-Yearly &amp; Annual demo quizzes with fake data.</div>
-            <div><b>4. Watch Results</b> — Winners are auto-drawn when each quiz's result time arrives. Scheduler runs automatically.</div>
-          </div>
-          <p style="margin:12px 0 0;color:#64748b;font-size:12px"><i class="fa-solid fa-trash-can" style="color:#ef4444"></i> Click <b>Stop &amp; Cleanup</b> anytime to delete all demo quizzes and participants.</p>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ===== QUIZ DETAIL MODAL ===== -->
@@ -2296,7 +2214,7 @@ function switchPage(page, updateHash = true){
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
   if(page === 'projectcosts') renderCostEditor();
-  if(page === 'fundraiser')  { loadFundRaiser(); checkDemoOnLoad(); }
+  if(page === 'fundraiser')  { loadFundRaiser(); }
   if(page === 'invoices')    { loadZohoStatus(); loadInvoices(); }
 }
 
@@ -3451,12 +3369,12 @@ let pParticipantsCache = [];
 
 /* ---------- TABS ---------- */
 function switchFRTab(tab) {
-  ['overview','quizzes','results','demo'].forEach(t => {
+  ['overview','quizzes','results'].forEach(t => {
     document.getElementById(`frSection-${t}`).style.display = t === tab ? '' : 'none';
     const btn = document.getElementById(`frTab-${t}`);
     if(t === tab){
-      btn.style.borderBottom = t === 'demo' ? '3px solid #f59e0b' : '3px solid #3b82f6';
-      btn.style.color = t === 'demo' ? '#f59e0b' : '#3b82f6';
+      btn.style.borderBottom = '3px solid #3b82f6';
+      btn.style.color = '#3b82f6';
       btn.style.fontWeight = '700';
     } else {
       btn.style.borderBottom = '3px solid transparent';
@@ -3828,142 +3746,7 @@ async function manualDraw(quizId){
   } catch(err){ alert('❌ Error: ' + err.message); }
 }
 
-/* ---------- DEMO MODE ---------- */
-let demoRefreshTimer = null;
 
-function updateDemoTimingInfo(){
-  const radios = document.querySelectorAll('input[name="demoDuration"]');
-  let val = '0';
-  radios.forEach(r => { if(r.checked) val = r.value; });
-  const custInp = document.getElementById('customDemoInput');
-  custInp.style.display = val === 'custom' ? '' : 'none';
-  let minsM, minsH, minsY, resGap;
-  if(val === '0'){ minsM=30; minsH=60; minsY=90; resGap=5; }
-  else if(val === '24'){ minsM=24*60; minsH=26*60; minsY=28*60; resGap=60; }
-  else {
-    const h = Number(document.getElementById('customDemoHours')?.value||24);
-    minsM=h*60; minsH=(h+2)*60; minsY=(h+4)*60; resGap=60;
-  }
-  const fmt = m => { if(m >= 60){ const h = Math.floor(m/60); const rm = m%60; return rm ? `${h}h ${rm}min` : `${h}h`; } return `${m}min`; };
-  document.getElementById('demoTimingInfo').innerHTML =
-    `📅 <b>Monthly:</b> Ends in <b>${fmt(minsM)}</b> • Result <b>${fmt(minsM+resGap)}</b> after start<br>` +
-    `📅 <b>Half-Yearly:</b> Ends in <b>${fmt(minsH)}</b> • Result <b>${fmt(minsH+resGap)}</b> after start<br>` +
-    `📅 <b>Annual:</b> Ends in <b>${fmt(minsY)}</b> • Result <b>${fmt(minsY+resGap)}</b> after start<br>` +
-    `⚡ Scheduler checks every <b>${val==='0'?'1 min':'5 min'}</b>`;
-}
-
-function demoLog(msg){
-  const log = document.getElementById('demoLog');
-  if(!log) return;
-  const t = new Date().toLocaleTimeString('en-IN');
-  log.innerHTML = `<div>[${t}] ${msg}</div>` + log.innerHTML;
-}
-
-function buildDemoCard(q){
-  const colors = { monthly:'#3b82f6', half_yearly:'#8b5cf6', yearly:'#f59e0b' };
-  const labels = { monthly:'Monthly', half_yearly:'Half-Yearly', yearly:'Annual' };
-  const c = colors[q.type] || '#64748b';
-  let statusHtml = '';
-  if(q.status === 'result_declared'){
-    const w0 = (q.winners||[])[0];
-    const ws = w0 ? `<div style="font-size:11px;color:#fbbf24;margin-top:4px">🎉 Lucky Winner: ${w0.name} — ₹${(w0.prize||0).toLocaleString('en-IN')}</div>` : '';
-    statusHtml = `<div style="background:#166534;color:#4ade80;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">✅ RESULT DECLARED</div>${ws}`;
-  } else if(q.ends_in === 'ENDED'){
-    statusHtml = `<div style="background:#78350f;color:#fbbf24;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">⏳ ${q.result_in}</div>`;
-  } else {
-    statusHtml = `<div style="background:rgba(255,255,255,.1);color:#e2e8f0;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;margin-top:6px">⏱️ Ends ${q.ends_in} • Result ${q.result_in}</div>`;
-  }
-  return `<div style="background:linear-gradient(135deg,${c}22,${c}11);border:1px solid ${c}55;border-radius:12px;padding:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <span style="color:${c};font-weight:800;font-size:13px">${labels[q.type]||q.type}</span>
-      <span style="background:${c};color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">${q.status?.toUpperCase()}</span>
-    </div>
-    <div style="color:#cbd5e1;font-size:11px">${q.participants} participants • ₹${q.collection.toLocaleString('en-IN')} collected</div>
-    ${statusHtml}
-    <button onclick="openParticipants('${q.quiz_id}')" style="margin-top:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#e2e8f0;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;width:100%">👥 View Participants</button>
-  </div>`;
-}
-
-async function refreshDemoStatus(){
-  try {
-    const data = await AUTH.api('/api/admin/quiz-demo-status');
-    if(!data.ok) throw new Error(data.error);
-    const grid = document.getElementById('demoCardsGrid');
-    if(data.quizzes.length === 0){ setDemoUI(false); return; }
-    grid.innerHTML = data.quizzes.map(q => buildDemoCard(q)).join('');
-    const allDone = data.quizzes.every(q => q.status === 'result_declared');
-    if(allDone){ demoLog('🎉 All demo quizzes completed!'); setDemoUI(false); }
-    if(data.demoRunning) document.getElementById('demoStatusBadge').textContent = 'RUNNING';
-    else if(allDone) document.getElementById('demoStatusBadge').textContent = 'COMPLETED';
-    loadFundRaiser();
-  } catch(err){ demoLog('❌ ' + err.message); }
-}
-
-function setDemoUI(running){
-  document.getElementById('btnDemoStart').style.display  = running ? 'none' : '';
-  document.getElementById('btnDemoStop').style.display   = running ? '' : 'none';
-  document.getElementById('btnDemoRefresh').style.display= running ? '' : 'none';
-  document.getElementById('demoStatusBadge').style.display = running ? '' : 'none';
-  document.getElementById('demoTracker').style.display   = running ? '' : 'none';
-  if(running && !demoRefreshTimer){
-    demoRefreshTimer = setInterval(refreshDemoStatus, 15000);
-  }
-  if(!running && demoRefreshTimer){ clearInterval(demoRefreshTimer); demoRefreshTimer = null; }
-}
-
-async function startDemo(){
-  const radios = document.querySelectorAll('input[name="demoDuration"]');
-  let demoVal = '0';
-  radios.forEach(r => { if(r.checked) demoVal = r.value; });
-  let demoHours = 0;
-  if(demoVal === '24') demoHours = 24;
-  else if(demoVal === 'custom') demoHours = Number(document.getElementById('customDemoHours')?.value||24);
-  const fakeCount = document.getElementById('demoFakeCount')?.value || 15;
-  const durLabel = demoHours === 0 ? 'Quick (30/60/90 min)' : demoHours + ' hours';
-  if(!confirm(`Start Fund Raiser Demo?\n\nDuration: ${durLabel}\nFake participants: ~${fakeCount} per quiz\n\nAll demo data will be labelled DEMO-*`)) return;
-  document.getElementById('btnDemoStart').disabled = true;
-  document.getElementById('btnDemoStart').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Starting...';
-  document.getElementById('demoLog').innerHTML = '';
-  try {
-    const data = await AUTH.api('/api/admin/quiz-demo-start', { method:'POST', body: { demoHours, fakeCount: Number(fakeCount) } });
-    if(!data.ok) throw new Error(data.error);
-    demoLog(`✅ Demo started! ${data.totalParticipants} participants added.`);
-    data.quizzes.forEach(q => demoLog(`📋 ${q.type}: ends in ${q.ends_in}, result in ${q.result_in} (${q.participants} participants)`));
-    setDemoUI(true);
-    refreshDemoStatus();
-    switchFRTab('overview'); // show overview after start
-    setTimeout(()=>switchFRTab('demo'),100);
-  } catch(err){
-    alert('❌ Error: ' + err.message);
-    demoLog('❌ Failed: ' + err.message);
-  } finally {
-    document.getElementById('btnDemoStart').disabled = false;
-    document.getElementById('btnDemoStart').innerHTML = '<i class="fa-solid fa-play"></i> Start Demo';
-  }
-}
-
-async function stopDemo(){
-  if(!confirm('Stop demo and delete all demo quizzes & participants?')) return;
-  try {
-    const data = await AUTH.api('/api/admin/quiz-demo-stop', { method:'POST' });
-    if(!data.ok) throw new Error(data.error);
-    demoLog(`🛑 Stopped. Deleted ${data.deleted.quizzes} quizzes, ${data.deleted.participations} participations.`);
-    setDemoUI(false);
-    document.getElementById('demoCardsGrid').innerHTML = '';
-    loadFundRaiser();
-  } catch(err){ alert('❌ Error: ' + err.message); }
-}
-
-async function checkDemoOnLoad(){
-  try {
-    const data = await AUTH.api('/api/admin/quiz-demo-status');
-    if(data.ok && data.quizzes.length > 0){
-      const allDone = data.quizzes.every(q => q.status === 'result_declared');
-      if(data.demoRunning || !allDone){ setDemoUI(true); refreshDemoStatus(); }
-    }
-  } catch(e){}
-  updateDemoTimingInfo();
-}
 
 // ═══════════════════════════════════════════
 // PROJECT COST EDITOR

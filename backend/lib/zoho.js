@@ -1,17 +1,19 @@
 /**
  * Zoho Books Integration for FWF Backend
  * Region: India (.in domains)
- * Handles: OAuth token management, contacts, sales receipts
+ * Handles: OAuth token management, contacts, invoices
  */
 
 const ZOHO_BASE      = 'https://www.zohoapis.in/books/v3';
 const ZOHO_AUTH_URL  = 'https://accounts.zoho.in/oauth/v2/auth';
 const ZOHO_TOKEN_URL = 'https://accounts.zoho.in/oauth/v2/token';
 
-// Zoho OAuth scopes required (Zoho India uses .ALL variant)
+// Zoho OAuth scopes (uppercase operation type per Zoho docs)
 export const ZOHO_SCOPES = [
-  'ZohoBooks.contacts.ALL',
-  'ZohoBooks.salesreceipts.ALL',
+  'ZohoBooks.contacts.CREATE',
+  'ZohoBooks.contacts.READ',
+  'ZohoBooks.invoices.CREATE',
+  'ZohoBooks.invoices.READ',
   'ZohoBooks.settings.READ',
 ].join(',');
 
@@ -143,21 +145,22 @@ export async function findOrCreateContact({ name, email, mobile, pan }) {
 }
 
 // ──────────────────────────────────────────────────────
-// Sales Receipts
+// Invoices (used for donation/membership receipts)
 // ──────────────────────────────────────────────────────
 
 /**
- * Create a Sales Receipt in Zoho Books
+ * Create an Invoice in Zoho Books (marked as paid)
  * Used for already-paid membership/donation transactions
  */
-export async function createZohoSalesReceipt({ contactId, receiptId, date, lineItems, total, paymentId, type, is80g }) {
+export async function createZohoInvoice({ contactId, receiptId, date, lineItems, total, paymentId, type, is80g }) {
   const dateStr = new Date(date).toISOString().split('T')[0]; // YYYY-MM-DD
 
   const body = {
     customer_id:      contactId,
     reference_number: receiptId,
     date:             dateStr,
-    payment_mode:     'Online',
+    payment_terms:    0,
+    payment_terms_label: 'Due on Receipt',
     notes:            `FWF ${type} payment${is80g ? ' – 80G Eligible' : ''}.${paymentId ? ` Razorpay: ${paymentId}` : ''}`,
     line_items: lineItems.map(li => ({
       name:        li.name,
@@ -167,14 +170,9 @@ export async function createZohoSalesReceipt({ contactId, receiptId, date, lineI
     })),
   };
 
-  // Custom fields (Razorpay payment ID)
-  if (paymentId) {
-    body.custom_fields = [{ label: 'Payment ID', value: paymentId }];
-  }
-
-  const result = await zohoPost('/salesreceipts', body);
-  if (result.salesreceipt?.salesreceipt_id) return result.salesreceipt;
-  throw new Error('Zoho sales receipt creation failed: ' + JSON.stringify(result));
+  const result = await zohoPost('/invoices', body);
+  if (result.invoice?.invoice_id) return result.invoice;
+  throw new Error('Zoho invoice creation failed: ' + JSON.stringify(result));
 }
 
 // ──────────────────────────────────────────────────────
@@ -182,8 +180,8 @@ export async function createZohoSalesReceipt({ contactId, receiptId, date, lineI
 // ──────────────────────────────────────────────────────
 
 /**
- * Sync a Receipt document to Zoho Books as a Sales Receipt.
- * Returns { zoho_salesreceipt_id, zoho_contact_id } or null on failure.
+ * Sync a Receipt document to Zoho Books as an Invoice.
+ * Returns { zoho_invoice_id, zoho_contact_id } or null on failure.
  */
 export async function syncReceiptToZoho(receipt) {
   if (!process.env.ZOHO_CLIENT_ID || !process.env.ZOHO_ORG_ID) {
@@ -210,7 +208,7 @@ export async function syncReceiptToZoho(receipt) {
     ? receipt.line_items
     : [{ name: receipt.description || 'Payment', amount: receipt.total, quantity: 1 }];
 
-  const sr = await createZohoSalesReceipt({
+  const inv = await createZohoInvoice({
     contactId,
     receiptId:  receipt.receipt_id,
     date:       receipt.created_at || new Date(),
@@ -221,9 +219,9 @@ export async function syncReceiptToZoho(receipt) {
     is80g:      receipt.is_80g,
   });
 
-  console.log(`✅ Zoho: Sales receipt created → ${sr.salesreceipt_id}`);
+  console.log(`✅ Zoho: Invoice created → ${inv.invoice_id}`);
   return {
-    zoho_salesreceipt_id: sr.salesreceipt_id,
+    zoho_salesreceipt_id: inv.invoice_id,
     zoho_contact_id:      contactId,
   };
 }

@@ -552,6 +552,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <button class="nav-item" data-page="fundraiser">
       <i class="fa-solid fa-trophy"></i> Fund Raiser
     </button>
+    <button class="nav-item" data-page="invoices">
+      <i class="fa-solid fa-file-invoice"></i> Invoices
+    </button>
     <button class="nav-item" data-page="reports">
       <i class="fa-solid fa-chart-bar"></i> Reports
     </button>
@@ -1766,6 +1769,63 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     </div>
   </div>
 
+  <!-- ======== INVOICES PAGE ======== -->
+  <div class="page" id="page-invoices">
+    <!-- Stats Row -->
+    <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat-card"><div class="s-icon s-blue"><i class="fa-solid fa-file-invoice"></i></div><div class="s-label">Total Receipts</div><div class="s-value" id="invStatTotal">0</div></div>
+      <div class="stat-card"><div class="s-icon s-green"><i class="fa-solid fa-indian-rupee-sign"></i></div><div class="s-label">Total Amount</div><div class="s-value" id="invStatAmount">₹0</div></div>
+      <div class="stat-card"><div class="s-icon s-purple"><i class="fa-solid fa-id-card"></i></div><div class="s-label">Membership</div><div class="s-value" id="invStatMembership">0</div></div>
+      <div class="stat-card"><div class="s-icon s-amber"><i class="fa-solid fa-hand-holding-heart"></i></div><div class="s-label">Donations</div><div class="s-value" id="invStatDonation">0</div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#dcfce7"><i class="fa-solid fa-leaf" style="color:#16a34a"></i></div><div class="s-label">80G Eligible</div><div class="s-value" id="invStat80g">0</div></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <input id="invSearch" type="text" placeholder="Search receipt ID, name, payment ID..." style="flex:1;min-width:220px;padding:9px 14px;border:1px solid var(--brd,#e2e8f0);border-radius:8px;font-size:13px;background:var(--card,#fff);color:inherit" oninput="loadInvoices()">
+      <select id="invFilterType" style="padding:9px 14px;border:1px solid var(--brd,#e2e8f0);border-radius:8px;font-size:13px;background:var(--card,#fff);color:inherit" onchange="loadInvoices()">
+        <option value="">All Types</option>
+        <option value="membership">Membership</option>
+        <option value="donation">Donation</option>
+        <option value="renewal">Renewal</option>
+        <option value="quiz">Quiz</option>
+      </select>
+      <button onclick="loadInvoices()" style="padding:9px 18px;background:var(--gA,#3b82f6);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+    </div>
+
+    <!-- Invoices Table -->
+    <div style="background:var(--card,#fff);border-radius:12px;border:1px solid var(--brd,#e2e8f0);overflow:hidden">
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:var(--card,#f8fafc);border-bottom:1px solid var(--brd,#e2e8f0)">
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">Receipt ID</th>
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">Type</th>
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">Customer</th>
+              <th style="padding:11px 14px;text-align:right;font-weight:600;color:#6b7280">Amount</th>
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">Payment ID</th>
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">80G</th>
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">Status</th>
+              <th style="padding:11px 14px;text-align:left;font-weight:600;color:#6b7280">Date</th>
+              <th style="padding:11px 14px;text-align:center;font-weight:600;color:#6b7280">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invTableBody">
+            <tr><td colspan="9" style="padding:32px;text-align:center;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div id="invPagination" style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-top:1px solid var(--brd,#e2e8f0);font-size:13px;color:#6b7280">
+        <span id="invPageInfo">—</span>
+        <div style="display:flex;gap:8px">
+          <button id="invPrevBtn" onclick="invChangePage(-1)" style="padding:6px 14px;border:1px solid var(--brd,#e2e8f0);border-radius:6px;background:var(--card,#fff);cursor:pointer;font-size:13px;color:inherit">← Prev</button>
+          <button id="invNextBtn" onclick="invChangePage(1)" style="padding:6px 14px;border:1px solid var(--brd,#e2e8f0);border-radius:6px;background:var(--card,#fff);cursor:pointer;font-size:13px;color:inherit">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ======== MOBILE BOTTOM NAV ======== -->
@@ -2087,7 +2147,8 @@ const pageTitles = {
   reports: '<i class="fa-solid fa-chart-bar"></i> Reports & Analytics',
   settings: '<i class="fa-solid fa-gear"></i> Website & Settings',
   projectcosts: '<i class="fa-solid fa-indian-rupee-sign"></i> Project Cost Manager',
-  fundraiser: '<i class="fa-solid fa-trophy"></i> Fund Raiser Quiz Management'
+  fundraiser: '<i class="fa-solid fa-trophy"></i> Fund Raiser Quiz Management',
+  invoices: '<i class="fa-solid fa-file-invoice"></i> Invoice & Receipt Management'
 };
 
 function switchPage(page, updateHash = true){
@@ -2122,6 +2183,7 @@ function switchPage(page, updateHash = true){
   if(page === 'marketplace') loadMarketplaceAdmin();
   if(page === 'projectcosts') renderCostEditor();
   if(page === 'fundraiser')  { loadFundRaiser(); checkDemoOnLoad(); }
+  if(page === 'invoices')    loadInvoices();
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -3848,6 +3910,93 @@ function resetAllCostOverrides() {
   localStorage.removeItem('fwf_cost_overrides');
   notify('All cost overrides cleared', 'success');
   renderCostEditor();
+}
+
+/* ============================================
+   INVOICES / RECEIPTS
+   ============================================ */
+let invCurrentPage = 1;
+
+async function loadInvoices(resetPage = false) {
+  if (resetPage) invCurrentPage = 1;
+  const search = document.getElementById('invSearch')?.value.trim() || '';
+  const type   = document.getElementById('invFilterType')?.value || '';
+  const tbody  = document.getElementById('invTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="9" style="padding:32px;text-align:center;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>';
+  try {
+    const params = new URLSearchParams({ page: invCurrentPage, limit: 50 });
+    if (search) params.set('search', search);
+    if (type)   params.set('type', type);
+    const data = await api(`/api/admin/invoices?${params}`);
+    if (!data.ok) throw new Error(data.error || 'Failed');
+
+    // Stats
+    const s = data.stats || {};
+    document.getElementById('invStatTotal').textContent     = s.total || 0;
+    document.getElementById('invStatAmount').textContent    = '₹' + (s.totalAmount || 0).toLocaleString('en-IN');
+    document.getElementById('invStatMembership').textContent = s.membership || 0;
+    document.getElementById('invStatDonation').textContent  = s.donation || 0;
+    document.getElementById('invStat80g').textContent       = s.is80g || 0;
+
+    // Table
+    const typeColors = { membership: '#3b82f6', donation: '#f59e0b', renewal: '#8b5cf6', quiz: '#10b981', other: '#6b7280' };
+    if (!data.invoices.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:32px;text-align:center;color:#9ca3af">No receipts found</td></tr>';
+    } else {
+      tbody.innerHTML = data.invoices.map(inv => {
+        const color = typeColors[inv.type] || '#6b7280';
+        const dateStr = new Date(inv.created_at).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+        const amtInr = (inv.total || 0).toLocaleString('en-IN');
+        const statusBadge = inv.status === 'viewed'
+          ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">VIEWED</span>'
+          : inv.status === 'sent'
+          ? '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">SENT</span>'
+          : '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">GENERATED</span>';
+        return `<tr style="border-bottom:1px solid var(--brd,#e2e8f0);transition:background .15s" onmouseover="this.style.background='var(--hover,#f9fafb)'" onmouseout="this.style.background=''">
+          <td style="padding:11px 14px;font-family:monospace;font-size:12px;font-weight:600;color:#111">${inv.receipt_id}</td>
+          <td style="padding:11px 14px"><span style="background:${color}22;color:${color};padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase">${inv.type}</span></td>
+          <td style="padding:11px 14px;color:#374151">${inv.customer_name || '—'}</td>
+          <td style="padding:11px 14px;text-align:right;font-weight:700;color:#059669">₹${amtInr}</td>
+          <td style="padding:11px 14px;font-family:monospace;font-size:11px;color:#6b7280">${inv.razorpay_payment_id ? inv.razorpay_payment_id.slice(0, 18) + '…' : '—'}</td>
+          <td style="padding:11px 14px">${inv.is_80g ? '<span style="color:#16a34a;font-weight:700">✓ Yes</span>' : '<span style="color:#9ca3af">—</span>'}</td>
+          <td style="padding:11px 14px">${statusBadge}</td>
+          <td style="padding:11px 14px;color:#6b7280;font-size:12px">${dateStr}</td>
+          <td style="padding:11px 14px;text-align:center">
+            <div style="display:flex;gap:6px;justify-content:center">
+              <a href="${inv.receipt_url}" target="_blank" style="padding:5px 10px;background:#dbeafe;color:#1d4ed8;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;border:none;cursor:pointer" title="View Receipt">View</a>
+              <button onclick="resendInvoice('${inv.receipt_id}')" style="padding:5px 10px;background:#f3e8ff;color:#7c3aed;border-radius:6px;font-size:12px;font-weight:600;border:none;cursor:pointer" title="Resend Email">Resend</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Pagination
+    const p = data.pagination;
+    document.getElementById('invPageInfo').textContent = `Showing ${(p.page - 1) * p.limit + 1}–${Math.min(p.page * p.limit, p.total)} of ${p.total}`;
+    document.getElementById('invPrevBtn').disabled = p.page <= 1;
+    document.getElementById('invNextBtn').disabled = p.page >= p.pages;
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="9" style="padding:32px;text-align:center;color:#ef4444">Error: ${err.message}</td></tr>`;
+  }
+}
+
+function invChangePage(dir) {
+  invCurrentPage += dir;
+  if (invCurrentPage < 1) invCurrentPage = 1;
+  loadInvoices();
+}
+
+async function resendInvoice(receiptId) {
+  if (!confirm(`Resend receipt email for ${receiptId}?`)) return;
+  try {
+    const data = await api(`/api/admin/invoice/${receiptId}/resend`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    if (data.ok) notify('Receipt email resent ✓', 'success');
+    else notify(data.error || 'Resend failed', 'error');
+  } catch(err) {
+    notify(err.message, 'error');
+  }
 }
 
 /* ============================================

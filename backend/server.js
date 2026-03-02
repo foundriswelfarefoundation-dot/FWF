@@ -28,6 +28,7 @@ import QuizParticipation from './models/QuizParticipation.js';
 import ReferralClick from './models/ReferralClick.js';
 import DonationOtp from './models/DonationOtp.js';
 import PaymentLink from './models/PaymentLink.js';
+import Receipt from './models/Receipt.js';
 import { getTransporter, send80GReceipt, sendMemberWelcome, sendSupporterWelcome, sendDonationConfirmation, sendAdminAlert } from './lib/mailer.js';
 import { sendWhatsAppCredentials, sendWhatsAppDonation } from './lib/msg91.js';
 
@@ -212,6 +213,83 @@ async function nextDonationId() {
     if (m) n = parseInt(m[1], 10);
   }
   return `DON-${(n + 1).toString().padStart(6, '0')}`;
+}
+async function nextReceiptId() {
+  const last = await Receipt.findOne({ receipt_id: { $regex: /^RCP-\d{6}$/ } })
+    .sort({ created_at: -1 }).select('receipt_id').lean();
+  let n = 0;
+  if (last?.receipt_id) { const m = last.receipt_id.match(/(\d{6})$/); if (m) n = parseInt(m[1], 10); }
+  return `RCP-${(n + 1).toString().padStart(6, '0')}`;
+}
+function genReceiptToken() {
+  return crypto.randomBytes(24).toString('hex');
+}
+async function createAndSendReceipt({ type, userId, memberId, customerName, customerEmail, customerMobile, customerPan, customerAddress, lineItems, total, tax = 0, razorpayPaymentId, razorpayOrderId, razorpaySubscriptionId, referenceId, is80g = false, description }) {
+  try {
+    const receipt_id = await nextReceiptId();
+    const token = genReceiptToken();
+    const subtotal = lineItems.reduce((s, i) => s + (i.amount * (i.quantity || 1)), 0);
+    const receipt = await Receipt.create({
+      receipt_id, token, type,
+      user_id: userId || null,
+      member_id: memberId || null,
+      customer_name: customerName,
+      customer_email: customerEmail || null,
+      customer_mobile: customerMobile || null,
+      customer_pan: customerPan || null,
+      customer_address: customerAddress || null,
+      description: description || '',
+      line_items: lineItems,
+      subtotal, tax, total,
+      razorpay_payment_id: razorpayPaymentId || null,
+      razorpay_order_id: razorpayOrderId || null,
+      razorpay_subscription_id: razorpaySubscriptionId || null,
+      reference_id: referenceId || null,
+      is_80g: !!is80g,
+      status: 'generated'
+    });
+    // Optionally email receipt link
+    if (customerEmail) {
+      const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+      const receiptUrl = `${backendUrl}/receipt/${token}`;
+      const transporter = getTransporter();
+      await transporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: customerEmail,
+        subject: `FWF Receipt ${receipt_id} — ₹${total.toLocaleString('en-IN')}`,
+        html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:580px;margin:0 auto">
+  <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center">
+    <div style="font-size:36px">🧾</div>
+    <h1 style="color:#fff;margin:8px 0 0;font-size:20px">Payment Receipt</h1>
+    <p style="color:#bfdbfe;margin:4px 0 0;font-size:13px">Foundation for Women's Future (FWF)</p>
+  </div>
+  <div style="padding:28px 32px;border:1px solid #e2e8f0;border-top:none">
+    <p style="color:#374151;font-size:15px">Dear <strong>${customerName}</strong>,</p>
+    <p style="color:#6b7280;font-size:14px">Thank you for your payment. Here is your official receipt.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:20px 0">
+      <tr style="background:#f8fafc"><td style="padding:10px 14px;color:#6b7280;font-weight:600;width:40%">Receipt No.</td><td style="padding:10px 14px;font-weight:700;font-family:monospace">${receipt_id}</td></tr>
+      <tr><td style="padding:10px 14px;color:#6b7280;font-weight:600">Date</td><td style="padding:10px 14px">${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</td></tr>
+      ${memberId ? `<tr style="background:#f8fafc"><td style="padding:10px 14px;color:#6b7280;font-weight:600">Member ID</td><td style="padding:10px 14px;font-family:monospace">${memberId}</td></tr>` : ''}
+      <tr${memberId ? '' : ' style="background:#f8fafc"'}><td style="padding:10px 14px;color:#6b7280;font-weight:600">Amount Paid</td><td style="padding:10px 14px;font-weight:800;color:#166534;font-size:16px">₹${total.toLocaleString('en-IN')}</td></tr>
+      ${razorpayPaymentId ? `<tr style="background:#f8fafc"><td style="padding:10px 14px;color:#6b7280;font-weight:600">Payment ID</td><td style="padding:10px 14px;font-family:monospace;font-size:12px">${razorpayPaymentId}</td></tr>` : ''}
+    </table>
+    <div style="text-align:center;margin:24px 0">
+      <a href="${receiptUrl}" style="background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:13px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px;display:inline-block">📄 View / Download Receipt</a>
+    </div>
+    <p style="color:#9ca3af;font-size:11px;text-align:center">This link is valid permanently. You can print from the receipt page.</p>
+  </div>
+  <div style="background:#f9fafb;padding:16px 32px;border-radius:0 0 12px 12px;border:1px solid #e2e8f0;border-top:none;text-align:center">
+    <p style="color:#9ca3af;font-size:11px;margin:0"><strong style="color:#1e40af">Foundris Welfare Foundation (FWF)</strong> · www.fwfindia.org</p>
+  </div>
+</div>`
+      }).catch(e => console.error('⚠️ Receipt email failed:', e.message));
+      await Receipt.updateOne({ _id: receipt._id }, { status: 'sent', email_sent: true, email_sent_at: new Date() });
+    }
+    return receipt;
+  } catch (err) {
+    console.error('⚠️ Receipt creation failed (non-fatal):', err.message);
+    return null;
+  }
 }
 function randPass(len = 10) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$%';
@@ -481,8 +559,8 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
-      member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
+      member: ['/api/member/me', '/api/member/invoices', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
+      admin: ['/api/admin/overview', '/api/admin/invoices', '/api/admin/invoice/:id/resend', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -901,6 +979,24 @@ app.post('/api/pay/membership', async (req, res) => {
       .then(() => console.log(`✅ Member welcome email sent → ${email}`))
       .catch(e => console.error('⚠️ Member welcome email failed:', e.message));
 
+    // Generate & email membership fee receipt (non-blocking)
+    const newUser2 = await User.findOne({ member_id: memberId }).select('_id').lean();
+    createAndSendReceipt({
+      type: 'membership',
+      userId: newUser2?._id,
+      memberId,
+      customerName: name,
+      customerEmail: email,
+      customerMobile: mobile,
+      lineItems: [{ name: 'FWF Membership Fee', description: 'Joining fee — Annual Membership (FWF India)', amount: 500, quantity: 1 }],
+      total: 500,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpayOrderId: razorpay_order_id,
+      razorpaySubscriptionId: razorpay_subscription_id,
+      referenceId: memberId,
+      description: 'FWF Membership Joining Fee'
+    }).then(r => r && console.log(`🧾 Membership receipt created: ${r.receipt_id}`));
+
     // Admin alert (non-blocking)
     sendAdminAlert({
       subject: `New Member via Payment: ${memberId} — ${name}`,
@@ -1011,8 +1107,28 @@ app.post('/api/pay/donation', async (req, res) => {
       });
     }
 
-    await Donation.create(donationData);
+    const donationRecord = await Donation.create(donationData);
     addBreadcrumb('payment', 'Donation recorded', { donationId, amount: numAmount, kycRequired, otpVerified });
+
+    // Generate donation receipt (non-blocking)
+    createAndSendReceipt({
+      type: 'donation',
+      userId: user?._id,
+      memberId: user?.member_id || null,
+      customerName: name || 'Anonymous',
+      customerEmail: email || null,
+      customerMobile: mobile || null,
+      customerPan: pan || null,
+      customerAddress: address || null,
+      lineItems: [{ name: `Donation to FWF${recurring ? ' (Monthly Recurring)' : ''}`, description: 'Charitable donation — Foundation for Women\'s Future', amount: numAmount, quantity: 1 }],
+      total: numAmount,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpayOrderId: razorpay_order_id || null,
+      razorpaySubscriptionId: razorpay_subscription_id || null,
+      referenceId: donationId,
+      is80g: !!(want80g && pan),
+      description: `Donation ₹${numAmount}${recurring ? ' (Recurring)' : ''}`
+    }).then(r => r && console.log(`🧾 Donation receipt created: ${r.receipt_id}`));
 
     // Send 80G receipt email if donor opted in and has PAN + email
     let receipt80GSent = false;
@@ -2965,6 +3081,22 @@ app.get('/api/member/affiliate', auth('member'), async (req, res) => {
   }
 });
 
+// Member: my invoices / receipts
+app.get('/api/member/invoices', auth(['member', 'supporter']), async (req, res) => {
+  try {
+    const receipts = await Receipt.find({ user_id: req.user.uid })
+      .sort({ created_at: -1 })
+      .select('receipt_id token type customer_name total status is_80g email_sent razorpay_payment_id reference_id created_at')
+      .lean();
+    const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+    const withUrls = receipts.map(r => ({ ...r, receipt_url: `${backendUrl}/receipt/${r.token}` }));
+    res.json({ ok: true, invoices: withUrls });
+  } catch (err) {
+    captureError(err, { context: 'member-invoices' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ========================
 // ADMIN QUIZ MANAGEMENT
 // ========================
@@ -3177,6 +3309,107 @@ app.get('/api/admin/quiz-scheduler-status', auth('admin'), async (req, res) => {
       }
     });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ========================
+// ADMIN INVOICE MANAGEMENT
+// ========================
+
+// Admin: list all receipts/invoices (paginated + filterable)
+app.get('/api/admin/invoices', auth('admin'), async (req, res) => {
+  try {
+    const { page = 1, limit = 50, type = '', search = '' } = req.query;
+    const filter = {};
+    if (type) filter.type = type;
+    if (search) filter.$or = [
+      { receipt_id: { $regex: search, $options: 'i' } },
+      { customer_name: { $regex: search, $options: 'i' } },
+      { member_id: { $regex: search, $options: 'i' } },
+      { razorpay_payment_id: { $regex: search, $options: 'i' } }
+    ];
+    const total = await Receipt.countDocuments(filter);
+    const invoices = await Receipt.find(filter)
+      .sort({ created_at: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .select('-line_items')
+      .lean();
+    const totalAgg = await Receipt.aggregate([{ $group: { _id: null, sum: { $sum: '$total' } } }]);
+    const stats = {
+      total: await Receipt.countDocuments(),
+      membership: await Receipt.countDocuments({ type: 'membership' }),
+      donation: await Receipt.countDocuments({ type: 'donation' }),
+      is80g: await Receipt.countDocuments({ is_80g: true }),
+      totalAmount: totalAgg[0]?.sum || 0
+    };
+    const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+    const withUrls = invoices.map(r => ({ ...r, receipt_url: `${backendUrl}/receipt/${r.token}` }));
+    res.json({ ok: true, invoices: withUrls, pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / limit) }, stats });
+  } catch (err) {
+    captureError(err, { context: 'admin-invoices-list' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: get single receipt details
+app.get('/api/admin/invoice/:receiptId', auth('admin'), async (req, res) => {
+  try {
+    const receipt = await Receipt.findOne({ receipt_id: req.params.receiptId }).lean();
+    if (!receipt) return res.status(404).json({ error: 'Receipt not found' });
+    const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+    res.json({ ok: true, receipt: { ...receipt, receipt_url: `${backendUrl}/receipt/${receipt.token}` } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: resend receipt email
+app.post('/api/admin/invoice/:receiptId/resend', auth('admin'), async (req, res) => {
+  try {
+    const receipt = await Receipt.findOne({ receipt_id: req.params.receiptId }).lean();
+    if (!receipt) return res.status(404).json({ error: 'Receipt not found' });
+    if (!receipt.customer_email) return res.status(400).json({ error: 'No email address on file for this receipt' });
+
+    const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+    const receiptUrl = `${backendUrl}/receipt/${receipt.token}`;
+    const typeLabel = receipt.type === 'membership' ? 'Membership Fee' : receipt.type === 'donation' ? 'Donation' : 'Payment';
+    const transporter = await getTransporter();
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM,
+      to: receipt.customer_email,
+      subject: `[Resent] Your FWF ${typeLabel} Receipt – ${receipt.receipt_id}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+          <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:32px;border-radius:12px 12px 0 0;text-align:center">
+            <div style="font-size:40px;margin-bottom:8px">🧾</div>
+            <h1 style="color:#fff;margin:0;font-size:24px">Payment Receipt</h1>
+            <p style="color:#a0a0c0;margin:8px 0 0">Foundation for Women's Future</p>
+          </div>
+          <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none">
+            <p style="color:#374151">Dear ${receipt.customer_name},</p>
+            <p style="color:#374151">This is a resent copy of your payment receipt. Please find the details below:</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0">
+              <tr style="background:#f9fafb"><td style="padding:10px 14px;color:#6b7280;font-size:13px">Receipt No.</td><td style="padding:10px 14px;font-weight:600;color:#111827">${receipt.receipt_id}</td></tr>
+              <tr><td style="padding:10px 14px;color:#6b7280;font-size:13px">Date</td><td style="padding:10px 14px;color:#374151">${new Date(receipt.created_at).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' })}</td></tr>
+              ${receipt.member_id ? `<tr style="background:#f9fafb"><td style="padding:10px 14px;color:#6b7280;font-size:13px">Member ID</td><td style="padding:10px 14px;color:#374151">${receipt.member_id}</td></tr>` : ''}
+              <tr ${receipt.member_id ? '' : 'style="background:#f9fafb"'}><td style="padding:10px 14px;color:#6b7280;font-size:13px">Amount Paid</td><td style="padding:10px 14px;font-weight:700;color:#059669;font-size:18px">₹${receipt.total?.toLocaleString('en-IN')}</td></tr>
+              ${receipt.razorpay_payment_id ? `<tr style="background:#f9fafb"><td style="padding:10px 14px;color:#6b7280;font-size:13px">Payment ID</td><td style="padding:10px 14px;color:#374151;font-family:monospace;font-size:12px">${receipt.razorpay_payment_id}</td></tr>` : ''}
+            </table>
+            <div style="text-align:center;margin:28px 0">
+              <a href="${receiptUrl}" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;display:inline-block">View / Download Receipt</a>
+            </div>
+            ${receipt.is_80g ? '<p style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;color:#166534;font-size:13px">✅ This receipt is eligible for <strong>80G tax deduction</strong> under the Income Tax Act, 1961.</p>' : ''}
+          </div>
+          <div style="background:#f9fafb;padding:20px;text-align:center;font-size:12px;color:#9ca3af">Foundation for Women's Future (FWF) | support@fwfindia.org</div>
+        </div>`
+    });
+
+    await Receipt.updateOne({ receipt_id: req.params.receiptId }, { $set: { email_sent: true, email_sent_at: new Date(), status: 'sent' } });
+    res.json({ ok: true, message: 'Receipt email resent successfully' });
+  } catch (err) {
+    captureError(err, { context: 'admin-resend-receipt' });
     res.status(500).json({ error: err.message });
   }
 });
@@ -3973,6 +4206,143 @@ async function autoDrawResults() {
     captureError(err, { context: 'auto-draw-results' });
   }
 }
+
+// ========================
+// PUBLIC RECEIPT VIEW
+// ========================
+
+// Helper: generate branded HTML receipt page
+function receiptHTML(r) {
+  const backendUrl = process.env.BACKEND_URL || 'https://api.fwfindia.org';
+  const typeLabel = r.type === 'membership' ? 'Membership Fee' : r.type === 'donation' ? 'Donation' : r.type === 'renewal' ? 'Membership Renewal' : r.type === 'quiz' ? 'Quiz Entry' : 'Payment';
+  const dateStr = new Date(r.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+  const lineItemsHtml = (r.line_items || []).map(li => `
+    <tr>
+      <td style="padding:10px 14px;color:#374151">${li.name}${li.description ? `<br><span style="color:#9ca3af;font-size:12px">${li.description}</span>` : ''}</td>
+      <td style="padding:10px 14px;text-align:center;color:#374151">${li.quantity || 1}</td>
+      <td style="padding:10px 14px;text-align:right;color:#374151">₹${(li.amount || 0).toLocaleString('en-IN')}</td>
+    </tr>`).join('');
+  const taxRow = r.tax ? `<tr style="background:#f9fafb"><td colspan="2" style="padding:10px 14px;color:#6b7280;text-align:right">Tax (GST)</td><td style="padding:10px 14px;text-align:right;color:#374151">₹${r.tax.toLocaleString('en-IN')}</td></tr>` : '';
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Receipt ${r.receipt_id} – FWF</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#f1f5f9;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px}
+    .page{max-width:680px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12)}
+    .header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);padding:40px 32px;text-align:center}
+    .header .icon{font-size:48px;margin-bottom:12px}
+    .header h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:4px}
+    .header .sub{color:#a0a0c0;font-size:14px}
+    .badge{display:inline-block;background:rgba(255,255,255,.1);color:#a0c4ff;border:1px solid rgba(160,196,255,.3);border-radius:20px;padding:4px 14px;font-size:12px;margin-top:10px}
+    .body{padding:32px}
+    .receipt-id{color:#6b7280;font-size:13px;margin-bottom:20px}
+    .receipt-id strong{color:#111827;font-size:16px;font-family:monospace}
+    .info-table{width:100%;border-collapse:collapse;margin-bottom:24px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden}
+    .info-table tr:nth-child(even){background:#f9fafb}
+    .info-table td{padding:11px 16px;font-size:14px}
+    .info-table td:first-child{color:#6b7280;width:40%}
+    .info-table td:last-child{color:#111827;font-weight:500}
+    .section-title{font-size:13px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin:24px 0 10px}
+    .items-table{width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:16px}
+    .items-table thead tr{background:#f9fafb}
+    .items-table thead td{padding:10px 14px;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase}
+    .items-table tbody tr{border-top:1px solid #e5e7eb}
+    .total-row td{padding:12px 14px;font-weight:700;font-size:16px;border-top:2px solid #e5e7eb;background:#f0fdf4}
+    .total-row td:last-child{color:#059669;font-size:18px}
+    .stamp{margin:28px 0;text-align:center}
+    .stamp .paid-stamp{display:inline-block;border:3px solid #059669;color:#059669;border-radius:8px;padding:8px 28px;font-size:20px;font-weight:800;letter-spacing:.08em;opacity:.85;transform:rotate(-3deg)}
+    .note-80g{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin:20px 0;color:#166534;font-size:13px;line-height:1.6}
+    .actions{display:flex;gap:12px;justify-content:center;margin:28px 0 8px;flex-wrap:wrap}
+    .btn{padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-block}
+    .btn-print{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff}
+    .btn-outline{background:#fff;color:#374151;border:1px solid #d1d5db}
+    .footer{background:#f9fafb;padding:20px 32px;text-align:center;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb}
+    .footer a{color:#6b7280;text-decoration:none}
+    @media print{
+      body{background:#fff;padding:0}
+      .page{box-shadow:none;border-radius:0}
+      .actions{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="icon">🧾</div>
+      <h1>Payment Receipt</h1>
+      <div class="sub">Foundation for Women's Future</div>
+      <div class="badge">${typeLabel}</div>
+    </div>
+    <div class="body">
+      <div class="receipt-id">Receipt No: <strong>${r.receipt_id}</strong></div>
+      <div class="section-title">Customer Details</div>
+      <table class="info-table">
+        <tr><td>Name</td><td>${r.customer_name || '—'}</td></tr>
+        ${r.customer_email ? `<tr><td>Email</td><td>${r.customer_email}</td></tr>` : ''}
+        ${r.customer_mobile ? `<tr><td>Mobile</td><td>${r.customer_mobile}</td></tr>` : ''}
+        ${r.member_id ? `<tr><td>Member ID</td><td>${r.member_id}</td></tr>` : ''}
+        ${r.customer_pan ? `<tr><td>PAN</td><td>${r.customer_pan}</td></tr>` : ''}
+        ${r.customer_address ? `<tr><td>Address</td><td>${r.customer_address}</td></tr>` : ''}
+      </table>
+      <div class="section-title">Payment Details</div>
+      <table class="info-table">
+        <tr><td>Receipt Date</td><td>${dateStr}</td></tr>
+        <tr><td>Payment Type</td><td>${typeLabel}</td></tr>
+        ${r.razorpay_payment_id ? `<tr><td>Transaction ID</td><td style="font-family:monospace;font-size:12px">${r.razorpay_payment_id}</td></tr>` : ''}
+        ${r.razorpay_order_id ? `<tr><td>Order ID</td><td style="font-family:monospace;font-size:12px">${r.razorpay_order_id}</td></tr>` : ''}
+      </table>
+      ${(r.line_items && r.line_items.length > 0) ? `
+      <div class="section-title">Items</div>
+      <table class="items-table">
+        <thead><tr><td>Description</td><td style="text-align:center">Qty</td><td style="text-align:right">Amount</td></tr></thead>
+        <tbody>
+          ${lineItemsHtml}
+          ${taxRow}
+          <tr class="total-row"><td colspan="2" style="text-align:right">Total Paid</td><td>₹${(r.total || 0).toLocaleString('en-IN')}</td></tr>
+        </tbody>
+      </table>` : `
+      <div class="stamp"><div class="paid-stamp">✓ PAID — ₹${(r.total || 0).toLocaleString('en-IN')}</div></div>`}
+      ${r.is_80g ? `<div class="note-80g">✅ <strong>80G Tax Deduction Eligible</strong><br>This donation is eligible for tax deduction under Section 80G of the Income Tax Act, 1961. Please retain this receipt for your tax records.<br><span style="color:#359e6c">• FWF is a registered NGO under FCRA and Section 80G</span></div>` : ''}
+      <div class="actions">
+        <button class="btn btn-print" onclick="window.print()">🖨 Print / Save PDF</button>
+        <a class="btn btn-outline" href="https://fwfindia.org">Visit FWF</a>
+      </div>
+    </div>
+    <div class="footer">
+      Foundation for Women's Future (FWF) &nbsp;|&nbsp; <a href="mailto:support@fwfindia.org">support@fwfindia.org</a> &nbsp;|&nbsp; <a href="https://fwfindia.org">fwfindia.org</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+// Public: view receipt by token (no auth required)
+app.get('/receipt/:token', async (req, res) => {
+  try {
+    const receipt = await Receipt.findOneAndUpdate(
+      { token: req.params.token },
+      { $inc: { views: 1 }, $set: { viewed_at: new Date(), status: 'viewed' } },
+      { new: true }
+    ).lean();
+    if (!receipt) return res.status(404).send(`
+      <html><body style="font-family:sans-serif;text-align:center;padding:60px">
+        <h2 style="color:#ef4444">Receipt Not Found</h2>
+        <p>This receipt link may be invalid or expired.</p>
+        <a href="https://fwfindia.org" style="color:#2563eb">Return to FWF</a>
+      </body></html>`);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(receiptHTML(receipt));
+  } catch (err) {
+    captureError(err, { context: 'receipt-view' });
+    res.status(500).send('<h2>Error loading receipt</h2>');
+  }
+});
 
 // Schedule: Run every hour
 function startQuizScheduler() {

@@ -29,6 +29,8 @@ import ReferralClick from './models/ReferralClick.js';
 import DonationOtp from './models/DonationOtp.js';
 import PaymentLink from './models/PaymentLink.js';
 import Receipt from './models/Receipt.js';
+import AppConfig from './models/AppConfig.js';
+import { syncReceiptToZoho, checkZohoConnection, getAuthUrl, exchangeCodeForTokens } from './lib/zoho.js';
 import { getTransporter, send80GReceipt, sendMemberWelcome, sendSupporterWelcome, sendDonationConfirmation, sendAdminAlert } from './lib/mailer.js';
 import { sendWhatsAppCredentials, sendWhatsAppDonation } from './lib/msg91.js';
 
@@ -285,6 +287,15 @@ async function createAndSendReceipt({ type, userId, memberId, customerName, cust
       }).catch(e => console.error('⚠️ Receipt email failed:', e.message));
       await Receipt.updateOne({ _id: receipt._id }, { status: 'sent', email_sent: true, email_sent_at: new Date() });
     }
+    // Sync to Zoho Books (non-blocking)
+    syncReceiptToZoho(receipt.toObject()).then(zohoResult => {
+      if (zohoResult?.zoho_salesreceipt_id) {
+        Receipt.updateOne({ _id: receipt._id }, {
+          $set: { zoho_salesreceipt_id: zohoResult.zoho_salesreceipt_id, zoho_synced_at: new Date() }
+        }).catch(() => {});
+        console.log(`📊 Zoho synced: ${receipt.receipt_id} → ${zohoResult.zoho_salesreceipt_id}`);
+      }
+    }).catch(err => console.warn('⚠️ Zoho sync skipped:', err.message));
     return receipt;
   } catch (err) {
     console.error('⚠️ Receipt creation failed (non-fatal):', err.message);
@@ -560,7 +571,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/invoices', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/invoices', '/api/admin/invoice/:id/resend', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
+      admin: ['/api/admin/overview', '/api/admin/invoices', '/api/admin/invoice/:id/resend', '/api/admin/invoice/:id', '/api/admin/zoho/status', '/api/admin/zoho/sync', '/api/admin/zoho/sync/:receiptId', '/api/admin/zoho/disconnect', '/api/admin/invoice/:id', '/api/admin/zoho/status', '/api/admin/zoho/sync', '/api/admin/zoho/sync/:receiptId', '/api/admin/zoho/disconnect', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/quiz/:quizId/detail', '/api/admin/quiz/:quizId/participants', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -3410,6 +3421,120 @@ app.post('/api/admin/invoice/:receiptId/resend', auth('admin'), async (req, res)
     res.json({ ok: true, message: 'Receipt email resent successfully' });
   } catch (err) {
     captureError(err, { context: 'admin-resend-receipt' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ========================
+// ZOHO BOOKS INTEGRATION
+// ========================
+
+// Step 1: Redirect admin to Zoho OAuth (open in browser)
+app.get('/api/admin/zoho/auth', auth('admin'), (req, res) => {
+  const url = getAuthUrl();
+  res.redirect(url);
+});
+
+// Step 2: Zoho OAuth callback — exchange code for refresh token, store in DB
+app.get('/api/admin/zoho/callback', async (req, res) => {
+  const { code, error } = req.query;
+  if (error || !code) {
+    return res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:60px">
+      <h2 style="color:#ef4444">Zoho OAuth Failed</h2>
+      <p>${error || 'No authorization code received'}</p>
+      <a href="https://fwfindia.org/admin-dashboard.html#invoices">Back to Dashboard</a>
+    </body></html>`);
+  }
+  try {
+    const tokens = await exchangeCodeForTokens(code);
+    if (!tokens.refresh_token) throw new Error('No refresh token returned: ' + JSON.stringify(tokens));
+    // Store refresh token in MongoDB
+    await AppConfig.findOneAndUpdate(
+      { key: 'zoho_refresh_token' },
+      { key: 'zoho_refresh_token', value: tokens.refresh_token, meta: { access_token: tokens.access_token, set_at: new Date() }, updated_at: new Date() },
+      { upsert: true }
+    );
+    console.log('✅ Zoho Books connected successfully');
+    res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:60px">
+      <h2 style="color:#16a34a">✅ Zoho Books Connected!</h2>
+      <p>FWF is now syncing receipts to Zoho Books automatically.</p>
+      <script>setTimeout(()=>{ window.close(); },2000)</script>
+      <a href="https://fwfindia.org/admin-dashboard.html#invoices">Return to Dashboard</a>
+    </body></html>`);
+  } catch (err) {
+    captureError(err, { context: 'zoho-callback' });
+    res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:60px">
+      <h2 style="color:#ef4444">Error</h2><p>${err.message}</p>
+      <a href="https://fwfindia.org/admin-dashboard.html#invoices">Back to Dashboard</a>
+    </body></html>`);
+  }
+});
+
+// Check Zoho connection status
+app.get('/api/admin/zoho/status', auth('admin'), async (req, res) => {
+  try {
+    const status = await checkZohoConnection();
+    const cfg = await AppConfig.findOne({ key: 'zoho_refresh_token' }).lean();
+    res.json({ ok: true, ...status, configured_at: cfg?.updated_at || null });
+  } catch (err) {
+    res.json({ ok: true, connected: false, reason: err.message });
+  }
+});
+
+// Sync ALL unsynced receipts to Zoho Books (manual bulk sync)
+app.post('/api/admin/zoho/sync', auth('admin'), async (req, res) => {
+  try {
+    const status = await checkZohoConnection();
+    if (!status.connected) return res.status(400).json({ error: 'Zoho not connected: ' + status.reason });
+
+    const unsynced = await Receipt.find({ zoho_salesreceipt_id: { $exists: false }, status: { $ne: 'cancelled' } })
+      .sort({ created_at: -1 }).limit(100).lean();
+
+    let synced = 0, failed = 0, errors = [];
+    for (const receipt of unsynced) {
+      try {
+        const result = await syncReceiptToZoho(receipt);
+        if (result?.zoho_salesreceipt_id) {
+          await Receipt.updateOne({ _id: receipt._id }, {
+            $set: { zoho_salesreceipt_id: result.zoho_salesreceipt_id, zoho_synced_at: new Date() }
+          });
+          synced++;
+        } else { failed++; }
+      } catch (err) {
+        failed++;
+        errors.push({ receipt_id: receipt.receipt_id, error: err.message });
+      }
+    }
+    res.json({ ok: true, total: unsynced.length, synced, failed, errors: errors.slice(0, 5) });
+  } catch (err) {
+    captureError(err, { context: 'zoho-bulk-sync' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Sync single receipt to Zoho Books
+app.post('/api/admin/zoho/sync/:receiptId', auth('admin'), async (req, res) => {
+  try {
+    const receipt = await Receipt.findOne({ receipt_id: req.params.receiptId }).lean();
+    if (!receipt) return res.status(404).json({ error: 'Receipt not found' });
+    const result = await syncReceiptToZoho(receipt);
+    if (!result?.zoho_salesreceipt_id) return res.status(500).json({ error: 'Zoho sync returned no ID' });
+    await Receipt.updateOne({ _id: receipt._id }, {
+      $set: { zoho_salesreceipt_id: result.zoho_salesreceipt_id, zoho_synced_at: new Date() }
+    });
+    res.json({ ok: true, zoho_salesreceipt_id: result.zoho_salesreceipt_id });
+  } catch (err) {
+    captureError(err, { context: 'zoho-sync-single' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Disconnect Zoho (remove stored token)
+app.post('/api/admin/zoho/disconnect', auth('admin'), async (req, res) => {
+  try {
+    await AppConfig.deleteOne({ key: 'zoho_refresh_token' });
+    res.json({ ok: true, message: 'Zoho Books disconnected' });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

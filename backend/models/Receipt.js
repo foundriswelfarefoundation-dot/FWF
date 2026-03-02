@@ -45,6 +45,10 @@ const receiptSchema = new mongoose.Schema({
   viewed_at:      { type: Date, default: null },
   views:          { type: Number, default: 0 },
 
+  // Zoho Books sync
+  zoho_salesreceipt_id: { type: String, default: null },
+  zoho_synced_at:       { type: Date, default: null },
+
   created_at:     { type: Date, default: Date.now }
 });
 

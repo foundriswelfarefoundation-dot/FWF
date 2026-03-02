@@ -1528,6 +1528,34 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <span id="frLastRefresh" style="font-size:11px;color:#94a3b8;align-self:center;margin-left:auto"></span>
     </div>
 
+    <!-- ========= DEMO TEST PANEL ========= -->
+    <div class="content-card" id="demoPanel" style="margin-bottom:20px;border:2px dashed #f59e0b;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <span style="font-size:28px">🧪</span>
+        <div>
+          <h3 style="margin:0;color:#fbbf24;font-size:16px">Demo / Test Mode</h3>
+          <p style="margin:0;color:#c4b5fd;font-size:12px">Monthly=30min, Half-Yearly=1hr, Annual=1.5hr — Auto result 5 min after end</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button id="btnDemoStart" onclick="startDemo()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">
+          <i class="fa-solid fa-play"></i> Start Demo
+        </button>
+        <button id="btnDemoStop" onclick="stopDemo()" style="background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;display:none">
+          <i class="fa-solid fa-stop"></i> Stop & Cleanup
+        </button>
+        <button id="btnDemoRefresh" onclick="refreshDemoStatus()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;display:none">
+          <i class="fa-solid fa-sync"></i> Refresh Status
+        </button>
+        <span id="demoStatusBadge" style="display:none;background:#fbbf24;color:#1e1b4b;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">RUNNING</span>
+      </div>
+      <!-- Demo Live Tracker -->
+      <div id="demoTracker" style="display:none;margin-top:16px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px" id="demoCardsGrid"></div>
+        <div id="demoLog" style="margin-top:12px;max-height:200px;overflow-y:auto;background:rgba(0,0,0,.3);border-radius:8px;padding:10px;font-family:monospace;font-size:11px;color:#a5b4fc"></div>
+      </div>
+    </div>
+
     <!-- Active Quizzes -->
     <div class="content-card" style="margin-bottom:16px">
       <h3><i class="fa-solid fa-bolt" style="color:#3b82f6"></i> Active Quizzes</h3>
@@ -1961,7 +1989,7 @@ function switchPage(page, updateHash = true){
   if(page === 'reports')     loadReports();
   if(page === 'marketplace') loadMarketplaceAdmin();
   if(page === 'projectcosts') renderCostEditor();
-  if(page === 'fundraiser')  loadFundRaiser();
+  if(page === 'fundraiser')  { loadFundRaiser(); checkDemoOnLoad(); }
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -3228,6 +3256,146 @@ async function manualDraw(quizId){
   } catch(err){
     alert('❌ Error: ' + err.message);
   }
+}
+
+// ======== DEMO / TEST MODE ========
+let demoRefreshTimer = null;
+
+function demoLog(msg){
+  const log = document.getElementById('demoLog');
+  if(!log) return;
+  const t = new Date().toLocaleTimeString('en-IN');
+  log.innerHTML = `<div>[${t}] ${msg}</div>` + log.innerHTML;
+}
+
+function buildDemoCard(q){
+  const colors = { monthly:'#3b82f6', half_yearly:'#8b5cf6', yearly:'#f59e0b' };
+  const labels = { monthly:'Monthly (30 min)', half_yearly:'Half-Yearly (1 hr)', yearly:'Annual (1.5 hr)' };
+  const c = colors[q.type] || '#64748b';
+  let statusHtml = '';
+  if(q.status === 'result_declared'){
+    const ws = (q.winners||[]).map(w => `<div style="font-size:11px;color:#fbbf24">🏆 #${w.rank} ${w.name} — ₹${w.prize.toLocaleString('en-IN')}</div>`).join('');
+    statusHtml = `<div style="background:#166534;color:#4ade80;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">✅ RESULT DECLARED</div>${ws}`;
+  } else if(q.ends_in === 'ENDED'){
+    statusHtml = `<div style="background:#78350f;color:#fbbf24;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px">⏳ ${q.result_in}</div>`;
+  } else {
+    statusHtml = `<div style="background:rgba(255,255,255,.1);color:#e2e8f0;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;margin-top:6px">⏱️ Ends in ${q.ends_in} · Result ${q.result_in}</div>`;
+  }
+  return `<div style="background:linear-gradient(135deg,${c}22,${c}11);border:1px solid ${c}55;border-radius:12px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="color:${c};font-weight:800;font-size:13px">${labels[q.type]||q.type}</span>
+      <span style="background:${c};color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">${q.status.toUpperCase()}</span>
+    </div>
+    <div style="color:#cbd5e1;font-size:11px">${q.participants} participants · ₹${q.collection.toLocaleString('en-IN')} collected</div>
+    ${statusHtml}
+  </div>`;
+}
+
+async function refreshDemoStatus(){
+  try {
+    const data = await AUTH.api('/api/admin/quiz-demo-status');
+    if(!data.ok) throw new Error(data.error);
+    
+    const grid = document.getElementById('demoCardsGrid');
+    if(data.quizzes.length === 0){
+      grid.innerHTML = '<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">No demo quizzes found</div>';
+      setDemoUI(false);
+      return;
+    }
+    grid.innerHTML = data.quizzes.map(q => buildDemoCard(q)).join('');
+
+    // Check if all done
+    const allDone = data.quizzes.every(q => q.status === 'result_declared');
+    if(allDone){
+      demoLog('🎉 All demo quizzes completed! Results declared for all tiers.');
+      setDemoUI(false);
+    }
+
+    // Update running status
+    if(data.demoRunning){
+      document.getElementById('demoStatusBadge').textContent = 'RUNNING';
+      document.getElementById('demoStatusBadge').style.background = '#fbbf24';
+    } else if(allDone){
+      document.getElementById('demoStatusBadge').textContent = 'COMPLETED';
+      document.getElementById('demoStatusBadge').style.background = '#4ade80';
+    }
+
+    // Also refresh main tables
+    loadFundRaiser();
+  } catch(err){
+    demoLog('❌ Error: ' + err.message);
+  }
+}
+
+function setDemoUI(running){
+  document.getElementById('btnDemoStart').style.display = running ? 'none' : '';
+  document.getElementById('btnDemoStop').style.display = running ? '' : 'none';
+  document.getElementById('btnDemoRefresh').style.display = running ? '' : 'none';
+  document.getElementById('demoStatusBadge').style.display = running ? '' : 'none';
+  document.getElementById('demoTracker').style.display = running ? '' : 'none';
+  if(running && !demoRefreshTimer){
+    demoRefreshTimer = setInterval(refreshDemoStatus, 15000); // refresh every 15s
+  }
+  if(!running && demoRefreshTimer){
+    clearInterval(demoRefreshTimer);
+    demoRefreshTimer = null;
+  }
+}
+
+async function startDemo(){
+  if(!confirm('Start Fund Raiser Demo?\n\n• Monthly quiz: 30 min\n• Half-Yearly: 1 hour\n• Annual: 1.5 hours\n\nResults auto-declared 5 min after each ends.\nRandom participants will be added.')) return;
+  
+  document.getElementById('btnDemoStart').disabled = true;
+  document.getElementById('btnDemoStart').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Starting...';
+  document.getElementById('demoLog').innerHTML = '';
+  
+  try {
+    const data = await AUTH.api('/api/admin/quiz-demo-start', { method:'POST' });
+    if(!data.ok) throw new Error(data.error);
+    
+    demoLog('✅ Demo started! ' + data.totalParticipants + ' random participants added.');
+    data.quizzes.forEach(q => {
+      demoLog(`📋 ${q.type}: ends in ${q.ends_in}, result in ${q.result_in} (${q.participants} participants)`);
+    });
+    
+    setDemoUI(true);
+    refreshDemoStatus();
+    loadFundRaiser();
+  } catch(err){
+    alert('❌ Error starting demo: ' + err.message);
+    demoLog('❌ Failed: ' + err.message);
+  } finally {
+    document.getElementById('btnDemoStart').disabled = false;
+    document.getElementById('btnDemoStart').innerHTML = '<i class="fa-solid fa-play"></i> Start Demo';
+  }
+}
+
+async function stopDemo(){
+  if(!confirm('Stop demo and delete all demo quizzes?')) return;
+  try {
+    const data = await AUTH.api('/api/admin/quiz-demo-stop', { method:'POST' });
+    if(!data.ok) throw new Error(data.error);
+    demoLog('🛑 Demo stopped. Deleted ' + data.deleted.quizzes + ' quizzes, ' + data.deleted.participations + ' participations.');
+    setDemoUI(false);
+    document.getElementById('demoCardsGrid').innerHTML = '';
+    loadFundRaiser();
+  } catch(err){
+    alert('❌ Error: ' + err.message);
+  }
+}
+
+// On page load, check if demo is running
+async function checkDemoOnLoad(){
+  try {
+    const data = await AUTH.api('/api/admin/quiz-demo-status');
+    if(data.ok && data.quizzes.length > 0){
+      const allDone = data.quizzes.every(q => q.status === 'result_declared');
+      if(data.demoRunning || !allDone){
+        setDemoUI(true);
+        refreshDemoStatus();
+      }
+    }
+  } catch(e){}
 }
 
 // ═══════════════════════════════════════════

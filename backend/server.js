@@ -482,7 +482,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: ['/api/auth/login', '/api/admin/login', '/api/auth/logout'],
       member: ['/api/member/me', '/api/member/apply-wallet', '/api/member/weekly-task', '/api/member/complete-task', '/api/member/all-tasks', '/api/member/task-history', '/api/member/feed', '/api/member/create-post', '/api/member/active-quizzes', '/api/member/quiz-enroll', '/api/member/quiz-submit', '/api/member/quiz-history', '/api/member/affiliate'],
-      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
+      admin: ['/api/admin/overview', '/api/admin/create-quiz', '/api/admin/quiz-draw/:quizId', '/api/admin/quizzes', '/api/admin/quiz-auto-create', '/api/admin/quiz-auto-draw', '/api/admin/quiz-scheduler-status', '/api/admin/quiz-demo-start', '/api/admin/quiz-demo-stop', '/api/admin/quiz-demo-status', '/api/admin/social-stats', '/api/admin/social-posts', '/api/admin/social-posts/:id/approve', '/api/admin/social-posts/:id/reject'],
       payment: ['/api/pay/check-member', '/api/pay/simulate-join', '/api/pay/create-order', '/api/pay/create-subscription', '/api/pay/create-donation-subscription', '/api/pay/verify', '/api/pay/membership', '/api/pay/donation'],
       referral: ['/api/referral/click'],
       debug: ['/api/debug/users (development only)']
@@ -3119,6 +3119,218 @@ app.get('/api/admin/quiz-scheduler-status', auth('admin'), async (req, res) => {
 });
 
 // Admin: get social task stats
+
+// Admin: Start Demo Test — short timers + fake participants
+let demoSchedulerInterval = null;
+app.post('/api/admin/quiz-demo-start', auth('admin'), async (req, res) => {
+  try {
+    const now = new Date();
+
+    // Fake participant names
+    const fakeNames = [
+      'Priya Sharma', 'Anita Verma', 'Sunita Devi', 'Rekha Gupta', 'Savita Singh',
+      'Meena Kumari', 'Pooja Yadav', 'Kavita Pandey', 'Rani Patel', 'Geeta Mishra',
+      'Suman Joshi', 'Lata Chauhan', 'Usha Tiwari', 'Nirmala Rawat', 'Kamla Dubey',
+      'Bina Agarwal', 'Pushpa Soni', 'Kiran Bano', 'Seema Rathore', 'Neha Kapoor',
+      'Ritu Saxena', 'Shanti Bisht', 'Mamta Jain', 'Aarti Thakur', 'Deepa Negi'
+    ];
+
+    // Delete old demo quizzes (prefixed with DEMO-)
+    await Quiz.deleteMany({ quiz_id: { $regex: /^DEMO-/ } });
+    await QuizParticipation.deleteMany({ quiz_ref: { $regex: /^DEMO-/ } });
+
+    const demoQuizzes = [
+      {
+        quiz_id: `DEMO-M${Date.now()}`,
+        title: '🧪 DEMO Monthly Quiz',
+        description: 'Test demo — ends in 30 minutes',
+        type: 'monthly',
+        game_type: 'mcq',
+        entry_fee: 100,
+        start_date: now,
+        end_date: new Date(now.getTime() + 30 * 60 * 1000), // 30 min
+        result_date: new Date(now.getTime() + 35 * 60 * 1000), // 35 min (5 min after end)
+        status: 'active',
+        prizes: { first: 5000, second: 2000, third: 1000 },
+        questions: [
+          { q_no: 1, question: 'Demo Q1: 2+2=?', options: ['3', '4', '5', '6'], correct_answer: 1, points: 1 },
+          { q_no: 2, question: 'Demo Q2: Capital of India?', options: ['Mumbai', 'Delhi', 'Chennai', 'Kolkata'], correct_answer: 1, points: 1 },
+          { q_no: 3, question: 'Demo Q3: Sun rises in?', options: ['West', 'North', 'South', 'East'], correct_answer: 3, points: 1 }
+        ]
+      },
+      {
+        quiz_id: `DEMO-H${Date.now()}`,
+        title: '🧪 DEMO Half-Yearly Quiz',
+        description: 'Test demo — ends in 1 hour',
+        type: 'half_yearly',
+        game_type: 'general',
+        entry_fee: 500,
+        start_date: now,
+        end_date: new Date(now.getTime() + 60 * 60 * 1000), // 1 hour
+        result_date: new Date(now.getTime() + 65 * 60 * 1000), // 65 min
+        status: 'active',
+        prizes: { first: 25000, second: 10000, third: 5000 },
+        questions: [
+          { q_no: 1, question: 'Demo HY Q1: Largest ocean?', options: ['Atlantic', 'Indian', 'Pacific', 'Arctic'], correct_answer: 2, points: 1 },
+          { q_no: 2, question: 'Demo HY Q2: H2O is?', options: ['Oxygen', 'Water', 'Hydrogen', 'Salt'], correct_answer: 1, points: 1 }
+        ]
+      },
+      {
+        quiz_id: `DEMO-Y${Date.now()}`,
+        title: '🧪 DEMO Annual Quiz',
+        description: 'Test demo — ends in 1.5 hours',
+        type: 'yearly',
+        game_type: 'mcq',
+        entry_fee: 1000,
+        start_date: now,
+        end_date: new Date(now.getTime() + 90 * 60 * 1000), // 1.5 hours
+        result_date: new Date(now.getTime() + 95 * 60 * 1000), // 95 min
+        status: 'active',
+        prizes: { first: 50000, second: 25000, third: 10000 },
+        questions: [
+          { q_no: 1, question: 'Demo Y Q1: First PM of India?', options: ['Gandhi', 'Nehru', 'Patel', 'Ambedkar'], correct_answer: 1, points: 1 },
+          { q_no: 2, question: 'Demo Y Q2: 100 × 100 = ?', options: ['1000', '10000', '100000', '1000000'], correct_answer: 1, points: 1 }
+        ]
+      }
+    ];
+
+    const created = await Quiz.insertMany(demoQuizzes);
+
+    // Add random fake participants to each quiz
+    const participations = [];
+    for (const quiz of created) {
+      const numFake = 5 + Math.floor(Math.random() * 16); // 5 to 20 participants
+      const shuffled = [...fakeNames].sort(() => Math.random() - 0.5).slice(0, numFake);
+      
+      for (let i = 0; i < shuffled.length; i++) {
+        const fakeName = shuffled[i];
+        const fakeScore = Math.floor(Math.random() * (quiz.questions.length + 1));
+        const enrollNum = `DEMO-${quiz.type.charAt(0).toUpperCase()}${Date.now()}-${String(i+1).padStart(3,'0')}`;
+        
+        participations.push({
+          quiz_id: quiz._id,
+          quiz_ref: quiz.quiz_id,
+          user_id: new mongoose.Types.ObjectId(), // fake user ID
+          member_id: `FWF-DEMO-${String(1000 + i)}`,
+          name: fakeName,
+          enrollment_number: enrollNum,
+          payment_id: `demo_pay_${Date.now()}_${i}`,
+          amount_paid: quiz.entry_fee,
+          payment_status: 'paid',
+          score: fakeScore,
+          quiz_submitted: Math.random() > 0.3, // 70% submitted
+          submitted_at: Math.random() > 0.3 ? new Date() : null,
+          status: 'enrolled',
+          answers: quiz.questions.map((q, qi) => ({
+            q_no: q.q_no,
+            selected: Math.floor(Math.random() * q.options.length),
+            is_correct: Math.floor(Math.random() * q.options.length) === q.correct_answer
+          }))
+        });
+      }
+
+      // Update quiz participant count
+      await Quiz.findByIdAndUpdate(quiz._id, {
+        total_participants: shuffled.length,
+        total_collection: shuffled.length * quiz.entry_fee
+      });
+    }
+
+    await QuizParticipation.insertMany(participations);
+
+    // Start fast scheduler (every 1 min) for demo
+    if (demoSchedulerInterval) clearInterval(demoSchedulerInterval);
+    demoSchedulerInterval = setInterval(async () => {
+      console.log('⚡ Demo scheduler tick...');
+      await autoDrawResults();
+      // Check if all demo quizzes are done
+      const remaining = await Quiz.countDocuments({ quiz_id: { $regex: /^DEMO-/ }, status: { $in: ['active', 'closed'] } });
+      if (remaining === 0 && demoSchedulerInterval) {
+        clearInterval(demoSchedulerInterval);
+        demoSchedulerInterval = null;
+        console.log('✅ Demo complete — all quizzes drawn! Fast scheduler stopped.');
+      }
+    }, 60 * 1000); // every 1 minute
+    console.log('⚡ Demo fast scheduler started (every 1 min)');
+
+    const summary = created.map(q => ({
+      quiz_id: q.quiz_id,
+      type: q.type,
+      ends_in: q.type === 'monthly' ? '30 min' : q.type === 'half_yearly' ? '1 hour' : '1.5 hours',
+      result_in: q.type === 'monthly' ? '35 min' : q.type === 'half_yearly' ? '65 min' : '95 min',
+      participants: participations.filter(p => p.quiz_ref === q.quiz_id).length
+    }));
+
+    res.json({
+      ok: true,
+      message: 'Demo started! Fast scheduler running every 1 min.',
+      quizzes: summary,
+      totalParticipants: participations.length,
+      timeline: {
+        monthly_ends: demoQuizzes[0].end_date.toLocaleString(),
+        monthly_result: demoQuizzes[0].result_date.toLocaleString(),
+        half_yearly_ends: demoQuizzes[1].end_date.toLocaleString(),
+        half_yearly_result: demoQuizzes[1].result_date.toLocaleString(),
+        yearly_ends: demoQuizzes[2].end_date.toLocaleString(),
+        yearly_result: demoQuizzes[2].result_date.toLocaleString()
+      }
+    });
+  } catch (err) {
+    captureError(err, { context: 'quiz-demo-start' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Stop demo and cleanup
+app.post('/api/admin/quiz-demo-stop', auth('admin'), async (req, res) => {
+  try {
+    if (demoSchedulerInterval) {
+      clearInterval(demoSchedulerInterval);
+      demoSchedulerInterval = null;
+    }
+    const deletedQ = await Quiz.deleteMany({ quiz_id: { $regex: /^DEMO-/ } });
+    const deletedP = await QuizParticipation.deleteMany({ quiz_ref: { $regex: /^DEMO-/ } });
+    res.json({
+      ok: true,
+      message: 'Demo stopped and cleaned up.',
+      deleted: { quizzes: deletedQ.deletedCount, participations: deletedP.deletedCount }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Demo status
+app.get('/api/admin/quiz-demo-status', auth('admin'), async (req, res) => {
+  try {
+    const demoQuizzes = await Quiz.find({ quiz_id: { $regex: /^DEMO-/ } })
+      .select('quiz_id title type status end_date result_date total_participants total_collection winners').lean();
+    const now = new Date();
+    const timeline = demoQuizzes.map(q => {
+      const endMs = new Date(q.end_date).getTime() - now.getTime();
+      const resMs = new Date(q.result_date).getTime() - now.getTime();
+      return {
+        quiz_id: q.quiz_id,
+        type: q.type,
+        status: q.status,
+        ends_in: endMs > 0 ? Math.ceil(endMs/60000) + ' min' : 'ENDED',
+        result_in: resMs > 0 ? Math.ceil(resMs/60000) + ' min' : (q.winners?.length ? 'DECLARED' : 'PENDING DRAW'),
+        participants: q.total_participants || 0,
+        collection: q.total_collection || 0,
+        winners: (q.winners || []).map(w => ({ rank: w.rank, name: w.name, prize: w.prize_amount }))
+      };
+    });
+    res.json({
+      ok: true,
+      demoRunning: !!demoSchedulerInterval,
+      serverTime: now.toISOString(),
+      quizzes: timeline
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ========================
 // ADMIN SOCIAL POST ROUTES
 // ========================

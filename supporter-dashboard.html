@@ -418,27 +418,58 @@ textarea.form-input{ resize:vertical; min-height:80px; }
    ============================== */
 .feed-card{
   background:var(--card-bg); border:1px solid var(--card-border);
-  border-radius:var(--radius-md); padding:18px; margin-bottom:14px;
-  box-shadow:var(--shadow-card);
+  border-radius:18px; padding:0; margin-bottom:16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07); overflow:hidden;
+  transition:box-shadow .2s, transform .2s;
 }
-.feed-header{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.feed-card:hover{ box-shadow:0 6px 24px rgba(0,0,0,.11); transform:translateY(-1px); }
+.feed-card-top-bar{ height:4px; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+.feed-card-body{ padding:16px 18px 0; }
+.feed-header{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
 .feed-avatar{
-  width:38px; height:38px; border-radius:50%;
+  width:44px; height:44px; border-radius:50%;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:800; color:#fff; flex-shrink:0;
+  font-size:15px; font-weight:800; color:#fff; flex-shrink:0;
+  box-shadow:0 2px 8px rgba(16,185,129,.25); overflow:hidden;
 }
-.feed-name{ font-size:14px; font-weight:800; }
-.feed-time{ font-size:11px; color:var(--text-muted); font-weight:600; }
-.feed-body{ font-size:14px; line-height:1.7; color:var(--text-secondary); margin-bottom:10px; }
-.feed-actions{ display:flex; gap:8px; }
+.feed-name{ font-size:14px; font-weight:800; color:var(--text-primary); }
+.feed-time{ font-size:11px; color:var(--text-muted); font-weight:500; margin-top:1px; }
+.feed-type-badge{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700;
+  margin-top:4px;
+}
+.feed-body{
+  font-size:14px; line-height:1.75; color:var(--text-secondary);
+  margin-bottom:0; padding-bottom:12px;
+  border-bottom:1px solid var(--card-border);
+}
+.feed-images{
+  display:grid; gap:4px; margin:0 0 0;
+  border-bottom:1px solid var(--card-border);
+}
+.feed-images.single img{ width:100%; max-height:340px; object-fit:cover; display:block; }
+.feed-images.multi{ grid-template-columns:1fr 1fr; }
+.feed-images.multi img{ width:100%; height:180px; object-fit:cover; display:block; }
+.feed-images.multi img:first-child:nth-last-child(odd){ grid-column:1/-1; height:200px; }
+.feed-actions{
+  display:flex; gap:0; padding:2px 4px;
+  border-top:0;
+}
 .feed-actions button{
-  padding:6px 14px; border-radius:var(--radius-sm);
-  font-size:12px; font-weight:700; color:var(--text-muted);
-  background:var(--bg-1); border:1px solid var(--card-border);
+  flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 6px; border-radius:10px;
+  font-size:13px; font-weight:700; color:var(--text-muted);
+  background:none; border:none;
   cursor:pointer; transition:.15s; font-family:inherit;
 }
-.feed-actions button:hover{ color:var(--accent); border-color:var(--accent); }
+.feed-actions button:hover{ color:var(--accent); background:rgba(16,185,129,.07); }
+.feed-actions button.liked{ color:#ef4444; }
+.feed-actions button.liked i{ animation:heartPop .25s ease; }
+@keyframes heartPop{
+  0%{ transform:scale(1) } 50%{ transform:scale(1.4) } 100%{ transform:scale(1) }
+}
 
 /* ==============================
    EVENT CARD
@@ -751,10 +782,11 @@ textarea.form-input{ resize:vertical; min-height:80px; }
   .btn{ padding:10px 16px; font-size:12px; border-radius:10px; }
   .profile-avatar{ width:56px; height:56px; font-size:22px; }
   .profile-name{ font-size:18px; }
-  .feed-card{ padding:14px; border-radius:12px; }
-  .feed-avatar{ width:34px; height:34px; font-size:12px; }
+  .feed-card{ border-radius:14px; }
+  .feed-avatar{ width:38px; height:38px; font-size:13px; }
   .feed-name{ font-size:13px; }
   .feed-body{ font-size:13px; }
+  .feed-actions button{ font-size:12px; }
   .modal{ padding:0; }
   .modal-content{ max-width:100%; border-radius:16px 16px 0 0; max-height:92vh; margin-top:auto; }
   .modal-overlay{ padding:0; }
@@ -1013,34 +1045,43 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 
   <!-- ===================== SOCIAL BOOK ===================== -->
   <div class="page" id="page-feed">
-    <div style="background:var(--accent);border-radius:var(--radius-md);padding:16px 22px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:14px">
-      <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
-        <i class="fa-solid fa-users"></i>
-      </div>
-      <div style="flex:1">
-        <h2 style="font-size:18px;font-weight:700;margin:0;display:flex;align-items:center;gap:8px"><i class="fa-solid fa-book-open"></i> Share your social work, inspire others!</h2>
+
+    <!-- Header Banner -->
+    <div style="background:linear-gradient(135deg,#064e3b 0%,#059669 100%);border-radius:20px;padding:20px 22px;color:#fff;margin-bottom:16px;overflow:hidden;position:relative">
+      <div style="position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+      <div style="position:absolute;right:30px;bottom:-40px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <div style="display:flex;align-items:center;gap:14px;position:relative">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📖</div>
+        <div>
+          <h2 style="font-size:17px;font-weight:800;margin:0 0 3px">Social Book</h2>
+          <p style="font-size:12px;opacity:.85;margin:0">Share your social work, inspire others!</p>
+        </div>
       </div>
     </div>
 
     <!-- Create Post Box -->
-    <div class="content-card" style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:4px" onclick="openModal('postModal')">
-        <div class="feed-avatar" style="width:40px;height:40px;font-size:14px" id="feedUserAvatar">S</div>
-        <div style="flex:1;background:var(--bg-1);padding:10px 16px;border-radius:var(--radius-sm);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid var(--card-border)" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg-1)'">
+    <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:18px;padding:14px 16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div class="feed-avatar" id="feedUserAvatar" style="width:42px;height:42px;font-size:15px;flex-shrink:0">S</div>
+        <div style="flex:1;background:var(--bg-1);padding:11px 16px;border-radius:50px;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--card-border);transition:.15s" onclick="openModal('postModal')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--card-border)'">
           What's your social work story today?
         </div>
-        <button class="btn btn-primary" onclick="openModal('postModal')"><i class="fa-solid fa-image"></i> Post</button>
+      </div>
+      <div style="display:flex;gap:6px;border-top:1px solid var(--card-border);padding-top:10px">
+        <button class="btn" style="flex:1;gap:6px;font-size:12px;padding:7px 8px;border-radius:10px;color:#3b82f6;border-color:#dbeafe;background:#eff6ff" onclick="openModal('postModal')"><i class="fa-solid fa-image"></i> Photo</button>
+        <button class="btn" style="flex:1;gap:6px;font-size:12px;padding:7px 8px;border-radius:10px;color:#10b981;border-color:#d1fae5;background:#f0fdf4" onclick="openModal('postModal')"><i class="fa-solid fa-leaf"></i> Activity</button>
+        <button class="btn" style="flex:1;gap:6px;font-size:12px;padding:7px 8px;border-radius:10px;color:#8b5cf6;border-color:#ede9fe;background:#f5f3ff" onclick="openModal('postModal')"><i class="fa-solid fa-hand-holding-heart"></i> Welfare</button>
       </div>
     </div>
 
     <div id="feedContainer">
       <!-- skeletons shown on first load -->
-      <div class="skeleton-loader" style="height:120px;border-radius:16px;margin-bottom:12px" id="feedSkel1"></div>
-      <div class="skeleton-loader" style="height:120px;border-radius:16px;margin-bottom:12px" id="feedSkel2"></div>
-      <div class="skeleton-loader" style="height:120px;border-radius:16px;margin-bottom:12px" id="feedSkel3"></div>
+      <div class="skeleton-loader" style="height:140px;border-radius:18px;margin-bottom:14px"></div>
+      <div class="skeleton-loader" style="height:140px;border-radius:18px;margin-bottom:14px"></div>
+      <div class="skeleton-loader" style="height:140px;border-radius:18px;margin-bottom:14px"></div>
     </div>
-    <div style="text-align:center;padding:12px 0 6px" id="feedLoadMoreWrap" hidden>
-      <button class="btn" style="font-size:13px" onclick="loadFeed(true)">Load More</button>
+    <div style="text-align:center;padding:8px 0 16px" id="feedLoadMoreWrap" hidden>
+      <button style="display:inline-flex;align-items:center;gap:8px;padding:10px 28px;border-radius:50px;background:var(--card-bg);border:1.5px solid var(--card-border);font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--card-border)'" onclick="loadFeed(true)"><i class="fa-solid fa-rotate"></i> Load More Posts</button>
     </div>
   </div>
 
@@ -2352,27 +2393,39 @@ async function loadFeed(loadMore = false) {
       })();
       const typeLabel = typeLabels[p.post_type] || 'Activity';
       const typeColor = typeColors[p.post_type] || '#6b7280';
-      const imagesHtml = (p.images || []).length > 0
-        ? `<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">${
-            p.images.map(img => `<img src="${img}" style="max-height:180px;border-radius:10px;object-fit:cover;max-width:100%" loading="lazy">`).join('')
+      const imgs = p.images || [];
+      const imagesHtml = imgs.length > 0
+        ? `<div class="feed-images ${imgs.length === 1 ? 'single' : 'multi'}">${
+            imgs.map(img => `<img src="${img}" loading="lazy" onclick="openImgViewer(this.src)">`).join('')
           }</div>` : '';
+
+      // Avatar gradient based on name
+      const avatarColors = ['#10b981','#3b82f6','#8b5cf6','#f59e0b','#ec4899','#06b6d4','#f97316','#14b8a6'];
+      const avatarBg = avatarColors[(p.user_name||'').charCodeAt(0) % avatarColors.length];
+
       const card = document.createElement('div');
       card.className = 'feed-card';
       card.dataset.postId = p._id;
       card.innerHTML = `
-        <div class="feed-header">
-          <div class="feed-avatar" style="background:var(--accent)">${p.user_avatar ? `<img src="${p.user_avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : initials}</div>
-          <div style="flex:1">
-            <div class="feed-name">${p.user_name}</div>
-            <div class="feed-time">${timeAgo} • <span style="color:${typeColor};font-weight:700">${typeLabel}</span></div>
+        <div class="feed-card-top-bar" style="background:linear-gradient(90deg,${typeColor},${typeColor}88)"></div>
+        <div class="feed-card-body">
+          <div class="feed-header">
+            <div class="feed-avatar" style="background:${avatarBg}">${p.user_avatar ? `<img src="${p.user_avatar}" style="width:100%;height:100%;object-fit:cover">` : initials}</div>
+            <div style="flex:1;min-width:0">
+              <div class="feed-name">${p.user_name}</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px">
+                <span class="feed-time">${timeAgo}</span>
+                <span class="feed-type-badge" style="background:${typeColor}18;color:${typeColor}">${typeLabel}</span>
+              </div>
+            </div>
           </div>
+          <div class="feed-body" style="white-space:pre-line">${p.content.replace(/</g,'&lt;')}</div>
         </div>
-        <div class="feed-body" style="white-space:pre-line">${p.content.replace(/</g,'&lt;')}</div>
         ${imagesHtml}
         <div class="feed-actions">
-          <button onclick="toggleFeedLike('${p._id}',this)" data-liked="false"><i class="fa-regular fa-heart"></i> <span class="like-count">${p.likes_count||0}</span></button>
-          <button><i class="fa-regular fa-comment"></i> ${p.comments_count||0}</button>
-          <button onclick="shareFeedPost('${encodeURIComponent(p.user_name)}','${encodeURIComponent(p.content.slice(0,60))}')" ><i class="fa-solid fa-share"></i> Share</button>
+          <button onclick="toggleFeedLike('${p._id}',this)" data-liked="false"><i class="fa-regular fa-heart" style="font-size:15px"></i>&nbsp;<span class="like-count">${p.likes_count||0}</span></button>
+          <button><i class="fa-regular fa-comment" style="font-size:15px"></i>&nbsp;${p.comments_count||0}</button>
+          <button onclick="shareFeedPost('${encodeURIComponent(p.user_name)}','${encodeURIComponent(p.content.slice(0,60))}')" ><i class="fa-solid fa-share-nodes" style="font-size:15px"></i>&nbsp;Share</button>
         </div>`;
       container.appendChild(card);
     });
@@ -2409,6 +2462,15 @@ function shareFeedPost(name, preview) {
   const text = `Check out this social work post by ${decodeURIComponent(name)} on FWF Social Book!\n${decodeURIComponent(preview)}...\nhttps://fwfindia.org`;
   if (navigator.share) navigator.share({ title: 'FWF Social Book', text });
   else { navigator.clipboard.writeText(text); notify('Link copied!','success'); }
+}
+
+function openImgViewer(src) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:16px';
+  overlay.innerHTML = `<img src="${src}" style="max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.6);object-fit:contain">
+    <button style="position:fixed;top:16px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center">&times;</button>`;
+  overlay.addEventListener('click', () => overlay.remove());
+  document.body.appendChild(overlay);
 }
 
 /* ============================================

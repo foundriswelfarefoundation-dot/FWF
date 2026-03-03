@@ -1593,23 +1593,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <!-- TAB: DASHBOARD / OVERVIEW -->
     <div id="frSection-overview">
 
-      <!-- Quick Actions Card -->
-      <div class="content-card" style="margin-bottom:16px;background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%);border:1px solid #c7d2fe">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div style="flex:1;min-width:200px">
-            <h4 style="margin:0;font-size:15px;color:#1e3a5f"><i class="fa-solid fa-wand-magic-sparkles" style="color:#6366f1"></i> Quick Actions</h4>
-            <p style="margin:4px 0 0;color:#64748b;font-size:12px;line-height:1.5">
-              <b>Create Quizzes</b> — generates Monthly, Half-Yearly &amp; Annual lucky draws for the current period (max 1 per type)<br>
-              <b>Draw Results</b> — picks 1 random lucky winner for all quizzes whose result date has passed
-            </p>
-          </div>
-          <div style="display:flex;gap:8px;flex-shrink:0">
-            <button onclick="triggerAutoCreate()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;box-shadow:0 2px 8px rgba(59,130,246,.3)"><i class="fa-solid fa-plus"></i> Create Quizzes</button>
-            <button onclick="triggerAutoDraw()" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;box-shadow:0 2px 8px rgba(245,158,11,.3)"><i class="fa-solid fa-dice"></i> Draw Results</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Active Quizzes -->
       <div class="content-card" style="margin-bottom:16px">
         <h3><i class="fa-solid fa-bolt" style="color:#3b82f6"></i> Active Quizzes <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:6px">Currently running — members can participate</span></h3>
@@ -1635,7 +1618,10 @@ textarea.form-input{ resize:vertical; min-height:80px; }
     <!-- TAB: ALL QUIZZES -->
     <div id="frSection-quizzes" style="display:none">
       <div class="content-card">
-        <p style="margin:0 0 14px;color:#64748b;font-size:12px"><i class="fa-solid fa-info-circle" style="color:#3b82f6"></i> Complete list of all quizzes — search, filter by type/status, click any quiz for details or participants.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <p style="margin:0;color:#64748b;font-size:12px"><i class="fa-solid fa-info-circle" style="color:#3b82f6"></i> Complete list of all quizzes — search, filter by type/status, click any quiz for details or participants.</p>
+          <button onclick="triggerAutoCreate()" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:8px 18px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;box-shadow:0 2px 8px rgba(59,130,246,.3)"><i class="fa-solid fa-plus"></i> Create Quiz</button>
+        </div>
         <!-- Quick filter tabs -->
         <div style="display:flex;gap:6px;margin-bottom:14px">
           <button class="fr-filter-btn fr-filter-active" onclick="setQuizQuickFilter('')" id="frQF-all" style="padding:6px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer">All</button>
@@ -3430,7 +3416,8 @@ async function loadFundRaiser(){
           <td>${frStatusBadge(q.status)}</td>
           <td style="white-space:nowrap">
             <button onclick="openQuizDetail('${q.quiz_id}')" style="background:#dbeafe;color:#1e40af;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px">📋 Detail</button>
-            <button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">👥 Members</button>
+            <button onclick="openParticipants('${q.quiz_id}')" style="background:#ede9fe;color:#6d28d9;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px">👥 Members</button>
+            <button onclick="manualDraw('${q.quiz_id}')" style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🎲 Run Draw</button>
           </td>
         </tr>`).join('');
 
@@ -3717,33 +3704,57 @@ function exportParticipantsCSV(){
 }
 
 async function triggerAutoCreate(){
-  if(!confirm('Auto-create quizzes for current period?')) return;
-  try {
-    const data = await AUTH.api('/api/admin/quiz-auto-create', { method: 'POST' });
-    if(!data.ok) throw new Error(data.error || 'Failed');
-    alert('✅ ' + (data.message||'Done'));
-    loadFundRaiser();
-  } catch(err){ alert('❌ Error: ' + err.message); }
+  FWF_Notify.confirm(
+    `<div style="text-align:center">
+      <div style="font-size:34px;margin-bottom:8px">➕</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">Create Quizzes?</div>
+      <div style="font-size:13px;color:#666">Current period ke liye Monthly, Half-Yearly &amp; Annual quiz auto-generate honge.</div>
+    </div>`,
+    async () => {
+      try {
+        const data = await AUTH.api('/api/admin/quiz-auto-create', { method: 'POST' });
+        if(!data.ok) throw new Error(data.error || 'Failed');
+        FWF_Notify.toast('✅ ' + (data.message||'Quizzes created!'), 'success');
+        loadFundRaiser(); loadAllQuizzesList();
+      } catch(err){ FWF_Notify.toast('❌ Error: ' + err.message, 'error'); }
+    }
+  );
 }
 
 async function triggerAutoDraw(){
-  if(!confirm('Run auto-draw for all quizzes past result date?')) return;
-  try {
-    const data = await AUTH.api('/api/admin/quiz-auto-draw', { method: 'POST' });
-    if(!data.ok) throw new Error(data.error || 'Failed');
-    alert('✅ ' + (data.message||'Done'));
-    loadFundRaiser();
-  } catch(err){ alert('❌ Error: ' + err.message); }
+  FWF_Notify.confirm(
+    `<div style="text-align:center">
+      <div style="font-size:34px;margin-bottom:8px">🎲</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">Auto-Draw Run Karo?</div>
+      <div style="font-size:13px;color:#666">Result date pass ho chuke saare quizzes ka winner random select hoga.</div>
+    </div>`,
+    async () => {
+      try {
+        const data = await AUTH.api('/api/admin/quiz-auto-draw', { method: 'POST' });
+        if(!data.ok) throw new Error(data.error || 'Failed');
+        FWF_Notify.toast('✅ ' + (data.message||'Draw complete!'), 'success');
+        loadFundRaiser();
+      } catch(err){ FWF_Notify.toast('❌ Error: ' + err.message, 'error'); }
+    }
+  );
 }
 
 async function manualDraw(quizId){
-  if(!confirm('Draw results for quiz ' + quizId + '?')) return;
-  try {
-    const data = await AUTH.api('/api/admin/quiz-draw/' + quizId, { method: 'POST' });
-    if(!data.ok) throw new Error(data.error || 'Failed');
-    alert('✅ Result declared for ' + quizId);
-    loadFundRaiser();
-  } catch(err){ alert('❌ Error: ' + err.message); }
+  FWF_Notify.confirm(
+    `<div style="text-align:center">
+      <div style="font-size:34px;margin-bottom:8px">🎲</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">Run Draw: ${quizId}?</div>
+      <div style="font-size:13px;color:#666">Is quiz ke enrolled members mein se ek lucky winner random select hoga.</div>
+    </div>`,
+    async () => {
+      try {
+        const data = await AUTH.api('/api/admin/quiz-draw/' + quizId, { method: 'POST' });
+        if(!data.ok) throw new Error(data.error || 'Failed');
+        FWF_Notify.toast('✅ Result declared — ' + quizId, 'success');
+        loadFundRaiser();
+      } catch(err){ FWF_Notify.toast('❌ Error: ' + err.message, 'error'); }
+    }
+  );
 }
 
 

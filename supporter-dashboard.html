@@ -1175,28 +1175,28 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div style="position:absolute;top:0;right:0;width:90px;height:90px;background:radial-gradient(circle,rgba(255,255,255,.1),transparent);pointer-events:none"></div>
         <button onclick="document.getElementById('quizSellModal').style.display='none'" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">&times;</button>
         <div style="font-size:28px;margin-bottom:6px">🎫</div>
-        <h3 style="color:#fff;margin:0 0 3px;font-size:17px;font-weight:900">Quiz Ticket Sell करें</h3>
+        <h3 style="color:#fff;margin:0 0 3px;font-size:17px;font-weight:900">Sell Quiz Ticket</h3>
         <p id="sellModalSubtitle" style="color:rgba(255,255,255,.85);font-size:12px;margin:0"></p>
       </div>
       <div id="sellStep1" style="padding:22px 22px 24px">
-        <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;line-height:1.5">खरीदार की जानकारी भरें। एक unique quiz link generate होगी।</p>
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;line-height:1.5">Fill in buyer details. A unique quiz link will be generated.</p>
         <div style="display:grid;gap:12px">
-          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">खरीदार का पूरा नाम *</label><input type="text" id="sellBuyerName" class="form-input" placeholder="Full name" style="width:100%;box-sizing:border-box"></div>
-          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">मोबाइल नंबर *</label><input type="tel" id="sellBuyerMobile" class="form-input" placeholder="10-digit mobile" maxlength="10" style="width:100%;box-sizing:border-box"></div>
+          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">Buyer's Full Name *</label><input type="text" id="sellBuyerName" class="form-input" placeholder="Full name" style="width:100%;box-sizing:border-box"></div>
+          <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">Mobile Number *</label><input type="tel" id="sellBuyerMobile" class="form-input" placeholder="10-digit mobile" maxlength="10" style="width:100%;box-sizing:border-box"></div>
           <div><label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:5px">Email (optional)</label><input type="email" id="sellBuyerEmail" class="form-input" placeholder="buyer@email.com" style="width:100%;box-sizing:border-box"></div>
         </div>
         <div style="background:#fff8f0;border:1px solid #fcd9a0;border-radius:10px;padding:11px 13px;margin-top:14px;font-size:11px;color:#b45309;line-height:1.6"><i class="fa-solid fa-circle-info"></i> Link generate होने के बाद खरीदार खुद payment करेगा। आपको <strong>10% commission points</strong> मिलेंगे।</div>
         <button id="generateLinkBtn" onclick="generateSellLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><i class="fa-solid fa-link"></i> Generate Quiz Link</button>
       </div>
       <div id="sellStep2" style="display:none;padding:22px 22px 24px">
-        <div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:8px">🎉</div><h4 style="font-weight:900;color:var(--text-primary);margin:0 0 4px">Link Ready!</h4><p style="font-size:12px;color:var(--text-muted)">इस link को खरीदार के साथ share करें</p></div>
+        <div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:8px">🎉</div><h4 style="font-weight:900;color:var(--text-primary);margin:0 0 4px">Link Ready!</h4><p style="font-size:12px;color:var(--text-muted)">Share this link with the buyer</p></div>
         <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px 16px;margin-bottom:14px;text-align:center"><div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Support ID</div><div id="sellSupportId" style="font-size:18px;font-weight:900;color:#166534;font-family:monospace;letter-spacing:1px"></div></div>
         <div style="background:#f8fafc;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 16px;margin-bottom:14px"><div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Quiz Link</div><div style="display:flex;gap:8px;align-items:center"><input id="generatedSellLink" readonly style="flex:1;border:none;background:transparent;font-size:12px;color:var(--text-primary);font-family:monospace;outline:none;min-width:0" value=""><button onclick="copySellLink()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-copy"></i> Copy</button></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
           <button onclick="shareSellLink('whatsapp')" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:10px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
           <button onclick="shareSellLink('telegram')" style="background:linear-gradient(135deg,#0088cc,#0066aa);color:#fff;border:none;border-radius:10px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-brands fa-telegram"></i> Telegram</button>
         </div>
-        <button onclick="sellAnotherTicket()" style="width:100%;background:#f1f5f9;color:var(--text-primary);border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> दूसरा Ticket Sell करें</button>
+        <button onclick="sellAnotherTicket()" style="width:100%;background:#f1f5f9;color:var(--text-primary);border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> Sell Another Ticket</button>
       </div>
     </div>
   </div>

@@ -3141,7 +3141,8 @@ app.post('/api/admin/quiz-draw/:quizId', auth('admin'), async (req, res) => {
     if (quiz.status === 'result_declared') return res.status(400).json({ error: 'Results already declared' });
 
     // Get all paid participants (lucky draw — no score needed)
-    const participants = await QuizParticipation.find({ quiz_id: quiz._id, payment_status: 'paid' }).lean();
+    // Note: all QuizParticipation records are already paid (verified at enrollment)
+    const participants = await QuizParticipation.find({ quiz_id: quiz._id }).lean();
 
     if (participants.length === 0) return res.status(400).json({ error: 'No paid participants yet' });
 
@@ -4223,10 +4224,9 @@ async function autoDrawResults() {
         quiz.status = 'closed';
       }
 
-      // Get all participants
+      // Get all participants (all are paid — payment verified at enrollment time)
       const participants = await QuizParticipation.find({
-        quiz_ref: quiz.quiz_id,
-        payment_status: 'paid'
+        quiz_ref: quiz.quiz_id
       }).lean();
 
       if (participants.length === 0) {

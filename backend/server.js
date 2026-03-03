@@ -2913,7 +2913,7 @@ app.post('/api/quiz-ticket/:token/create-order', async (req, res) => {
     const order = await razorpay.orders.create({
       amount: ticket.ticket_price * 100,
       currency: 'INR',
-      receipt: `qt_${ticket._id}_${Date.now()}`
+      receipt: `qt_${ticket._id.toString().slice(-8)}_${Date.now().toString().slice(-8)}`
     });
 
     res.json({ ok: true, order, key: process.env.RAZORPAY_KEY_ID });

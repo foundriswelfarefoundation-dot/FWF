@@ -221,6 +221,33 @@
     .done-grid input[type="text"]{ width:100%; border:2px solid #e7e9f6; border-radius:10px; padding:10px 12px; font-weight:700; }
     .done-grid input[type="file"]{ border:1px solid #e7e9f6; border-radius:10px; padding:10px; background:#fafbff; }
     .btn-done{ margin-top:10px; width:100%; padding:10px 0; border:none; border-radius:10px; background:var(--primary); color:#fff; font-weight:900; cursor:pointer; }
+
+    /* ── T&C Checkboxes & Modal ── */
+    .tc-modal-overlay{align-items:flex-end;padding:0;z-index:10001}
+    .tc-modal-overlay .tc-card{width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;border-radius:20px 20px 0 0;overflow:hidden;margin:0 auto;background:#fff;box-shadow:0 -8px 40px rgba(0,0,0,.18)}
+    .tc-card-head{padding:14px 18px 10px;border-bottom:1px solid #e2e8f0;flex-shrink:0}
+    .tc-card-head h3{margin:0 0 8px;font-size:1rem;color:#0f172a;font-weight:800}
+    .tc-prog{height:5px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+    .tc-prog-fill{height:100%;background:linear-gradient(90deg,#6153ff,#8b5cf6);border-radius:99px;width:0%;transition:width .12s}
+    .tc-body{overflow-y:auto;flex:1;padding:14px 18px;font-size:.81rem;line-height:1.75;color:#334155;-webkit-overflow-scrolling:touch}
+    .tc-body h2{font-size:.92rem;color:#6153ff;margin:14px 0 5px;font-weight:800;border-bottom:1px solid #e0e7ff;padding-bottom:3px}
+    .tc-body h3{font-size:.85rem;color:#0f172a;margin:10px 0 3px;font-weight:700}
+    .tc-body p{margin:3px 0}
+    .tc-body ul{padding-left:16px;margin:4px 0}
+    .tc-body li{margin:2px 0}
+    .tc-foot{padding:10px 18px 14px;border-top:1px solid #e2e8f0;flex-shrink:0;background:#fafbff}
+    .tc-scroll-hint{text-align:center;font-size:.76rem;color:#94a3b8;margin:0 0 8px;display:flex;align-items:center;justify-content:center;gap:5px;transition:opacity .3s}
+    .tc-scroll-hint.hidden{opacity:0;pointer-events:none}
+    #tcAgreeBtn{width:100%;padding:11px;background:linear-gradient(135deg,#6153ff,#8b5cf6);color:#fff;border:none;border-radius:11px;font-weight:900;font-size:.95rem;cursor:not-allowed;opacity:.35;transition:.25s}
+    #tcAgreeBtn.ready{opacity:1;cursor:pointer}
+    .tc-checks{margin:12px 0 2px;display:flex;flex-direction:column;gap:8px}
+    .tc-check-row{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;background:#f8faff;border:1.5px solid #e0e7ff;border-radius:10px;transition:border-color .2s}
+    .tc-check-row.accepted{border-color:#86efac;background:#f0fdf4}
+    .tc-check-row input[type=checkbox]{width:17px;height:17px;margin-top:2px;flex-shrink:0;accent-color:#6153ff;cursor:pointer}
+    .tc-check-row input[type=checkbox]:disabled{opacity:.35;cursor:not-allowed}
+    .tc-check-row label{font-size:.81rem;color:#334155;line-height:1.45;cursor:default;user-select:none}
+    a.tc-open-link{color:#6153ff;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed!important;pointer-events:none}
   </style>
 </head>
 <body>
@@ -507,8 +534,7 @@
   <div class="modalCard">
     <button class="modalClose" id="closeMember"><i class="fa fa-times"></i></button>
     <div id="memberStep1">
-      <h2 style="margin:0 0 8px">Join Membership</h2>
-      <p class="subtle">₹500/month – training, projects, mentoring & job-connect</p>
+      <h2 style="margin:0 0 14px">Join Membership</h2>
       <form id="memberForm" autocomplete="on" novalidate>
         <div class="fl-group"><i class="fl-icon fa-regular fa-user"></i><input id="memberName" class="fl-input" name="name" placeholder=" " autocomplete="name" required><label class="fl-label" for="memberName">Full Name</label></div>
         <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input id="memberMobile" class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" autocomplete="tel" required><label class="fl-label" for="memberMobile">Phone</label></div>
@@ -540,7 +566,28 @@
           </select>
           <label class="fl-label" id="memberUnitLabel">Select Unit</label>
         </div>
-        <button class="btn-primary" type="submit">Proceed to Payment</button>
+        <!-- T&C Checkboxes -->
+        <div class="tc-checks">
+          <div class="tc-check-row" id="tcRow1">
+            <input type="checkbox" id="tcCheck1" name="tc1" disabled required>
+            <label for="tcCheck1">
+              <span class="tc-en">I have read and agree to the </span>
+              <span class="tc-hi" style="display:none">मैंने पढ़ लिया है और सहमत हूँ: </span>
+              <a class="tc-open-link" onclick="openTcModal(1)">
+                <span class="tc-en">Business Funding Agreement</span>
+                <span class="tc-hi" style="display:none">व्यवसाय वित्तीय सहायता समझौता</span>
+              </a>
+            </label>
+          </div>
+          <div class="tc-check-row" id="tcRow2">
+            <input type="checkbox" id="tcCheck2" name="tc2" required>
+            <label for="tcCheck2">
+              <span class="tc-en">I confirm all information provided is true and I take full responsibility for my business</span>
+              <span class="tc-hi" style="display:none">मैं पुष्टि करता/करती हूँ कि दी गई सभी जानकारी सत्य है और मैं अपने व्यवसाय की पूर्ण जिम्मेदारी लेता/लेती हूँ</span>
+            </label>
+          </div>
+        </div>
+        <button class="btn-primary" id="memberSubmitBtn" type="submit" disabled>Proceed to Payment</button>
         <p style="text-align:center; margin-top:16px; font-size:14px; color:#64748b;">
           Already a member? 
           <a href="/login" style="color:#6366f1; font-weight:700; text-decoration:none; transition:color .2s;">
@@ -567,6 +614,117 @@
       </div>
       <button id="razorpayMemberBtn" class="btn-solid" style="background:linear-gradient(135deg,#6153ff,#8b5cf6);font-size:1.05rem;padding:14px 0"><i class="fa-solid fa-lock"></i> Pay ₹500 &amp; Enable AutoPay</button>
       <p style="text-align:center;margin-top:10px;font-size:0.82rem;color:#94a3b8"><i class="fas fa-shield-alt"></i> Secured by Razorpay &nbsp;|&nbsp; <i class="fa-solid fa-rotate"></i> Auto-renews monthly</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== T&C Agreement Modal ===== -->
+<div id="tcModal" class="modal tc-modal-overlay" style="display:none;">
+  <div class="tc-card">
+    <div class="tc-card-head">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h3 id="tcModalTitle">Business Funding Agreement</h3>
+        <button onclick="closeTcModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#64748b;line-height:1">&times;</button>
+      </div>
+      <div class="tc-prog"><div class="tc-prog-fill" id="tcProgFill"></div></div>
+    </div>
+    <div class="tc-body" id="tcBody">
+      <!-- EN Content -->
+      <div id="tcContentEN">
+        <h2>Business Funding Agreement</h2>
+        <p><strong>Foundris Welfare Foundation (FWF)</strong></p>
+        <p>This Agreement is made between <strong>Foundris Welfare Foundation (FWF)</strong> and the <strong>Member</strong> who has applied for financial support for starting a business. By accepting funding support from FWF, the member agrees to the following terms and conditions.</p>
+        <h2>1. Objective of Funding</h2>
+        <p>1.1 The purpose of this funding is to support members in <strong>creating sustainable livelihood opportunities and becoming self-reliant</strong>.</p>
+        <p>1.2 Funding provided by FWF is intended <strong>only for the approved business project</strong> submitted by the member.</p>
+        <p>1.3 The funding support is <strong>not a grant unless specifically declared</strong>, and may require repayment as per the agreed schedule.</p>
+        <h2>2. Project Cost Sharing</h2>
+        <p>2.1 The total business project cost will be shared between the member and the NGO.</p>
+        <p>2.2 Funding structure:</p>
+        <ul><li><strong>50% of the project cost must be contributed by the member.</strong></li><li><strong>50% of the project cost may be provided by Foundris Welfare Foundation.</strong></li></ul>
+        <p>2.3 The member must deposit their <strong>50% contribution before the business project is initiated.</strong></p>
+        <p>2.4 The NGO may release funds <strong>in stages depending on project progress and verification.</strong></p>
+        <h2>3. Use of Funds</h2>
+        <p>3.1 The funds must be used <strong>strictly for the approved business purpose.</strong></p>
+        <p>3.2 The member is <strong>not allowed</strong> to use funds for personal expenses, unrelated activities, or transfer them to another person.</p>
+        <p>3.3 If misuse is detected, FWF has the right to: immediately stop funding, demand full repayment, and terminate membership.</p>
+        <h2>4. Monitoring &amp; Reporting</h2>
+        <p>4.1 FWF reserves the right to <strong>monitor the progress of the business project.</strong></p>
+        <p>4.2 The member must provide: business updates, financial details if requested, proof of fund utilization.</p>
+        <p>4.3 FWF representatives may <strong>inspect the business activity or project location if required.</strong></p>
+        <h2>5. Repayment Terms</h2>
+        <p>5.1 If structured as a loan, the member must repay <strong>as per the agreed EMI or installment schedule.</strong></p>
+        <p>5.2 Timely repayment is mandatory.</p>
+        <p>5.3 A member will not be eligible for future funding if repayment obligations are not fulfilled or EMI bounce count exceeds <strong>5 instances</strong>.</p>
+        <h2>6. Future Funding Eligibility</h2>
+        <p>6.1 Members can apply for additional funding <strong>only after clearing previous funding obligations.</strong></p>
+        <p>6.2 Approval depends on business performance, repayment history, and decision of the FWF management committee.</p>
+        <h2>7. Branding Requirement</h2>
+        <p>7.1 Businesses started with FWF support may be required to <strong>mention the NGO or sponsors on product packaging, marketing materials, or promotional activities.</strong></p>
+        <h2>8. Guarantor / Responsibility</h2>
+        <p>8.1 The member is <strong>fully responsible</strong> for managing and operating the business.</p>
+        <p>8.2 The funding received will be <strong>repaid according to the agreed schedule</strong>, regardless of business profit or loss.</p>
+        <h2>9. Default &amp; Recovery</h2>
+        <p>9.1 If a member fails to repay or misuses funds, FWF reserves the right to: suspend membership, cancel future funding eligibility, and recover the funded amount through appropriate legal or organizational measures.</p>
+        <h2>10. Liability Disclaimer</h2>
+        <p>10.1 FWF provides <strong>support, guidance, and financial assistance only.</strong></p>
+        <p>10.2 The business will be <strong>fully owned and operated by the member.</strong></p>
+        <p>10.3 FWF will <strong>not be liable</strong> for any business losses, market risks, or operational failures.</p>
+        <h2>11. False Information</h2>
+        <p>11.1 If any information is found to be <strong>false, misleading, or incomplete</strong>, FWF reserves the right to cancel membership, cancel funding support, and recover disbursed funds.</p>
+        <h2>12. Policy Changes</h2>
+        <p>FWF reserves the right to <strong>update or modify this agreement when necessary.</strong></p>
+        <h2>Member Declaration</h2>
+        <ul><li>I have read and understood this agreement.</li><li>All information provided by me is true and correct.</li><li>I agree to follow all rules, repayment terms, and conditions set by Foundris Welfare Foundation.</li></ul>
+      </div>
+      <!-- HI Content -->
+      <div id="tcContentHI" style="display:none">
+        <h2>व्यवसाय वित्तीय सहायता समझौता</h2>
+        <p><strong>Foundris Welfare Foundation (FWF)</strong></p>
+        <p>यह समझौता <strong>Foundris Welfare Foundation (FWF)</strong> और उस <strong>सदस्य (Member)</strong> के बीच किया जाता है जिसने अपना व्यवसाय शुरू करने के लिए वित्तीय सहायता के लिए आवेदन किया है। FWF से व्यवसाय सहायता प्राप्त करके सदस्य नीचे दी गई सभी शर्तों और नियमों से सहमत होता है।</p>
+        <h2>1. सहायता का उद्देश्य</h2>
+        <p>1.1 इस सहायता का उद्देश्य सदस्यों को <strong>स्थायी आजीविका के अवसर बनाने और आत्मनिर्भर बनने में सहायता प्रदान करना</strong> है।</p>
+        <p>1.2 FWF द्वारा दी गई वित्तीय सहायता <strong>केवल उस व्यवसाय परियोजना के लिए उपयोग की जाएगी जिसे NGO द्वारा स्वीकृत किया गया है।</strong></p>
+        <p>1.3 यह सहायता <strong>स्वतः अनुदान (Grant) नहीं मानी जाएगी</strong>, जब तक कि NGO द्वारा स्पष्ट रूप से ऐसा घोषित न किया जाए।</p>
+        <h2>2. परियोजना लागत का साझा योगदान</h2>
+        <p>2.1 व्यवसाय परियोजना की कुल लागत सदस्य और NGO द्वारा मिलकर वहन की जाएगी।</p>
+        <p>2.2 परियोजना लागत का ढांचा:</p>
+        <ul><li><strong>कुल परियोजना लागत का 50% सदस्य द्वारा योगदान किया जाएगा।</strong></li><li><strong>कुल परियोजना लागत का 50% Foundris Welfare Foundation द्वारा प्रदान किया जा सकता है।</strong></li></ul>
+        <p>2.3 व्यवसाय परियोजना शुरू करने से पहले सदस्य को <strong>अपना 50% योगदान जमा करना अनिवार्य होगा।</strong></p>
+        <p>2.4 NGO परियोजना की प्रगति और सत्यापन के आधार पर <strong>धनराशि एक या अधिक चरणों में जारी कर सकता है।</strong></p>
+        <h2>3. धनराशि का उपयोग</h2>
+        <p>3.1 FWF द्वारा प्रदान की गई धनराशि का उपयोग <strong>केवल स्वीकृत व्यवसाय उद्देश्य के लिए ही किया जाना चाहिए।</strong></p>
+        <p>3.2 सदस्य इस धनराशि का उपयोग व्यक्तिगत खर्चों, किसी अन्य व्यक्ति को स्थानांतरण, या किसी अन्य कार्य में नहीं कर सकता।</p>
+        <p>3.3 यदि धनराशि के दुरुपयोग का पता चलता है, तो FWF तुरंत वित्तीय सहायता रोक सकता है, पूरी राशि की वापसी की मांग कर सकता है और सदस्यता समाप्त कर सकता है।</p>
+        <h2>4. निगरानी और जानकारी</h2>
+        <p>4.1 FWF को व्यवसाय परियोजना की प्रगति की <strong>निगरानी करने का अधिकार होगा।</strong></p>
+        <p>4.2 सदस्य को व्यवसाय की प्रगति, धन के उपयोग का विवरण और आवश्यक दस्तावेज प्रदान करने होंगे।</p>
+        <p>4.3 FWF के प्रतिनिधि आवश्यकता होने पर <strong>व्यवसाय स्थल का निरीक्षण कर सकते हैं।</strong></p>
+        <h2>5. पुनर्भुगतान (Repayment)</h2>
+        <p>5.1 यदि सहायता ऋण के रूप में है, तो सदस्य को <strong>निर्धारित EMI या किस्तों के अनुसार राशि वापस करनी होगी।</strong></p>
+        <p>5.2 समय पर भुगतान करना सदस्य के लिए अनिवार्य होगा।</p>
+        <p>5.3 यदि <strong>EMI bounce की संख्या 5 से अधिक हो जाती है</strong>, तो सदस्य भविष्य में किसी भी प्रकार की वित्तीय सहायता के लिए पात्र नहीं रहेगा।</p>
+        <h2>6. भविष्य में सहायता की पात्रता</h2>
+        <p>6.1 सदस्य भविष्य में पुनः वित्तीय सहायता के लिए तभी आवेदन कर सकता है जब पिछली सभी भुगतान जिम्मेदारियाँ पूरी कर दी गई हों।</p>
+        <p>6.2 भविष्य में किसी भी सहायता की स्वीकृति <strong>FWF प्रबंधन समिति के निर्णय पर निर्भर करेगी।</strong></p>
+        <h2>7. NGO और प्रायोजकों का उल्लेख</h2>
+        <p>7.1 आवश्यक होने पर सदस्य को <strong>उत्पाद की पैकेजिंग, प्रचार सामग्री या विपणन में NGO और प्रायोजकों का नाम उल्लेख करना होगा।</strong></p>
+        <h2>8. व्यवसाय की जिम्मेदारी</h2>
+        <p>8.1 व्यवसाय का स्वामित्व, संचालन और प्रबंधन <strong>पूरी तरह सदस्य की जिम्मेदारी होगी।</strong></p>
+        <p>8.2 व्यवसाय में होने वाले किसी भी लाभ, हानि या जोखिम के लिए <strong>FWF जिम्मेदार नहीं होगा।</strong></p>
+        <h2>9. भुगतान में चूक और वसूली</h2>
+        <p>9.1 यदि सदस्य भुगतान में असफल रहता है, धन का दुरुपयोग करता है या गलत जानकारी प्रदान करता है, तो FWF सदस्यता निलंबित/समाप्त कर सकता है और दी गई राशि की वसूली कर सकता है।</p>
+        <h2>10. गलत या भ्रामक जानकारी</h2>
+        <p>10.1 यदि सदस्य द्वारा दी गई कोई भी जानकारी <strong>गलत, अधूरी या भ्रामक पाई जाती है</strong>, तो FWF सदस्यता रद्द कर सकता है, वित्तीय सहायता रद्द कर सकता है और राशि की वापसी की मांग कर सकता है।</p>
+        <h2>11. नियमों में संशोधन</h2>
+        <p>FWF को इन नियमों और शर्तों में <strong>समय-समय पर संशोधन या परिवर्तन करने का अधिकार होगा।</strong></p>
+        <h2>सदस्य घोषणा</h2>
+        <ul><li>मैंने इस समझौते को पढ़ लिया है और समझ लिया है।</li><li>मेरे द्वारा दी गई सभी जानकारी सही और सत्य है।</li><li>मैं Foundris Welfare Foundation के सभी नियमों और शर्तों का पालन करूंगा/करूंगी।</li></ul>
+      </div>
+    </div>
+    <div class="tc-foot">
+      <p class="tc-scroll-hint" id="tcScrollHint"><i class="fa-solid fa-angles-down"></i>&nbsp;<span class="tc-en">Scroll to the end to continue</span><span class="tc-hi" style="display:none">आगे बढ़ने के लिए अंत तक स्क्रॉल करें</span></p>
+      <button id="tcAgreeBtn" onclick="tcAgree()"><i class="fa-solid fa-check"></i>&nbsp;<span class="tc-en">I Agree &amp; Accept</span><span class="tc-hi" style="display:none">मैं सहमत हूँ</span></button>
     </div>
   </div>
 </div>
@@ -642,6 +800,10 @@
     const enBtn=document.getElementById('btn-en'),hiBtn=document.getElementById('btn-hi');
     if(enBtn) enBtn.classList.toggle('active',lang==='en');
     if(hiBtn) hiBtn.classList.toggle('active',lang==='hi');
+    // Toggle bilingual labels in T&C
+    const isHi = lang==='hi';
+    document.querySelectorAll('.tc-en').forEach(el=>el.style.display=isHi?'none':'');
+    document.querySelectorAll('.tc-hi').forEach(el=>el.style.display=isHi?'':'none');
   }
   const enBtn=document.getElementById('btn-en'), hiBtn=document.getElementById('btn-hi');
   if(enBtn) enBtn.addEventListener('click', ()=>applyLang('en'));
@@ -1043,7 +1205,16 @@
   const memberStep1=document.getElementById('memberStep1');
   const memberStep2=document.getElementById('memberStep2');
 
-  document.getElementById('openMember2').addEventListener('click', ()=>{ resetForm(memberForm); memberUnitGroup.style.display='none'; memberUnitSelect.required=false; memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal); });
+  document.getElementById('openMember2').addEventListener('click', ()=>{
+    resetForm(memberForm);
+    // Reset T&C state
+    const cb1=document.getElementById('tcCheck1'),cb2=document.getElementById('tcCheck2');
+    cb1.checked=false; cb1.disabled=true; document.getElementById('tcRow1').classList.remove('accepted');
+    cb2.checked=false; document.getElementById('tcRow2').classList.remove('accepted');
+    document.getElementById('memberSubmitBtn').disabled=true;
+    memberUnitGroup.style.display='none'; memberUnitSelect.required=false;
+    memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
+  });
   document.getElementById('closeMember').addEventListener('click', ()=> closeModal(memberModal));
   memberModal.addEventListener('click', (e)=>{ if(e.target===memberModal) closeModal(memberModal); });
 
@@ -1061,6 +1232,46 @@
     "Worship":["Agarbatti & Dhoop","Camphor & Sambrani","Fragrance Blend & Attar Fill","Puja Essentials Pack","Puja Vastra & Décor","Thali & Metalware Kitting","Festival & Ritual Kits","Temple/B2B Supply","MalaCraft Unit","HavanSamagri & Roli Unit","IncenseHolder & DonationBox Unit"],
     "Shiksha":["Notebook Printing & Binding","Pen/Pencil & Geometry Kitting","Art & Craft Supplies Pack","Folders & PP Stationery","School Bag Branding & Pouches","Teaching Aids & Charts","Ready School/CSR Kits","Classroom Hardware Branding","Register & Practical Book Unit","Chalk & Duster Unit","Pencil & Eraser Packing Unit","ID Card, Lanyard & Certificate Unit","Trophy & Medal Unit","School Uniform, Belt & Tie Unit"]
   };
+
+  /* ===== T&C Modal ===== */
+  let _tcTargetCb = null;
+  function openTcModal(idx) {
+    const isHi = document.documentElement.getAttribute('data-lang')==='hi';
+    document.getElementById('tcContentEN').style.display = isHi?'none':'';
+    document.getElementById('tcContentHI').style.display = isHi?'':'none';
+    document.getElementById('tcModalTitle').textContent = isHi?'\u0935\u094d\u092f\u0935\u0938\u093e\u092f \u0935\u093f\u0924\u094d\u0924\u0940\u092f \u0938\u0939\u093e\u092f\u0924\u093e \u0938\u092e\u091d\u094c\u0924\u093e':'Business Funding Agreement';
+    const body=document.getElementById('tcBody');
+    body.scrollTop=0;
+    document.getElementById('tcProgFill').style.width='0%';
+    const btn=document.getElementById('tcAgreeBtn'); btn.classList.remove('ready');
+    document.getElementById('tcScrollHint').classList.remove('hidden');
+    _tcTargetCb = idx===1?document.getElementById('tcCheck1'):null;
+    const m=document.getElementById('tcModal'); m.style.display='flex'; document.body.style.overflow='hidden';
+  }
+  function closeTcModal(){
+    document.getElementById('tcModal').style.display='none';
+    document.body.style.overflow='';
+  }
+  function tcAgree(){
+    if(!document.getElementById('tcAgreeBtn').classList.contains('ready')) return;
+    if(_tcTargetCb){
+      _tcTargetCb.disabled=false; _tcTargetCb.checked=true;
+      const row=_tcTargetCb.closest('.tc-check-row'); if(row) row.classList.add('accepted');
+    }
+    updateMemberSubmitBtn(); closeTcModal();
+  }
+  function updateMemberSubmitBtn(){
+    const btn=document.getElementById('memberSubmitBtn');
+    if(btn) btn.disabled=!(document.getElementById('tcCheck1').checked && document.getElementById('tcCheck2').checked);
+  }
+  document.getElementById('tcCheck1').addEventListener('change', updateMemberSubmitBtn);
+  document.getElementById('tcCheck2').addEventListener('change', updateMemberSubmitBtn);
+  document.getElementById('tcBody').addEventListener('scroll', function(){
+    const ratio = this.scrollTop/(this.scrollHeight-this.clientHeight)||0;
+    document.getElementById('tcProgFill').style.width=(ratio*100)+'%';
+    if(ratio>=0.92){ document.getElementById('tcAgreeBtn').classList.add('ready'); document.getElementById('tcScrollHint').classList.add('hidden'); }
+  });
+  document.getElementById('tcModal').addEventListener('click', function(e){ if(e.target===this) closeTcModal(); });
 
   const memberProjectSelect = document.getElementById('memberProjectSelect');
   const memberUnitGroup = document.getElementById('memberUnitGroup');
@@ -1086,6 +1297,9 @@
 
   memberForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
+    if(!document.getElementById('tcCheck1').checked || !document.getElementById('tcCheck2').checked){
+      FWF_Notify.toast('Please read and accept all Terms & Conditions first.', 'error'); return;
+    }
     if(!memberForm.checkValidity()){ memberForm.reportValidity(); return; }
     const submitBtn = memberForm.querySelector('button[type="submit"]');
     const origLabel = submitBtn.innerHTML;
@@ -1264,7 +1478,13 @@
   }
   // Auto-open memberModal when navigated via URL hash
   if(window.location.hash === '#memberModal') {
-    resetForm(memberForm); memberUnitGroup.style.display='none'; memberUnitSelect.required=false; memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
+    resetForm(memberForm);
+    const cb1=document.getElementById('tcCheck1'),cb2=document.getElementById('tcCheck2');
+    cb1.checked=false; cb1.disabled=true; document.getElementById('tcRow1').classList.remove('accepted');
+    cb2.checked=false; document.getElementById('tcRow2').classList.remove('accepted');
+    document.getElementById('memberSubmitBtn').disabled=true;
+    memberUnitGroup.style.display='none'; memberUnitSelect.required=false;
+    memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
   }
   // Auto-open supporterModal when navigated via URL hash
   if(window.location.hash === '#supporterModal') {

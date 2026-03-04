@@ -513,10 +513,10 @@
         <div class="fl-group"><i class="fl-icon fa-regular fa-user"></i><input id="memberName" class="fl-input" name="name" placeholder=" " autocomplete="name" required><label class="fl-label" for="memberName">Full Name</label></div>
         <div class="fl-group"><i class="fl-icon fa-solid fa-mobile-screen-button"></i><input id="memberMobile" class="fl-input" name="mobile" placeholder=" " pattern="[0-9]{10}" maxlength="10" autocomplete="tel" required><label class="fl-label" for="memberMobile">Phone</label></div>
         <div class="fl-group"><i class="fl-icon fa-regular fa-envelope"></i><input id="memberEmail" class="fl-input" type="email" name="email" placeholder=" " autocomplete="email" required><label class="fl-label" for="memberEmail">Email</label></div>
-        <!-- Project dropdown -> as per screenshot -->
+        <!-- Project dropdown -->
         <div class="fl-group">
           <i class="fl-icon fa-solid fa-diagram-project"></i>
-          <select class="fl-input" name="project" required style="padding-left:48px;">
+          <select class="fl-input" id="memberProjectSelect" name="project" required style="padding-left:48px;">
             <option value="" hidden selected></option>
             <option>Suraksha</option>
             <option>Swachh Bharat</option>
@@ -531,6 +531,14 @@
             <option>Shiksha</option>
           </select>
           <label class="fl-label">Select Project</label>
+        </div>
+        <!-- Unit dropdown — populated by JS based on selected project -->
+        <div class="fl-group" id="memberUnitGroup" style="display:none;">
+          <i class="fl-icon fa-solid fa-layer-group"></i>
+          <select class="fl-input" id="memberUnitSelect" name="unit" required style="padding-left:48px;">
+            <option value="" hidden selected></option>
+          </select>
+          <label class="fl-label" id="memberUnitLabel">Select Unit</label>
         </div>
         <button class="btn-primary" type="submit">Proceed to Payment</button>
         <p style="text-align:center; margin-top:16px; font-size:14px; color:#64748b;">
@@ -1035,9 +1043,46 @@
   const memberStep1=document.getElementById('memberStep1');
   const memberStep2=document.getElementById('memberStep2');
 
-  document.getElementById('openMember2').addEventListener('click', ()=>{ resetForm(memberForm); memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal); });
+  document.getElementById('openMember2').addEventListener('click', ()=>{ resetForm(memberForm); memberUnitGroup.style.display='none'; memberUnitSelect.required=false; memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal); });
   document.getElementById('closeMember').addEventListener('click', ()=> closeModal(memberModal));
   memberModal.addEventListener('click', (e)=>{ if(e.target===memberModal) closeModal(memberModal); });
+
+  /* Project → Units mapping */
+  const PROJECT_UNITS = {
+    "Suraksha":["MediSan Liquids Unit","Antiseptic Liquid Unit","FreshWipe Converting Unit","MedBand Unit","SteriGauze Pack Unit","PPE Lite Pack Unit","FirstAid & ClinicKit Unit","VectorGuard Repellent Unit","HomeShield Net & Mesh Unit","CottonMed Pack Unit","SafeStation Stand Unit","LightGuard Emergency Unit","SafeGear Reflective & Glove Unit","PowerSafe Electronics Assembly Unit","FireShield Safety Unit"],
+    "Swachh Bharat":["SecureGuard Assembly Unit","HomeCare Liquids Blend–Fill","Dishwash & Kitchen Care","Laundry Care","SoftSheet Tissue Converting","ScrubCraft Scrub & Scour","CleanTools Assembly","AromaShield Block & Gel","EcoBag Seal (Garbage Bags)","HandWash & Natural Cleaners Unit","Detergent Powder & Washing Bar Unit","BroomCraft & Brush Unit","BioGreen Compostable Bag Unit","PowderPack Unit","SmartHome Products Unit"],
+    "Happy Meal":["SpiceCrafter Masala","MixMaster RTC","StaplePack","Roast & Sweet","PulseGrain Branding","Dry Chutney & Condiments","Tea/Coffee & Herbal (dry)","Cloud Kitchen (dry base ops)","PapadBadi Unit","PicklePot Unit","Sattu & Roasted Chana Unit","NamkeenBhujia Snacks Unit","NaturalSweet Pack Unit","ProteinFit Laddu Unit","Cloud Kitchen (Live Food Service)"],
+    "Green Energy":["BrightLite LED Assembly","Solar Study Lamp & Lantern","Solar Home Lighting Kit","Street-Light Head & Battery-Swap","Portable Power & DC-UPS","E-Cycle Conversion & Service","Solar Components & Wiring Kits","O&M Cleaning & AMC","SolarPortable Assembly Unit","SolarMount Fabrication Unit","BatteryPack Assembly Unit"],
+    "DIY Crafts":["Jute & Canvas Bags Studio","Jewellery Assembly & Carding","PaperCraft & Stationery","Macramé & Home Décor","Personalised Print-on-Demand","Festive Hampers & Gifting","Eco & Upcycled Craft","Candles & Bath Craft","DiyaCraft Unit","RakhiCraft & Keychain Unit","PaperBag & Scrapbook Studio","ResinArt Studio","NeedleCraft Studio","FestivDecor Studio"],
+    "Swachh Jal":["PureFlow Gravity & UF","ROPro Assembly & QA","CartroPack Cartridges & Spares","MediaMix Filtration Repack","AquaTest QA & Field Kits","TankCare Cleaning & Disinfection","HydroServe Install & AMC","RainWise Harvest & Greywater","FilterCandle Unit","PlumbFit Assembly Unit","AquaContainer Unit","ChlorinePack Unit"],
+    "Samman":["Women's Basics Stitching","Men's/Unisex Knits","Innerwear Stitching","Kids & School Uniform","Workwear & Institutional","Footwear Assembly","Accessories & Small Goods","Branding & Finishing","ClothBag & Jute Bag Unit","EmbroideryHandicraft Unit","AgarbattiPaperPlate Unit","SoapMaking Unit","SpiceFlour Processing Unit","StarterKit Assembly Unit","SanitaryNapkin Making Unit"],
+    "Sweet Home":["Bed & Bath Linen","Kitchen & Dining Textiles","Curtains & Soft Furnishings","Storage & Organizers","Floor & Mats","Cushion & Pillow","Home Tool & Repair Kits","Laundry & Organizing Accessories","HangerClip & RubberBand Unit","PlasticDrawer & KeyHolder Unit","ShoePolish & Tiffin Kit Unit","KitchenRack Unit","BathroomAccessory Unit","ArtificialFlower & PlantPot Unit","DecorativeLamp Unit"],
+    "Hariyali":["Compost & Potting Media","Seedling & Nursery Kits","Neem & Bio-inputs","Irrigation & Drip Kits","Garden Tools & Hardware","Home Composting Systems","Garden QA & Test Kits","Community Green Bundles","SeedBall Unit","NurseryPot & Clay Planter Unit","BambooCraft Unit","RopeCraft Unit","OrganicGulal & CowDungLog Unit","HangingPlanter & VerticalGarden Unit","TreeGuard Fabrication Unit"],
+    "Worship":["Agarbatti & Dhoop","Camphor & Sambrani","Fragrance Blend & Attar Fill","Puja Essentials Pack","Puja Vastra & Décor","Thali & Metalware Kitting","Festival & Ritual Kits","Temple/B2B Supply","MalaCraft Unit","HavanSamagri & Roli Unit","IncenseHolder & DonationBox Unit"],
+    "Shiksha":["Notebook Printing & Binding","Pen/Pencil & Geometry Kitting","Art & Craft Supplies Pack","Folders & PP Stationery","School Bag Branding & Pouches","Teaching Aids & Charts","Ready School/CSR Kits","Classroom Hardware Branding","Register & Practical Book Unit","Chalk & Duster Unit","Pencil & Eraser Packing Unit","ID Card, Lanyard & Certificate Unit","Trophy & Medal Unit","School Uniform, Belt & Tie Unit"]
+  };
+
+  const memberProjectSelect = document.getElementById('memberProjectSelect');
+  const memberUnitGroup = document.getElementById('memberUnitGroup');
+  const memberUnitSelect = document.getElementById('memberUnitSelect');
+
+  memberProjectSelect.addEventListener('change', function() {
+    const units = PROJECT_UNITS[this.value] || [];
+    memberUnitSelect.innerHTML = '<option value="" hidden selected></option>';
+    if (units.length) {
+      units.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u; opt.textContent = u;
+        memberUnitSelect.appendChild(opt);
+      });
+      memberUnitGroup.style.display = '';
+      memberUnitSelect.required = true;
+    } else {
+      memberUnitGroup.style.display = 'none';
+      memberUnitSelect.required = false;
+    }
+    memberUnitSelect.value = '';
+  });
 
   memberForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -1064,7 +1109,8 @@
       name:    memberForm.querySelector('[name="name"]').value.trim(),
       mobile:  memberForm.querySelector('[name="mobile"]').value.trim(),
       email:   memberForm.querySelector('[name="email"]').value.trim(),
-      project: memberForm.querySelector('[name="project"]').value
+      project: memberForm.querySelector('[name="project"]').value,
+      unit:    memberForm.querySelector('[name="unit"]') ? memberForm.querySelector('[name="unit"]').value : ''
     };
     const BTN_LABEL = '<i class="fa-solid fa-lock"></i> Pay ₹500 &amp; Enable AutoPay';
 
@@ -1106,6 +1152,7 @@
                 mobile:  formData.mobile,
                 email:   formData.email,
                 project: formData.project,
+                unit:    formData.unit,
                 razorpay_payment_id:      response.razorpay_payment_id,
                 razorpay_subscription_id: response.razorpay_subscription_id,
                 razorpay_signature:       response.razorpay_signature
@@ -1116,7 +1163,7 @@
               // Save to MongoDB for welcome email
               try {
                 await fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, paymentRef: response.razorpay_payment_id }) });
+                  body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, unit: formData.unit, paymentRef: response.razorpay_payment_id }) });
               } catch(e) {}
               // Close modal + reset to step 1 immediately
               closeModal(memberModal);
@@ -1217,7 +1264,7 @@
   }
   // Auto-open memberModal when navigated via URL hash
   if(window.location.hash === '#memberModal') {
-    resetForm(memberForm); memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
+    resetForm(memberForm); memberUnitGroup.style.display='none'; memberUnitSelect.required=false; memberStep2.style.display='none'; memberStep1.style.display='block'; openModal(memberModal);
   }
   // Auto-open supporterModal when navigated via URL hash
   if(window.location.hash === '#supporterModal') {

@@ -24,8 +24,8 @@ function emailFooter(accentColor = '#E87722') {
 
 function infoRow(label, value, bg = '#fff') {
   return `<tr style="background:${bg}">
-    <td style="padding:12px 16px;color:#6b7280;font-weight:600;width:42%;border-bottom:1px solid #f1f5f9">${label}</td>
-    <td style="padding:12px 16px;color:#111827;font-weight:700;border-bottom:1px solid #f1f5f9">${value}</td>
+    <td style="padding:10px 14px;color:#6b7280;font-weight:600;font-size:13px;white-space:nowrap;border-bottom:1px solid #f1f5f9;vertical-align:top">${label}</td>
+    <td style="padding:10px 14px;color:#111827;font-weight:700;font-size:13px;border-bottom:1px solid #f1f5f9;word-break:break-all;overflow-wrap:anywhere">${value}</td>
   </tr>`;
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -168,16 +168,14 @@ export async function sendMemberWelcome({ name, email, memberId, password, mobil
     to: email,
     subject: `🎉 Welcome to FWF! Your Member ID: ${memberId}`,
     html: `
-    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:620px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
-      <!-- Header -->
-      <div style="background:linear-gradient(135deg,#E87722,#f59e0b);padding:36px 32px 28px;text-align:center">
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:620px;width:100%;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
         <div style="font-size:48px;margin-bottom:10px">🎉</div>
         <h1 style="color:#fff;margin:0;font-size:26px;font-weight:800">Welcome to FWF!</h1>
         <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:15px">Foundris Welfare Foundation — Empowering Women</p>
       </div>
 
       <!-- Body -->
-      <div style="padding:32px;border:1px solid #e5e7eb;border-top:none">
+      <div style="padding:24px 16px;border:1px solid #e5e7eb;border-top:none">
         <p style="color:#374151;font-size:15px;line-height:1.7;margin-bottom:24px">
           Dear <strong>${name}</strong>,<br><br>
           Congratulations! 🙌 Your membership with <strong>Foundris Welfare Foundation (FWF)</strong> has been successfully activated on <strong>${date}</strong>.<br>
@@ -185,13 +183,13 @@ export async function sendMemberWelcome({ name, email, memberId, password, mobil
         </p>
 
         <!-- Credentials Box -->
-        <div style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px solid #fed7aa;border-radius:12px;padding:22px 24px;margin-bottom:24px">
+        <div style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px solid #fed7aa;border-radius:12px;padding:20px;margin-bottom:24px">
           <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:.5px">🔐 Your Login Credentials</p>
-          <table style="width:100%;border-collapse:collapse;font-size:15px">
-            ${infoRow('Member ID', `<span style="font-family:monospace;font-size:18px;color:#C2410C;font-weight:900">${memberId}</span>`, '#fff8f0')}
-            ${infoRow('Password', `<span style="font-family:monospace;font-size:16px;color:#b45309;letter-spacing:1px">${password}</span>`, '#fff')}
+          <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
+            ${infoRow('Member ID', `<span style="font-family:monospace;font-size:16px;color:#C2410C;font-weight:900;word-break:break-all">${memberId}</span>`, '#fff8f0')}
+            ${infoRow('Password', `<span style="font-family:monospace;font-size:15px;color:#b45309;letter-spacing:1px;word-break:break-all">${password}</span>`, '#fff')}
             ${mobile ? infoRow('Mobile', mobile, '#fff8f0') : ''}
-            ${infoRow('Login URL', `<a href="${SITE}/login" style="color:#E87722;font-weight:700">${SITE}/login</a>`, '#fff')}
+            ${infoRow('Login URL', `<a href="${SITE}/login" style="color:#E87722;font-weight:700;word-break:break-all">${SITE}/login</a>`, '#fff')}
           </table>
         </div>
 
@@ -246,7 +244,7 @@ export async function sendSupporterWelcome({ name, email, supporterId, password,
     to: email,
     subject: `🤝 Welcome FWF Supporter! Your ID: ${supporterId}`,
     html: `
-    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:620px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:620px;width:100%;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
       <!-- Header -->
       <div style="background:linear-gradient(135deg,#059669,#10b981);padding:36px 32px 28px;text-align:center">
         <div style="font-size:48px;margin-bottom:10px">🤝</div>
@@ -255,7 +253,7 @@ export async function sendSupporterWelcome({ name, email, supporterId, password,
       </div>
 
       <!-- Body -->
-      <div style="padding:32px;border:1px solid #e5e7eb;border-top:none">
+      <div style="padding:24px 16px;border:1px solid #e5e7eb;border-top:none">
         <p style="color:#374151;font-size:15px;line-height:1.7;margin-bottom:24px">
           Dear <strong>${name}</strong>,<br><br>
           Your support means the world to us! 💚 You have been registered as a <strong>Supporter</strong> with Foundris Welfare Foundation on <strong>${date}</strong>.
@@ -264,12 +262,12 @@ export async function sendSupporterWelcome({ name, email, supporterId, password,
         </p>
 
         <!-- Credentials Box -->
-        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:12px;padding:22px 24px;margin-bottom:24px">
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:12px;padding:20px;margin-bottom:24px">
           <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#14532d;text-transform:uppercase;letter-spacing:.5px">🔐 Your Login Credentials</p>
-          <table style="width:100%;border-collapse:collapse;font-size:15px">
-            ${infoRow('Supporter ID', `<span style="font-family:monospace;font-size:18px;color:#059669;font-weight:900">${supporterId}</span>`, '#f0fff8')}
-            ${infoRow('Password', `<span style="font-family:monospace;font-size:16px;color:#047857;letter-spacing:1px">${password}</span>`, '#fff')}
-            ${infoRow('Login URL', `<a href="${SITE}/login" style="color:#10b981;font-weight:700">${SITE}/login</a>`, '#f0fff8')}
+          <table style="width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed">
+            ${infoRow('Supporter ID', `<span style="font-family:monospace;font-size:16px;color:#059669;font-weight:900;word-break:break-all">${supporterId}</span>`, '#f0fff8')}
+            ${infoRow('Password', `<span style="font-family:monospace;font-size:15px;color:#047857;letter-spacing:1px;word-break:break-all">${password}</span>`, '#fff')}
+            ${infoRow('Login URL', `<a href="${SITE}/login" style="color:#10b981;font-weight:700;word-break:break-all">${SITE}/login</a>`, '#f0fff8')}
           </table>
         </div>
 

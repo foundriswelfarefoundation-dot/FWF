@@ -503,6 +503,12 @@ textarea.form-input{ resize:vertical; min-height:80px; }
 }
 .wallet-section-header i{ font-size:18px; }
 
+/* Referral tracking sub-tabs */
+.rtab-wrap{ display:flex; gap:8px; flex-wrap:wrap; padding:12px 20px 6px; }
+.rtab{ background:#f1f5f9; border:none; border-radius:20px; padding:7px 16px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; transition:.2s; font-family:inherit; }
+.rtab.active{ background:var(--accent, #E87722); color:#fff; }
+.rtab-body{ display:block; }
+
 /* Mobile App Style Tabs */
 .app-tabs{
   display:flex;
@@ -1815,7 +1821,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </div>
           <div style="font-size:12px;font-weight:800;color:var(--accent);background:rgba(232,119,34,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">+250 Points</div>
           <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Member</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Register a new member with ₹500 payment. You earn 250 points instantly!</p>
+          <p style="font-size:12px;color:var(--text-muted);margin:0 0 24px;line-height:1.5">Share a pre-filled join link — earn 250 points when they register!</p>
           <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:var(--accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center">
             <i class="fa-solid fa-arrow-right" style="color:var(--accent);font-size:11px"></i>
           </div>
@@ -1830,13 +1836,13 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </div>
           <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
           <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Supporter</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Bring a new supporter on board and earn 100 referral points.</p>
+          <p style="font-size:12px;color:var(--text-muted);margin:0 0 24px;line-height:1.5">Share a pre-filled link — earn 10% back when they join as supporter!</p>
           <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center">
             <i class="fa-solid fa-arrow-right" style="color:#0a8f3f;font-size:11px"></i>
           </div>
         </div>
 
-        <!-- Card: Receive Donation -->
+        <!-- Card: Collect Donation -->
         <div onclick="openActionModal('donation')" style="background:#fff;border:1.5px solid #dbeafe;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
              onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(26,115,232,.15)'"
              onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1844,143 +1850,148 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             <i class="fa-solid fa-hand-holding-heart" style="color:#fff;font-size:18px"></i>
           </div>
           <div style="font-size:12px;font-weight:800;color:#1a73e8;background:rgba(26,115,232,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
-          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Record Donation</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Record a donation you collected and earn 10% as reward points.</p>
+          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Collect Donation</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0 0 24px;line-height:1.5">Record a donation you collected and earn 10% as reward points.</p>
           <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
             <i class="fa-solid fa-arrow-right" style="color:#1a73e8;font-size:11px"></i>
           </div>
         </div>
-
-        <!-- Card: Sell Ticket -->
-        <div onclick="openActionModal('sellTicket')" style="background:#fff;border:1.5px solid #fef3c7;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
-             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(229,161,0,.15)'"
-             onmouseout="this.style.transform='';this.style.boxShadow=''">
-          <div style="width:46px;height:46px;background:linear-gradient(135deg,#fbbf24,#e5a100);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <i class="fa-solid fa-ticket" style="color:#fff;font-size:18px"></i>
-          </div>
-          <div style="font-size:12px;font-weight:800;color:#b45309;background:rgba(180,83,9,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
-          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Sell Quiz Ticket</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Sold a quiz ticket? Record it and earn 10% of the ticket price.</p>
-          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#fffbeb;border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <i class="fa-solid fa-arrow-right" style="color:#e5a100;font-size:11px"></i>
-          </div>
-        </div>
       </div>
 
-      <!-- Referral Tracking Table -->
+      <!-- My Referrals & Quiz Tickets — Tabbed Tracking -->
       <div style="padding:4px 20px 20px">
         <div style="border-top:1px solid var(--card-border);padding-top:16px;margin-top:10px">
-          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-list"></i> My Referrals</h4>
-          <div class="table-wrap">
-            <table class="data-table">
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-chart-bar"></i> My Referrals & Quiz Tickets</h4>
+          <!-- Tab Buttons -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+            <button class="rtab active" onclick="switchRefTab('members',this)">👥 Members</button>
+            <button class="rtab" onclick="switchRefTab('supporters',this)">🤝 Supporters</button>
+            <button class="rtab" onclick="switchRefTab('donations',this)">💰 Donations</button>
+            <button class="rtab" onclick="switchRefTab('tickets',this)">🎫 Tickets</button>
+          </div>
+          <div id="rtab-members" class="rtab-body">
+            <div class="table-wrap"><table class="data-table">
               <thead><tr><th>Name</th><th>Member ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
-              <tbody id="referralsBody">
-                <tr><td colspan="6" class="empty-state"><p>No referrals yet</p></td></tr>
-              </tbody>
-            </table>
+              <tbody id="rtbMembers"><tr><td colspan="6" class="empty-state"><p>No members referred yet</p></td></tr></tbody>
+            </table></div>
+          </div>
+          <div id="rtab-supporters" class="rtab-body" style="display:none">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Name</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbSupporters"><tr><td colspan="5" class="empty-state"><p>No supporters referred yet</p></td></tr></tbody>
+            </table></div>
+          </div>
+          <div id="rtab-donations" class="rtab-body" style="display:none">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Donor</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbDonations"><tr><td colspan="5" class="empty-state"><p>No donations recorded yet</p></td></tr></tbody>
+            </table></div>
+          </div>
+          <div id="rtab-tickets" class="rtab-body" style="display:none">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Buyer</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbTickets"><tr><td colspan="5" class="empty-state"><p>No quiz tickets sold yet</p></td></tr></tbody>
+            </table></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============ MODAL: Add Member (with Razorpay) ============ -->
+    <!-- ============ MODAL: Add Member — Generate Link ============ -->
     <div id="modalAddMember" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
       <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
         <div style="background:linear-gradient(135deg,#ff9a3c,#e87722);padding:20px 24px 16px;position:relative">
           <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-user-plus"></i> Add New Member</h3>
-          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Register & earn <strong>250 points</strong> on successful payment</p>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Fill their details → generate a referral link → share with them</p>
           <button onclick="closeActionModal('addMember')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
         </div>
         <div style="padding:22px 24px 24px">
+          <!-- Step 1: Fill Details -->
           <div id="amStep1">
             <div style="display:grid;gap:12px">
-              <div class="form-group" style="margin:0">
-                <label>Full Name *</label>
-                <input type="text" class="form-input" id="amName" placeholder="New member's full name">
-              </div>
-              <div class="form-group" style="margin:0">
-                <label>Mobile Number *</label>
-                <input type="tel" class="form-input" id="amMobile" placeholder="10-digit mobile" maxlength="10">
-              </div>
-              <div class="form-group" style="margin:0">
-                <label>Email *</label>
-                <input type="email" class="form-input" id="amEmail" placeholder="member@email.com">
-              </div>
+              <div class="form-group" style="margin:0"><label>Full Name *</label><input type="text" class="form-input" id="amName" placeholder="New member's full name"></div>
+              <div class="form-group" style="margin:0"><label>Mobile Number *</label><input type="tel" class="form-input" id="amMobile" placeholder="10-digit mobile" maxlength="10"></div>
+              <div class="form-group" style="margin:0"><label>Email *</label><input type="email" class="form-input" id="amEmail" placeholder="member@email.com"></div>
             </div>
             <div style="background:#fff8f0;border:1px solid #f5c99d;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#b8591a">
-              <i class="fa-solid fa-circle-info"></i> Payment of <strong>₹500</strong> will be collected via Razorpay. Login credentials will be generated automatically.
+              <i class="fa-solid fa-circle-info"></i> A pre-filled registration link will be generated. Share it with the person — they pay ₹500 themselves and you earn <strong>250 points</strong>!
             </div>
-            <button id="amPayBtn" onclick="startMemberPayment()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#ff9a3c,#e87722);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
-              <i class="fa-solid fa-lock"></i> Proceed to Pay ₹500
+            <button onclick="generateMemberLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#ff9a3c,#e87722);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+              <i class="fa-solid fa-link"></i> Generate Referral Link
             </button>
           </div>
-          <!-- Success step -->
-          <div id="amStep2" style="display:none;text-align:center">
-            <div style="font-size:40px;margin-bottom:8px">🎉</div>
-            <h4 style="color:var(--success);font-size:16px;font-weight:800;margin-bottom:4px">Member Added!</h4>
-            <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px">Share these credentials with the new member</p>
-            <div style="background:#f8fffe;border:1.5px solid #a7f3d0;border-radius:12px;padding:16px;text-align:left">
-              <div style="margin-bottom:8px"><span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700">Member ID</span><br><strong id="amResultId" style="font-size:16px;color:var(--accent)"></strong></div>
-              <div><span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700">Password</span><br><strong id="amResultPass" style="font-size:16px;font-family:monospace;background:#f1f5f9;padding:4px 8px;border-radius:6px;color:#d93025"></strong></div>
+          <!-- Step 2: Share Link -->
+          <div id="amStep2" style="display:none">
+            <div style="text-align:center;margin-bottom:16px">
+              <div style="font-size:36px;margin-bottom:6px">🔗</div>
+              <h4 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">Link Ready!</h4>
+              <p id="amLinkForName" style="font-size:12px;color:var(--text-muted);margin:0"></p>
             </div>
-            <p id="amResultPoints" style="margin-top:12px;font-size:13px;color:var(--success);font-weight:700"></p>
-            <button onclick="closeActionModal('addMember')" style="margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
+            <div style="background:#f8fffe;border:1.5px solid #a7f3d0;border-radius:12px;padding:14px">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Registration Link</label>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <input type="text" id="amGeneratedLink" readonly class="form-input" style="font-size:11px;background:#fff">
+                <button onclick="copyGenLink('amGeneratedLink')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="fa-solid fa-copy"></i></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <button onclick="waShareLink('amGeneratedLink','member')" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer"><i class="fa-brands fa-whatsapp"></i> Share on WhatsApp</button>
+              <button onclick="resetMemberLinkModal()" style="flex:1;background:#f1f5f9;color:#334155;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> New Link</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============ MODAL: Add Supporter (with Razorpay) ============ -->
+    <!-- ============ MODAL: Add Supporter — Generate Link ============ -->
     <div id="modalAddSupporter" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
       <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
         <div style="background:linear-gradient(135deg,#34d366,#0a8f3f);padding:20px 24px 16px;position:relative">
           <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hands-helping"></i> Add Supporter</h3>
-          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10% back</strong> of the supporter's joining amount as points!</p>
+          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Fill their details → generate a referral link → share with them</p>
           <button onclick="closeActionModal('addSupporter')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
         </div>
         <div style="padding:22px 24px 24px">
           <div id="spStep1">
             <div style="display:grid;gap:12px">
-              <div class="form-group" style="margin:0">
-                <label>Supporter Name *</label>
-                <input type="text" class="form-input" id="spName" placeholder="Full name">
-              </div>
-              <div class="form-group" style="margin:0">
-                <label>Mobile / Email *</label>
-                <input type="text" class="form-input" id="spContact" placeholder="Phone or email">
-              </div>
-              <div class="form-group" style="margin:0">
-                <label>Joining Amount (₹) *</label>
-                <input type="number" class="form-input" id="spAmount" placeholder="e.g. 500" min="1" value="500">
-              </div>
-              <div class="form-group" style="margin:0">
-                <label>Notes (optional)</label>
-                <input type="text" class="form-input" id="spNotes" placeholder="e.g. Corporate, Local leader">
-              </div>
+              <div class="form-group" style="margin:0"><label>Supporter Name *</label><input type="text" class="form-input" id="spName" placeholder="Full name"></div>
+              <div class="form-group" style="margin:0"><label>Mobile Number *</label><input type="tel" class="form-input" id="spMobile" placeholder="10-digit mobile" maxlength="10"></div>
+              <div class="form-group" style="margin:0"><label>Email *</label><input type="email" class="form-input" id="spEmail" placeholder="supporter@email.com"></div>
             </div>
             <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#166534">
-              <i class="fa-solid fa-circle-info"></i> You earn <strong>10%</strong> of the supporter's payment as reward points. e.g. ₹500 → <strong>5 points</strong>.
+              <i class="fa-solid fa-circle-info"></i> A pre-filled supporter registration link will be generated. Share it with them — they pay themselves and you earn <strong>10% back</strong>!
             </div>
-            <button id="spPayBtn" onclick="startSupporterPayment()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
-              <i class="fa-solid fa-lock"></i> Proceed to Payment
+            <button onclick="generateSupporterLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+              <i class="fa-solid fa-link"></i> Generate Referral Link
             </button>
           </div>
-          <!-- Success step -->
-          <div id="spStep2" style="display:none;text-align:center">
-            <div style="font-size:40px;margin-bottom:8px">🎉</div>
-            <h4 style="color:var(--success);font-size:16px;font-weight:800;margin-bottom:4px">Supporter Added!</h4>
-            <p id="spResultPoints" style="color:var(--text-muted);font-size:13px;margin-bottom:16px"></p>
-            <button onclick="closeActionModal('addSupporter')" style="background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
+          <div id="spStep2" style="display:none">
+            <div style="text-align:center;margin-bottom:16px">
+              <div style="font-size:36px;margin-bottom:6px">🔗</div>
+              <h4 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">Link Ready!</h4>
+              <p id="spLinkForName" style="font-size:12px;color:var(--text-muted);margin:0"></p>
+            </div>
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:14px">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Registration Link</label>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <input type="text" id="spGeneratedLink" readonly class="form-input" style="font-size:11px;background:#fff">
+                <button onclick="copyGenLink('spGeneratedLink')" style="background:#0a8f3f;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="fa-solid fa-copy"></i></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <button onclick="waShareLink('spGeneratedLink','supporter')" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer"><i class="fa-brands fa-whatsapp"></i> Share on WhatsApp</button>
+              <button onclick="resetSupporterLinkModal()" style="flex:1;background:#f1f5f9;color:#334155;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> New Link</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============ MODAL: Record Donation ============ -->
+    <!-- ============ MODAL: Collect Donation ============ -->
     <div id="modalDonation" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
       <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
         <div style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);padding:20px 24px 16px;position:relative">
-          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hand-holding-heart"></i> Record Donation</h3>
+          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hand-holding-heart"></i> Collect Donation</h3>
           <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the donated amount as reward points</p>
           <button onclick="closeActionModal('donation')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
         </div>
@@ -1999,34 +2010,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           </div>
           <button id="donBtn" onclick="submitDonation()" style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
             <i class="fa-solid fa-plus"></i> Record Donation
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ MODAL: Sell Quiz Ticket ============ -->
-    <div id="modalSellTicket" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
-      <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
-        <div style="background:linear-gradient(135deg,#fbbf24,#e5a100);padding:20px 24px 16px;position:relative">
-          <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-ticket"></i> Sell Quiz Ticket</h3>
-          <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the ticket price as reward points</p>
-          <button onclick="closeActionModal('sellTicket')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
-        </div>
-        <div style="padding:22px 24px 24px;display:grid;gap:12px">
-          <div class="form-group" style="margin:0">
-            <label>Buyer Name *</label>
-            <input type="text" class="form-input" id="tickBuyer" placeholder="Buyer's full name">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label>Buyer Contact</label>
-            <input type="text" class="form-input" id="tickContact" placeholder="Phone or email">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label>Ticket Price (₹)</label>
-            <input type="number" class="form-input" id="tickPrice" value="100" min="1">
-          </div>
-          <button id="tickBtn" onclick="submitTicket()" style="background:linear-gradient(135deg,#fbbf24,#e5a100);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
-            <i class="fa-solid fa-plus"></i> Record Ticket Sale
           </button>
         </div>
       </div>
@@ -3889,19 +3872,30 @@ async function loadReferral(){
     // Referral code
     document.getElementById('refCode').value = data.user?.referral_code || 'N/A';
 
-    // Referrals table
+    // Populate tabbed referral tracking
     const refs = data.referrals || [];
-    const refBody = document.getElementById('referralsBody');
-    if(refs.length){
-      refBody.innerHTML = refs.map(r => `<tr>
+
+    function refRow(r){
+      return `<tr>
         <td style="font-weight:700">${r.referred_name || '—'}</td>
         <td style="font-family:monospace;font-size:12px">${r.referred_member_id || '—'}</td>
-        <td style="font-weight:800">₹${fmtN(r.amount)}</td>
-        <td style="color:var(--success);font-weight:700">+${r.points_earned}</td>
+        <td style="font-weight:800">₹${fmtN(r.amount || 0)}</td>
+        <td style="color:var(--success);font-weight:700">+${r.points_earned || 0}</td>
         <td>${statusBadge(r.status)}</td>
         <td style="color:var(--text-muted);font-size:12px">${fmtDate(r.created_at)}</td>
-      </tr>`).join('');
+      </tr>`;
     }
+    const emptyRow = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:18px;font-size:13px">No records yet</td></tr>`;
+
+    const members    = refs.filter(r => !r.type || r.type === 'member');
+    const supporters = refs.filter(r => r.type === 'supporter');
+    const donations  = refs.filter(r => r.type === 'donation');
+    const tickets    = refs.filter(r => r.type === 'quiz_ticket');
+
+    document.getElementById('rtbMembers').innerHTML    = members.length    ? members.map(refRow).join('')    : emptyRow;
+    document.getElementById('rtbSupporters').innerHTML = supporters.length ? supporters.map(refRow).join('') : emptyRow;
+    document.getElementById('rtbDonations').innerHTML  = donations.length  ? donations.map(refRow).join('')  : emptyRow;
+    document.getElementById('rtbTickets').innerHTML    = tickets.length    ? tickets.map(refRow).join('')    : emptyRow;
 
     // Setup affiliate links
     setupQuizReferralLinks();
@@ -4071,8 +4065,7 @@ async function submitRedeemRequest(){
 const actionModalMap = {
   addMember:    'modalAddMember',
   addSupporter: 'modalAddSupporter',
-  donation:     'modalDonation',
-  sellTicket:   'modalSellTicket'
+  donation:     'modalDonation'
 };
 
 function openActionModal(key) {
@@ -4080,7 +4073,6 @@ function openActionModal(key) {
   if (!el) return;
   el.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-  // Reset Add Member to step 1
   if (key === 'addMember') {
     document.getElementById('amStep1').style.display = 'block';
     document.getElementById('amStep2').style.display = 'none';
@@ -4088,16 +4080,12 @@ function openActionModal(key) {
     document.getElementById('amMobile').value = '';
     document.getElementById('amEmail').value = '';
   }
-  // Reset Add Supporter to step 1
   if (key === 'addSupporter') {
     document.getElementById('spStep1').style.display = 'block';
     document.getElementById('spStep2').style.display = 'none';
     document.getElementById('spName').value = '';
-    document.getElementById('spContact').value = '';
-    document.getElementById('spAmount').value = '500';
-    document.getElementById('spNotes').value = '';
-    const btn = document.getElementById('spPayBtn');
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment'; }
+    document.getElementById('spMobile').value = '';
+    document.getElementById('spEmail').value = '';
   }
 }
 function closeActionModal(key) {
@@ -4112,157 +4100,79 @@ Object.values(actionModalMap).forEach(id => {
 });
 
 /* ============================================
-   ADD MEMBER — RAZORPAY PAYMENT FLOW
+   GENERATE REFERRAL LINK — ADD MEMBER
    ============================================ */
-async function startMemberPayment() {
+function generateMemberLink() {
   const name   = document.getElementById('amName').value.trim();
   const mobile = document.getElementById('amMobile').value.trim();
   const email  = document.getElementById('amEmail').value.trim();
-
   if (!name || !mobile || !email) return notify('Please fill all fields', 'warning');
   if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) return notify('Enter valid 10-digit mobile', 'warning');
   if (!/\S+@\S+\.\S+/.test(email)) return notify('Enter valid email', 'warning');
-
-  const btn = document.getElementById('amPayBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order...';
-
-  try {
-    const orderRes = await AUTH.api('/api/pay/create-order', {
-      method: 'POST',
-      body: { amount: 500, type: 'membership', notes: { addedBy: memberData?.user?.member_id || '' } }
-    });
-    if (!orderRes.ok) throw new Error(orderRes.error || 'Order creation failed');
-
-    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500';
-    btn.disabled = false;
-
-    const referrerCode = memberData?.user?.referral_code || '';
-
-    const options = {
-      key: orderRes.key,
-      amount: orderRes.order.amount,
-      currency: 'INR',
-      name: 'FWF — Foundation for Women\'s Future',
-      description: 'Membership Registration ₹500',
-      image: '/assets/images/logo.png',
-      order_id: orderRes.order.id,
-      prefill: { name, contact: mobile, email },
-      theme: { color: '#E87722' },
-      handler: async function(response) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Registering member...';
-        try {
-          const regRes = await AUTH.api('/api/pay/membership', {
-            method: 'POST',
-            body: {
-              name, mobile, email,
-              referrerCode,
-              razorpay_payment_id:  response.razorpay_payment_id,
-              razorpay_order_id:    response.razorpay_order_id,
-              razorpay_signature:   response.razorpay_signature
-            }
-          });
-          if (!regRes.ok) throw new Error(regRes.error || 'Registration failed');
-
-          // Show success step
-          document.getElementById('amStep1').style.display = 'none';
-          document.getElementById('amStep2').style.display = 'block';
-          document.getElementById('amResultId').textContent   = regRes.memberId;
-          document.getElementById('amResultPass').textContent = regRes.password;
-          document.getElementById('amResultPoints').textContent = regRes.referralPoints
-            ? `🎉 You earned ${regRes.referralPoints} referral points!`
-            : '✅ Member registered successfully!';
-
-          memberData = null; // refresh wallet
-          loadWallet();
-        } catch(e) {
-          notify(e.message || 'Registration failed after payment. Contact support.', 'error');
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500';
-        }
-      },
-      modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500'; } }
-    };
-    const rzp = new Razorpay(options);
-    rzp.on('payment.failed', resp => { notify('Payment failed: ' + (resp.error?.description || 'Unknown error'), 'error'); });
-    rzp.open();
-  } catch(e) {
-    notify(e.message || 'Failed to start payment', 'error');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Pay ₹500';
-  }
+  const ref = memberData?.user?.referral_code || '';
+  const url = `${location.origin}/join?ref=${encodeURIComponent(ref)}&n=${encodeURIComponent(name)}&m=${encodeURIComponent(mobile)}&e=${encodeURIComponent(email)}&src=member`;
+  document.getElementById('amGeneratedLink').value = url;
+  document.getElementById('amLinkForName').textContent = `Share this link with ${name}`;
+  document.getElementById('amStep1').style.display = 'none';
+  document.getElementById('amStep2').style.display = 'block';
+}
+function resetMemberLinkModal() {
+  document.getElementById('amStep1').style.display = 'block';
+  document.getElementById('amStep2').style.display = 'none';
+  document.getElementById('amName').value = '';
+  document.getElementById('amMobile').value = '';
+  document.getElementById('amEmail').value = '';
 }
 
 /* ============================================
-   ADD SUPPORTER (Razorpay payment + 10% points)
+   GENERATE REFERRAL LINK — ADD SUPPORTER
    ============================================ */
-async function startSupporterPayment() {
-  const name    = document.getElementById('spName').value.trim();
-  const contact = document.getElementById('spContact').value.trim();
-  const amount  = parseFloat(document.getElementById('spAmount').value);
-  const notes   = document.getElementById('spNotes').value.trim();
+function generateSupporterLink() {
+  const name   = document.getElementById('spName').value.trim();
+  const mobile = document.getElementById('spMobile').value.trim();
+  const email  = document.getElementById('spEmail').value.trim();
+  if (!name || !mobile || !email) return notify('Please fill all fields', 'warning');
+  if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) return notify('Enter valid 10-digit mobile', 'warning');
+  if (!/\S+@\S+\.\S+/.test(email)) return notify('Enter valid email', 'warning');
+  const ref = memberData?.user?.referral_code || '';
+  const url = `${location.origin}/join?ref=${encodeURIComponent(ref)}&n=${encodeURIComponent(name)}&m=${encodeURIComponent(mobile)}&e=${encodeURIComponent(email)}&src=supporter`;
+  document.getElementById('spGeneratedLink').value = url;
+  document.getElementById('spLinkForName').textContent = `Share this link with ${name}`;
+  document.getElementById('spStep1').style.display = 'none';
+  document.getElementById('spStep2').style.display = 'block';
+}
+function resetSupporterLinkModal() {
+  document.getElementById('spStep1').style.display = 'block';
+  document.getElementById('spStep2').style.display = 'none';
+  document.getElementById('spName').value = '';
+  document.getElementById('spMobile').value = '';
+  document.getElementById('spEmail').value = '';
+}
 
-  if (!name || !contact)        return notify('Enter supporter name and contact', 'warning');
-  if (!amount || amount < 1)    return notify('Enter a valid joining amount', 'warning');
+/* ============ COPY LINK / WHATSAPP SHARE ============ */
+function copyGenLink(inputId) {
+  const val = document.getElementById(inputId).value;
+  navigator.clipboard.writeText(val).then(() => notify('Link copied!', 'success')).catch(() => {
+    const el = document.getElementById(inputId); el.select(); document.execCommand('copy');
+    notify('Link copied!', 'success');
+  });
+}
+function waShareLink(inputId, type) {
+  const url  = document.getElementById(inputId).value;
+  const name = memberData?.user?.name || 'a friend';
+  const msg  = type === 'member'
+    ? `*FWF Membership Registration*\nHello! ${name} has invited you to join FWF as a member.\n\nClick the link below to register (₹500 fee):\n${url}\n\n_Foundation for Women's Future_`
+    : `*FWF Supporter Registration*\nHello! ${name} has invited you to join FWF as a supporter.\n\nClick the link below to register:\n${url}\n\n_Foundation for Women's Future_`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
 
-  const btn = document.getElementById('spPayBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order...';
-  try {
-    // Create Razorpay order
-    const order = await AUTH.api('/api/pay/create-order', {
-      method: 'POST',
-      body: { amount, type: 'supporter', notes: { supporter: name } }
-    });
-
-    const options = {
-      key:         order.key,
-      amount:      order.order.amount,
-      currency:    order.order.currency,
-      name:        'FWF — Supporter Joining',
-      description: `Supporter: ${name}`,
-      order_id:    order.order.id,
-      handler: async function(resp) {
-        try {
-          const result = await AUTH.api('/api/pay/supporter', {
-            method: 'POST',
-            body: {
-              supporterName:    name,
-              supporterContact: contact,
-              supporterNotes:   notes,
-              amount,
-              razorpay_payment_id: resp.razorpay_payment_id,
-              razorpay_order_id:   resp.razorpay_order_id,
-              razorpay_signature:  resp.razorpay_signature
-            }
-          });
-          document.getElementById('spResultPoints').textContent =
-            result.message || `Supporter added! You earned ${result.pointsEarned} points.`;
-          document.getElementById('spStep1').style.display = 'none';
-          document.getElementById('spStep2').style.display = 'block';
-          memberData = null;
-          loadWallet();
-        } catch(e) {
-          notify('Payment received but failed to record — contact support: ' + e.message, 'warning');
-        }
-      },
-      prefill:  { name: memberData?.name || '', contact: contact },
-      theme:    { color: '#0a8f3f' },
-      modal:    { ondismiss: () => {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment';
-      }}
-    };
-    const rzp = new Razorpay(options);
-    rzp.open();
-  } catch(e) {
-    notify('Could not initiate payment: ' + e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment';
-  }
+/* ============ REFERRAL TRACKING TABS ============ */
+function switchRefTab(tab, btn) {
+  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.rtab-body').forEach(b => b.style.display = 'none');
+  const el = document.getElementById('rtab-' + tab);
+  if (el) el.style.display = 'block';
 }
 
 function copyRefCode(){
@@ -4297,25 +4207,18 @@ async function submitDonation() {
 }
 
 async function submitTicket() {
-  const buyerName = document.getElementById('tickBuyer').value.trim();
-  if (!buyerName) return notify('Enter buyer name', 'warning');
-  const btn = document.getElementById('tickBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Recording...';
+  const buyerName = document.getElementById('tickBuyer')?.value?.trim();
+  if (!buyerName) return;
   try {
     const r = await AUTH.api('/api/member/sell-ticket', { method: 'POST', body: {
       buyerName,
-      buyerContact: document.getElementById('tickContact').value.trim(),
-      ticketPrice:  parseFloat(document.getElementById('tickPrice').value) || 100
+      buyerContact: document.getElementById('tickContact')?.value?.trim() || '',
+      ticketPrice:  parseFloat(document.getElementById('tickPrice')?.value) || 100
     }});
     notify(r.message || `Ticket recorded! +${r.pointsEarned} points`, 'success');
-    document.getElementById('tickBuyer').value   = '';
-    document.getElementById('tickContact').value = '';
-    closeActionModal('sellTicket');
     memberData = null;
     loadWallet();
   } catch(e) { notify(e.message || 'Failed', 'error'); }
-  finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Record Ticket Sale'; }
 }
 
 /* ============================================

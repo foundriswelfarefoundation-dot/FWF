@@ -200,6 +200,13 @@ a{color:inherit;text-decoration:none}
   color:var(--text-primary);
 }
 .wallet-section-header i{ font-size:18px; }
+
+/* Referral tracking sub-tabs */
+.rtab-wrap{ display:flex; gap:8px; flex-wrap:wrap; padding:0 0 12px; }
+.rtab{ background:#f1f5f9; border:none; border-radius:20px; padding:7px 16px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; transition:.2s; font-family:inherit; }
+.rtab.active{ background:var(--accent, #E87722); color:#fff; }
+.rtab-body{ display:block; }
+
 .app-tabs{
   display:flex;
   gap:0;
@@ -1500,107 +1507,174 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       <!-- Action Cards Grid -->
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:18px 20px 4px">
 
-        <!-- Add Supporter -->
-        <div onclick="openActionModal('addSupporter')" style="background:#fff;border:1.5px solid #c8f7db;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
-             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(10,143,63,.15)'"
-             onmouseout="this.style.transform='';this.style.boxShadow=''">
-          <div style="width:46px;height:46px;background:linear-gradient(135deg,#34d366,#0a8f3f);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <i class="fa-solid fa-hands-helping" style="color:#fff;font-size:18px"></i>
-          </div>
-          <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
-          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Supporter</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Bring a new supporter on board and earn 10% referral points.</p>
-          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <i class="fa-solid fa-arrow-right" style="color:#0a8f3f;font-size:11px"></i>
-          </div>
-        </div>
+<!-- Add Member -->
+  <div onclick="openActionModal('addMember')" style="background:#fff;border:1.5px solid #ffe4cc;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(232,119,34,.15)'"
+       onmouseout="this.style.transform='';this.style.boxShadow=''">
+    <div style="width:46px;height:46px;background:linear-gradient(135deg,#f97316,#E87722);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+      <i class="fa-solid fa-user-plus" style="color:#fff;font-size:18px"></i>
+    </div>
+    <div style="font-size:12px;font-weight:800;color:#E87722;background:rgba(232,119,34,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">+250 pts</div>
+    <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Member</h4>
+    <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Refer someone as an FWF member and earn 250 reward points.</p>
+    <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#fff7ed;border-radius:50%;display:flex;align-items:center;justify-content:center">
+      <i class="fa-solid fa-arrow-right" style="color:#E87722;font-size:11px"></i>
+    </div>
+  </div>
 
-        <!-- Record Donation -->
-        <div onclick="openActionModal('donation')" style="background:#fff;border:1.5px solid #dbeafe;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
-             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(26,115,232,.15)'"
-             onmouseout="this.style.transform='';this.style.boxShadow=''">
-          <div style="width:46px;height:46px;background:linear-gradient(135deg,#4f9ef8,#1a73e8);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <i class="fa-solid fa-hand-holding-heart" style="color:#fff;font-size:18px"></i>
-          </div>
-          <div style="font-size:12px;font-weight:800;color:#1a73e8;background:rgba(26,115,232,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
-          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Record Donation</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Record a donation you collected and earn 10% as reward points.</p>
-          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <i class="fa-solid fa-arrow-right" style="color:#1a73e8;font-size:11px"></i>
-          </div>
-        </div>
+  <!-- Add Supporter -->
+  <div onclick="openActionModal('addSupporter')" style="background:#fff;border:1.5px solid #c8f7db;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(10,143,63,.15)'"
+       onmouseout="this.style.transform='';this.style.boxShadow=''">
+    <div style="width:46px;height:46px;background:linear-gradient(135deg,#34d366,#0a8f3f);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+      <i class="fa-solid fa-hands-helping" style="color:#fff;font-size:18px"></i>
+    </div>
+    <div style="font-size:12px;font-weight:800;color:#0a8f3f;background:rgba(10,143,63,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+    <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Add Supporter</h4>
+    <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Bring a new supporter on board and earn 10% referral points.</p>
+    <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center">
+      <i class="fa-solid fa-arrow-right" style="color:#0a8f3f;font-size:11px"></i>
+    </div>
+  </div>
 
-        <!-- Sell Quiz Ticket -->
-        <div onclick="openActionModal('sellTicket')" style="background:#fff;border:1.5px solid #fef3c7;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
-             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(229,161,0,.15)'"
-             onmouseout="this.style.transform='';this.style.boxShadow=''">
-          <div style="width:46px;height:46px;background:linear-gradient(135deg,#fbbf24,#e5a100);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <i class="fa-solid fa-ticket" style="color:#fff;font-size:18px"></i>
-          </div>
-          <div style="font-size:12px;font-weight:800;color:#b45309;background:rgba(180,83,9,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
-          <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Sell Quiz Ticket</h4>
-          <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Sold a quiz ticket? Record it and earn 10% of the ticket price.</p>
-          <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#fffbeb;border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <i class="fa-solid fa-arrow-right" style="color:#e5a100;font-size:11px"></i>
+  <!-- Collect Donation -->
+  <div onclick="openActionModal('donation')" style="background:#fff;border:1.5px solid #dbeafe;border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden"
+       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(26,115,232,.15)'"
+       onmouseout="this.style.transform='';this.style.boxShadow=''">
+    <div style="width:46px;height:46px;background:linear-gradient(135deg,#4f9ef8,#1a73e8);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+      <i class="fa-solid fa-hand-holding-heart" style="color:#fff;font-size:18px"></i>
+    </div>
+    <div style="font-size:12px;font-weight:800;color:#1a73e8;background:rgba(26,115,232,.1);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:8px">10% Back</div>
+    <h4 style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Collect Donation</h4>
+    <p style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.5">Record a donation you collected and earn 10% as reward points.</p>
+    <div style="position:absolute;bottom:16px;right:16px;width:28px;height:28px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+      <i class="fa-solid fa-arrow-right" style="color:#1a73e8;font-size:11px"></i>
           </div>
         </div>
       </div>
 
-      <!-- Referral Tracking Table -->
+      <!-- Referral Tracking — Tabbed -->
       <div style="padding:4px 20px 20px">
         <div style="border-top:1px solid var(--card-border);padding-top:16px;margin-top:10px">
-          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-list"></i> My Referrals & Quiz Tickets</h4>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>Type</th><th>Name</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
-              <tbody id="referralsBody">
-                <tr><td colspan="6" class="empty-state"><p>No referrals yet</p></td></tr>
-              </tbody>
-            </table>
+          <h4 style="margin-bottom:12px;font-size:14px;font-weight:800"><i class="fa-solid fa-list"></i> My Referrals &amp; Quiz Tickets</h4>
+          <div class="rtab-wrap">
+            <button class="rtab active" onclick="switchRefTab('members',this)">👥 Members</button>
+            <button class="rtab" onclick="switchRefTab('supporters',this)">🤝 Supporters</button>
+            <button class="rtab" onclick="switchRefTab('donations',this)">💰 Donations</button>
+            <button class="rtab" onclick="switchRefTab('tickets',this)">🎫 Tickets</button>
+          </div>
+
+          <div id="rtab-members" class="rtab-body">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Name</th><th>Member ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbMembers"><tr><td colspan="6" class="empty-state"><p>No referrals yet</p></td></tr></tbody>
+            </table></div>
+          </div>
+
+          <div id="rtab-supporters" class="rtab-body" style="display:none">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Name</th><th>Member ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbSupporters"><tr><td colspan="6" class="empty-state"><p>No referrals yet</p></td></tr></tbody>
+            </table></div>
+          </div>
+
+          <div id="rtab-donations" class="rtab-body" style="display:none">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Name</th><th>ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbDonations"><tr><td colspan="6" class="empty-state"><p>No donations yet</p></td></tr></tbody>
+            </table></div>
+          </div>
+
+          <div id="rtab-tickets" class="rtab-body" style="display:none">
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Name</th><th>ID</th><th>Amount</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="rtbTickets"><tr><td colspan="6" class="empty-state"><p>No tickets yet</p></td></tr></tbody>
+            </table></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ============ MODAL: Add Supporter ============ -->
+  <!-- ============ MODAL: Add Member (link generation) ============ -->
+  <div id="modalAddMember" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="background:linear-gradient(135deg,#f97316,#E87722);padding:20px 24px 16px;position:relative">
+        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-user-plus"></i> Add Member</h3>
+        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Generate a referral link — earn <strong>250 points</strong> when they register!</p>
+        <button onclick="closeActionModal('addMember')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+      </div>
+      <div style="padding:22px 24px 24px">
+        <div id="amStep1">
+          <div style="display:grid;gap:12px">
+            <div class="form-group" style="margin:0"><label>Full Name *</label><input type="text" class="form-input" id="amName" placeholder="Member's full name"></div>
+            <div class="form-group" style="margin:0"><label>Mobile Number *</label><input type="tel" class="form-input" id="amMobile" placeholder="10-digit mobile" maxlength="10"></div>
+            <div class="form-group" style="margin:0"><label>Email Address *</label><input type="email" class="form-input" id="amEmail" placeholder="name@example.com"></div>
+          </div>
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#7c2d12">
+            <i class="fa-solid fa-circle-info"></i> A pre-filled registration link will be generated. Share it via WhatsApp — when the person pays ₹500, you earn <strong>250 points</strong>.
+          </div>
+          <button onclick="generateMemberLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#f97316,#E87722);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+            <i class="fa-solid fa-link"></i> Generate Registration Link
+          </button>
+        </div>
+        <div id="amStep2" style="display:none">
+          <p id="amLinkForName" style="font-size:13px;color:var(--text-muted);margin-bottom:10px;text-align:center;font-weight:600"></p>
+          <div style="background:#f8fafc;border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;margin-bottom:14px">
+            <input id="amGeneratedLink" readonly style="flex:1;border:none;background:transparent;font-size:11px;color:var(--text-primary);font-family:monospace;outline:none;word-break:break-all" />
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <button onclick="copyGenLink('amGeneratedLink')" style="background:#f1f5f9;color:var(--text-primary);border:1.5px solid var(--card-border);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-copy"></i> Copy Link</button>
+            <button onclick="waShareLink('amGeneratedLink','member')" style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+          </div>
+          <button onclick="resetMemberLinkModal()" style="width:100%;background:transparent;color:var(--text-muted);border:1.5px solid var(--card-border);border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer">← New Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Add Supporter (link generation) ============ -->
   <div id="modalAddSupporter" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
     <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
       <div style="background:linear-gradient(135deg,#34d366,#0a8f3f);padding:20px 24px 16px;position:relative">
         <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hands-helping"></i> Add Supporter</h3>
-        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10% back</strong> of the supporter's joining amount as points!</p>
+        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Generate a referral link — earn <strong>10% back</strong> as reward points!</p>
         <button onclick="closeActionModal('addSupporter')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
       </div>
       <div style="padding:22px 24px 24px">
         <div id="spStep1">
           <div style="display:grid;gap:12px">
-            <div class="form-group" style="margin:0"><label>Supporter Name *</label><input type="text" class="form-input" id="spName" placeholder="Full name"></div>
-            <div class="form-group" style="margin:0"><label>Mobile / Email *</label><input type="text" class="form-input" id="spContact" placeholder="Phone or email"></div>
-            <div class="form-group" style="margin:0"><label>Joining Amount (₹) *</label><input type="number" class="form-input" id="spAmount" placeholder="e.g. 500" min="1" value="500"></div>
-            <div class="form-group" style="margin:0"><label>Notes (optional)</label><input type="text" class="form-input" id="spNotes" placeholder="e.g. Corporate, Local leader"></div>
+            <div class="form-group" style="margin:0"><label>Full Name *</label><input type="text" class="form-input" id="spName" placeholder="Supporter's full name"></div>
+            <div class="form-group" style="margin:0"><label>Mobile Number *</label><input type="tel" class="form-input" id="spMobile" placeholder="10-digit mobile" maxlength="10"></div>
+            <div class="form-group" style="margin:0"><label>Email Address *</label><input type="email" class="form-input" id="spEmail" placeholder="name@example.com"></div>
           </div>
           <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:12px;color:#166534">
-            <i class="fa-solid fa-circle-info"></i> You earn <strong>10%</strong> of the supporter's payment as reward points. e.g. ₹500 → <strong>5 points</strong>.
+            <i class="fa-solid fa-circle-info"></i> A pre-filled registration link will be generated. Share it via WhatsApp — when the person pays, you earn <strong>10%</strong> as reward points.
           </div>
-          <button id="spPayBtn" onclick="startSupporterPayment()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
-            <i class="fa-solid fa-lock"></i> Proceed to Payment
+          <button onclick="generateSupporterLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+            <i class="fa-solid fa-link"></i> Generate Registration Link
           </button>
         </div>
-        <div id="spStep2" style="display:none;text-align:center">
-          <div style="font-size:40px;margin-bottom:8px">🎉</div>
-          <h4 style="color:var(--success);font-size:16px;font-weight:800;margin-bottom:4px">Supporter Added!</h4>
-          <p id="spResultPoints" style="color:var(--text-muted);font-size:13px;margin-bottom:16px"></p>
-          <button onclick="closeActionModal('addSupporter')" style="background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
+        <div id="spStep2" style="display:none">
+          <p id="spLinkForName" style="font-size:13px;color:var(--text-muted);margin-bottom:10px;text-align:center;font-weight:600"></p>
+          <div style="background:#f8fafc;border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;margin-bottom:14px">
+            <input id="spGeneratedLink" readonly style="flex:1;border:none;background:transparent;font-size:11px;color:var(--text-primary);font-family:monospace;outline:none;word-break:break-all" />
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <button onclick="copyGenLink('spGeneratedLink')" style="background:#f1f5f9;color:var(--text-primary);border:1.5px solid var(--card-border);border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-copy"></i> Copy Link</button>
+            <button onclick="waShareLink('spGeneratedLink','supporter')" style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+          </div>
+          <button onclick="resetSupporterLinkModal()" style="width:100%;background:transparent;color:var(--text-muted);border:1.5px solid var(--card-border);border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer">← New Link</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ============ MODAL: Record Donation ============ -->
+  <!-- ============ MODAL: Collect Donation ============ -->
   <div id="modalDonation" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
     <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
       <div style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);padding:20px 24px 16px;position:relative">
-        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hand-holding-heart"></i> Record Donation</h3>
+        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-hand-holding-heart"></i> Collect Donation</h3>
         <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the donated amount as reward points</p>
         <button onclick="closeActionModal('donation')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
       </div>
@@ -1610,25 +1684,6 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         <div class="form-group" style="margin:0"><label>Donor Contact</label><input type="text" class="form-input" id="donContact" placeholder="Phone or email"></div>
         <button id="donBtn" onclick="submitDonation()" style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
           <i class="fa-solid fa-plus"></i> Record Donation
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ MODAL: Sell Quiz Ticket ============ -->
-  <div id="modalSellTicket" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:center;justify-content:center;padding:16px">
-    <div style="background:#fff;border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)">
-      <div style="background:linear-gradient(135deg,#fbbf24,#e5a100);padding:20px 24px 16px;position:relative">
-        <h3 style="color:#fff;margin:0;font-size:17px;font-weight:800"><i class="fa-solid fa-ticket"></i> Sell Quiz Ticket</h3>
-        <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the ticket price as reward points</p>
-        <button onclick="closeActionModal('sellTicket')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
-      </div>
-      <div style="padding:22px 24px 24px;display:grid;gap:12px">
-        <div class="form-group" style="margin:0"><label>Buyer Name *</label><input type="text" class="form-input" id="tickBuyer" placeholder="Buyer's full name"></div>
-        <div class="form-group" style="margin:0"><label>Buyer Contact</label><input type="text" class="form-input" id="tickContact" placeholder="Phone or email"></div>
-        <div class="form-group" style="margin:0"><label>Ticket Price (₹)</label><input type="number" class="form-input" id="tickPrice" value="100" min="1"></div>
-        <button id="tickBtn" onclick="submitTicket()" style="background:linear-gradient(135deg,#fbbf24,#e5a100);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
-          <i class="fa-solid fa-plus"></i> Record Ticket Sale
         </button>
       </div>
     </div>
@@ -1998,59 +2053,37 @@ async function loadReferral(){
   try{
     const [data, ticketRes] = await Promise.all([
       memberData || AUTH.api('/api/member/me'),
-      AUTH.api('/api/member/my-quiz-tickets')
+      AUTH.api('/api/member/my-quiz-tickets').catch(() => ({ tickets: [] }))
     ]);
     memberData = data;
     document.getElementById('refCode').value = data.user?.referral_code || 'N/A';
 
-    const refs = (data.referrals || []).map(r => ({
-      _type: 'referral',
-      name: r.referred_name || '—',
-      amount: r.amount || 0,
-      points: r.points_earned || 0,
-      status: r.status,
-      date: r.created_at
-    }));
-
-    const tickets = (ticketRes?.tickets || []).map(t => ({
-      _type: 'quiz_ticket',
-      name: t.buyer_name || '—',
-      amount: t.ticket_price || 0,
-      points: t.points_earned || 0,
-      status: t.ticket_status === 'converted' ? 'paid' : 'pending',
-      date: t.sold_at,
-      support_id: t.seller_support_id,
-      quiz_ref: t.quiz_ref
-    }));
-
-    const all = [...refs, ...tickets].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    const refBody = document.getElementById('referralsBody');
-    if(all.length){
-      refBody.innerHTML = all.map(r => {
-        const typeCell = r._type === 'quiz_ticket'
-          ? `<span style="background:#fef9c3;color:#92400e;border:1px solid #fde68a;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:800">🎫 Quiz</span>`
-          : `<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:800">👤 Referral</span>`;
-        const nameCell = r._type === 'quiz_ticket'
-          ? `<div style="font-weight:700">${r.name}</div><div style="font-size:10px;color:var(--text-muted)">${r.quiz_ref || ''} · ${r.support_id || ''}</div>`
-          : `<div style="font-weight:700">${r.name}</div>`;
-        const statusCell = r.status === 'paid' || r.status === 'active'
-          ? `<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">✅ Paid</span>`
-          : r.status === 'converted'
-          ? `<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">✅ Paid</span>`
-          : `<span style="background:#fef9c3;color:#92400e;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">⏳ Pending</span>`;
-        return `<tr>
-          <td>${typeCell}</td>
-          <td>${nameCell}</td>
-          <td style="font-weight:800">₹${fmtN(r.amount)}</td>
-          <td style="color:var(--success);font-weight:700">${r.points > 0 ? '+'+r.points : '—'}</td>
-          <td>${statusCell}</td>
-          <td style="color:var(--text-muted);font-size:12px">${fmtDate(r.date)}</td>
-        </tr>`;
-      }).join('');
-    } else {
-      refBody.innerHTML = `<tr><td colspan="6" class="empty-state"><p>No referrals or quiz tickets yet</p></td></tr>`;
+    function refRow(r){
+      return `<tr>
+        <td style="font-weight:700">${r.referred_name || r.name || '—'}</td>
+        <td style="font-family:monospace;font-size:12px">${r.referred_member_id || '—'}</td>
+        <td style="font-weight:800">₹${fmtN(r.amount || 0)}</td>
+        <td style="color:var(--success);font-weight:700">+${r.points_earned || r.points || 0}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td style="color:var(--text-muted);font-size:12px">${fmtDate(r.created_at || r.date)}</td>
+      </tr>`;
     }
+    const emptyRow = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:18px;font-size:13px">No records yet</td></tr>`;
+
+    const refs       = data.referrals || [];
+    const members    = refs.filter(r => !r.type || r.type === 'member');
+    const supporters = refs.filter(r => r.type === 'supporter');
+    const donations  = refs.filter(r => r.type === 'donation');
+    const rawTickets = (ticketRes?.tickets || []).map(t => ({
+      name: t.buyer_name || '—', referred_member_id: t.seller_support_id || '—',
+      amount: t.ticket_price || 0, points_earned: t.points_earned || 0,
+      status: t.ticket_status === 'converted' ? 'paid' : 'pending', created_at: t.sold_at
+    }));
+
+    document.getElementById('rtbMembers').innerHTML    = members.length    ? members.map(refRow).join('')    : emptyRow;
+    document.getElementById('rtbSupporters').innerHTML = supporters.length ? supporters.map(refRow).join('') : emptyRow;
+    document.getElementById('rtbDonations').innerHTML  = donations.length  ? donations.map(refRow).join('')  : emptyRow;
+    document.getElementById('rtbTickets').innerHTML    = rawTickets.length ? rawTickets.map(refRow).join('') : emptyRow;
 
   } catch(e){ console.error(e); notify('Failed to load referral data', 'error'); }
 }
@@ -2064,24 +2097,28 @@ function copyRefCode(){
    ACTION MODALS
    ============================================ */
 const actionModalMap = {
+  addMember:    'modalAddMember',
   addSupporter: 'modalAddSupporter',
-  donation:     'modalDonation',
-  sellTicket:   'modalSellTicket'
+  donation:     'modalDonation'
 };
 function openActionModal(key){
   const el = document.getElementById(actionModalMap[key]);
   if(!el) return;
   el.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  if(key === 'addMember'){
+    document.getElementById('amStep1').style.display = 'block';
+    document.getElementById('amStep2').style.display = 'none';
+    document.getElementById('amName').value = '';
+    document.getElementById('amMobile').value = '';
+    document.getElementById('amEmail').value = '';
+  }
   if(key === 'addSupporter'){
     document.getElementById('spStep1').style.display = 'block';
     document.getElementById('spStep2').style.display = 'none';
     document.getElementById('spName').value = '';
-    document.getElementById('spContact').value = '';
-    document.getElementById('spAmount').value = '500';
-    document.getElementById('spNotes').value = '';
-    const btn = document.getElementById('spPayBtn');
-    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment'; }
+    document.getElementById('spMobile').value = '';
+    document.getElementById('spEmail').value = '';
   }
 }
 function closeActionModal(key){
@@ -2097,49 +2134,79 @@ Object.values(actionModalMap).forEach(id => {
 });
 
 /* ============================================
-   ADD SUPPORTER (Razorpay + 10% points)
+   GENERATE REFERRAL LINK — ADD MEMBER
    ============================================ */
-async function startSupporterPayment(){
-  const name    = document.getElementById('spName').value.trim();
-  const contact = document.getElementById('spContact').value.trim();
-  const amount  = parseFloat(document.getElementById('spAmount').value);
-  const notes   = document.getElementById('spNotes').value.trim();
-  if(!name || !contact) return notify('Enter supporter name and contact', 'warning');
-  if(!amount || amount < 1) return notify('Enter a valid joining amount', 'warning');
-  const btn = document.getElementById('spPayBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating order...';
-  try{
-    const order = await AUTH.api('/api/pay/create-order', { method:'POST', body:{ amount, type:'supporter', notes:{ supporter: name } } });
-    const options = {
-      key: order.key, amount: order.order.amount, currency: order.order.currency,
-      name: 'FWF — Supporter Joining', description: `Supporter: ${name}`,
-      image: '/assets/images/logo.png',
-      order_id: order.order.id,
-      handler: async function(resp){
-        try{
-          const result = await AUTH.api('/api/pay/supporter', { method:'POST', body:{
-            supporterName: name, supporterContact: contact, supporterNotes: notes, amount,
-            razorpay_payment_id: resp.razorpay_payment_id,
-            razorpay_order_id: resp.razorpay_order_id,
-            razorpay_signature: resp.razorpay_signature
-          }});
-          document.getElementById('spResultPoints').textContent = result.message || `Supporter added! You earned ${result.pointsEarned} points.`;
-          document.getElementById('spStep1').style.display = 'none';
-          document.getElementById('spStep2').style.display = 'block';
-          memberData = null; loadWallet();
-        } catch(e){ notify('Payment received but failed to record — contact support: ' + e.message, 'warning'); }
-      },
-      prefill: { name: memberData?.user?.name || '', contact },
-      theme: { color: '#10b981' },
-      modal: { ondismiss: () => { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment'; } }
-    };
-    new Razorpay(options).open();
-  } catch(e){
-    notify('Could not initiate payment: ' + e.message, 'error');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Proceed to Payment';
-  }
+function generateMemberLink() {
+  const name   = document.getElementById('amName').value.trim();
+  const mobile = document.getElementById('amMobile').value.trim();
+  const email  = document.getElementById('amEmail').value.trim();
+  if (!name || !mobile || !email) return notify('Please fill all fields', 'warning');
+  if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) return notify('Enter valid 10-digit mobile', 'warning');
+  if (!/\S+@\S+\.\S+/.test(email)) return notify('Enter valid email', 'warning');
+  const ref = memberData?.user?.referral_code || '';
+  const url = `${location.origin}/join?ref=${encodeURIComponent(ref)}&n=${encodeURIComponent(name)}&m=${encodeURIComponent(mobile)}&e=${encodeURIComponent(email)}&src=member`;
+  document.getElementById('amGeneratedLink').value = url;
+  document.getElementById('amLinkForName').textContent = `Share this link with ${name}`;
+  document.getElementById('amStep1').style.display = 'none';
+  document.getElementById('amStep2').style.display = 'block';
+}
+function resetMemberLinkModal() {
+  document.getElementById('amStep1').style.display = 'block';
+  document.getElementById('amStep2').style.display = 'none';
+  document.getElementById('amName').value = '';
+  document.getElementById('amMobile').value = '';
+  document.getElementById('amEmail').value = '';
+}
+
+/* ============================================
+   GENERATE REFERRAL LINK — ADD SUPPORTER
+   ============================================ */
+function generateSupporterLink() {
+  const name   = document.getElementById('spName').value.trim();
+  const mobile = document.getElementById('spMobile').value.trim();
+  const email  = document.getElementById('spEmail').value.trim();
+  if (!name || !mobile || !email) return notify('Please fill all fields', 'warning');
+  if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) return notify('Enter valid 10-digit mobile', 'warning');
+  if (!/\S+@\S+\.\S+/.test(email)) return notify('Enter valid email', 'warning');
+  const ref = memberData?.user?.referral_code || '';
+  const url = `${location.origin}/join?ref=${encodeURIComponent(ref)}&n=${encodeURIComponent(name)}&m=${encodeURIComponent(mobile)}&e=${encodeURIComponent(email)}&src=supporter`;
+  document.getElementById('spGeneratedLink').value = url;
+  document.getElementById('spLinkForName').textContent = `Share this link with ${name}`;
+  document.getElementById('spStep1').style.display = 'none';
+  document.getElementById('spStep2').style.display = 'block';
+}
+function resetSupporterLinkModal() {
+  document.getElementById('spStep1').style.display = 'block';
+  document.getElementById('spStep2').style.display = 'none';
+  document.getElementById('spName').value = '';
+  document.getElementById('spMobile').value = '';
+  document.getElementById('spEmail').value = '';
+}
+
+/* ============ COPY LINK / WHATSAPP SHARE ============ */
+function copyGenLink(inputId) {
+  const val = document.getElementById(inputId).value;
+  navigator.clipboard.writeText(val).then(() => notify('Link copied!', 'success')).catch(() => {
+    const el = document.getElementById(inputId); el.select(); document.execCommand('copy');
+    notify('Link copied!', 'success');
+  });
+}
+function waShareLink(inputId, type) {
+  const url  = document.getElementById(inputId).value;
+  const name = memberData?.user?.name || 'a friend';
+  const msg  = type === 'member'
+    ? `*FWF Membership Registration*\nHello! ${name} has invited you to join FWF as a member.\n\nClick the link below to register (₹500 fee):\n${url}\n\n_Foundation for Women's Future_`
+    : `*FWF Supporter Registration*\nHello! ${name} has invited you to join FWF as a supporter.\n\nClick the link below to register:\n${url}\n\n_Foundation for Women's Future_`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+/* ============ REFERRAL TRACKING TABS ============ */
+function switchRefTab(tab, btn) {
+  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.rtab-body').forEach(b => b.style.display = 'none');
+  const el = document.getElementById('rtab-' + tab);
+  if (el) el.style.display = 'block';
 }
 
 /* ============================================

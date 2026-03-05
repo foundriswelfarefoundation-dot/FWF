@@ -242,6 +242,21 @@
     form.pan.addEventListener('input', (e) => {
       e.target.value = e.target.value.toUpperCase();
     });
+
+    // ── Pre-fill from referral link params (?ref=CODE&n=Name&m=Mobile&e=Email) ──
+    (function(){
+      const p = new URLSearchParams(location.search);
+      if(p.get('n')) form.fullName.value = p.get('n');
+      if(p.get('m')) form.mobile.value   = p.get('m');
+      if(p.get('e')) form.email.value    = p.get('e');
+      if(p.get('ref')) sessionStorage.setItem('fwfRefCode', p.get('ref'));
+      if(p.get('ref') || p.get('n')){
+        const banner = document.createElement('div');
+        banner.style.cssText = 'background:#fff8f0;border:1px solid #fbbf24;border-radius:10px;padding:10px 14px;font-size:13px;color:#b45309;margin-bottom:14px;text-align:center;';
+        banner.innerHTML = '<i class="fas fa-link"></i> आपको एक referral link से invite किया गया है। Details already filled हैं!';
+        form.insertAdjacentElement('beforebegin', banner);
+      }
+    })();
   </script>
 </body>
 </html>

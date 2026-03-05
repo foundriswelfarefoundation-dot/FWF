@@ -1370,6 +1370,7 @@
                 email:   formData.email,
                 project: formData.project,
                 unit:    formData.unit,
+                ref:     sessionStorage.getItem('fwfRefCode') || '',
                 razorpay_payment_id:      response.razorpay_payment_id,
                 razorpay_subscription_id: response.razorpay_subscription_id,
                 razorpay_signature:       response.razorpay_signature
@@ -1380,7 +1381,8 @@
               // Save to MongoDB for welcome email
               try {
                 await fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, unit: formData.unit, paymentRef: response.razorpay_payment_id }) });
+                  body: JSON.stringify({ fullName: formData.name, mobile: formData.mobile, email: formData.email, project: formData.project, unit: formData.unit, paymentRef: response.razorpay_payment_id, ref: sessionStorage.getItem('fwfRefCode') || '' }) });
+                sessionStorage.removeItem('fwfRefCode');
               } catch(e) {}
               // Close modal + reset to step 1 immediately
               closeModal(memberModal);

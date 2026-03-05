@@ -1986,22 +1986,36 @@ textarea.form-input{ resize:vertical; min-height:80px; }
           <p style="color:rgba(255,255,255,.8);font-size:12px;margin:4px 0 0">Earn <strong>10%</strong> of the donated amount as reward points</p>
           <button onclick="closeActionModal('donation')" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
         </div>
-        <div style="padding:22px 24px 24px;display:grid;gap:12px">
-          <div class="form-group" style="margin:0">
-            <label>Donation Amount (₹) *</label>
-            <input type="number" class="form-input" id="donAmount" placeholder="e.g. 1000" min="1">
+        <div style="padding:22px 24px 24px">
+          <!-- Step 1: Donor Details -->
+          <div id="donStep1">
+            <div style="display:grid;gap:12px">
+              <div class="form-group" style="margin:0"><label>Donor Name <span style="font-weight:400;color:#94a3b8">(optional)</span></label><input type="text" class="form-input" id="donLinkName" placeholder="Donor's full name"></div>
+              <div class="form-group" style="margin:0"><label>Donor Mobile <span style="font-weight:400;color:#94a3b8">(optional)</span></label><input type="tel" class="form-input" id="donLinkMobile" placeholder="10-digit mobile" maxlength="10"></div>
+            </div>
+            <button id="donGenBtn" onclick="generateDonationLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
+              <i class="fa-solid fa-link"></i> Generate Donation Link
+            </button>
           </div>
-          <div class="form-group" style="margin:0">
-            <label>Donor Name *</label>
-            <input type="text" class="form-input" id="donName" placeholder="Donor's name">
+          <!-- Step 2: Share Link -->
+          <div id="donStep2" style="display:none">
+            <div style="text-align:center;margin-bottom:16px">
+              <div style="font-size:36px;margin-bottom:6px">🔗</div>
+              <h4 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">Donation Link Ready!</h4>
+              <p id="donLinkForName" style="font-size:12px;color:var(--text-muted);margin:0"></p>
+            </div>
+            <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:14px">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Donation Link</label>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <input type="text" id="donGeneratedLink" readonly class="form-input" style="font-size:11px;background:#fff">
+                <button onclick="copyGenLink('donGeneratedLink')" style="background:#1a73e8;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap"><i class="fa-solid fa-copy"></i></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <button onclick="waShareLink('donGeneratedLink','donation')" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer"><i class="fa-brands fa-whatsapp"></i> Share on WhatsApp</button>
+              <button onclick="resetDonationLinkModal()" style="flex:1;background:#f1f5f9;color:#334155;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-plus"></i> New Link</button>
+            </div>
           </div>
-          <div class="form-group" style="margin:0">
-            <label>Donor Contact</label>
-            <input type="text" class="form-input" id="donContact" placeholder="Phone or email">
-          </div>
-          <button id="donBtn" onclick="submitDonation()" style="background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">
-            <i class="fa-solid fa-plus"></i> Record Donation
-          </button>
         </div>
       </div>
     </div>
@@ -4079,6 +4093,12 @@ function openActionModal(key) {
     document.getElementById('spMobile').value = '';
     document.getElementById('spEmail').value = '';
   }
+  if (key === 'donation') {
+    document.getElementById('donStep1').style.display = 'block';
+    document.getElementById('donStep2').style.display = 'none';
+    document.getElementById('donLinkName').value = '';
+    document.getElementById('donLinkMobile').value = '';
+  }
 }
 function closeActionModal(key) {
   const el = document.getElementById(actionModalMap[key]);
@@ -4166,6 +4186,26 @@ function resetSupporterLinkModal() {
   document.getElementById('spMobile').value = '';
   document.getElementById('spEmail').value = '';
 }
+function generateDonationLink() {
+  const name   = document.getElementById('donLinkName').value.trim();
+  const mobile = document.getElementById('donLinkMobile').value.trim();
+  const ref    = memberData?.user?.referral_code || '';
+  const params = new URLSearchParams({ ref, src: 'donation' });
+  if (name)   params.set('dn', name);
+  if (mobile) params.set('dm', mobile);
+  const url = `${location.origin}/donation?${params.toString()}#donateModal`;
+  savePendingLink({ name: name || 'Donor', mobile: mobile || '', email: '', link: url, type: 'donation', generated_at: new Date().toISOString() });
+  document.getElementById('donGeneratedLink').value = url;
+  document.getElementById('donLinkForName').textContent = name ? `Share this link with ${name}` : 'Share this donation link';
+  document.getElementById('donStep1').style.display = 'none';
+  document.getElementById('donStep2').style.display = 'block';
+}
+function resetDonationLinkModal() {
+  document.getElementById('donStep1').style.display = 'block';
+  document.getElementById('donStep2').style.display = 'none';
+  document.getElementById('donLinkName').value = '';
+  document.getElementById('donLinkMobile').value = '';
+}
 
 /* ============ COPY LINK / WHATSAPP SHARE ============ */
 function copyGenLink(inputId) {
@@ -4243,6 +4283,8 @@ function waShareLink(inputId, type) {
   const name = memberData?.user?.name || 'a friend';
   const msg  = type === 'member'
     ? `*FWF Membership Registration*\nHello! ${name} has invited you to join FWF as a member.\n\nClick the link below to register (₹500 fee):\n${url}\n\n_Foundation for Women's Future_`
+    : type === 'donation'
+    ? `*FWF Donation*\nHello! ${name} has shared a donation link with you.\n\nClick the link below to make a donation:\n${url}\n\n_Foundation for Women's Future_`
     : `*FWF Supporter Registration*\nHello! ${name} has invited you to join FWF as a supporter.\n\nClick the link below to register:\n${url}\n\n_Foundation for Women's Future_`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }

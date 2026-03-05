@@ -1094,6 +1094,7 @@
                   amount: Number(donateFormData.amount),
                   want80g: donateFormData.want80g,
                   recurring: true,
+                  ref: sessionStorage.getItem('fwfDonRefCode') || '',
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_subscription_id: response.razorpay_subscription_id,
                   razorpay_signature: response.razorpay_signature
@@ -1106,7 +1107,7 @@
                   message: `Your monthly donation of ₹${donateFormData.amount}/month has been set up successfully!<br><br><span style="background:#dbeafe;border:1px solid #bfdbfe;color:#1d4ed8;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block"><i class="fa-solid fa-rotate"></i> Auto-debits every month · Cancel anytime from UPI app</span>${data.receipt80GSent ? '<br><br><span style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block">📄 80G Receipt sent to <strong>' + donateFormData.email + '</strong></span>' : ''}<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>`,
                   type: 'success',
                   confirmText: 'OK',
-                  onConfirm: () => { closeModal(donateModal); resetDonate(); }
+                  onConfirm: () => { closeModal(donateModal); resetDonate(); sessionStorage.removeItem('fwfDonRefCode'); }
                 });
               } else {
                 FWF_Notify.toast(data.error || 'Error recording donation', 'error', 5000);
@@ -1156,6 +1157,7 @@
                   amount: Number(donateFormData.amount),
                   want80g: donateFormData.want80g,
                   verified_token: donateFormData.verified_token,
+                  ref: sessionStorage.getItem('fwfDonRefCode') || '',
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_signature: response.razorpay_signature
@@ -1168,7 +1170,7 @@
                   message: `Your donation of ₹${donateFormData.amount} has been received successfully!${data.receipt80GSent ? '<br><br><span style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 10px;border-radius:8px;font-size:0.85rem;display:inline-block">📄 80G Receipt sent to <strong>' + donateFormData.email + '</strong></span>' : (donateFormData.want80g ? '<br><br><small style="color:#ef4444">80G receipt could not be sent — our team will follow up.</small>' : '')}<br><br><small style="color:#64748b">Payment ID: ${response.razorpay_payment_id}</small>${data.pointsEarned ? '<br><small style="color:#22c55e">Points earned: ' + data.pointsEarned + '</small>' : ''}`,
                   type: 'success',
                   confirmText: 'OK',
-                  onConfirm: () => { closeModal(donateModal); resetDonate(); }
+                  onConfirm: () => { closeModal(donateModal); resetDonate(); sessionStorage.removeItem('fwfDonRefCode'); }
                 });
               } else {
                 FWF_Notify.toast(data.error || 'Error recording donation', 'error', 5000);
@@ -1510,6 +1512,10 @@
   // Auto-open donateModal when navigated via URL hash (placed last, after all vars/fns are defined)
   if(window.location.hash === '#donateModal') {
     resetDonate(); openModal(donateModal);
+    (function(){
+      const p = new URLSearchParams(location.search);
+      if(p.get('ref')) sessionStorage.setItem('fwfDonRefCode', p.get('ref'));
+    })();
   }
   // Auto-open memberModal when navigated via URL hash
   if(window.location.hash === '#memberModal') {

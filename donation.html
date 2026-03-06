@@ -1577,6 +1577,17 @@
     (function(){
       const p = new URLSearchParams(location.search);
       if(p.get('ref')) sessionStorage.setItem('fwfDonRefCode', p.get('ref'));
+      // Prefill donor details from link params (dn=name, dm=mobile, da=amount)
+      if(p.get('dn')) { const el = donateForm.querySelector('[name="name"]');   if(el) el.value = p.get('dn'); }
+      if(p.get('dm')) { const el = donateForm.querySelector('[name="mobile"]'); if(el) el.value = p.get('dm'); }
+      if(p.get('da')) {
+        const amt = Number(p.get('da'));
+        if(amt > 0) {
+          document.getElementById('donateAmountInput').value = amt;
+          document.querySelectorAll('.amount-chip').forEach(c => c.classList.toggle('active', Number(c.dataset.amount) === amt));
+          document.getElementById('donateAmountDisplay').textContent = amt.toLocaleString('en-IN');
+        }
+      }
     })();
   }
   // Auto-open memberModal when navigated via URL hash

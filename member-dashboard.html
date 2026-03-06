@@ -1992,6 +1992,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             <div style="display:grid;gap:12px">
               <div class="form-group" style="margin:0"><label>Donor Name <span style="font-weight:400;color:#94a3b8">(optional)</span></label><input type="text" class="form-input" id="donLinkName" placeholder="Donor's full name"></div>
               <div class="form-group" style="margin:0"><label>Donor Mobile <span style="font-weight:400;color:#94a3b8">(optional)</span></label><input type="tel" class="form-input" id="donLinkMobile" placeholder="10-digit mobile" maxlength="10"></div>
+              <div class="form-group" style="margin:0"><label>Donation Amount ₹ <span style="font-weight:400;color:#94a3b8">(optional)</span></label><input type="number" class="form-input" id="donLinkAmount" placeholder="e.g. 500" min="1"></div>
             </div>
             <button id="donGenBtn" onclick="generateDonationLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#4f9ef8,#1a73e8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
               <i class="fa-solid fa-link"></i> Generate Donation Link
@@ -4098,6 +4099,7 @@ function openActionModal(key) {
     document.getElementById('donStep2').style.display = 'none';
     document.getElementById('donLinkName').value = '';
     document.getElementById('donLinkMobile').value = '';
+    document.getElementById('donLinkAmount').value = '';
   }
 }
 function closeActionModal(key) {
@@ -4189,10 +4191,12 @@ function resetSupporterLinkModal() {
 function generateDonationLink() {
   const name   = document.getElementById('donLinkName').value.trim();
   const mobile = document.getElementById('donLinkMobile').value.trim();
+  const amount = document.getElementById('donLinkAmount').value.trim();
   const ref    = memberData?.user?.referral_code || '';
   const params = new URLSearchParams({ ref, src: 'donation' });
   if (name)   params.set('dn', name);
   if (mobile) params.set('dm', mobile);
+  if (amount) params.set('da', amount);
   const url = `${location.origin}/donation?${params.toString()}#donateModal`;
   savePendingLink({ name: name || 'Donor', mobile: mobile || '', email: '', link: url, type: 'donation', generated_at: new Date().toISOString() });
   document.getElementById('donGeneratedLink').value = url;
@@ -4205,6 +4209,7 @@ function resetDonationLinkModal() {
   document.getElementById('donStep2').style.display = 'none';
   document.getElementById('donLinkName').value = '';
   document.getElementById('donLinkMobile').value = '';
+  document.getElementById('donLinkAmount').value = '';
 }
 
 /* ============ COPY LINK / WHATSAPP SHARE ============ */

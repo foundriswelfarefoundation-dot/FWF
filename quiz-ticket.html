@@ -536,15 +536,17 @@
       const passed = data.passed;
       const score = data.score;
       const total = data.totalQuestions;
+      const passingScore = data.passing_score || Math.ceil(total / 2);
 
+      // Header colour & icon
       document.getElementById('resultHeader').style.background = passed
         ? 'linear-gradient(135deg,#22c55e,#16a34a)'
-        : 'linear-gradient(135deg,#f59e0b,#d97706)';
-      document.getElementById('resultEmoji').textContent = passed ? '🎉' : '📝';
-      document.getElementById('resultTitle').textContent = passed ? 'Congratulations!' : 'Quiz Submitted!';
+        : 'linear-gradient(135deg,#ef4444,#dc2626)';
+      document.getElementById('resultEmoji').textContent = passed ? '🎉' : '😔';
+      document.getElementById('resultTitle').textContent = passed ? 'Congratulations! 🌟' : 'Quiz Failed! ❌';
       document.getElementById('resultScore').textContent = passed
-        ? `सभी ${total} जवाब सही हैं! 🌟`
-        : `Score: ${score}/${total}`;
+        ? `Score: ${score}/${total} — आपने quiz pass कर लिया! 🎊`
+        : `Score: ${score}/${total} — Pass के लिए ${passingScore}/${total} सही होने चाहिए थे`;
 
       document.getElementById('resEnrollId').textContent = data.enrollment_number || _enrollmentNumber || '—';
 
@@ -554,7 +556,7 @@
         document.getElementById('resSupportBox').style.display = 'none';
       }
 
-      // Buyer account
+      // Buyer account (show even on fail — they paid)
       const ba = data.buyer_account;
       if(ba){
         const accDiv = document.getElementById('resBuyerAccount');
@@ -569,28 +571,48 @@
         }
       }
 
-      // Result date info (if not passed show result date)
-      if(!passed && data.result_date_fmt){
-        const di = document.getElementById('resDateInfo');
-        di.style.display = 'block';
-        di.textContent = `📅 Result will be announced on: ${data.result_date_fmt}`;
+      if(!passed){
+        // ── FAILED: show "Try Your Luck" box + new ticket button ──
+        const waDiv = document.getElementById('resWhatsAppBtns');
+        waDiv.style.display = 'grid';
+        waDiv.innerHTML = `
+          <div style="background:#fef2f2;border:2px solid #fca5a5;border-radius:14px;padding:20px 16px;text-align:center">
+            <div style="font-size:40px;margin-bottom:8px">🍀</div>
+            <div style="font-size:17px;font-weight:900;color:#dc2626;margin-bottom:6px">Try Your Luck Next Time!</div>
+            <div style="font-size:13px;color:#7f1d1d;line-height:1.6;margin-bottom:14px">
+              इस बार किस्मत ने साथ नहीं दिया — कोई बात नहीं! 💪<br>
+              नया ticket खरीदकर दोबारा quiz दें और जीतें।
+            </div>
+            <a href="/supporter-dashboard" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:12px;font-weight:800;font-size:14px;text-decoration:none;margin-bottom:8px">
+              🎫 New Ticket Purchase करें
+            </a>
+          </div>
+          <a href="https://wa.me/919580118412" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#f1f5f9;color:#374151;padding:10px;border-radius:12px;font-weight:700;font-size:12px;text-decoration:none;margin-top:4px">
+            <i class="fa-brands fa-whatsapp" style="color:#25d366"></i> FWF WhatsApp Support
+          </a>`;
+      } else {
+        // ── PASSED: WhatsApp share ──
+        const enrollId = data.enrollment_number || _enrollmentNumber;
+        const supportId = data.support_id || '';
+        const waText = encodeURIComponent(
+          `🎓 FWF Quiz Passed!\nParticipation ID: ${enrollId}${supportId?'\nSeller Support ID: '+supportId:''}\nScore: ${score}/${total}\nResult Date: ${data.result_date_fmt||'TBD'}`
+        );
+        const waDiv = document.getElementById('resWhatsAppBtns');
+        waDiv.style.display = 'grid';
+        waDiv.innerHTML = `
+          <a href="https://wa.me/?text=${waText}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;padding:12px;border-radius:12px;font-weight:800;font-size:13px;text-decoration:none">
+            <i class="fa-brands fa-whatsapp"></i> Share Details on WhatsApp
+          </a>
+          <a href="https://wa.me/919580118412" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#f1f5f9;color:#374151;padding:10px;border-radius:12px;font-weight:700;font-size:12px;text-decoration:none">
+            <i class="fa-brands fa-whatsapp" style="color:#25d366"></i> FWF WhatsApp Support
+          </a>`;
+        // Show result date for passed too
+        if(data.result_date_fmt){
+          const di = document.getElementById('resDateInfo');
+          di.style.display = 'block';
+          di.textContent = `📅 Result will be announced on: ${data.result_date_fmt}`;
+        }
       }
-
-      // WhatsApp buttons
-      const waDiv = document.getElementById('resWhatsAppBtns');
-      waDiv.style.display = 'grid';
-      const enrollId = data.enrollment_number || _enrollmentNumber;
-      const supportId = data.support_id || '';
-      const waText = encodeURIComponent(
-        `🎓 FWF Quiz Enrollment Success!\nParticipation ID: ${enrollId}${supportId?'\nSeller Support ID: '+supportId:''}\nResult Date: ${data.result_date_fmt||'TBD'}`
-      );
-      waDiv.innerHTML = `
-        <a href="https://wa.me/?text=${waText}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;padding:12px;border-radius:12px;font-weight:800;font-size:13px;text-decoration:none">
-          <i class="fa-brands fa-whatsapp"></i> Share Details on WhatsApp
-        </a>
-        <a href="https://wa.me/919580118412" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#f1f5f9;color:#374151;padding:10px;border-radius:12px;font-weight:700;font-size:12px;text-decoration:none">
-          <i class="fa-brands fa-whatsapp" style="color:#25d366"></i> FWF WhatsApp Support
-        </a>`;
 
       show('stateResult');
     }

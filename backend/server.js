@@ -408,12 +408,7 @@ async function seedData() {
           { q_no: 2, question: 'गंगा नदी कहाँ से निकलती है?', options: ['गंगोत्री', 'यमुनोत्री', 'केदारनाथ', 'बद्रीनाथ'], correct_answer: 0, points: 1 },
           { q_no: 3, question: 'भारत का सबसे बड़ा राज्य कौन सा है?', options: ['मध्य प्रदेश', 'उत्तर प्रदेश', 'राजस्थान', 'महाराष्ट्र'], correct_answer: 2, points: 1 },
           { q_no: 4, question: 'हमारे राष्ट्रीय ध्वज में कितने रंग हैं?', options: ['2', '3', '4', '5'], correct_answer: 1, points: 1 },
-          { q_no: 5, question: 'भारत के पहले राष्ट्रपति कौन थे?', options: ['महात्मा गांधी', 'जवाहरलाल नेहरू', 'डॉ. राजेंद्र प्रसाद', 'सरदार पटेल'], correct_answer: 2, points: 1 },
-          { q_no: 6, question: 'TAJ MAHAL किसने बनवाया था?', options: ['अकबर', 'शाहजहाँ', 'जहाँगीर', 'औरंगज़ेब'], correct_answer: 1, points: 1 },
-          { q_no: 7, question: 'भारत का राष्ट्रीय खेल कौन सा है?', options: ['क्रिकेट', 'कबड्डी', 'हॉकी', 'फुटबॉल'], correct_answer: 2, points: 1 },
-          { q_no: 8, question: 'सूरज किस दिशा में उगता है?', options: ['पश्चिम', 'उत्तर', 'दक्षिण', 'पूर्व'], correct_answer: 3, points: 1 },
-          { q_no: 9, question: '1 किलोमीटर में कितने मीटर होते हैं?', options: ['100', '500', '1000', '10000'], correct_answer: 2, points: 1 },
-          { q_no: 10, question: 'भारत का सबसे लंबा नदी पुल कौन सा है?', options: ['हावड़ा ब्रिज', 'भूपेन हजारिका सेतु', 'महात्मा गांधी सेतु', 'राजीव गांधी सेतु'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'भारत के पहले राष्ट्रपति कौन थे?', options: ['महात्मा गांधी', 'जवाहरलाल नेहरू', 'डॉ. राजेंद्र प्रसाद', 'सरदार पटेल'], correct_answer: 2, points: 1 }
         ]
       },
       {
@@ -433,10 +428,7 @@ async function seedData() {
           { q_no: 2, question: 'शहद कभी खराब नहीं होता।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
           { q_no: 3, question: 'ऑक्टोपस के 10 दिल होते हैं।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 },
           { q_no: 4, question: 'भारत में सबसे ज़्यादा बोली जाने वाली भाषा हिंदी है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
-          { q_no: 5, question: 'सूर्य एक तारा है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
-          { q_no: 6, question: 'माउंट एवरेस्ट भारत में है।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 },
-          { q_no: 7, question: 'इंसानी शरीर में 206 हड्डियाँ होती हैं।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
-          { q_no: 8, question: 'बिजली की खोज थॉमस एडिसन ने की।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'सूर्य एक तारा है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 }
         ]
       },
       {
@@ -456,12 +448,7 @@ async function seedData() {
           { q_no: 2, question: 'भारतीय संविधान कब लागू हुआ?', options: ['15 Aug 1947', '26 Jan 1950', '2 Oct 1949', '26 Nov 1949'], correct_answer: 1, points: 1 },
           { q_no: 3, question: 'पृथ्वी सूर्य का चक्कर कितने दिन में लगाती है?', options: ['365', '360', '366', '364'], correct_answer: 0, points: 1 },
           { q_no: 4, question: 'विश्व का सबसे ऊँचा पर्वत शिखर कौन सा है?', options: ['K2', 'कंचनजंगा', 'माउंट एवरेस्ट', 'मकालू'], correct_answer: 2, points: 1 },
-          { q_no: 5, question: 'RBI का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 },
-          { q_no: 6, question: 'भारत में कुल कितने राज्य हैं (2024)?', options: ['28', '29', '30', '31'], correct_answer: 0, points: 1 },
-          { q_no: 7, question: 'चंद्रयान-3 किस साल लॉन्च हुआ?', options: ['2021', '2022', '2023', '2024'], correct_answer: 2, points: 1 },
-          { q_no: 8, question: 'DNA का पूरा नाम क्या है?', options: ['Di Nucleic Acid', 'Deoxyribo Nucleic Acid', 'Data Nucleic Acid', 'Dual Nucleic Acid'], correct_answer: 1, points: 1 },
-          { q_no: 9, question: 'भारत का सबसे बड़ा बांध कौन सा है?', options: ['भाखड़ा नांगल', 'हीराकुंड', 'टिहरी', 'सरदार सरोवर'], correct_answer: 2, points: 1 },
-          { q_no: 10, question: 'IPL का पहला सीज़न कब हुआ?', options: ['2007', '2008', '2009', '2010'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'RBI का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 }
         ]
       },
       {
@@ -481,14 +468,7 @@ async function seedData() {
           { q_no: 2, question: 'ISRO का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'बेंगलुरु', 'हैदराबाद'], correct_answer: 2, points: 1 },
           { q_no: 3, question: 'भारतीय रुपये का चिह्न (₹) किसने डिज़ाइन किया?', options: ['डी. उदय कुमार', 'रघुराम राजन', 'अमर्त्य सेन', 'ए.पी.जे. अब्दुल कलाम'], correct_answer: 0, points: 1 },
           { q_no: 4, question: 'विश्व का सबसे बड़ा देश (क्षेत्रफल) कौन सा है?', options: ['चीन', 'अमेरिका', 'कनाडा', 'रूस'], correct_answer: 3, points: 1 },
-          { q_no: 5, question: 'पहला कंप्यूटर वायरस कौन सा था?', options: ['ILOVEYOU', 'Creeper', 'Brain', 'MyDoom'], correct_answer: 1, points: 1 },
-          { q_no: 6, question: 'UN Security Council में कितने स्थायी सदस्य हैं?', options: ['3', '4', '5', '6'], correct_answer: 2, points: 1 },
-          { q_no: 7, question: 'ओलंपिक खेल कितने साल में होते हैं?', options: ['2', '3', '4', '5'], correct_answer: 2, points: 1 },
-          { q_no: 8, question: 'भारतीय रेलवे की स्थापना कब हुई?', options: ['1843', '1853', '1863', '1873'], correct_answer: 1, points: 1 },
-          { q_no: 9, question: 'विश्व स्वास्थ्य संगठन (WHO) का मुख्यालय कहाँ है?', options: ['न्यूयॉर्क', 'जिनेवा', 'लंदन', 'पेरिस'], correct_answer: 1, points: 1 },
-          { q_no: 10, question: 'MangalyaanAan (Mars Orbiter) भारत ने कब लॉन्च किया?', options: ['2012', '2013', '2014', '2015'], correct_answer: 1, points: 1 },
-          { q_no: 11, question: 'भारत में सबसे लंबी नदी कौन सी है?', options: ['यमुना', 'गोदावरी', 'गंगा', 'नर्मदा'], correct_answer: 2, points: 1 },
-          { q_no: 12, question: 'LED का फ़ुल फ़ॉर्म क्या है?', options: ['Light Energy Diode', 'Light Emitting Diode', 'Laser Emitting Device', 'Low Energy Display'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'पहला कंप्यूटर वायरस कौन सा था?', options: ['ILOVEYOU', 'Creeper', 'Brain', 'MyDoom'], correct_answer: 1, points: 1 }
         ]
       },
       {
@@ -2753,26 +2733,29 @@ app.post('/api/member/quiz-submit', auth(['member','supporter']), async (req, re
       return { q_no: ans.q_no, selected: ans.selected, is_correct: isCorrect };
     });
 
+    const totalQ = quiz.questions.length;
+    const passing_score = Math.ceil(totalQ / 2);
+    const passed = score >= passing_score;
+
     participation.answers = scoredAnswers;
     participation.score = score;
     participation.quiz_submitted = true;
     participation.submitted_at = new Date();
-    participation.status = 'submitted';
+    participation.status = passed ? 'submitted' : 'failed';
     await participation.save();
 
-    const totalQ = quiz.questions.length;
-    const passed = score === totalQ;
     res.json({
       ok: true,
       score,
       totalQuestions: totalQ,
+      passing_score,
       passed,
       enrollment_number: participation.enrollment_number,
       result_date: quiz.result_date,
       quiz_title: quiz.title,
       message: passed
-        ? `🎉 शानदार! सभी ${totalQ} जवाब सही हैं! Result ${quiz.result_date.toLocaleDateString('hi-IN')} को आएगा।`
-        : `Quiz submit हो गया! Score: ${score}/${totalQ}. Result ${quiz.result_date.toLocaleDateString('hi-IN')} को आएगा।`
+        ? `🎉 शानदार! ${score}/${totalQ} जवाब सही हैं! Result ${quiz.result_date.toLocaleDateString('hi-IN')} को आएगा।`
+        : `❌ Quiz Failed! Score: ${score}/${totalQ} — Passing: ${passing_score}/${totalQ}. 🍀 Try Your Luck Next Time!`
     });
   } catch (err) {
     captureError(err, { context: 'quiz-submit' });
@@ -3082,13 +3065,14 @@ app.post('/api/quiz-ticket/:token/submit-quiz', async (req, res) => {
     });
 
     const totalQ = quiz.questions.length;
-    const passed = score === totalQ;
+    const passing_score = Math.ceil(totalQ / 2);
+    const passed = score >= passing_score;
 
     participation.answers = scoredAnswers;
     participation.score = score;
     participation.quiz_submitted = true;
     participation.submitted_at = new Date();
-    participation.status = 'submitted';
+    participation.status = passed ? 'submitted' : 'failed';
     await participation.save();
 
     // Generate seller support ID now (after buyer paid + submitted quiz)
@@ -3112,8 +3096,12 @@ app.post('/api/quiz-ticket/:token/submit-quiz', async (req, res) => {
       });
     }
 
-    // Update ticket with support_id and points
-    await QuizTicket.updateOne({ _id: ticket._id }, { seller_support_id: supportId, points_earned: commPoints });
+    // Update ticket with support_id, points, and failed status if applicable
+    await QuizTicket.updateOne({ _id: ticket._id }, {
+      seller_support_id: supportId,
+      points_earned: commPoints,
+      ...(passed ? {} : { ticket_status: 'failed' })
+    });
 
     // Create or find buyer supporter account
     let buyerAccount = null;
@@ -3144,6 +3132,7 @@ app.post('/api/quiz-ticket/:token/submit-quiz', async (req, res) => {
       ok: true,
       score,
       totalQuestions: totalQ,
+      passing_score,
       passed,
       enrollment_number: participation.enrollment_number,
       support_id: supportId,
@@ -3152,8 +3141,8 @@ app.post('/api/quiz-ticket/:token/submit-quiz', async (req, res) => {
         ? new Date(quiz.result_date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
         : 'TBD',
       message: passed
-        ? `🎉 Congratulations! All ${totalQ} answers correct!`
-        : `Quiz submitted! Score: ${score}/${totalQ}`
+        ? `🎉 Congratulations! ${score}/${totalQ} answers correct!`
+        : `❌ Quiz Failed! Score: ${score}/${totalQ} — Passing: ${passing_score}/${totalQ}. 🍀 Try Your Luck Next Time!`
     });
   } catch (err) {
     captureError(err, { context: 'quiz-ticket-submit-quiz' });

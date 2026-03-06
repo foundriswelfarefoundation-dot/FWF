@@ -1900,8 +1900,9 @@ function notify(msg, type){
   else alert(msg);
 }
 function statusBadge(s){
-  const map = {active:'b-active',inactive:'b-inactive',open:'b-open','in-progress':'b-progress',resolved:'b-resolved',closed:'b-closed',pending:'b-pending'};
-  return `<span class="badge ${map[s]||'b-open'}">${s}</span>`;
+  const map = {active:'b-active',inactive:'b-inactive',open:'b-open','in-progress':'b-progress',resolved:'b-resolved',closed:'b-closed',pending:'b-pending',paid:'b-active',failed:'b-inactive'};
+  const labels = {paid:'Paid ✓',pending:'Pending ⏳',failed:'Failed — Not Submitted'};
+  return `<span class="badge ${map[s]||'b-open'}">${labels[s]||s}</span>`;
 }
 
 /* ============================================
@@ -2093,7 +2094,7 @@ async function loadReferral(){
     const rawTickets = (ticketRes?.tickets || []).map(t => ({
       name: t.buyer_name || '—', referred_member_id: t.seller_support_id || '—',
       amount: t.ticket_price || 0, points_earned: t.points_earned || 0,
-      status: t.ticket_status === 'converted' ? 'paid' : 'pending', created_at: t.sold_at
+      status: t.ticket_status === 'converted' ? 'paid' : t.ticket_status === 'failed' ? 'failed' : 'pending', created_at: t.sold_at
     }));
 
     document.getElementById('rtbMembers').innerHTML    = '';

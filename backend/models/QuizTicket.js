@@ -20,7 +20,7 @@ const quizTicketSchema = new mongoose.Schema({
   // Status tracking
   ticket_status: {
     type: String,
-    enum: ['pending', 'converted'],  // pending = link not yet used; converted = buyer paid
+    enum: ['pending', 'converted', 'failed'],  // pending = link not yet used; converted = buyer paid; failed = buyer failed quiz
     default: 'pending'
   },
 

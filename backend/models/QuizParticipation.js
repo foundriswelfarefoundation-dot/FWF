@@ -22,7 +22,7 @@ const quizParticipationSchema = new mongoose.Schema({
   referrer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,
-    enum: ['enrolled', 'submitted', 'won', 'lost'],
+    enum: ['enrolled', 'submitted', 'won', 'lost', 'failed'],
     default: 'enrolled'
   },
   prize_won: { type: Number, default: 0 },

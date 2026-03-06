@@ -3324,6 +3324,12 @@ async function generateSellLink(){
   const buyerEmail = document.getElementById('sellBuyerEmail').value.trim();
   if(!buyerName){ notify('खरीदार का नाम दर्ज करें','error'); return; }
   if(!/^\d{10}$/.test(buyerMobile)){ notify('10-digit mobile number दर्ज करें','error'); return; }
+  // Prevent selling to yourself
+  const sellerMobile = (memberData?.user?.mobile || '').replace(/\D/g,'').slice(-10);
+  if(sellerMobile && buyerMobile === sellerMobile){
+    notify('आप अपने खुद के लिए ticket नहीं बेच सकते। खरीदार का अलग mobile number दर्ज करें।','error');
+    return;
+  }
   const btn = document.getElementById('generateLinkBtn');
   btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
   try {

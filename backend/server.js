@@ -2833,6 +2833,14 @@ app.post('/api/member/quiz/generate-ticket', auth(['member','supporter']), async
       .select('quiz_id title type entry_fee end_date result_date prizes').lean();
     if (!quiz) return res.status(404).json({ error: 'Quiz नहीं मिला या enrollment बंद है' });
 
+    // Prevent selling to yourself
+    const seller = await User.findById(req.user.uid).select('mobile').lean();
+    const sellerMobile = (seller?.mobile || '').replace(/\D/g, '').slice(-10);
+    const buyerMobileClean = (buyer_contact || '').replace(/\D/g, '').slice(-10);
+    if (sellerMobile && buyerMobileClean === sellerMobile) {
+      return res.status(400).json({ error: 'आप अपने खुद के लिए ticket नहीं बेच सकते। किसी और का mobile number दर्ज करें।' });
+    }
+
     // Generate token only — support ID assigned after buyer pays + submits quiz
     const token = crypto.randomBytes(16).toString('hex');
 
@@ -2973,15 +2981,38 @@ app.post('/api/quiz-ticket/:token/enroll', async (req, res) => {
     const quiz = await Quiz.findOne({ quiz_id: ticket.quiz_ref, status: { $in: ['upcoming','active','closed'] } });
     if (!quiz) return res.status(404).json({ error: 'Quiz enrollment closed. Please contact support.' });
 
+    // Prevent self-purchase: if buyer contact matches seller's mobile, reject
+    const sellerUser = await User.findById(ticket.seller_id).select('mobile').lean();
+    const sellerMobileClean = (sellerUser?.mobile || '').replace(/\D/g, '').slice(-10);
+    const buyerContactClean = (ticket.buyer_contact || '').replace(/\D/g, '').slice(-10);
+    if (sellerMobileClean && buyerContactClean === sellerMobileClean) {
+      return res.status(400).json({ error: 'Ticket seller और buyer एक ही नहीं हो सकते। यह ticket किसी और के लिए है।' });
+    }
+
+    // Resolve buyer user_id: use existing account if found, else a fresh ObjectId
+    let buyerUserId;
+    if (buyerContactClean.length === 10) {
+      const existingBuyer = await User.findOne({ mobile: buyerContactClean }).select('_id').lean();
+      buyerUserId = existingBuyer?._id || new mongoose.Types.ObjectId();
+    } else {
+      buyerUserId = new mongoose.Types.ObjectId();
+    }
+
+    // Check if buyer already enrolled in this quiz
+    const alreadyEnrolled = await QuizParticipation.findOne({ quiz_id: quiz._id, user_id: buyerUserId });
+    if (alreadyEnrolled) {
+      return res.status(400).json({ error: 'यह buyer पहले ही इस quiz में enrolled है!', enrollment_number: alreadyEnrolled.enrollment_number });
+    }
+
     // Generate enrollment number for buyer
     const randomDigits = Math.floor(10000 + Math.random() * 90000);
     const enrollmentNumber = `FWF-${quiz.quiz_id}-${randomDigits}`;
 
-    // Create participation for buyer (buyer is anonymous — stored with buyer contact)
+    // Create participation for buyer
     const participation = await QuizParticipation.create({
       quiz_id: quiz._id,
       quiz_ref: quiz.quiz_id,
-      user_id: ticket.seller_id, // linked to seller's account for tracking; buyer is external
+      user_id: buyerUserId,
       member_id: ticket.buyer_contact,
       name: ticket.buyer_name,
       enrollment_number: enrollmentNumber,

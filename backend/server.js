@@ -2834,7 +2834,7 @@ app.post('/api/member/quiz/generate-ticket', auth(['member','supporter']), async
     if (!quiz) return res.status(404).json({ error: 'Quiz नहीं मिला या enrollment बंद है' });
 
     // Prevent selling to yourself
-    const seller = await User.findById(req.user.uid).select('mobile').lean();
+    const seller = await User.findById(req.user.uid).select('mobile name member_id').lean();
     const sellerMobile = (seller?.mobile || '').replace(/\D/g, '').slice(-10);
     const buyerMobileClean = (buyer_contact || '').replace(/\D/g, '').slice(-10);
     if (sellerMobile && buyerMobileClean === sellerMobile) {
@@ -2856,7 +2856,6 @@ app.post('/api/member/quiz/generate-ticket', auth(['member','supporter']), async
       ticket_status: 'pending'
     });
 
-    const seller = await User.findById(req.user.uid).select('name member_id').lean();
     const link = `${process.env.FRONTEND_URL || req.protocol + '://' + req.get('host')}/quiz-ticket?token=${token}`;
 
     res.json({

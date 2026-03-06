@@ -171,7 +171,7 @@ export async function sendMemberWelcome({ name, email, memberId, password, mobil
     <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:620px;width:100%;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
         <div style="font-size:48px;margin-bottom:10px">🎉</div>
         <h1 style="color:#fff;margin:0;font-size:26px;font-weight:800">Welcome to FWF!</h1>
-        <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:15px">Foundris Welfare Foundation — Empowering Women</p>
+        <p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:15px">Foundris Welfare Foundation — Skills to Livelihood</p>
       </div>
 
       <!-- Body -->
@@ -329,7 +329,7 @@ export async function sendDonationConfirmation({ name, email, amount, donationId
         <p style="color:#374151;font-size:15px;line-height:1.7;margin-bottom:24px">
           Dear <strong>${name}</strong>,<br><br>
           We have received your ${recurring ? '<strong>monthly recurring</strong> ' : ''}donation of <strong>₹${formatted}</strong> on <strong>${date}</strong>.
-          Your generosity directly supports women's skills, welfare & self-employment programs. 🙏
+          Your generosity directly supports skill development, welfare &amp; self-employment programs. 🙏
         </p>
 
         <!-- Amount Highlight -->
@@ -356,10 +356,10 @@ export async function sendDonationConfirmation({ name, email, amount, donationId
         <div style="background:#f9fafb;border-radius:12px;padding:18px 22px;margin-bottom:24px">
           <p style="margin:0 0 10px;font-size:13px;font-weight:800;color:#374151">🌸 Your Impact:</p>
           <ul style="margin:0;padding-left:18px;color:#6b7280;font-size:13px;line-height:2">
-            <li>Skill training & livelihood programs for women</li>
+            <li>Skill training &amp; livelihood programs</li>
             <li>Educational support & scholarships</li>
             <li>Health camps & community welfare activities</li>
-            <li>Entrepreneurship support for women self-help groups</li>
+            <li>Entrepreneurship support for individuals &amp; self-help groups</li>
           </ul>
         </div>
 

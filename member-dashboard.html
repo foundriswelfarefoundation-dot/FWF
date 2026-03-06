@@ -4326,10 +4326,10 @@ function waShareLink(inputId, type) {
   const url  = document.getElementById(inputId).value;
   const name = memberData?.user?.name || 'a friend';
   const msg  = type === 'member'
-    ? `*FWF Membership Registration*\nHello! ${name} has invited you to join FWF as a member.\n\nClick the link below to register (₹500 fee):\n${url}\n\n_Foundation for Women's Future_`
+    ? `*FWF Membership Registration*\nHello! ${name} has invited you to join FWF as a member.\n\nClick the link below to register (₹500 fee):\n${url}\n\n_Foundris Welfare Foundation_`
     : type === 'donation'
-    ? `*FWF Donation*\nHello! ${name} has shared a donation link with you.\n\nClick the link below to make a donation:\n${url}\n\n_Foundation for Women's Future_`
-    : `*FWF Supporter Registration*\nHello! ${name} has invited you to join FWF as a supporter.\n\nClick the link below to register:\n${url}\n\n_Foundation for Women's Future_`;
+    ? `*FWF Donation*\nHello! ${name} has shared a donation link with you.\n\nClick the link below to make a donation:\n${url}\n\n_Foundris Welfare Foundation_`
+    : `*FWF Supporter Registration*\nHello! ${name} has invited you to join FWF as a supporter.\n\nClick the link below to register:\n${url}\n\n_Foundris Welfare Foundation_`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }
 

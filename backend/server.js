@@ -719,7 +719,7 @@ app.post('/api/pay/create-subscription', async (req, res) => {
       const plan = await razorpay.plans.create({
         period: 'monthly',
         interval: 1,
-        item: { name: 'FWF Monthly Membership', amount: 50000, currency: 'INR', description: 'Foundation for Women\'s Future — monthly membership fee' },
+        item: { name: 'FWF Monthly Membership', amount: 50000, currency: 'INR', description: 'Foundris Welfare Foundation — monthly membership fee' },
         notes: { org: 'FWF' }
       });
       planId = plan.id;

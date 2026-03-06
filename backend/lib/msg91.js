@@ -165,7 +165,7 @@ async function _sendWhatsApp({ mobile, templateName, namespace, variables = [] }
       body:    JSON.stringify(body)
     });
     const data = await res.json();
-    const ok = data.type === 'success' || String(data.message || '').toLowerCase().includes('success');
+    const ok = data.type === 'success' || data.status === 'success' || String(data.message || data.data || '').toLowerCase().includes('success');
     if (ok) console.log(`✅ MSG91 WhatsApp [${templateName}] sent → ${mobile}`);
     else    console.error(`⚠️ MSG91 WhatsApp [${templateName}] error:`, JSON.stringify(data));
     return data;

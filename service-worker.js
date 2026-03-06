@@ -3,7 +3,7 @@
  * Provides offline capability and faster loading through caching
  */
 
-const CACHE_VERSION = 'fwf-v1.0.0';
+const CACHE_VERSION = 'fwf-v1.0.1';
 const CACHE_NAME = `fwf-cache-${CACHE_VERSION}`;
 
 // Assets to cache immediately on install

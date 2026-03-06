@@ -141,6 +141,14 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(siteRoot));
 
+// Prevent Vercel edge / browser caching of all API responses
+app.use('/api', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
 // --- MongoDB connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {

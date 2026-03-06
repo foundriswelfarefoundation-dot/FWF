@@ -2099,7 +2099,6 @@ async function loadReferral(){
     document.getElementById('rtbMembers').innerHTML    = '';
     document.getElementById('rtbSupporters').innerHTML = '';
     renderReferralTables(refs);
-    document.getElementById('rtbDonations').innerHTML  = donations.length  ? donations.map(refRow).join('')  : emptyRow;
     document.getElementById('rtbTickets').innerHTML    = rawTickets.length ? rawTickets.map(refRow).join('') : emptyRow;
 
   } catch(e){ console.error(e); notify('Failed to load referral data', 'error'); }
@@ -2171,6 +2170,41 @@ function renderReferralTables(refs) {
   const allSupporters = [...pendingSupporters.map(pendingRow), ...backendSupporters.map(backendRow)];
   document.getElementById('rtbMembers').innerHTML    = allMembers.length    ? allMembers.join('')    : empty7;
   document.getElementById('rtbSupporters').innerHTML = allSupporters.length ? allSupporters.join('') : empty7;
+
+  // Donations table
+  const pendingDonations  = pending.filter(l => l.type === 'donation');
+  const backendDonations  = memberData?.recentDonations || [];
+  function pendingDonRow(l) {
+    const expired = isLinkExpired(l.generated_at);
+    const badge = expired
+      ? '<span style="background:#f1f5f9;color:#64748b;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">&#x23F0; Link Expired</span>'
+      : '<span style="background:#fff7ed;color:#c2410c;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">&#x1F4E4; Link Sent</span>';
+    const action = expired
+      ? '<span style="color:#94a3b8;font-size:11px">&mdash;</span>'
+      : `<button onclick="copyPendingLink(this)" data-link="${l.link}" style="background:var(--accent,#6153ff);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer"><i class="fa-solid fa-copy"></i> Copy</button>`;
+    return `<tr>
+      <td style="font-weight:700">${l.name}</td>
+      <td style="font-size:12px">${l.amount ? '&#8377;'+l.amount : '&mdash;'}</td>
+      <td style="font-size:12px;color:#94a3b8">&mdash;</td>
+      <td>${badge}</td>
+      <td style="color:var(--text-muted);font-size:12px">${fmtDate(l.generated_at)}</td>
+      <td>${action}</td>
+    </tr>`;
+  }
+  function backendDonRow(r) {
+    const pts = r.points_earned || 0;
+    return `<tr>
+      <td style="font-weight:700">${r.donor_name || '&mdash;'}</td>
+      <td style="font-size:12px">&#8377;${fmtN(r.amount || 0)}</td>
+      <td style="font-size:12px;color:#22c55e;font-weight:700">${pts ? '+'+pts+' pts' : '&mdash;'}</td>
+      <td><span style="background:#f0fdf4;color:#166534;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">&#x2705; Donated</span></td>
+      <td style="color:var(--text-muted);font-size:12px">${fmtDate(r.created_at)}</td>
+      <td></td>
+    </tr>`;
+  }
+  const empty5don = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:18px;font-size:13px">No donations recorded yet</td></tr>`;
+  const allDonations = [...pendingDonations.map(pendingDonRow), ...backendDonations.map(backendDonRow)];
+  document.getElementById('rtbDonations').innerHTML = allDonations.length ? allDonations.join('') : empty5don;
 }
 
 /* ============================================
@@ -2308,11 +2342,12 @@ function generateDonationLink() {
   if (mobile) params.set('dm', mobile);
   if (amount) params.set('da', amount);
   const url = `${location.origin}/donation?${params.toString()}#donateModal`;
-  savePendingLink({ name: name || 'Donor', mobile: mobile || '', email: '', link: url, type: 'donation', generated_at: new Date().toISOString() });
+  savePendingLink({ name: name || 'Donor', mobile: mobile || '', email: '', amount: amount || '', link: url, type: 'donation', generated_at: new Date().toISOString() });
   document.getElementById('donGeneratedLink').value = url;
   document.getElementById('donLinkForName').textContent = name ? `Share this link with ${name}` : 'Share this donation link';
   document.getElementById('donStep1').style.display = 'none';
   document.getElementById('donStep2').style.display = 'block';
+  renderReferralTables(memberData?.referrals || []);
 }
 function resetDonationLinkModal() {
   document.getElementById('donStep1').style.display = 'block';

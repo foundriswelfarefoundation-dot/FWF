@@ -1002,7 +1002,7 @@ app.post('/api/pay/donation', async (req, res) => {
     const {
       name, mobile, email, pan, address,
       amount, memberId: memberIdInput,
-      want80g,
+      want80g, ref,
       razorpay_payment_id, razorpay_order_id, razorpay_signature,
       verified_token
     } = req.body;
@@ -1049,9 +1049,10 @@ app.post('/api/pay/donation', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'Payment verification failed' });
     }
 
-    // Award points if linked member
+    // Award points if linked member (by memberId or referral code from donation link)
     let user = null;
     if (memberIdInput) user = await User.findOne({ member_id: memberIdInput });
+    if (!user && ref) user = await User.findOne({ referral_code: ref });
 
     const donationId = await nextDonationId();
     const donationData = {

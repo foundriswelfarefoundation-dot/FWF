@@ -408,7 +408,8 @@ async function seedData() {
           { q_no: 2, question: 'गंगा नदी कहाँ से निकलती है?', options: ['गंगोत्री', 'यमुनोत्री', 'केदारनाथ', 'बद्रीनाथ'], correct_answer: 0, points: 1 },
           { q_no: 3, question: 'भारत का सबसे बड़ा राज्य कौन सा है?', options: ['मध्य प्रदेश', 'उत्तर प्रदेश', 'राजस्थान', 'महाराष्ट्र'], correct_answer: 2, points: 1 },
           { q_no: 4, question: 'हमारे राष्ट्रीय ध्वज में कितने रंग हैं?', options: ['2', '3', '4', '5'], correct_answer: 1, points: 1 },
-          { q_no: 5, question: 'भारत के पहले राष्ट्रपति कौन थे?', options: ['महात्मा गांधी', 'जवाहरलाल नेहरू', 'डॉ. राजेंद्र प्रसाद', 'सरदार पटेल'], correct_answer: 2, points: 1 }
+          { q_no: 5, question: 'भारत के पहले राष्ट्रपति कौन थे?', options: ['महात्मा गांधी', 'जवाहरलाल नेहरू', 'डॉ. राजेंद्र प्रसाद', 'सरदार पटेल'], correct_answer: 2, points: 1 },
+          { q_no: 6, question: 'TAJ MAHAL किसने बनवाया था?', options: ['अकबर', 'शाहजहाँ', 'जहाँगीर', 'औरंगज़ेब'], correct_answer: 1, points: 1 }
         ]
       },
       {
@@ -428,7 +429,8 @@ async function seedData() {
           { q_no: 2, question: 'शहद कभी खराब नहीं होता।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
           { q_no: 3, question: 'ऑक्टोपस के 10 दिल होते हैं।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 },
           { q_no: 4, question: 'भारत में सबसे ज़्यादा बोली जाने वाली भाषा हिंदी है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
-          { q_no: 5, question: 'सूर्य एक तारा है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 }
+          { q_no: 5, question: 'सूर्य एक तारा है।', options: ['सही', 'गलत'], correct_answer: 0, points: 1 },
+          { q_no: 6, question: 'माउंट एवरेस्ट भारत में है।', options: ['सही', 'गलत'], correct_answer: 1, points: 1 }
         ]
       },
       {
@@ -448,7 +450,8 @@ async function seedData() {
           { q_no: 2, question: 'भारतीय संविधान कब लागू हुआ?', options: ['15 Aug 1947', '26 Jan 1950', '2 Oct 1949', '26 Nov 1949'], correct_answer: 1, points: 1 },
           { q_no: 3, question: 'पृथ्वी सूर्य का चक्कर कितने दिन में लगाती है?', options: ['365', '360', '366', '364'], correct_answer: 0, points: 1 },
           { q_no: 4, question: 'विश्व का सबसे ऊँचा पर्वत शिखर कौन सा है?', options: ['K2', 'कंचनजंगा', 'माउंट एवरेस्ट', 'मकालू'], correct_answer: 2, points: 1 },
-          { q_no: 5, question: 'RBI का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'RBI का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'कोलकाता', 'चेन्नई'], correct_answer: 1, points: 1 },
+          { q_no: 6, question: 'चंद्रयान-3 किस साल लॉन्च हुआ?', options: ['2021', '2022', '2023', '2024'], correct_answer: 2, points: 1 }
         ]
       },
       {
@@ -468,7 +471,8 @@ async function seedData() {
           { q_no: 2, question: 'ISRO का मुख्यालय कहाँ है?', options: ['दिल्ली', 'मुंबई', 'बेंगलुरु', 'हैदराबाद'], correct_answer: 2, points: 1 },
           { q_no: 3, question: 'भारतीय रुपये का चिह्न (₹) किसने डिज़ाइन किया?', options: ['डी. उदय कुमार', 'रघुराम राजन', 'अमर्त्य सेन', 'ए.पी.जे. अब्दुल कलाम'], correct_answer: 0, points: 1 },
           { q_no: 4, question: 'विश्व का सबसे बड़ा देश (क्षेत्रफल) कौन सा है?', options: ['चीन', 'अमेरिका', 'कनाडा', 'रूस'], correct_answer: 3, points: 1 },
-          { q_no: 5, question: 'पहला कंप्यूटर वायरस कौन सा था?', options: ['ILOVEYOU', 'Creeper', 'Brain', 'MyDoom'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'पहला कंप्यूटर वायरस कौन सा था?', options: ['ILOVEYOU', 'Creeper', 'Brain', 'MyDoom'], correct_answer: 1, points: 1 },
+          { q_no: 6, question: 'ओलंपिक खेल कितने साल में होते हैं?', options: ['2', '3', '4', '5'], correct_answer: 2, points: 1 }
         ]
       },
       {
@@ -488,7 +492,8 @@ async function seedData() {
           { q_no: 2, question: '7 × 8 = ?', options: ['54', '56', '58', '64'], correct_answer: 1, points: 1 },
           { q_no: 3, question: 'भारत की मुद्रा क्या है?', options: ['डॉलर', 'रुपया', 'यूरो', 'पौंड'], correct_answer: 1, points: 1 },
           { q_no: 4, question: 'Rainbow में कितने रंग होते हैं?', options: ['5', '6', '7', '8'], correct_answer: 2, points: 1 },
-          { q_no: 5, question: 'पानी का boiling point?', options: ['50°C', '100°C', '150°C', '200°C'], correct_answer: 1, points: 1 }
+          { q_no: 5, question: 'पानी का boiling point?', options: ['50°C', '100°C', '150°C', '200°C'], correct_answer: 1, points: 1 },
+          { q_no: 6, question: 'भारत का राष्ट्रीय खेल कौन सा है?', options: ['क्रिकेट', 'कबड्डी', 'हॉकी', 'फुटबॉल'], correct_answer: 2, points: 1 }
         ]
       }
     ];

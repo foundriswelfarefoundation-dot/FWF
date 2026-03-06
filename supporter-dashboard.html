@@ -1641,6 +1641,7 @@ textarea.form-input{ resize:vertical; min-height:80px; }
             <div class="form-group" style="margin:0"><label>Full Name *</label><input type="text" class="form-input" id="spName" placeholder="Supporter's full name"></div>
             <div class="form-group" style="margin:0"><label>Mobile Number *</label><input type="tel" class="form-input" id="spMobile" placeholder="10-digit mobile" maxlength="10"></div>
             <div class="form-group" style="margin:0"><label>Email Address *</label><input type="email" class="form-input" id="spEmail" placeholder="name@example.com"></div>
+            <div class="form-group" style="margin:0"><label>Donation Amount ₹ <span style="font-weight:400;color:#94a3b8">(optional)</span></label><input type="number" class="form-input" id="spDonAmount" placeholder="e.g. 500" min="1"></div>
           </div>
           <button id="spGenBtn" onclick="generateSupporterLink()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,#34d366,#0a8f3f);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">
             <i class="fa-solid fa-link"></i> Generate Registration Link
@@ -2198,6 +2199,7 @@ function openActionModal(key){
     document.getElementById('spName').value = '';
     document.getElementById('spMobile').value = '';
     document.getElementById('spEmail').value = '';
+    document.getElementById('spDonAmount').value = '';
   }
   if(key === 'donation') {
     document.getElementById('donStep1').style.display = 'block';
@@ -2279,7 +2281,8 @@ async function generateSupporterLink() {
   } catch(e) { /* network err — allow */ }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-link"></i> Generate Registration Link'; } }
   const ref = memberData?.user?.referral_code || '';
-  const url = `${location.origin}/donation?ref=${encodeURIComponent(ref)}&n=${encodeURIComponent(name)}&m=${encodeURIComponent(mobile)}&e=${encodeURIComponent(email)}&src=supporter#memberModal`;
+  const amount = document.getElementById('spDonAmount').value.trim();
+  const url = `${location.origin}/donation?ref=${encodeURIComponent(ref)}&n=${encodeURIComponent(name)}&m=${encodeURIComponent(mobile)}&e=${encodeURIComponent(email)}&src=supporter${amount ? '&da='+encodeURIComponent(amount) : ''}#supporterModal`;
   savePendingLink({ name, mobile, email, link: url, type: 'supporter', generated_at: new Date().toISOString() });
   document.getElementById('spGeneratedLink').value = url;
   document.getElementById('spLinkForName').textContent = `Share this link with ${name}`;
@@ -2293,6 +2296,7 @@ function resetSupporterLinkModal() {
   document.getElementById('spName').value = '';
   document.getElementById('spMobile').value = '';
   document.getElementById('spEmail').value = '';
+  document.getElementById('spDonAmount').value = '';
 }
 function generateDonationLink() {
   const name   = document.getElementById('donLinkName').value.trim();

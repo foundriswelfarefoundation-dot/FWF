@@ -1611,6 +1611,21 @@
   // Auto-open supporterModal when navigated via URL hash
   if(window.location.hash === '#supporterModal') {
     resetForm(document.getElementById('supForm')); openModal(supModal);
+    (function(){
+      const p = new URLSearchParams(location.search);
+      const supF = document.getElementById('supForm');
+      if(p.get('n')) supF.querySelector('[name="name"]').value = p.get('n');
+      if(p.get('m')) supF.querySelector('[name="mobile"]').value = p.get('m');
+      if(p.get('da')) {
+        const amt = Number(p.get('da'));
+        if(amt > 0) {
+          document.getElementById('supDonateChk').checked = true;
+          document.getElementById('supDonateAmtRow').style.display = 'block';
+          document.getElementById('supDonateAmt').required = true;
+          document.getElementById('supDonateAmt').value = amt;
+        }
+      }
+    })();
   }
 </script>
 </body>

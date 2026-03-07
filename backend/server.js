@@ -2243,12 +2243,18 @@ app.get('/api/admin/redeem-requests', auth('admin'), async (req, res) => {
 // Admin: approve or reject a redeem request
 app.patch('/api/admin/redeem-request/:id', auth('admin'), async (req, res) => {
   try {
-    const { status, admin_notes } = req.body;
+    const { status, admin_notes, utr_number, transfer_date } = req.body;
     if (!['approved', 'rejected'].includes(status))
       return res.status(400).json({ error: 'Status must be approved or rejected' });
     const req_ = await RedeemRequest.findById(req.params.id);
     if (!req_) return res.status(404).json({ error: 'Request not found' });
     if (req_.status !== 'pending') return res.status(400).json({ error: 'Request already processed' });
+
+    if (status === 'approved') {
+      if (!utr_number) return res.status(400).json({ error: 'UTR number is required for approval' });
+      req_.utr_number = utr_number;
+      req_.transfer_date = transfer_date ? new Date(transfer_date) : new Date();
+    }
 
     // If rejecting, refund the points back to supporter
     if (status === 'rejected') {

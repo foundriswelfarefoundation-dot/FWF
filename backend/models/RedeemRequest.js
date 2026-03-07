@@ -18,6 +18,8 @@ const redeemRequestSchema = new mongoose.Schema({
   admin_notes:     { type: String },
   processed_by:    { type: String },
   processed_at:    { type: Date },
+  utr_number:      { type: String },
+  transfer_date:   { type: Date },
   created_at:      { type: Date, default: Date.now },
   updated_at:      { type: Date, default: Date.now }
 });

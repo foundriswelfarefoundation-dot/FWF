@@ -1143,9 +1143,9 @@ textarea.form-input{ resize:vertical; min-height:80px; }
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Supporter ID</th><th>Name</th><th>Points</th><th>Amount</th><th>Payment Method</th><th>Payment Details</th><th>Cause</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Supporter ID</th><th>Name</th><th>Points</th><th>Amount</th><th>Payment Method</th><th>Payment Details</th><th>Cause</th><th>Status</th><th>Date</th><th>UTR No</th><th>Transfer Date</th><th>Actions</th></tr></thead>
             <tbody id="redeemRequestsBody">
-              <tr><td colspan="10" class="empty-state"><p>No redeem requests yet</p></td></tr>
+              <tr><td colspan="12" class="empty-state"><p>No redeem requests yet</p></td></tr>
             </tbody>
           </table>
         </div>
@@ -3302,8 +3302,10 @@ async function loadRedeemRequests(){
     document.getElementById('redeemStatApproved').textContent   = '₹' + fmtN(data.stats.approvedAmt);
 
     const body = document.getElementById('redeemRequestsBody');
+    _redeemRequests = {};
+    data.requests.forEach(r => { _redeemRequests[r._id] = r; });
     if(!data.requests.length){
-      body.innerHTML = `<tr><td colspan="10" class="empty-state"><p>No ${status||''} redeem requests</p></td></tr>`;
+      body.innerHTML = `<tr><td colspan="12" class="empty-state"><p>No ${status||''} redeem requests</p></td></tr>`;
       return;
     }
 
@@ -3316,9 +3318,14 @@ async function loadRedeemRequests(){
 
       const actions = r.status === 'pending' ? `
         <div style="display:flex;gap:6px">
-          <button class="btn btn-sm btn-success" onclick="processRedeemRequest('${r._id}','approved')"><i class="fa-solid fa-check"></i> Approve</button>
-          <button class="btn btn-sm btn-danger"  onclick="processRedeemRequest('${r._id}','rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
+          <button class="btn btn-sm btn-success" onclick="openApproveRedeemModal('${r._id}')"><i class="fa-solid fa-check"></i> Approve</button>
+          <button class="btn btn-sm btn-danger"  onclick="processRedeemRequest('${r._id}')"><i class="fa-solid fa-xmark"></i> Reject</button>
         </div>` : statusBadge(r.status);
+
+      const utrCell = r.utr_number
+        ? `<span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--accent)">${r.utr_number}</span>`
+        : '—';
+      const transferDateCell = r.transfer_date ? fmtDate(r.transfer_date) : '—';
 
       return `<tr>
         <td style="font-weight:700">${r.supporter_id}</td>
@@ -3330,18 +3337,63 @@ async function loadRedeemRequests(){
         <td style="font-size:12px">${r.cause||'—'}</td>
         <td>${statusBadge(r.status)}</td>
         <td style="color:var(--text-muted)">${fmtDate(r.created_at)}</td>
+        <td>${utrCell}</td>
+        <td style="color:var(--text-muted);font-size:12px">${transferDateCell}</td>
         <td>${actions}</td>
       </tr>`;
     }).join('');
   } catch(e){ notify('Failed to load redeem requests','error'); }
 }
 
-async function processRedeemRequest(id, status){
-  const notes = status === 'rejected' ? (prompt('Reason for rejection (optional):') ?? '') : '';
-  if(status === 'rejected' && notes === null) return; // user cancelled
+let _redeemRequests = {};
+let _approveRedeemId = null;
+
+function openApproveRedeemModal(id){
+  _approveRedeemId = id;
+  const r = _redeemRequests[id] || {};
+  const methodLabel = { upi:'UPI', phonepe_gpay:'PhonePe/GPay', bank:'Bank Account' };
+  const payInfo = r.upi_id || r.phone_number || (r.bank_account ? `${r.bank_account} (${r.bank_name||''})` : '') || '—';
+  document.getElementById('approveRedeemInfo').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;margin-bottom:3px">Supporter</div><strong>${r.name||'—'}</strong><br><span style="font-size:12px;color:var(--text-muted)">${r.supporter_id||''}</span></div>
+      <div><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;margin-bottom:3px">Payout Amount</div><strong style="font-size:20px;color:#10b981">₹${fmtN(r.amount_inr||0)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${fmtN(r.points||0)} Points</span></div>
+      <div><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;margin-bottom:3px">Payment Method</div><strong>${methodLabel[r.payment_method]||r.payment_method||'—'}</strong></div>
+      <div><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;margin-bottom:3px">Payment Details</div><span style="font-size:12px;word-break:break-all">${payInfo}</span></div>
+    </div>`;
+  document.getElementById('approveRedeemDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('approveRedeemUTR').value = '';
+  document.getElementById('approveRedeemNotes').value = '';
+  document.getElementById('approveRedeemModal').style.display = 'flex';
+}
+
+function closeApproveRedeemModal(){
+  document.getElementById('approveRedeemModal').style.display = 'none';
+  _approveRedeemId = null;
+}
+
+async function submitApproveRedeem(){
+  const utr = document.getElementById('approveRedeemUTR').value.trim();
+  const date = document.getElementById('approveRedeemDate').value;
+  const notes = document.getElementById('approveRedeemNotes').value.trim();
+  if(!utr){ notify('UTR number is required for approval','error'); return; }
+  if(!date){ notify('Transfer date is required','error'); return; }
   try{
-    await AUTH.api(`/api/admin/redeem-request/${id}`, { method:'PATCH', body:{ status, admin_notes: notes } });
-    notify(`Request ${status} successfully!`, 'success');
+    await AUTH.api(`/api/admin/redeem-request/${_approveRedeemId}`, {
+      method:'PATCH', body:{ status:'approved', utr_number: utr, transfer_date: date, admin_notes: notes }
+    });
+    closeApproveRedeemModal();
+    notify('Redeem request approved successfully!','success');
+    document.getElementById('redeemStatusFilter').value = 'approved';
+    loadRedeemRequests();
+  } catch(e){ notify(e.message||'Failed','error'); }
+}
+
+async function processRedeemRequest(id){
+  const notes = prompt('Rejection reason (optional):');
+  if(notes === null) return; // user cancelled
+  try{
+    await AUTH.api(`/api/admin/redeem-request/${id}`, { method:'PATCH', body:{ status:'rejected', admin_notes: notes||'' } });
+    notify('Request rejected!', 'success');
     loadRedeemRequests();
   } catch(e){ notify(e.message||'Failed','error'); }
 }
@@ -4189,8 +4241,38 @@ async function resendInvoice(receiptId) {
 document.addEventListener('click', e => {
   if(e.target.id === 'modalQuizDetail') closeQuizDetail();
   if(e.target.id === 'modalParticipants') closeParticipantsModal();
+  if(e.target.id === 'approveRedeemModal') closeApproveRedeemModal();
 });
 loadDashboard();
 </script>
+
+<!-- ===== Approve Redeem Modal ===== -->
+<div id="approveRedeemModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg-card,#fff);border-radius:16px;width:100%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border,#e5e7eb);display:flex;align-items:center;justify-content:space-between">
+      <h3 style="margin:0;font-size:17px"><i class="fa-solid fa-circle-check" style="color:#10b981;margin-right:8px"></i>Approve Redeem Request</h3>
+      <button onclick="closeApproveRedeemModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted,#6b7280);line-height:1">&times;</button>
+    </div>
+    <div style="padding:20px 24px">
+      <div id="approveRedeemInfo" style="background:var(--bg-light,#f9fafb);border:1px solid var(--border,#e5e7eb);border-radius:10px;padding:14px;margin-bottom:18px"></div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Transfer Date <span style="color:#ef4444">*</span></label>
+        <input type="date" id="approveRedeemDate" class="form-input" style="width:100%;box-sizing:border-box">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">UTR / Reference Number <span style="color:#ef4444">*</span></label>
+        <input type="text" id="approveRedeemUTR" class="form-input" placeholder="e.g. 506221234567890" style="width:100%;box-sizing:border-box;font-family:monospace">
+      </div>
+      <div style="margin-bottom:6px">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Admin Notes <span style="color:var(--text-muted,#9ca3af);font-weight:400">(optional)</span></label>
+        <input type="text" id="approveRedeemNotes" class="form-input" placeholder="Any notes for this approval" style="width:100%;box-sizing:border-box">
+      </div>
+    </div>
+    <div style="padding:14px 24px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border,#e5e7eb)">
+      <button onclick="closeApproveRedeemModal()" class="btn btn-ghost">Cancel</button>
+      <button onclick="submitApproveRedeem()" class="btn btn-success"><i class="fa-solid fa-check"></i> Confirm Approval</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

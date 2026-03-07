@@ -2120,6 +2120,7 @@ function openModal(id){
   } else {
     modal.classList.add('show');
   }
+  document.body.style.overflow = 'hidden';
 }
 function closeModal(id){ 
   const modal = document.getElementById(id);
@@ -2128,6 +2129,9 @@ function closeModal(id){
   } else {
     modal.classList.remove('show');
   }
+  // Only restore scroll if no other modals are open
+  const anyOpen = document.querySelector('.modal.show, .modal-overlay:not(.hidden)');
+  if(!anyOpen) document.body.style.overflow = '';
 }
 
 /* ============================================

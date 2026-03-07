@@ -2736,7 +2736,7 @@ async function submitTicket(){
    REDEEM
    ============================================ */
 function openRedeemModal(){
-  const pts = memberData?.wallet?.points_balance || memberData?.wallet?.total_points_earned || 0;
+  const pts = Math.round((memberData?.wallet?.points_balance || memberData?.wallet?.total_points_earned || 0) * 100) / 100;
   document.getElementById('availPointsDisplay').textContent = pts;
   // Reset form
   document.getElementById('redeemPointsInput').value = '';
@@ -2758,7 +2758,7 @@ function updateRedeemAmount(){
   const pts = parseFloat(document.getElementById('redeemPointsInput').value) || 0;
   const preview = document.getElementById('redeemAmountPreview');
   if(pts > 0){
-    document.getElementById('redeemAmountValue').textContent = (pts * 10).toFixed(0);
+    document.getElementById('redeemAmountValue').textContent = Math.round(pts * 10);
     preview.style.display = '';
   } else {
     preview.style.display = 'none';

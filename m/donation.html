@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
@@ -8,7 +8,9 @@
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
   <link href="../assets/css/fwf-app.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Mukta:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <style>
+    [data-lang="hi"] body { font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif; }
     /* Impact cards */
     .impact-row { display: flex; flex-direction: column; gap: 10px; }
     .impact-card {
@@ -61,26 +63,28 @@
         <div class="brand-sub">Foundris Welfare Foundation</div>
       </div>
     </div>
+    <div class="lang-pill">
+      <button id="langEN" class="active" onclick="setLanguage('en')">EN</button>
+      <button id="langHI" onclick="setLanguage('hi')">HI</button>
+    </div>
   </header>
-
-  <!-- Impact section -->
   <div class="app-section">
     <div class="section-head">
-      <h2>❤️ Your Impact</h2>
-      <p>Every rupee directly supports livelihoods and self-reliance</p>
+      <h2 data-i18n="impact.title">❤️ Your Impact</h2>
+      <p data-i18n="impact.sub">Every rupee directly supports livelihoods and self-reliance</p>
     </div>
     <div class="impact-row">
       <div class="impact-card">
         <div class="impact-amt">₹500</div>
-        <p class="impact-desc">Provides skill training materials for one woman</p>
+        <p class="impact-desc" data-i18n="impact.d1">Provides skill training materials for one woman</p>
       </div>
       <div class="impact-card">
         <div class="impact-amt">₹1,000</div>
-        <p class="impact-desc">Supports one woman's training for a month</p>
+        <p class="impact-desc" data-i18n="impact.d2">Supports one woman's training for a month</p>
       </div>
       <div class="impact-card">
         <div class="impact-amt">₹5,000</div>
-        <p class="impact-desc">Funds complete training &amp; job placement for one woman</p>
+        <p class="impact-desc" data-i18n="impact.d3">Funds complete training &amp; job placement for one woman</p>
       </div>
     </div>
   </div>
@@ -88,7 +92,7 @@
   <!-- Donation Form -->
   <div class="app-section" style="margin-top:8px;">
     <div class="section-head">
-      <h2>Make a Donation</h2>
+      <h2 data-i18n="form.title">Make a Donation</h2>
     </div>
 
     <div id="alertBox" class="app-alert mb-16"></div>
@@ -263,6 +267,22 @@
 
   <script>
     let selectedAmount = null;
+
+    /* ── Language support ── */
+    const T_DON = {
+      en: { 'impact.title': '❤️ Your Impact', 'impact.sub': 'Every rupee directly supports livelihoods and self-reliance', 'impact.d1': 'Provides skill training materials for one woman', 'impact.d2': "Supports one woman's training for a month", 'impact.d3': 'Funds complete training & job placement for one woman', 'form.title': 'Make a Donation' },
+      hi: { 'impact.title': '❤️ आपका योगदान', 'impact.sub': 'हर रुपया सीधे आजीविका और आत्मनिर्भरता को सहारा देता है।', 'impact.d1': 'एक महिला के लिए कौशल प्रशिक्षण सामग्री प्रदान करता है।', 'impact.d2': 'एक महिला का एक महीने का प्रशिक्षण का खर्च उठाता है।', 'impact.d3': 'एक महिला के लिए पूरा प्रशिक्षण व नौकरी प्लेसमेंट फंड करता है।', 'form.title': 'दान करें' }
+    };
+    function setLanguage(lang) {
+      const l = (lang === 'hi' || lang === 'en') ? lang : 'en';
+      document.documentElement.setAttribute('data-lang', l);
+      const t = T_DON[l];
+      document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (t[k] !== undefined) el.textContent = t[k]; });
+      document.getElementById('langEN').classList.toggle('active', l === 'en');
+      document.getElementById('langHI').classList.toggle('active', l === 'hi');
+      try { localStorage.setItem('fwf_lang', l); } catch(e) {}
+    }
+    try { const s = localStorage.getItem('fwf_lang'); if (s === 'en' || s === 'hi') setLanguage(s); } catch(e) {}
 
     function selectAmount(amount, el) {
       document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('sel'));

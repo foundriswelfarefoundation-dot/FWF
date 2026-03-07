@@ -220,22 +220,27 @@
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <a href="../csr.html" style="font-size:11px;color:var(--text2);text-decoration:none;white-space:nowrap;">Full Page ↗</a>
+      <div class="lang-pill">
+        <button id="langEN" class="active" onclick="setLanguage('en')">EN</button>
+        <button id="langHI" onclick="setLanguage('hi')">HI</button>
+      </div>
     </div>
   </header>
 
   <!-- CSR Hero -->
   <section class="csr-hero">
-    <div class="badge"><i class="fas fa-handshake"></i> CSR Partnership</div>
-    <h1>Empowering Lives,<br><span>Creating Impact</span></h1>
-    <p>Partner with FWF to build livelihoods through skills &amp; micro-businesses. Meet your CSR obligations while making real, documented change.</p>
+    <div class="badge"><i class="fas fa-handshake"></i> <span data-i18n="badge">CSR Partnership</span></div>
+    <h1 data-i18n="hero.title">Empowering Lives,</h1>
+    <h1 style="margin-top:-8px"><span data-i18n="hero.title2">Creating Impact</span></h1>
+    <p data-i18n="hero.sub">Partner with FWF to build livelihoods through skills &amp; micro-businesses. Meet your CSR obligations while making real, documented change.</p>
     <a href="#csr-contact" class="btn-csr-cta">
-      <i class="fas fa-paper-plane"></i> Partner With Us
+      <i class="fas fa-paper-plane"></i> <span data-i18n="hero.cta">Partner With Us</span>
     </a>
   </section>
 
   <!-- Certifications -->
   <div class="app-section" style="margin-top:20px;">
-    <div class="section-head"><h2>Certifications</h2></div>
+    <div class="section-head"><h2 data-i18n="sec.cert">Certifications</h2></div>
   </div>
   <div class="cert-strip">
     <div class="cert-badge"><i class="fas fa-certificate" style="color:#f59e0b"></i> 12A Certified</div>
@@ -246,7 +251,7 @@
 
   <!-- WINS -->
   <div class="app-section" style="margin-top:24px;">
-    <div class="section-head"><h2>Why Partner with FWF?</h2></div>
+    <div class="section-head"><h2 data-i18n="sec.why">Why Partner with FWF?</h2></div>
   </div>
   <div class="wins-strip">
     <div class="wins-card">
@@ -273,7 +278,7 @@
 
   <!-- Ways to Partner -->
   <div class="app-section" style="margin-top:24px;">
-    <div class="section-head"><h2>Ways to Partner</h2></div>
+    <div class="section-head"><h2 data-i18n="sec.ways">Ways to Partner</h2></div>
   </div>
   <div class="ways-list">
     <div class="way-card">
@@ -308,7 +313,7 @@
 
   <!-- Projects -->
   <div class="app-section" style="margin-top:24px;">
-    <div class="section-head"><h2>Sponsor a Project</h2></div>
+    <div class="section-head"><h2 data-i18n="sec.proj">Sponsor a Project</h2></div>
   </div>
   <div class="projects-grid">
     <div class="proj-card">
@@ -355,7 +360,7 @@
 
   <!-- Contact Form -->
   <div class="app-section" style="margin-top:24px;" id="csr-contact">
-    <div class="section-head"><h2>Get In Touch</h2></div>
+    <div class="section-head"><h2 data-i18n="sec.contact">Get In Touch</h2></div>
   </div>
   <div class="csr-form-wrap" style="margin-bottom: 24px;">
     <form id="csrMobileForm" onsubmit="submitCSRForm(event)">
@@ -459,6 +464,46 @@
     // Footer year
     const fy = document.getElementById('footerYear');
     if (fy) fy.textContent = new Date().getFullYear();
+
+    /* ── Language support ── */
+    const T_CSR = {
+      en: {
+        badge: 'CSR Partnership',
+        'hero.title': 'Empowering Lives,', 'hero.title2': 'Creating Impact',
+        'hero.sub': 'Partner with FWF to build livelihoods through skills & micro-businesses. Meet your CSR obligations while making real, documented change.',
+        'hero.cta': 'Partner With Us',
+        'sec.cert': 'Certifications', 'sec.why': 'Why Partner with FWF?',
+        'sec.ways': 'Ways to Partner', 'sec.proj': 'Sponsor a Project',
+        'sec.contact': 'Get In Touch'
+      },
+      hi: {
+        badge: 'CSR साझेदारी',
+        'hero.title': 'जीवन सशक्त बनाएं,', 'hero.title2': 'प्रभाव बनाएं',
+        'hero.sub': 'FWF के साथ साझेदारी करें और कौशल व माइक्रो-बिज़नेस के ज़रिए आजीविका बनाएं। अपने CSR दायित्व पूरे करें और वास्तविक, दस्तावेज़ी बदलाव लाएं।',
+        'hero.cta': 'हमारे साथ जुड़ें',
+        'sec.cert': 'प्रमाण पत्र', 'sec.why': 'FWF के साथ क्यों जुड़ें?',
+        'sec.ways': 'साझेदारी के तरीके', 'sec.proj': 'किसी प्रोजेक्ट को स्पॉन्सर करें',
+        'sec.contact': 'संपर्क करें'
+      }
+    };
+
+    function setLanguage(lang) {
+      const l = (lang === 'hi' || lang === 'en') ? lang : 'en';
+      document.documentElement.setAttribute('data-lang', l);
+      const t = T_CSR[l];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.textContent = t[key];
+      });
+      document.getElementById('langEN').classList.toggle('active', l === 'en');
+      document.getElementById('langHI').classList.toggle('active', l === 'hi');
+      try { localStorage.setItem('fwf_lang', l); } catch(e) {}
+    }
+
+    try {
+      const s = localStorage.getItem('fwf_lang');
+      if (s === 'en' || s === 'hi') setLanguage(s);
+    } catch(e) {}
 
     // CSR Form submit (sends via mailto as fallback; replace with API call if needed)
     async function submitCSRForm(e) {

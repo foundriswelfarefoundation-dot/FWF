@@ -499,6 +499,21 @@
         display: flex; align-items: center; justify-content: center;
         cursor: pointer; flex-shrink: 0;
       }
+      /* ── Lang toggle in booklet topbar ── */
+      .mob-lang-pill { display:flex; background:rgba(255,255,255,.15); border-radius:8px; overflow:hidden; flex-shrink:0; }
+      .mob-lang-pill button { padding:4px 9px; font-size:10px; font-weight:800; border:none; background:transparent; color:rgba(255,255,255,.75); cursor:pointer; }
+      .mob-lang-pill button.active { background:rgba(255,255,255,.3); color:#fff; }
+      /* ── Lang Toggle in booklet topbar ── */
+      .mob-lang-pill {
+        display: flex; background: rgba(255,255,255,.15);
+        border-radius: 8px; overflow: hidden; flex-shrink: 0;
+      }
+      .mob-lang-pill button {
+        padding: 4px 9px; font-size: 10px; font-weight: 800;
+        border: none; background: transparent;
+        color: rgba(255,255,255,.75); cursor: pointer; letter-spacing: .04em;
+      }
+      .mob-lang-pill button.active { background: rgba(255,255,255,.3); color: #fff; }
 
       /* ── Page viewport — single page at a time ── */
       .mob-viewport {
@@ -889,6 +904,10 @@
     <!-- Mobile Top Bar -->
     <div class="mob-topbar" id="mobTopbar">
       <div class="mob-title" id="mobTitle">Project Booklet</div>
+      <div class="mob-lang-pill">
+        <button id="bkEN" class="active" onclick="setLang('en')">EN</button>
+        <button id="bkHI" onclick="setLang('hi')">HI</button>
+      </div>
       <div class="mob-pages" id="mobPages">1 / 10</div>
       <button class="mob-close" onclick="window.history.back()">×</button>
     </div>
@@ -986,6 +1005,11 @@
     let totalPages = 3;
     let projectData = null;
     let allPages = [];
+    let curLang = 'en';
+    try { const _sl = localStorage.getItem('fwf_lang'); if (_sl === 'en' || _sl === 'hi') curLang = _sl; } catch(e) {}
+
+    /* ── Bilingual labels helper ── */
+    function bl(en, hi) { return curLang === 'hi' ? hi : en; }
 
     /* ═══════ ALL 11 FWF PROJECTS ═══════ */
     const ALL_PROJECTS = {
@@ -993,9 +1017,12 @@
       "suraksha": {
         key:"suraksha", name:"Suraksha", icon:"fa-shield-heart",
         subtitle:"Health, hygiene & safety protection products for communities.",
+        nameHi:"सुरक्षा", subtitleHi:"स्वास्थ्य, स्वच्छता और सुरक्षा उत्पाद, समुदाय के लिए।",
         coverGradient:"linear-gradient(135deg,#22c55e,#16a34a)",
         impacts:["Employment","Community Development","Health","Safety"],
+        impactsHi:["रोज़गार","सामुदायिक विकास","स्वास्थ्य","सुरक्षा"],
         description:"Suraksha empowers communities by creating dignified livelihoods through the production of essential health, hygiene, safety and security products. Each unit is designed to be profitable while addressing critical public health and personal safety needs.",
+        descriptionHi:"सुरक्षा प्रोजेक्ट समुदाय को स्वास्थ्य, स्वच्छता, सुरक्षा उत्पाद बनाकर सम्मानजनक रोज़गार देता है। हर यूनिट लाभदायक है और सार्वजनिक स्वास्थ्य व व्यावसायिक सुरक्षा जरूरतों को पूरा करती है।",
         costs:{setup:"₹3.5–10.6L", working:"₹1.4–2.9L", upfront:"₹35k–1.06L"},
         units:[
           {name:"MediSan Liquids Unit", space:"~260 sqft", workers:"4 workers", profit:"₹60k–90k/m", setup:"₹7,50,000", working:"₹2,00,000", upfront:"₹75,000",
@@ -1150,7 +1177,10 @@
         subtitle:"Home & surface care, cleaning tools & eco products for cleaner cities.",
         coverGradient:"linear-gradient(135deg,#3b82f6,#1d4ed8)",
         impacts:["Employment","Sustainability","Environment"],
+        nameHi:"स्वच्छ भारत", subtitleHi:"घर व सतह की सफाई, सफाई उत्पाद और पर्यावरण अनुकूल सामान, स्वच्छ शहरों के लिए।",
+        impactsHi:["रोज़गार","सतत विकास","पर्यावरण"],
         description:"Swachh Bharat creates livelihood opportunities through manufacturing affordable home and surface care products, cleaning tools, eco-friendly bags, and herbal cleaners — contributing to cleaner cities while giving women a steady income.",
+        descriptionHi:"स्वच्छ भारत प्रोजेक्ट घर और सतह की सफाई के उत्पाद — फिनाइल, डिसइन्फेक्टेंट, लॉन्ड्री जेल, हर्बल क्लीनर — बनाकर महिलाओं को स्थायी आजीविका देता है और शहरों को स्वच्छ बनाता है।",
         costs:{setup:"₹3.4–9.8L", working:"₹1.3–2.85L", upfront:"₹34k–98k"},
         units:[
           {name:"HomeCare Liquids Blend–Fill", space:"~280 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹9,20,000", working:"₹2,85,000", upfront:"₹92,000",
@@ -1287,7 +1317,10 @@
         subtitle:"Safe & value-added foods, snacks, pickles & cloud kitchen — made locally.",
         coverGradient:"linear-gradient(135deg,#f59e0b,#d97706)",
         impacts:["Nutrition","Local Economy","Employment","Food Safety"],
+        nameHi:"हैप्पी मील", subtitleHi:"सुरक्षित और पोषक खाद्य उत्पाद — पापड़, अचार, मसाले, क्लाउड किचन — स्थानीय रूप से बने।",
+        impactsHi:["पोषण","स्थानीय अर्थव्यवस्था","रोज़गार","खाद्य सुरक्षा"],
         description:"Happy Meal creates employment through local food processing — from papad, pickle & sattu to namkeen, protein laddu, packaged naturals, and a full live cloud kitchen. Women produce high-quality foods for households, institutions, and food-delivery platforms.",
+        descriptionHi:"हैप्पी मील प्रोजेक्ट महिलाओं को फूड प्रोसेसिंग के ज़रिए आजीविका देता है — पापड़, अचार, सत्तू से लेकर नमकीन, प्रोटीन लड्डू और क्लाउड किचन तक। स्थानीय उत्पाद, श्रेष्ठ गुणवत्ता।",
         costs:{setup:"₹4.8–12.5L", working:"₹1.8–3.5L", upfront:"₹48k–1.25L"},
         units:[
           {name:"SpiceCrafter Masala", space:"~260 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹8,71,000", working:"₹2,85,000", upfront:"₹87,100",
@@ -1433,7 +1466,10 @@
         subtitle:"Affordable clean-tech assembly & services.",
         coverGradient:"linear-gradient(135deg,#eab308,#ca8a04)",
         impacts:["Green Energy","Employment","Innovation"],
+        nameHi:"ग्रीन एनर्जी", subtitleHi:"किफायती स्वच्छ तकनीक असेंबली व सेवाएं।",
+        impactsHi:["हरित ऊर्जा","रोज़गार","नवाचार"],
         description:"Green Energy units assemble and service affordable solar and LED products, enabling women entrepreneurs to participate in India's clean energy revolution while building sustainable businesses.",
+        descriptionHi:"ग्रीन एनर्जी प्रोजेक्ट सोलर लाइट और LED उत्पाद असेंबल व सर्विस करता है, जिससे महिला उद्यमी भारत के स्वच्छ ऊर्जा क्षेत्र में भाग लेकर टिकाऊ व्यवसाय बना सकती हैं।",
         costs:{setup:"₹10.83–32.49L", working:"₹3.61–10.26L", upfront:"₹1.08L–3.25L"},
         units:[
           {name:"BrightLite LED Assembly", space:"~260 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹16,15,000", working:"₹5,32,000", upfront:"₹1,61,500",
@@ -1543,7 +1579,10 @@
         subtitle:"Creative & custom products with strong margins.",
         coverGradient:"linear-gradient(135deg,#ec4899,#be185d)",
         impacts:["Community Development","Skill Building"],
+        nameHi:"DIY क्राफ्ट्स", subtitleHi:"क्रिएटिव और कस्टम हस्तनिर्मित उत्पाद, अच्छे मार्जिन के साथ।",
+        impactsHi:["सामुदायिक विकास","कौशल विकास"],
         description:"DIY Crafts unlocks the creative potential of women artisans by producing handmade, customised products — from diyas and rakhis to resin art, festival decorations, and personalised gifts — with excellent profit margins.",
+        descriptionHi:"DIY क्राफ्ट्स प्रोजेक्ट दीये, राखी, रेज़िन आर्ट, फेस्टिव डेकोर और गिफ्टिंग जैसे हस्तनिर्मित उत्पाद बनाकर महिला कारीगरों की रचनात्मक प्रतिभा को आजीविका में बदलता है।",
         costs:{setup:"₹3.32–6.46L", working:"₹1.14–1.71L", upfront:"₹33k–64.6k"},
         units:[
           {name:"Jute & Canvas Bags Studio", space:"~260 sqft", workers:"4 workers", profit:"₹30k–48k/m", setup:"₹5,14,000", working:"₹1,62,000", upfront:"₹51,400",
@@ -1680,7 +1719,10 @@
         subtitle:"Water purification & services for safe drinking.",
         coverGradient:"linear-gradient(135deg,#06b6d4,#0e7490)",
         impacts:["Health","Sustainability"],
+        nameHi:"स्वच्छ जल", subtitleHi:"सुरक्षित पेयजल के लिए जल शुद्धि व सेवाएं।",
+        impactsHi:["स्वास्थ्य","पर्यावरण"],
         description:"Swachh Jal builds livelihoods around water safety — assembling purifiers, filter candles, water containers, testing kits, and providing installation & maintenance services — while ensuring safe drinking water for communities.",
+        descriptionHi:"स्वच्छ जल प्रोजेक्ट वाटर प्यूरीफायर, फिल्टर कैंडल, टेस्टिंग किट असेंबल व सर्विस करता है और समुदायों को सुरक्षित पेयजल सुनिश्चित करते हुए रोज़गार देता है।",
         costs:{setup:"₹4.37–21.09L", working:"₹1.52–7.22L", upfront:"₹44k–2.11L"},
         units:[
           {name:"PureFlow Gravity & UF", space:"~260 sqft", workers:"4 workers", profit:"₹35k–55k/m", setup:"₹11,02,000", working:"₹3,61,000", upfront:"₹1,10,200",
@@ -1799,7 +1841,10 @@
         subtitle:"Apparel & footwear manufacturing for dignified livelihoods.",
         coverGradient:"linear-gradient(135deg,#8b5cf6,#6d28d9)",
         impacts:["Employment","Community Development"],
+        nameHi:"सम्मान", subtitleHi:"सम्मानजनक आजीविका के लिए परिधान व निर्माण।",
+        impactsHi:["रोज़गार","सामुदायिक विकास"],
         description:"Samman creates dignified livelihoods through manufacturing — from apparel and footwear to agarbatti, soap, sanitary napkins, embroidery, spice processing, and starter kits — empowering women workers with diverse skilled-trade incomes.",
+        descriptionHi:"सम्मान प्रोजेक्ट परिधान, जूते, अगरबत्ती, साबुन, सैनिटरी नैपकिन और अन्य उत्पाद निर्माण से महिलाओं को विविध कौशल-आधारित सम्मानजनक आजीविका देता है।",
         costs:{setup:"₹5.98–15.20L", working:"₹1.99–4.37L", upfront:"₹60k–1.52L"},
         units:[
           {name:"Women's Basics Stitching", space:"~250 sqft", workers:"5 workers", profit:"₹40k–60k/m", setup:"₹9,69,000", working:"₹2,85,000", upfront:"₹96,900",
@@ -1945,7 +1990,10 @@
         subtitle:"Home utility products — stitched & assembled.",
         coverGradient:"linear-gradient(135deg,#f97316,#ea580c)",
         impacts:["Employment","Local Economy"],
+        nameHi:"स्वीट होम", subtitleHi:"घरेलू उपयोगी उत्पाद — सिले और असेंबल किए गए।",
+        impactsHi:["रोज़गार","स्थानीय अर्थव्यवस्था"],
         description:"Sweet Home units produce essential home utility products — from kitchen racks and bathroom accessories to decorative lamps, plastic drawers, hangers, and artificial flowers — creating steady employment while meeting everyday household needs.",
+        descriptionHi:"स्वीट होम प्रोजेक्ट किचन रैक, बाथरूम एक्सेसरी, डेकोरेटिव लैंप, ड्रॉअर, हैंगर और आर्टिफिशियल फूल जैसे घरेलू उत्पाद बनाकर महिलाओं को स्थायी रोज़गार देता है।",
         costs:{setup:"₹5.51–9.79L", working:"₹1.71–2.85L", upfront:"₹55k–98k"},
         units:[
           {name:"Bed & Bath Linen", space:"~280 sqft", workers:"4 workers", profit:"₹40k–60k/m", setup:"₹9,79,000", working:"₹2,85,000", upfront:"₹97,900",
@@ -2091,7 +2139,10 @@
         subtitle:"Green livelihoods with compost & small agri tools.",
         coverGradient:"linear-gradient(135deg,#84cc16,#65a30d)",
         impacts:["Sustainability","Local Economy"],
+        nameHi:"हरियाली", subtitleHi:"खाद और छोटे कृषि उपकरणों से हरित आजीविका।",
+        impactsHi:["पर्यावरण","स्थानीय अर्थव्यवस्था"],
         description:"Hariyali taps into growing urban farming and green living trends — producing compost, nursery pots, seed balls, bamboo crafts, ropes, organic gulal, cow dung logs, hanging planters and tree guards — creating eco-friendly livelihoods with consistent demand.",
+        descriptionHi:"हरियाली प्रोजेक्ट खाद, नर्सरी पॉट, सीड बॉल, बांस क्राफ्ट, ऑर्गेनिक गुलाल और हैंगिंग प्लांटर जैसे उत्पाद बनाकर शहरी खेती व हरित जीवनशैली की मांग पूरी करता है।",
         costs:{setup:"₹3.42–9.12L", working:"₹1.14–2.85L", upfront:"₹34k–91k"},
         units:[
           {name:"Compost & Potting Media", space:"~260 sqft", workers:"3 workers", profit:"₹25k–40k/m", setup:"₹5,13,000", working:"₹1,71,000", upfront:"₹51,300",
@@ -2237,7 +2288,10 @@
         subtitle:"Puja samagri & incense products with local branding.",
         coverGradient:"linear-gradient(135deg,#e11d48,#be123c)",
         impacts:["Local Economy","Community Development"],
+        nameHi:"वर्शिप", subtitleHi:"पूजा सामग्री और अगरबत्ती उत्पाद, स्थानीय ब्रांडिंग के साथ।",
+        impactsHi:["स्थानीय अर्थव्यवस्था","सामुदायिक विकास"],
         description:"Worship units produce agarbatti, dhoop, camphor, malas, havan samagri, incense holders, donation boxes and puja essentials — tapping into India's consistent devotional product demand while creating dignified employment for women.",
+        descriptionHi:"वर्शिप प्रोजेक्ट अगरबत्ती, धूप, कपूर, माला, हवन सामग्री और पूजा किट बनाता है — भारत की भक्ति उत्पाद मांग को पूरा करते हुए महिलाओं को सम्मानजनक रोज़गार देता है।",
         costs:{setup:"₹4.08–6.08L", working:"₹1.33–2.09L", upfront:"₹41k–61k"},
         units:[
           {name:"Agarbatti & Dhoop", space:"~220 sqft", workers:"3 workers", profit:"₹28k–45k/m", setup:"₹5,56,000", working:"₹1,90,000", upfront:"₹55,600",
@@ -2347,7 +2401,10 @@
         subtitle:"Affordable stationery & learning essentials.",
         coverGradient:"linear-gradient(135deg,#0ea5e9,#0284c7)",
         impacts:["Education","Employment"],
+        nameHi:"शिक्षा", subtitleHi:"किफायती स्टेशनरी और शिक्षण सामग्री।",
+        impactsHi:["शिक्षा","रोज़गार"],
         description:"Shiksha creates employment through production of affordable notebooks, stationery sets, art supplies and school kits — serving the growing demand from schools, students and CSR programs.",
+        descriptionHi:"शिक्षा प्रोजेक्ट नोटबुक, स्टेशनरी सेट, आर्ट सप्लाई और स्कूल किट बनाकर रोज़गार देता है — स्कूलों, छात्रों और सीएसआर कार्यक्रमों की बढ़ती मांग पूरी करता है।",
         costs:{setup:"₹4.75–10.64L", working:"₹1.52–3.04L", upfront:"₹47k–1.06L"},
         units:[
           {name:"Notebook Printing & Binding", space:"~300 sqft", workers:"4 workers", profit:"₹45k–70k/m", setup:"₹10,64,000", working:"₹3,04,000", upfront:"₹1,06,400",
@@ -2495,13 +2552,14 @@
 
       // Populate cover
       document.getElementById('coverIcon').innerHTML = `<i class="fa-solid ${projectData.icon}"></i>`;
-      document.getElementById('coverTitle').textContent = projectData.name;
-      document.getElementById('coverSubtitle').textContent = projectData.subtitle;
+      document.getElementById('coverTitle').textContent = curLang === 'hi' ? (projectData.nameHi || projectData.name) : projectData.name;
+      document.getElementById('coverSubtitle').textContent = curLang === 'hi' ? (projectData.subtitleHi || projectData.subtitle) : projectData.subtitle;
 
       // Populate summary
-      document.getElementById('summaryDescription').textContent = projectData.description;
+      document.getElementById('summaryDescription').textContent = curLang === 'hi' ? (projectData.descriptionHi || projectData.description) : projectData.description;
 
-      const impactBadges = projectData.impacts.map(impact =>
+      const activeImpacts = (curLang === 'hi' && projectData.impactsHi) ? projectData.impactsHi : projectData.impacts;
+      const impactBadges = activeImpacts.map(impact =>
         `<span class="impact-badge" style="background:${projectData.coverGradient}"><i class="fa-solid fa-circle-check"></i> ${impact}</span>`
       ).join('');
       document.getElementById('impactBadges').innerHTML = impactBadges;
@@ -2532,19 +2590,19 @@
       document.getElementById('statsGrid').innerHTML = `
         <div class="stat-box">
           <div class="stat-value">${totalProductCount}</div>
-          <div class="stat-label">Total Products</div>
+          <div class="stat-label">${bl('Total Products','कुल उत्पाद')}</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">${projectData.units.length}</div>
-          <div class="stat-label">Business Units</div>
+          <div class="stat-label">${bl('Business Units','बिज़नेस यूनिट')}</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">${projectData.costs.setup}</div>
-          <div class="stat-label">Total Project Cost</div>
+          <div class="stat-label">${bl('Total Project Cost','कुल प्रोजेक्ट लागत')}</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">${projectData.costs.upfront}</div>
-          <div class="stat-label">Upfront Payment</div>
+          <div class="stat-label">${bl('Upfront Payment','अग्रिम भुगतान')}</div>
         </div>
       `;
 
@@ -2599,8 +2657,8 @@
       ctaItem.style.cssText = 'background:linear-gradient(135deg,#f5f3ff,#fdf4ff);border-color:#e9d5ff;margin-top:8px;';
       ctaItem.innerHTML = `
         <div>
-          <div class="index-prod-name" style="color:#7c3aed;">🚀 Submit Your Business Idea</div>
-          <div class="index-prod-unit">Propose a project to FWF admins</div>
+          <div class="index-prod-name" style="color:#7c3aed;">🚀 ${bl('Submit Your Business Idea','अपना बिज़नेस आइडिया भेजें')}</div>
+          <div class="index-prod-unit">${bl('Propose a project to FWF admins','FWF एडमिन को प्रोजेक्ट प्रस्ताव भेजें')}</div>
         </div>
         <span class="index-prod-page" style="color:#7c3aed;">${ctaPageNum + 1}</span>
       `;
@@ -2609,7 +2667,7 @@
 
       // Mobile: set up top bar title & gradient
       if (isMobile) {
-        document.getElementById('mobTitle').textContent = projectData.name;
+        document.getElementById('mobTitle').textContent = curLang === 'hi' ? (projectData.nameHi || projectData.name) : projectData.name;
         const topbar = document.getElementById('mobTopbar');
         if (topbar) topbar.style.background = projectData.coverGradient;
         document.querySelectorAll('.mob-btn').forEach(btn => {
@@ -2621,10 +2679,14 @@
         }, 4000);
       }
 
+      // Sync lang-pill button states
+      const bkEN = document.getElementById('bkEN');
+      const bkHI = document.getElementById('bkHI');
+      if (bkEN) bkEN.classList.toggle('active', curLang === 'en');
+      if (bkHI) bkHI.classList.toggle('active', curLang === 'hi');
+
       updateUI();
     }
-
-    function createProductPage(product, unit, pageNum) {
       const page = document.createElement('div');
       page.className = 'page unit-detail prod-detail-page';
       page.setAttribute('data-page', pageNum);
@@ -2643,19 +2705,19 @@
           </div>
           <div class="prod-basic-grid">
             <div class="prod-basic-card">
-              <div class="prod-basic-lbl">Setup Cost</div>
+              <div class="prod-basic-lbl">${bl('Setup Cost','सेटअप लागत')}</div>
               <div class="prod-basic-val">${unit.setup}</div>
             </div>
             <div class="prod-basic-card">
-              <div class="prod-basic-lbl">Working Capital</div>
+              <div class="prod-basic-lbl">${bl('Working Capital','वर्किंग कैपिटल')}</div>
               <div class="prod-basic-val">${unit.working}</div>
             </div>
             <div class="prod-basic-card">
-              <div class="prod-basic-lbl">Upfront Payment</div>
+              <div class="prod-basic-lbl">${bl('Upfront Payment','अग्रिम भुगतान')}</div>
               <div class="prod-basic-val">${unit.upfront}</div>
             </div>
             <div class="prod-basic-card" style="background:#f0fdf4;border-color:#bbf7d0;">
-              <div class="prod-basic-lbl" style="color:#166534;">Monthly Profit</div>
+              <div class="prod-basic-lbl" style="color:#166534;">${bl('Monthly Profit','मासिक लाभ')}</div>
               <div class="prod-basic-val" style="color:#15803d;">${unit.profit}</div>
             </div>
           </div>
@@ -2674,53 +2736,53 @@
 
         const machineryHTML = (m && m.items) ? `
           <div class="unit-section">
-            <h3><i class="fa-solid fa-cogs"></i> Machinery & Equipment</h3>
+            <h3><i class="fa-solid fa-cogs"></i> ${bl('Machinery & Equipment','मशीनरी और उपकरण')}</h3>
             ${m.items.map(i => `<div class="prod-section-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
-            <div class="prod-row-total"><span>Total Machinery</span><span>${m.total}</span></div>
+            <div class="prod-row-total"><span>${bl('Total Machinery','कुल मशीनरी')}</span><span>${m.total}</span></div>
           </div>` : '';
 
         const setupHTML = (s && s.items) ? `
           <div class="unit-section">
-            <h3><i class="fa-solid fa-building"></i> Setup & Registration</h3>
+            <h3><i class="fa-solid fa-building"></i> ${bl('Setup & Registration','सेटअप और रजिस्ट्रेशन')}</h3>
             ${s.items.map(i => `<div class="prod-section-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
-            <div class="prod-row-total"><span>Total Setup</span><span>${s.total}</span></div>
+            <div class="prod-row-total"><span>${bl('Total Setup','कुल सेटअप')}</span><span>${s.total}</span></div>
           </div>` : '';
 
         const workingHTML = (w && w.items) ? `
           <div class="unit-section">
-            <h3><i class="fa-solid fa-cubes"></i> Working Capital (1 Month)</h3>
+            <h3><i class="fa-solid fa-cubes"></i> ${bl('Working Capital (1 Month)','वर्किंग कैपिटल (1 महीना)')}</h3>
             ${w.items.map(i => `<div class="prod-inv-row"><span>${i.name}</span><strong>${i.cost}</strong></div>`).join('')}
-            <div class="prod-inv-grand"><span>Total Working Capital</span><span>${w.total}</span></div>
+            <div class="prod-inv-grand"><span>${bl('Total Working Capital','कुल वर्किंग कैपिटल')}</span><span>${w.total}</span></div>
           </div>` : '';
 
         const fundingHTML = (f && e) ? `
           <div class="unit-section">
-            <h3><i class="fa-solid fa-handshake"></i> Funding Structure (50 : 50)</h3>
+            <h3><i class="fa-solid fa-handshake"></i> ${bl('Funding Structure (50 : 50)','फंडिंग स्ट्रक्चर (50:50)')}</h3>
             <div class="prod-fund-grid">
               <div class="prod-fund-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
                 <div class="prod-fund-pct" style="color:#15803d;">50%</div>
-                <div class="prod-fund-lbl" style="color:#166534;">Beneficiary Share</div>
+                <div class="prod-fund-lbl" style="color:#166534;">${bl('Beneficiary Share','लाभार्थी का हिस्सा')}</div>
                 <div class="prod-fund-amt">${f.beneficiaryAmt}</div>
               </div>
               <div class="prod-fund-box" style="background:#fef3c7;border:1.5px solid #fde68a;">
                 <div class="prod-fund-pct" style="color:#b45309;">50%</div>
-                <div class="prod-fund-lbl" style="color:#92400e;">NGO Loan (0% Interest)</div>
+                <div class="prod-fund-lbl" style="color:#92400e;">${bl('NGO Loan (0% Interest)','NGO लोन (0% ब्याज)')}</div>
                 <div class="prod-fund-amt">${f.ngoLoanAmt}</div>
               </div>
             </div>
-            <div class="prod-fund-total"><span>Total Project Cost</span><span>${f.totalProject}</span></div>
-            <h4 style="margin:14px 0 8px;font-size:13px;"><i class="fa-solid fa-calculator"></i> EMI Details</h4>
+            <div class="prod-fund-total"><span>${bl('Total Project Cost','कुल प्रोजेक्ट लागत')}</span><span>${f.totalProject}</span></div>
+            <h4 style="margin:14px 0 8px;font-size:13px;"><i class="fa-solid fa-calculator"></i> ${bl('EMI Details','EMI विवरण')}</h4>
             <div class="prod-emi-grid">
-              <div class="prod-emi-box"><div class="prod-emi-lbl">Loan Amount</div><div class="prod-emi-val">${e.loanAmount}</div></div>
-              <div class="prod-emi-box"><div class="prod-emi-lbl">Tenure</div><div class="prod-emi-val">${e.tenure}</div></div>
-              <div class="prod-emi-box"><div class="prod-emi-lbl">Moratorium</div><div class="prod-emi-val">${e.moratorium}</div></div>
-              <div class="prod-emi-box hl"><div class="prod-emi-lbl">Monthly EMI</div><div class="prod-emi-val">${e.monthlyEMI}</div></div>
+              <div class="prod-emi-box"><div class="prod-emi-lbl">${bl('Loan Amount','लोन राशि')}</div><div class="prod-emi-val">${e.loanAmount}</div></div>
+              <div class="prod-emi-box"><div class="prod-emi-lbl">${bl('Tenure','अवधि')}</div><div class="prod-emi-val">${e.tenure}</div></div>
+              <div class="prod-emi-box"><div class="prod-emi-lbl">${bl('Moratorium','मोरेटोरियम')}</div><div class="prod-emi-val">${e.moratorium}</div></div>
+              <div class="prod-emi-box hl"><div class="prod-emi-lbl">${bl('Monthly EMI','मासिक EMI')}</div><div class="prod-emi-val">${e.monthlyEMI}</div></div>
             </div>
           </div>` : '';
 
         const profitHTML = unit.profit ? `
           <div class="prod-profit-banner">
-            <span class="prod-profit-lbl"><i class="fa-solid fa-chart-line"></i> Estimated Monthly Profit</span>
+            <span class="prod-profit-lbl"><i class="fa-solid fa-chart-line"></i> ${bl('Estimated Monthly Profit','अनुमानित मासिक लाभ')}</span>
             <span class="prod-profit-val">${unit.profit}</span>
           </div>` : '';
 
@@ -3097,6 +3159,23 @@
       if (e && e.target !== document.getElementById('prodModalOverlay')) return;
       document.getElementById('prodModalOverlay').classList.remove('open');
       document.body.style.overflow = '';
+    }
+
+    function setLang(lang) {
+      curLang = (lang === 'hi' || lang === 'en') ? lang : 'en';
+      try { localStorage.setItem('fwf_lang', curLang); } catch(e) {}
+      const bkEN = document.getElementById('bkEN');
+      const bkHI = document.getElementById('bkHI');
+      if (bkEN) bkEN.classList.toggle('active', curLang === 'en');
+      if (bkHI) bkHI.classList.toggle('active', curLang === 'hi');
+      // Remove existing dynamic pages and rebuild
+      const container = isMobile
+        ? document.getElementById('mobViewport')
+        : document.getElementById('booklet');
+      if (container) {
+        container.querySelectorAll('.prod-detail-page, .cta-page').forEach(p => p.remove());
+      }
+      init();
     }
 
     window.addEventListener('DOMContentLoaded', init);

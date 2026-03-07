@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en" data-lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
@@ -8,12 +8,15 @@
 
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/images/logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Unbounded:wght@700;900&family=Noto+Sans+Devanagari:wght@400;700&family=Mukta:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="../assets/css/fwf-app.css" rel="stylesheet">
 
   <style>
-    /* ── Base: dark night theme (matches desktop) ── */
+    /* Hindi typography */
+    [data-lang="hi"] body { font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif; }
+
+    /* â”€â”€ Base: dark night theme (matches desktop) â”€â”€ */
     body {
       background: linear-gradient(180deg, #0b1220 0%, #0c1f21 45%, #132a3a 100%);
       min-height: 100vh;
@@ -22,7 +25,7 @@
 
 
 
-    /* ── Hero (matches desktop) ── */
+    /* â”€â”€ Hero (matches desktop) â”€â”€ */
     .hero-wrap { padding: 22px 14px 18px; display: flex; justify-content: center; }
     .hero-content {
       background: rgba(255,255,255,0.07);
@@ -55,7 +58,7 @@
     .kick.modern .T2 { color: #06b6d4; } .kick.modern .H  { color: #3b82f6; }
     .kick.modern .E2 { color: #8b5cf6; } .kick.modern .R  { color: #ec4899; }
 
-    /* ── Filter chips ── */
+    /* â”€â”€ Filter chips â”€â”€ */
     .filter-row {
       display: flex; gap: 8px; overflow-x: auto;
       padding: 12px 16px;
@@ -73,7 +76,7 @@
     }
     .chip.active { background: #f97316; border-color: #f97316; color: #fff; }
 
-    /* ── Cards ── */
+    /* â”€â”€ Cards â”€â”€ */
     .projects-list { padding: 16px; }
 
     .project-card {
@@ -127,7 +130,7 @@
     .btn-view:active { opacity: .82; transform: scale(0.98); }
     .btn-view:hover  { opacity: .88; }
 
-    /* ── Join CTA card ── */
+    /* â”€â”€ Join CTA card â”€â”€ */
     .cta-card {
       margin: 0 16px 24px;
       background: linear-gradient(135deg, #1e3a8a, #2563eb);
@@ -143,7 +146,7 @@
       font-weight: 800; text-decoration: none;
     }
 
-    /* ── Rich Footer ── */
+    /* â”€â”€ Rich Footer â”€â”€ */
     .site-footer {
       background: rgba(255,255,255,0.04);
       border-top: 1px solid rgba(255,255,255,0.09);
@@ -215,9 +218,13 @@
         <div class="brand-sub">Foundris Welfare Foundation</div>
       </div>
     </div>
+    <div class="lang-pill">
+      <button id="langEN" class="active" onclick="setLanguage('en')">EN</button>
+      <button id="langHI" onclick="setLanguage('hi')">HI</button>
+    </div>
   </header>
 
-  <!-- Hero — same as desktop -->
+  <!-- Hero â€” same as desktop -->
   <div class="hero-wrap">
     <div class="hero-content">
       <h1 class="hero-title">
@@ -225,340 +232,40 @@
           <span class="L T">T</span><span class="L O">O</span><span class="L G">G</span>
           <span class="L E1">E</span><span class="L T2">T</span><span class="L H">H</span>
           <span class="L E2">E</span><span class="L R">R</span>
-        </span>, We Turn Skills into Livelihoods
+        </span>, <span data-i18n="hero.tagline">We Turn Skills into Livelihoods</span>
       </h1>
-      <p class="hero-sub">From learning to earning — we're with you every step of the way.</p>
+      <p class="hero-sub" data-i18n="hero.sub">From learning to earning â€” we're with you every step of the way.</p>
       <div class="hero-btns">
-        <a href="../join.html" class="btn-hero-primary">Start Your Journey</a>
-        <button class="btn-hero-outline" onclick="document.getElementById('projectsList').scrollIntoView({behavior:'smooth'})">Explore Projects</button>
+        <a href="../join.html" class="btn-hero-primary" data-i18n="hero.join">Start Your Journey</a>
+        <button class="btn-hero-outline" data-i18n="hero.explore" onclick="document.getElementById('projectsList').scrollIntoView({behavior:'smooth'})">Explore Projects</button>
       </div>
     </div>
   </div>
 
   <!-- Filter chips -->
   <div class="filter-row">
-    <div class="chip active"  onclick="filterProjects('all',this)">🎯 All</div>
-    <div class="chip" onclick="filterProjects('health',this)">🏥 Health</div>
-    <div class="chip" onclick="filterProjects('food',this)">🍲 Food</div>
-    <div class="chip" onclick="filterProjects('energy',this)">⚡ Energy</div>
-    <div class="chip" onclick="filterProjects('craft',this)">🎨 Craft</div>
-    <div class="chip" onclick="filterProjects('apparel',this)">👗 Apparel</div>
-    <div class="chip" onclick="filterProjects('green',this)">🌱 Green</div>
-    <div class="chip" onclick="filterProjects('puja',this)">🪔 Puja</div>
-    <div class="chip" onclick="filterProjects('education',this)">📚 Education</div>
+    <div class="chip active"  onclick="filterProjects('all',this)" data-i18n-chip="all">ðŸŽ¯ All</div>
+    <div class="chip" onclick="filterProjects('health',this)" data-i18n-chip="health">ðŸ¥ Health</div>
+    <div class="chip" onclick="filterProjects('food',this)" data-i18n-chip="food">ðŸ² Food</div>
+    <div class="chip" onclick="filterProjects('energy',this)" data-i18n-chip="energy">âš¡ Energy</div>
+    <div class="chip" onclick="filterProjects('craft',this)" data-i18n-chip="craft">ðŸŽ¨ Craft</div>
+    <div class="chip" onclick="filterProjects('apparel',this)" data-i18n-chip="apparel">ðŸ‘— Apparel</div>
+    <div class="chip" onclick="filterProjects('green',this)" data-i18n-chip="green">ðŸŒ± Green</div>
+    <div class="chip" onclick="filterProjects('puja',this)" data-i18n-chip="puja">ðŸª” Puja</div>
+    <div class="chip" onclick="filterProjects('education',this)" data-i18n-chip="education">ðŸ“š Education</div>
   </div>
 
-  <!-- Project cards -->
+  <!-- Project cards (JS-rendered) -->
   <div class="projects-list" id="projectsList">
-
-    <!-- 1. Suraksha -->
-    <div class="project-card" data-cat="health">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
-          <i class="fa-solid fa-shield-heart"></i>
-        </div>
-        <div>
-          <div class="card-title">Suraksha</div>
-          <p class="card-subtitle">Health &amp; hygiene products for safer communities.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Community Development</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Health</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.2–1.8L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.30–0.50L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=suraksha" class="btn-view" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 2. Swachh Bharat -->
-    <div class="project-card" data-cat="health">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
-          <i class="fa-solid fa-soap"></i>
-        </div>
-        <div>
-          <div class="card-title">Swachh Bharat</div>
-          <p class="card-subtitle">Home &amp; surface care units for cleaner cities.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Sustainability</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.0–1.8L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.45L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=swachh-bharat" class="btn-view" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 3. Happy Meal -->
-    <div class="project-card" data-cat="food">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-          <i class="fa-solid fa-bowl-food"></i>
-        </div>
-        <div>
-          <div class="card-title">Happy Meal</div>
-          <p class="card-subtitle">Safe &amp; value-added foods made locally.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Nutrition</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.3–1.8L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.45L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=happy-meal" class="btn-view" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 4. Green Energy -->
-    <div class="project-card" data-cat="energy">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
-          <i class="fa-solid fa-solar-panel"></i>
-        </div>
-        <div>
-          <div class="card-title">Green Energy</div>
-          <p class="card-subtitle">Affordable clean-tech assembly &amp; services.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Green Energy</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Innovation</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹2.4–6.0L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.60–1.50L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=green-energy" class="btn-view" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 5. DIY Crafts -->
-    <div class="project-card" data-cat="craft">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#ec4899,#be185d)">
-          <i class="fa-solid fa-gem"></i>
-        </div>
-        <div>
-          <div class="card-title">DIY Crafts</div>
-          <p class="card-subtitle">Creative &amp; custom products with strong margins.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Community Development</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Skill Building</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹0.9–1.3L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.15–0.30L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=diy-crafts" class="btn-view" style="background:linear-gradient(135deg,#ec4899,#be185d)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 6. Swachh Jal -->
-    <div class="project-card" data-cat="health">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">
-          <i class="fa-solid fa-droplet"></i>
-        </div>
-        <div>
-          <div class="card-title">Swachh Jal</div>
-          <p class="card-subtitle">Water purification &amp; services for safe drinking.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Health</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Sustainability</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.7–6.0L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.50–1.50L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=swachh-jal" class="btn-view" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 7. Samman -->
-    <div class="project-card" data-cat="apparel">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
-          <i class="fa-solid fa-shirt"></i>
-        </div>
-        <div>
-          <div class="card-title">Samman</div>
-          <p class="card-subtitle">Apparel manufacturing for steady livelihoods.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Community Development</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.6–2.7L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.30–0.60L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=samman" class="btn-view" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 8. Sweet Home -->
-    <div class="project-card" data-cat="apparel">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#f97316,#ea580c)">
-          <i class="fa-solid fa-house-chimney"></i>
-        </div>
-        <div>
-          <div class="card-title">Sweet Home</div>
-          <p class="card-subtitle">Home utility products — stitched &amp; assembled.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.1–2.2L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.50L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=sweet-home" class="btn-view" style="background:linear-gradient(135deg,#f97316,#ea580c)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 9. Hariyali -->
-    <div class="project-card" data-cat="green">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#84cc16,#65a30d)">
-          <i class="fa-solid fa-seedling"></i>
-        </div>
-        <div>
-          <div class="card-title">Hariyali</div>
-          <p class="card-subtitle">Green livelihoods with compost &amp; small agri tools.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Sustainability</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹0.6–2.4L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.15–0.45L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=hariyali" class="btn-view" style="background:linear-gradient(135deg,#84cc16,#65a30d)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 10. Worship -->
-    <div class="project-card" data-cat="puja">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#e11d48,#be123c)">
-          <i class="fa-solid fa-hands-praying"></i>
-        </div>
-        <div>
-          <div class="card-title">Worship</div>
-          <p class="card-subtitle">Puja samagri &amp; incense products with local branding.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Local Economy</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Community Development</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹0.96–1.5L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.15–0.35L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=worship" class="btn-view" style="background:linear-gradient(135deg,#e11d48,#be123c)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-    <!-- 11. Shiksha -->
-    <div class="project-card" data-cat="education">
-      <div class="card-header">
-        <div class="card-icon" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">
-          <i class="fa-solid fa-pen-ruler"></i>
-        </div>
-        <div>
-          <div class="card-title">Shiksha</div>
-          <p class="card-subtitle">Affordable stationery &amp; learning essentials.</p>
-        </div>
-      </div>
-      <div class="impact-row">
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Education</span>
-        <span class="impact-tag"><i class="fa-solid fa-circle-check"></i> Employment</span>
-      </div>
-      <div class="card-meta">
-        <div class="meta-item"><div class="meta-label">Setup Cost</div><div class="meta-value">₹1.2–1.6L</div></div>
-        <div class="meta-item"><div class="meta-label">Working Capital</div><div class="meta-value">₹0.25–0.40L</div></div>
-        <div class="meta-item"><div class="meta-label">Units</div><div class="meta-value">8 types</div></div>
-      </div>
-      <div class="card-footer">
-        <a href="../project-booklet.html?project=shiksha" class="btn-view" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">
-          <i class="fa-solid fa-book-open"></i> View Project Booklet
-        </a>
-      </div>
-    </div>
-
-  </div><!-- /projects-list -->
+    <!-- Populated by renderCards() -->
+  </div>
 
   <!-- CTA -->
   <div class="cta-card">
-    <h3>Want to Join a Project?</h3>
-    <p>Become a member and get access to all livelihood projects</p>
+    <h3 data-i18n="cta.title">Want to Join a Project?</h3>
+    <p data-i18n="cta.sub">Become a member and get access to all livelihood projects</p>
     <a href="https://www.fwfindia.org/donation#memberModal" class="btn-cta">
-      <i class="fas fa-user-plus"></i> Join Now
+      <i class="fas fa-user-plus"></i> <span data-i18n="cta.btn">Join Now</span>
     </a>
   </div>
 
@@ -596,6 +303,181 @@
   </footer>
 
   <script>
+    /* ── Projects data with Hindi fields ── */
+    const PROJECTS = [
+      { key:'suraksha',     cat:'health',    icon:'fa-shield-heart',   grad:'linear-gradient(135deg,#22c55e,#16a34a)',
+        name:'Suraksha',     nameHi:'सुरक्षा',
+        subtitle:'Health &amp; hygiene products for safer communities.',
+        subtitleHi:'स्वास्थ्य व स्वच्छता उत्पाद, समुदाय की सुरक्षा के लिए।',
+        impacts:['Employment','Community Development','Health'],
+        impactsHi:['रोज़गार','सामुदायिक विकास','स्वास्थ्य'],
+        setup:'₹1.2–1.8L', working:'₹0.30–0.50L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'swachh-bharat', cat:'health',   icon:'fa-soap',            grad:'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+        name:'Swachh Bharat', nameHi:'स्वच्छ भारत',
+        subtitle:'Home &amp; surface care units for cleaner cities.',
+        subtitleHi:'घर व सतह की सफाई, स्वच्छ शहरों के लिए।',
+        impacts:['Employment','Sustainability'],
+        impactsHi:['रोज़गार','पर्यावरण'],
+        setup:'₹1.0–1.8L', working:'₹0.25–0.45L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'happy-meal',   cat:'food',      icon:'fa-bowl-food',       grad:'linear-gradient(135deg,#f59e0b,#d97706)',
+        name:'Happy Meal',   nameHi:'हैप्पी मील',
+        subtitle:'Safe &amp; value-added foods made locally.',
+        subtitleHi:'सुरक्षित और उच्च मूल्य वाले खाद्य उत्पाद, स्थानीय रूप से।',
+        impacts:['Nutrition','Local Economy','Employment'],
+        impactsHi:['पोषण','स्थानीय अर्थव्यवस्था','रोज़गार'],
+        setup:'₹1.3–1.8L', working:'₹0.25–0.45L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'green-energy', cat:'energy',    icon:'fa-solar-panel',     grad:'linear-gradient(135deg,#eab308,#ca8a04)',
+        name:'Green Energy', nameHi:'ग्रीन एनर्जी',
+        subtitle:'Affordable clean-tech assembly &amp; services.',
+        subtitleHi:'किफायती स्वच्छ तकनीक असेंबली व सेवाएं।',
+        impacts:['Green Energy','Employment','Innovation'],
+        impactsHi:['हरित ऊर्जा','रोज़गार','नवाचार'],
+        setup:'₹2.4–6.0L', working:'₹0.60–1.50L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'diy-crafts',   cat:'craft',     icon:'fa-gem',             grad:'linear-gradient(135deg,#ec4899,#be185d)',
+        name:'DIY Crafts',   nameHi:'DIY क्राफ्ट्स',
+        subtitle:'Creative &amp; custom products with strong margins.',
+        subtitleHi:'क्रिएटिव और कस्टम उत्पाद, अच्छे मार्जिन के साथ।',
+        impacts:['Community Development','Skill Building'],
+        impactsHi:['सामुदायिक विकास','कौशल विकास'],
+        setup:'₹0.9–1.3L', working:'₹0.15–0.30L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'swachh-jal',   cat:'health',    icon:'fa-droplet',         grad:'linear-gradient(135deg,#06b6d4,#0e7490)',
+        name:'Swachh Jal',   nameHi:'स्वच्छ जल',
+        subtitle:'Water purification &amp; services for safe drinking.',
+        subtitleHi:'सुरक्षित पेयजल के लिए जल शुद्धि व सेवाएं।',
+        impacts:['Health','Sustainability'],
+        impactsHi:['स्वास्थ्य','पर्यावरण'],
+        setup:'₹1.7–6.0L', working:'₹0.50–1.50L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'samman',       cat:'apparel',   icon:'fa-shirt',           grad:'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+        name:'Samman',       nameHi:'सम्मान',
+        subtitle:'Apparel manufacturing for steady livelihoods.',
+        subtitleHi:'स्थिर आजीविका के लिए परिधान निर्माण।',
+        impacts:['Employment','Community Development'],
+        impactsHi:['रोज़गार','सामुदायिक विकास'],
+        setup:'₹1.6–2.7L', working:'₹0.30–0.60L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'sweet-home',   cat:'apparel',   icon:'fa-house-chimney',   grad:'linear-gradient(135deg,#f97316,#ea580c)',
+        name:'Sweet Home',   nameHi:'स्वीट होम',
+        subtitle:'Home utility products — stitched &amp; assembled.',
+        subtitleHi:'घरेलू उपयोगी उत्पाद — सिले और असेंबल किए गए।',
+        impacts:['Employment','Local Economy'],
+        impactsHi:['रोज़गार','स्थानीय अर्थव्यवस्था'],
+        setup:'₹1.1–2.2L', working:'₹0.25–0.50L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'hariyali',     cat:'green',     icon:'fa-seedling',        grad:'linear-gradient(135deg,#84cc16,#65a30d)',
+        name:'Hariyali',     nameHi:'हरियाली',
+        subtitle:'Green livelihoods with compost &amp; small agri tools.',
+        subtitleHi:'खाद और छोटे कृषि उपकरणों से हरित आजीविका।',
+        impacts:['Sustainability','Local Economy'],
+        impactsHi:['पर्यावरण','स्थानीय अर्थव्यवस्था'],
+        setup:'₹0.6–2.4L', working:'₹0.15–0.45L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'worship',      cat:'puja',      icon:'fa-hands-praying',   grad:'linear-gradient(135deg,#e11d48,#be123c)',
+        name:'Worship',      nameHi:'वर्शिप',
+        subtitle:'Puja samagri &amp; incense products with local branding.',
+        subtitleHi:'पूजा सामग्री और अगरबत्ती उत्पाद, स्थानीय ब्रांडिंग के साथ।',
+        impacts:['Local Economy','Community Development'],
+        impactsHi:['स्थानीय अर्थव्यवस्था','सामुदायिक विकास'],
+        setup:'₹0.96–1.5L', working:'₹0.15–0.35L', units:'8 types', unitsHi:'8 प्रकार' },
+      { key:'shiksha',      cat:'education', icon:'fa-pen-ruler',       grad:'linear-gradient(135deg,#0ea5e9,#0284c7)',
+        name:'Shiksha',      nameHi:'शिक्षा',
+        subtitle:'Affordable stationery &amp; learning essentials.',
+        subtitleHi:'किफायती स्टेशनरी और शिक्षण सामग्री।',
+        impacts:['Education','Employment'],
+        impactsHi:['शिक्षा','रोज़गार'],
+        setup:'₹1.2–1.6L', working:'₹0.25–0.40L', units:'8 types', unitsHi:'8 प्रकार' }
+    ];
+
+    /* ── Translations ── */
+    const T = {
+      en: {
+        hero: { tagline:'We Turn Skills into Livelihoods', sub:"From learning to earning — we're with you every step of the way.", join:'Start Your Journey', explore:'Explore Projects' },
+        chips: { all:'🎯 All', health:'🏥 Health', food:'🍲 Food', energy:'⚡ Energy', craft:'🎨 Craft', apparel:'👗 Apparel', green:'🌱 Green', puja:'🪔 Puja', education:'📚 Education' },
+        card: { setup:'Setup Cost', working:'Working Capital', units:'Units', view:'View Project Booklet' },
+        cta: { title:'Want to Join a Project?', sub:'Become a member and get access to all livelihood projects', btn:'Join Now' }
+      },
+      hi: {
+        hero: { tagline:'हम कौशल को आजीविका में बदलते हैं', sub:'सीखने से कमाने तक — हम हर कदम आपके साथ हैं।', join:'अपनी यात्रा शुरू करें', explore:'प्रोजेक्ट देखें' },
+        chips: { all:'🎯 सभी', health:'🏥 स्वास्थ्य', food:'🍲 खाद्य', energy:'⚡ ऊर्जा', craft:'🎨 क्राफ्ट', apparel:'👗 परिधान', green:'🌱 हरित', puja:'🪔 पूजा', education:'📚 शिक्षा' },
+        card: { setup:'सेटअप लागत', working:'वर्किंग कैपिटल', units:'यूनिट', view:'प्रोजेक्ट बुकलेट देखें' },
+        cta: { title:'किसी प्रोजेक्ट में जुड़ना है?', sub:'सदस्य बनें और सभी आजीविका प्रोजेक्ट तक पहुंच पाएं', btn:'अभी जुड़ें' }
+      }
+    };
+
+    let curLang = 'en';
+
+    function renderCards() {
+      const list = document.getElementById('projectsList');
+      const t = T[curLang];
+      const hi = curLang === 'hi';
+      list.innerHTML = '';
+      PROJECTS.forEach(p => {
+        const name    = hi ? p.nameHi    : p.name;
+        const sub     = hi ? p.subtitleHi: p.subtitle;
+        const impacts = hi ? p.impactsHi : p.impacts;
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.setAttribute('data-cat', p.cat);
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-icon" style="background:${p.grad}"><i class="fa-solid ${p.icon}"></i></div>
+            <div>
+              <div class="card-title">${name}</div>
+              <p class="card-subtitle">${sub}</p>
+            </div>
+          </div>
+          <div class="impact-row">
+            ${impacts.map(imp => `<span class="impact-tag"><i class="fa-solid fa-circle-check"></i> ${imp}</span>`).join('')}
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><div class="meta-label">${t.card.setup}</div><div class="meta-value">${p.setup}</div></div>
+            <div class="meta-item"><div class="meta-label">${t.card.working}</div><div class="meta-value">${p.working}</div></div>
+            <div class="meta-item"><div class="meta-label">${t.card.units}</div><div class="meta-value">${hi ? p.unitsHi : p.units}</div></div>
+          </div>
+          <div class="card-footer">
+            <a href="../project-booklet.html?project=${p.key}" class="btn-view" style="background:${p.grad}">
+              <i class="fa-solid fa-book-open"></i> ${t.card.view}
+            </a>
+          </div>`;
+        list.appendChild(card);
+      });
+      // Re-apply active filter after re-render
+      const activeChip = document.querySelector('.chip.active');
+      const activeCat = activeChip ? (activeChip.getAttribute('data-i18n-chip') || 'all') : 'all';
+      if (activeCat !== 'all') {
+        list.querySelectorAll('.project-card').forEach(c => {
+          c.style.display = (c.dataset.cat === activeCat) ? 'block' : 'none';
+        });
+      }
+    }
+
+    function setLanguage(lang) {
+      curLang = (lang === 'hi' || lang === 'en') ? lang : 'en';
+      document.documentElement.setAttribute('data-lang', curLang);
+      const t = T[curLang];
+      const hi = curLang === 'hi';
+
+      // Update data-i18n elements
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const keys = el.getAttribute('data-i18n').split('.');
+        let v = t;
+        for (const k of keys) v = v?.[k];
+        if (v !== undefined) el.textContent = v;
+      });
+
+      // Update filter chips
+      document.querySelectorAll('[data-i18n-chip]').forEach(el => {
+        const key = el.getAttribute('data-i18n-chip');
+        if (t.chips[key]) el.textContent = t.chips[key];
+      });
+
+      // Update lang pill buttons
+      document.getElementById('langEN').classList.toggle('active', !hi);
+      document.getElementById('langHI').classList.toggle('active', hi);
+
+      // Re-render cards in new language
+      renderCards();
+
+      // Persist in localStorage (syncs with booklet page)
+      try { localStorage.setItem('fwf_lang', curLang); } catch(e) {}
+    }
+
     function filterProjects(cat, el) {
       document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
@@ -604,6 +486,16 @@
       });
     }
 
+    // Init
+    renderCards();
+    try {
+      const saved = localStorage.getItem('fwf_lang');
+      if (saved === 'en' || saved === 'hi') setLanguage(saved);
+    } catch(e) {}
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('../service-worker.js').catch(() => {}));
+    }
   </script>
 
   <!-- Bottom Tab Bar -->

@@ -1746,13 +1746,16 @@ app.get('/api/admin/overview', auth('admin'), async (req, res) => {
     User.countDocuments({ role: 'member', upgraded_from_supporter: { $exists: true, $ne: null } })
   ]);
 
-  let csrPartners = 0, supportTickets = 0, pendingFees = 0, totalFeeCollected = 0;
+  let csrPartners = 0, supportTickets = 0, pendingFees = 0, totalFeeCollected = 0, pendingRedeemRequests = 0, pendingRedeemAmount = 0;
   try {
     csrPartners = await CsrPartner.countDocuments();
     supportTickets = await SupportTicket.countDocuments({ status: 'open' });
     pendingFees = await MembershipFee.countDocuments({ status: 'pending' });
     const feeAgg = await MembershipFee.aggregate([{ $match: { status: 'verified' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]);
     totalFeeCollected = feeAgg[0]?.total || 0;
+    pendingRedeemRequests = await RedeemRequest.countDocuments({ status: 'pending' });
+    const redeemAgg = await RedeemRequest.aggregate([{ $match: { status: 'pending' } }, { $group: { _id: null, total: { $sum: '$amount_inr' } } }]);
+    pendingRedeemAmount = redeemAgg[0]?.total || 0;
   } catch (e) { }
 
   const totals = {
@@ -1769,7 +1772,9 @@ app.get('/api/admin/overview', auth('admin'), async (req, res) => {
     csr_partners: csrPartners,
     support_tickets: supportTickets,
     pending_fees: pendingFees,
-    total_fee_collected: totalFeeCollected
+    total_fee_collected: totalFeeCollected,
+    pending_redeem_requests: pendingRedeemRequests,
+    pending_redeem_amount: pendingRedeemAmount
   };
 
   const latest = await User.find({ role: 'member' }).sort({ created_at: -1 }).limit(10)

@@ -710,6 +710,23 @@ textarea.form-input{ resize:vertical; min-height:80px; }
       </div>
     </div>
 
+    <div class="stats-row" style="grid-template-columns:repeat(2,1fr)">
+      <div class="stat-card" style="cursor:pointer;border-left:4px solid #f59e0b" onclick="switchPage('points');setTimeout(()=>{ document.querySelector('[data-tab=redeem-tab]')?.click(); loadRedeemRequests(); },300)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="s-icon s-amber" style="margin-bottom:0"><i class="fa-solid fa-coins"></i></div>
+          <span id="hRedeemBadge" style="display:none;background:#f59e0b;color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px">ACTION NEEDED</span>
+        </div>
+        <div class="s-label">Pending Redeem Requests</div>
+        <div class="s-value" id="hPendingRedeem">0</div>
+        <div class="s-sub" id="hPendingRedeemAmt">₹0 pending payout</div>
+      </div>
+      <div class="stat-card" style="cursor:pointer" onclick="switchPage('points');setTimeout(()=>{ document.querySelector('[data-tab=redeem-tab]')?.click(); loadRedeemRequests(); },300)">
+        <div class="s-icon s-green"><i class="fa-solid fa-check-circle"></i></div>
+        <div class="s-label">View All Redeem Requests</div>
+        <div class="s-value" style="font-size:14px;font-weight:700;color:var(--text-secondary);margin-top:6px">Points &amp; Activity → Redeem Requests</div>
+      </div>
+    </div>
+
     <div class="content-card">
       <h3><i class="fa-solid fa-clock"></i> Recent Members</h3>
       <div class="table-wrap">
@@ -2389,6 +2406,10 @@ async function loadDashboard(){
     document.getElementById('hSupport').textContent = fmtN(t.support_tickets);
     document.getElementById('hFeeCollected').textContent = '₹' + fmtN(t.total_fee_collected);
     document.getElementById('hFeePending').textContent = fmtN(t.pending_fees);
+    document.getElementById('hPendingRedeem').textContent = fmtN(t.pending_redeem_requests || 0);
+    document.getElementById('hPendingRedeemAmt').textContent = '₹' + fmtN(t.pending_redeem_amount || 0) + ' pending payout';
+    const redeemBadge = document.getElementById('hRedeemBadge');
+    if(redeemBadge) redeemBadge.style.display = (t.pending_redeem_requests > 0) ? '' : 'none';
 
     const tbody = document.getElementById('hLatest');
     if(data.latest && data.latest.length > 0){
